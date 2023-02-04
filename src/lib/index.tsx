@@ -1,6 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme, ThemeTypes } from './config/theme';
+import Button from './components/Button'; 
 
 const UiInit = ({
   children, themeConfig = theme
@@ -11,3 +12,5 @@ const UiInit = ({
 );
 
 export default UiInit
+
+export { Button }
