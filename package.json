@@ -44,10 +44,7 @@
           "import/no-anonymous-default-export": "off"
         }
       }
-    ],
-    "env": {
-      "NODE_ENV": "development"
-    }
+    ]
   },
   "browserslist": {
     "production": [
