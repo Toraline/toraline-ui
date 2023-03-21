@@ -5,6 +5,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  font-family: 'Montserrat', sans-serif;
 `;
 
 export const FieldContainer = styled.div`
@@ -15,10 +16,11 @@ export const FieldContainer = styled.div`
 export const Label = styled.label`
   color: ${({ theme }) => theme.colors.grey500};
   font-size: 0.875rem;
+  font-weight: 400;
   left: 0.75rem;
   padding: 0 0.125rem;
   position: absolute;
-  top: calc(50% - 0.4375rem);
+  top: calc(50% - 0.6rem);
   transition: transform 0.2s, font-weigth 0.2s, background-color 0.2s;
 `;
 
@@ -40,8 +42,7 @@ export const Field = styled.input<{ error?: string }>`
   }
 
   :focus {
-    border: 0.0625rem solid ${({ theme }) => theme.colors.primary};
-    border: 0.0625rem solid ${({ error, theme }) => error && theme.colors.red};
+    border: 0.0625rem solid ${({ error, theme }) => error? theme.colors.red : theme.colors.primary};
     color: ${({ theme }) => theme.colors.grey900};
     outline: 0;
     + ${Label} {
