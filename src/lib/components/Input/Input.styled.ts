@@ -37,8 +37,7 @@ export const Field = styled.input<{ error?: string }>`
   ${({ disabled, theme }) => disabled && `background-color: ${theme.colors.grey200}`};
 
   :hover {
-    border: 0.0625rem solid ${({ theme }) => theme.colors.grey700};
-    border: 0.0625rem solid ${({ error, theme }) => error && theme.colors.red};
+    border: 0.0625rem solid ${({ error, theme }) => error? theme.colors.red : theme.colors.grey700};
   }
 
   :focus {
