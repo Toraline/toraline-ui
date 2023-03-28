@@ -26,7 +26,8 @@ export const ToggleSwitchWrapper = styled.label`
   justify-content: center;
   position: relative;
   width: 53px;  
-  border: 2px solid #947BC3;
+  border: 2px solid ${({ theme }) => theme.colors.purpleSlider};
+  
   
 
   :before {
@@ -38,7 +39,7 @@ export const ToggleSwitchWrapper = styled.label`
       height: 32px;
       background-repeat: no-repeat;
       background-image: url(${LockedChecked});
-      transition: 0.50s;
+      transition:0.5s;
       background-size:32px;
       
     }
@@ -47,6 +48,7 @@ export const ToggleSwitchWrapper = styled.label`
 
   export const Input = styled.input `
     display: none;
+    
 
     :checked + ${ToggleSwitchWrapper}:before {
       content: '';
@@ -56,13 +58,13 @@ export const ToggleSwitchWrapper = styled.label`
       height: 32px;
       background-repeat: no-repeat;
       background-image: url(${Checked});     
-      transition: 0.50s;
+      transition:0.5s;
       background-size:32px;
     }
     :checked + ${ToggleSwitchWrapper}{
-      background-color: #7EC36D;
-      border: 2px solid #68A15F;
-      
+      background-color: ${({ theme }) => theme.colors.green100};
+      border: 2px solid ${({ theme }) => theme.colors.greenSlider};   
+       
       
     }
   `;
