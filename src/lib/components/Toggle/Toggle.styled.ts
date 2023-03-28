@@ -2,6 +2,19 @@ import styled from 'styled-components';
 import  Checked  from '../../../assets/Icons/toggle-checked.svg';
 import LockedChecked  from '../../../assets/Icons/toggle-locked.svg';
 
+export const Container = styled.div<{ title?: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;  
+  color: ${({ theme }) => theme.colors.grey700};
+  gap: 4px;
+  width: 78px;
+  height: 56px;
+  
+`;
+
 export const ToggleSwitchWrapper = styled.label`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.purple200};
@@ -9,21 +22,24 @@ export const ToggleSwitchWrapper = styled.label`
   border-radius: 30px;
   display: flex;
   flex-direction: column;
-  gap: 5rem;
-  height:12px;
+  height:19px;
   justify-content: center;
   position: relative;
-  width: 32px;  
+  width: 53px;  
+  border: 2px solid #947BC3;
+  
 
   :before {
       content: '';
       position: absolute;
-      top:calc(50% - 10px);
-      left: -25%;
-      width: 20px;
-      height: 20px;
+      top:calc(50% - 16px);
+      left: -16px;
+      width: 32px;
+      height: 32px;
+      background-repeat: no-repeat;
       background-image: url(${LockedChecked});
       transition: 0.50s;
+      background-size:32px;
       
     }
     
@@ -35,15 +51,18 @@ export const ToggleSwitchWrapper = styled.label`
     :checked + ${ToggleSwitchWrapper}:before {
       content: '';
       position: absolute;
-      top:calc(50% - 10px);
-      left: 50%;
-      width: 20px;
-      height: 20px;
+      left: calc(100% - 16px);
+      width: 32px;
+      height: 32px;
+      background-repeat: no-repeat;
       background-image: url(${Checked});     
       transition: 0.50s;
+      background-size:32px;
     }
     :checked + ${ToggleSwitchWrapper}{
       background-color: #7EC36D;
+      border: 2px solid #68A15F;
+      
       
     }
   `;
