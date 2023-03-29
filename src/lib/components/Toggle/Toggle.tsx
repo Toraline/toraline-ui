@@ -5,11 +5,11 @@ type Toggletypes = {
   id: string;
   value: string;
   onChange?: React.FocusEventHandler<HTMLInputElement>;
-  title?: string;
+  label?: string;
   checked?: boolean;
 }
 
-const Toggle : React.FC<Toggletypes> = ({ id = 'toggle-checkbox', value, onChange, title, checked }) => {    
+const Toggle : React.FC<Toggletypes> = ({ id = 'toggle-checkbox', value, onChange, label, checked }) => {    
   return (
     <Container>    
       <Input
@@ -20,7 +20,7 @@ const Toggle : React.FC<Toggletypes> = ({ id = 'toggle-checkbox', value, onChang
         checked={checked}
       />
       <ToggleSwitchWrapper
-        aria-label={title}
+        aria-label={label}
         htmlFor={id}
       />    
     </Container>
