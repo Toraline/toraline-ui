@@ -9,11 +9,11 @@ type Toggletypes = {
   checked?: boolean;
 }
 
-const Toggle : React.FC<Toggletypes> = ({id, value, onChange, title, checked}) => {    
+const Toggle : React.FC<Toggletypes> = ({ id = 'toggle-checkbox', value, onChange, title, checked }) => {    
   return (
     <Container>    
       <Input
-        id='input'
+        id={id}
         type="checkbox"
         value={value} 
         onChange={onChange} 
@@ -21,10 +21,9 @@ const Toggle : React.FC<Toggletypes> = ({id, value, onChange, title, checked}) =
       />
       <ToggleSwitchWrapper
         aria-label={title}
-        htmlFor='input'
+        htmlFor={id}
       />    
     </Container>
-  
   ) 
 }
 

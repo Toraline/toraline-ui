@@ -2,69 +2,57 @@ import styled from 'styled-components';
 import  Checked  from '../../../assets/Icons/toggle-checked.svg';
 import LockedChecked  from '../../../assets/Icons/toggle-locked.svg';
 
-export const Container = styled.div<{ title?: string }>`
-  display: flex;
-  flex-direction: column;
+export const Container = styled.div`
   align-items: center;
-  justify-content: center;
-  text-align: center;  
   color: ${({ theme }) => theme.colors.grey700};
-  gap: 4px;
-  width: 78px;
-  height: 56px;
+  display: flex;
+  gap: 0.25rem;
+  height: 3.5rem; 
+  width: 4.875rem;
   
 `;
 
 export const ToggleSwitchWrapper = styled.label`
-  align-items: center;
   background-color: ${({ theme }) => theme.colors.purple200};
-  border:1px;
-  border-radius: 30px;
+  border-radius: 1.875rem;
+  border: 0.125rem solid ${({ theme }) => theme.colors.purpleSlider};
   display: flex;
-  flex-direction: column;
-  height:19px;
-  justify-content: center;
+  height: 1.25rem;
   position: relative;
-  width: 53px;  
-  border: 2px solid ${({ theme }) => theme.colors.purpleSlider};
+  width: 3.375rem;  
   
-  
-
   :before {
-      content: '';
-      position: absolute;
-      top:calc(50% - 16px);
-      left: -16px;
-      width: 32px;
-      height: 32px;
-      background-repeat: no-repeat;
-      background-image: url(${LockedChecked});
-      transition:0.5s;
-      background-size:32px;
+    background-image: url(${LockedChecked});
+    background-repeat: no-repeat;
+    background-size: 2rem;
+    content: '';
+    height: 2rem;
+    left: -1rem;
+    position: absolute;
+    top:calc(50% - 1rem);
+    transition:0.5s;
+    width: 2rem;
       
     }
     
   `;
 
   export const Input = styled.input `
-    display: none;
-    
+    display: none;    
 
     :checked + ${ToggleSwitchWrapper}:before {
-      content: '';
-      position: absolute;
-      left: calc(100% - 16px);
-      width: 32px;
-      height: 32px;
-      background-repeat: no-repeat;
       background-image: url(${Checked});     
-      transition:0.5s;
-      background-size:32px;
+      background-repeat: no-repeat;
+      height: 2rem;
+      left: calc(100% - 1rem);
+      position: absolute;
+      transition: 0.5s;
+      
     }
+
     :checked + ${ToggleSwitchWrapper}{
       background-color: ${({ theme }) => theme.colors.green100};
-      border: 2px solid ${({ theme }) => theme.colors.greenSlider};   
-       
+      border: 0.125rem solid ${({ theme }) => theme.colors.greenSlider};    
       
     }
   `;
