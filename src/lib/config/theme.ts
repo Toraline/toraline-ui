@@ -11,6 +11,7 @@ const theme = {
     purple300: '#833cda',
     purple200: '#b593ea',
     purple100: '#d0b1ff',
+    purpleSlider: '#947BC3',
     grey900: '#0f1928',
     grey800: '#27303e',
     grey700: '#3f4753',
@@ -23,6 +24,8 @@ const theme = {
     greyTransparent: 'rgba(207, 209, 212, .75)',
     red: '#f04848',
     green: '#84D235',
+    green100: '#7EC36D',
+    greenSlider:'#68A15F',
     blackTransparent: (percentage: string) => `rgba(0, 0, 0, ${percentage})`,
   },
 };
