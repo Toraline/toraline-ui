@@ -5,10 +5,10 @@ import { BreadcrumbsProps, Crumb } from './Breadcrumbs.types';
 export const Breadcrumbs = ({ crumbs }: BreadcrumbsProps): JSX.Element => (
   <Container>
     <List>
-      {crumbs.map((crumb: Crumb, id: number) => {
-        const isActive = id === crumbs.length - 1;
+      {crumbs.map((crumb: Crumb, index: number) => {
+        const isActive = index === crumbs.length - 1;
         return (
-          <ListItem key={crumb.id} isActive={isActive}>
+          <ListItem key={index} isActive={isActive}>
             {!isActive ? <Link href={crumb.url}>{crumb.label}</Link> : crumb.label}
           </ListItem>
         );
