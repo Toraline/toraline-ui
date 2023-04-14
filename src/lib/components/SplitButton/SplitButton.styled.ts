@@ -24,6 +24,7 @@ export const Button = styled.button`
     0px 2px 4px rgba(0, 0, 0, 0.2);
   color: ${({ theme }) => theme.colors.grey100};
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
   padding: 1.125rem 1rem;
@@ -85,7 +86,10 @@ export const List = styled.div`
     0px 2px 4px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
   max-width: 17.5rem;
+  font-weight: 400;
   background-color: ${({ theme }) => theme.colors.grey100};
 `;
 

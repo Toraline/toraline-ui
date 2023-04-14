@@ -32,17 +32,17 @@ export const Tab = styled.button<{isActive: boolean}>`
   padding: 0.5rem 2.125rem;
   position: relative;
 
-${({isActive, theme}) => isActive && `
-  :before{
-    background-color: ${theme.colors.primary};
-    border-radius:  0.25rem;
-    bottom: -0.4375rem;
-    content: '';
-    height:  0.75rem;
-    left: 0;
-    position: absolute;
-    right: 0;
-    width: 100%;
-  }
-` }
+  ${({isActive, theme}) => isActive && `
+    :before{
+      background-color: ${theme.colors.primary};
+      border-radius:  0.25rem;
+      bottom: -0.4375rem;
+      content: '';
+      height:  0.75rem;
+      left: 0;
+      position: absolute;
+      right: 0;
+      width: 100%;
+    }
+  `}
 `;
