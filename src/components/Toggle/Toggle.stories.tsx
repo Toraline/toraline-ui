@@ -1,25 +1,19 @@
-import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import Toggle from './Toggle';
-import useState from 'storybook-addon-state';
+import type { Meta, StoryObj } from '@storybook/react';
+import { Toggle } from './Toggle';
 
-// More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
-export default {
-  title: 'Example/Toggle',
+const meta: Meta<typeof Toggle> = {
+  title: 'Toggle',
   component: Toggle,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
-  argTypes: {},
-} as ComponentMeta<typeof Toggle>;
-
-// More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof Toggle> = (args) => {
-  const [checked, setChecked] = useState('check', args.checked);
-  React.useEffect(() => {
-    setChecked(args.checked);
-  }, [args.checked]);
-  return <Toggle {...args} checked={checked} onChange={() => setChecked(!checked)} />;
 };
 
-export const Primary = Template.bind({});
-// More on args: https://storybook.js.org/docs/react/writing-stories/args
-Primary.args = { id: 'input' };
+export default meta;
+type Story = StoryObj<typeof Toggle>;
+
+/*
+ *👇 Render functions are a framework specific feature to allow you control on how the component renders.
+ * See https://storybook.js.org/docs/7.0/react/api/csf
+ * to learn how to use render functions.
+ */
+export const Default: Story = {
+  args: {},
+};

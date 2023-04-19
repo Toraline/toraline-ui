@@ -1,6 +1,4 @@
 import styled from 'styled-components';
-import Checked from '../../assets/icons/';
-import LockedChecked from '../../assets/Icons/ToggleLocked.svg';
 
 export const Container = styled.div`
   align-items: center;
@@ -21,7 +19,7 @@ export const ToggleSwitchWrapper = styled.label`
   width: 3.375rem;
 
   :before {
-    background-image: url(${LockedChecked});
+    background-image: url('../../assets/icons/locked.png');
     background-repeat: no-repeat;
     background-size: 2rem;
     content: '';
@@ -37,7 +35,7 @@ export const ToggleSwitchWrapper = styled.label`
 export const Input = styled.input`
   display: none;
   :checked + ${ToggleSwitchWrapper}:before {
-    background-image: url(${Checked});
+    background-image: url('../../assets/icons/Vector.png');
     background-repeat: no-repeat;
     height: 2rem;
     left: calc(100% - 1rem);
