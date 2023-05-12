@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import Table from './Table';
+import { Table } from './Table';
 import { TableProps } from './Table.types';
 
 const tableInformation: TableProps = {

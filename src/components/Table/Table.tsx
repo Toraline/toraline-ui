@@ -2,7 +2,7 @@ import React from 'react';
 import { TableProps } from './Table.types';
 import { TableStyle, Text, TableHeader, TableRowHeader, TableRowBody, TableCell } from './Table.styled';
 
-const Table = ({ tableRows, tableHeader }: TableProps) => (
+export const Table = ({ tableRows, tableHeader }: TableProps) => (
   <TableStyle>
     <TableRowHeader length={tableHeader.length}>
       {tableHeader.map(({ label, key, alignment }, index) => (
@@ -25,5 +25,3 @@ const Table = ({ tableRows, tableHeader }: TableProps) => (
     ))}
   </TableStyle>
 );
-
-export default Table;
