@@ -1,0 +1,7 @@
+{
+  "name": "@toraline/catalog",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The catalog of the Toraline component library. Storybook arrives in phase 4 (TOR-998).",
+  "type": "module"
+}
