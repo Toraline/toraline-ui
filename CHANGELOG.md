@@ -58,6 +58,17 @@ The components get the shape of the same components of the app Intraweb: variant
 - ProgressBar and ProgressRing (phase 8): how much of a whole is done, as a line or as a circle, in the tones `brand`, `success`, `warning` and `danger`. The ring has the sizes `md` and `sm`. A screen reader says the label and the value. StatCard gets the prop `progress`, a progress bar at the bottom of the card.
 - StatCard (phase 8): a card with one number, its label, an icon and how the number changed, in the tones `default` and `tinted`.
 - `@toraline.tech/tokens` (phase 8): the tokens `--text-2xl` (the class `text-2xl`, 24 pixels) and `--text-3xl` (the class `text-3xl`, 32 pixels), the font sizes of the number of StatCard. `createTheme` accepts `textSizes["2xl"]` and `textSizes["3xl"]`. There are now 78 level 2 tokens. With the preset, the class `text-3xl` is 32 pixels; with Tailwind CSS alone it is 30 pixels. An app that uses `text-3xl` with the preset gets text 2 pixels larger.
+- Overlays (phase 9, TOR-1125). An overlay is a part of the screen that opens above the page. They are written by hand, from the overlays of Intraweb, and an app sets up nothing for them.
+- `useAnchoredPanel`: a hook that places a floating panel (a menu, a popover, a filter) next to the button that opened it, on the other side when there is no room, and inside the window. `computeAnchoredPosition` is the same rule as a plain function.
+- CloseButton: the button with a cross that closes a dialog or a side panel. Its name for a screen reader is `"Close"` unless the app gives `aria-label`.
+- Modal: a dialog above the page, in the sizes `md`, `lg`, `xl` and `full`. The focus goes into it, Tab stays inside, Escape closes only the newest overlay, and the focus goes back to the element that opened it.
+- Drawer: a panel on the right side of the screen with a footer that stays at the bottom. It leaves the page next to it usable. It has the same 3 focus rules as Modal. While it is open, `<body>` has the attribute `data-drawer-open`.
+- DiscardConfirmation: the question before something a person typed is lost. Modal and Drawer show it by themselves when they get the prop `discardConfirmation` with its 4 texts.
+- DeleteOverlay: the dialog that asks before something is deleted, with the states `pending`, `error` and `blocked`. Every text of the 2 confirmation dialogs is a prop of the app.
+- ActionMenu: a button (3 dots, or a text with an arrow) that opens a menu of actions next to it. The menu and the menu of SplitButton are the same code.
+- SplitButton: Escape in its menu no longer reaches a Modal or a Drawer that the SplitButton is in, so the key closes only the menu. Nothing else changed.
+- Popover: a button with a floating panel under it. Escape and a press outside close it. It opens above when there is no room below, and stays inside the window.
+- Tooltip: a small label next to an element, shown on hover and on keyboard focus. A screen reader says its text as the description of the element. Escape hides it.
 
 ## 0.1.0 (2026-11-15)
 

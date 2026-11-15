@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, FocusEvent, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
+import { Menu, menuFocusTargetOfKey } from "../shared/menu/Menu.js";
+import type { MenuFocusTarget } from "../shared/menu/Menu.js";
 import type { SplitButtonMenuPlacement } from "./split-button-options.js";
 
 /*
@@ -48,24 +50,13 @@ const arrowClass = classNames(
 
 /**
  * The menu sits above the page and does not move the content around it.
- * Its look, and the look of an action, are the ones of the menu of actions of
- * the app Intraweb (components/ui/action-menu.tsx).
+ * Its look, the look of an action and its keyboard are in the menu that
+ * SplitButton and ActionMenu share (shared/menu/Menu.tsx). These classes place
+ * it: under the buttons, or above them. The text of an action stays on one line.
  */
-const menuClass = classNames(
-  "absolute top-full left-0 z-10 mx-0 my-1 box-border flex min-w-full flex-col rounded-lg border border-subtle bg-surface py-1 shadow-lg",
+const menuPlaceClass = classNames(
+  "absolute top-full left-0 z-10 mx-0 my-1 box-border flex min-w-full flex-col whitespace-nowrap",
   "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
-);
-
-/**
- * One action. The action under the pointer and the action that has the
- * keyboard focus have a quiet background. The focus ring is drawn inside the
- * action, because the actions touch each other.
- */
-const itemClass = classNames(
-  "flex w-full items-center gap-2 px-3 py-2 text-start font-body text-sm/5 whitespace-nowrap text-body",
-  "hover:bg-subtle focus:bg-subtle",
-  focusRingClass,
-  "focus-visible:-outline-offset-2",
 );
 
 /** The icon of an action: 16 pixels, in the color of an icon. */
@@ -124,21 +115,11 @@ export function SplitButton({
   const [isOpen, setIsOpen] = useState(false);
   const rootElement = useRef<HTMLDivElement>(null);
   const triggerElement = useRef<HTMLButtonElement>(null);
-  const itemElements = useRef<(HTMLButtonElement | null)[]>([]);
   // Which action gets the focus when the menu opens.
-  const focusOnOpen = useRef<"first" | "last">("first");
+  const [focusOnOpen, setFocusOnOpen] = useState<MenuFocusTarget>("first");
 
-  const focusItem = (index: number) => {
-    const count = items.length;
-    if (count === 0) {
-      return;
-    }
-    // The index goes around: after the last action comes the first.
-    itemElements.current[(index + count) % count]?.focus();
-  };
-
-  const openMenu = (focusTarget: "first" | "last") => {
-    focusOnOpen.current = focusTarget;
+  const openMenu = (focusTarget: MenuFocusTarget) => {
+    setFocusOnOpen(focusTarget);
     setIsOpen(true);
   };
 
@@ -148,14 +129,6 @@ export function SplitButton({
     }
     setIsOpen(false);
   };
-
-  // After the menu is on the page, move the focus into it.
-  useEffect(() => {
-    if (isOpen) {
-      focusItem(focusOnOpen.current === "first" ? 0 : -1);
-    }
-    // Runs only when the menu opens or closes.
-  }, [isOpen]);
 
   // While the menu is open, a press anywhere outside the component closes it.
   useEffect(() => {
@@ -172,46 +145,10 @@ export function SplitButton({
   }, [isOpen]);
 
   const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    const focusTarget = menuFocusTargetOfKey(event.key);
+    if (focusTarget !== undefined) {
       event.preventDefault();
-      openMenu(event.key === "ArrowDown" ? "first" : "last");
-    }
-  };
-
-  const handleMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const currentIndex = itemElements.current.findIndex(
-      (element) => element === document.activeElement,
-    );
-    const targets: Record<string, number> = {
-      ArrowDown: currentIndex + 1,
-      ArrowUp: currentIndex - 1,
-      Home: 0,
-      End: -1,
-    };
-    const targetIndex = targets[event.key];
-
-    if (targetIndex !== undefined) {
-      event.preventDefault();
-      focusItem(targetIndex);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu(true);
-    } else if (event.key === "Tab") {
-      // The focus goes back to the button first. The browser then moves it
-      // to the element after or before that button.
-      closeMenu(true);
-    } else if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey) {
-      // A letter: go to the next action whose text starts with it.
-      const letter = event.key.toLowerCase();
-      const count = items.length;
-      for (let step = 1; step <= count; step += 1) {
-        const index = (currentIndex + step) % count;
-        const text = itemElements.current[index]?.textContent ?? "";
-        if (text.trim().toLowerCase().startsWith(letter)) {
-          focusItem(index);
-          break;
-        }
-      }
+      openMenu(focusTarget);
     }
   };
 
@@ -221,11 +158,6 @@ export function SplitButton({
     if (isOpen && nextElement instanceof Node && !event.currentTarget.contains(nextElement)) {
       setIsOpen(false);
     }
-  };
-
-  const handleSelect = (item: SplitButtonItem) => {
-    closeMenu(true);
-    item.onSelect();
   };
 
   return (
@@ -274,36 +206,24 @@ export function SplitButton({
         </svg>
       </button>
       {isOpen ? (
-        <div
-          role="menu"
+        <Menu
           id={menuId}
-          className={menuClass}
-          data-slot="menu"
+          className={menuPlaceClass}
           aria-labelledby={triggerId}
-          onKeyDown={handleMenuKeyDown}
-        >
-          {items.map((item, index) => (
-            <button
-              key={index}
-              ref={(element) => {
-                itemElements.current[index] = element;
-              }}
-              type="button"
-              role="menuitem"
-              tabIndex={-1}
-              className={itemClass}
-              data-slot="item"
-              onClick={() => handleSelect(item)}
-            >
-              {item.icon === undefined ? null : (
+          focusOnOpen={focusOnOpen}
+          onClose={({ restoreFocus }) => closeMenu(restoreFocus)}
+          entries={items.map((item, index) => ({
+            key: index,
+            label: item.label,
+            onSelect: item.onSelect,
+            icon:
+              item.icon === undefined ? undefined : (
                 <span className={itemIconClass} data-slot="item-icon" aria-hidden="true">
                   {item.icon}
                 </span>
-              )}
-              {item.label}
-            </button>
-          ))}
-        </div>
+              ),
+          }))}
+        />
       ) : null}
     </div>
   );

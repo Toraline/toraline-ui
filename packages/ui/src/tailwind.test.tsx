@@ -46,6 +46,21 @@ import {
   statCardTones,
   statusBadgeVariants,
 } from "./index";
+// Phase 9: overlays
+import {
+  ActionMenu,
+  CloseButton,
+  DeleteOverlay,
+  DiscardConfirmation,
+  Drawer,
+  Modal,
+  Popover,
+  Tooltip,
+  actionMenuTriggers,
+  modalSizes,
+  popoverAligns,
+  tooltipSides,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -110,6 +125,87 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
 }
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** The floating panels of phase 9: each one opens with a press on its button. */
+const floatingButtonNames = [
+  ...actionMenuTriggers.map((trigger) => `Actions, ${trigger}`),
+  ...popoverAligns.map((align) => `Columns, ${align}`),
+];
+
+function FloatingExamples() {
+  return (
+    <>
+      {actionMenuTriggers.map((trigger) => (
+        <ActionMenu
+          key={trigger}
+          trigger={trigger}
+          aria-label={`Actions, ${trigger}`}
+          items={[
+            { key: "edit", label: "Edit", icon: PlusIcon, onSelect: () => undefined },
+            { key: "delete", label: "Delete", onSelect: () => undefined, disabled: true, hint: "In use" },
+          ]}
+        >
+          Actions
+        </ActionMenu>
+      ))}
+      {popoverAligns.map((align) => (
+        <Popover key={align} label={`Columns, ${align}`} align={align}>
+          The content
+        </Popover>
+      ))}
+      {tooltipSides.map((side) => (
+        <Tooltip key={side} label={`A tooltip, ${side}`} side={side}>
+          <button>Help, {side}</button>
+        </Tooltip>
+      ))}
+    </>
+  );
+}
+
+/** The overlays of phase 9, open. An overlay is rendered in <body>, outside the element that holds the other components. */
+function OverlayExamples() {
+  return (
+    <>
+      <CloseButton />
+      {modalSizes.map((size) => (
+        <Modal key={size} title={`A dialog, ${size}`} size={size} onClose={() => undefined}>
+          The content
+        </Modal>
+      ))}
+      {[false, true].map((wide) => (
+        <Drawer
+          key={String(wide)}
+          title={`A side panel, wide: ${wide}`}
+          wide={wide}
+          footer="The footer"
+          onClose={() => undefined}
+        >
+          The content
+        </Drawer>
+      ))}
+      <DeleteOverlay
+        title="Delete"
+        cancelLabel="Cancel"
+        deleteLabel="Delete"
+        closeLabel="Close"
+        consequence="Its prices are deleted too."
+        error="It could not be deleted."
+        onDelete={() => undefined}
+        onClose={() => undefined}
+      >
+        Delete the product?
+      </DeleteOverlay>
+      <DiscardConfirmation
+        title="Discard the changes?"
+        description="What you typed is lost."
+        discardLabel="Discard"
+        keepEditingLabel="Keep editing"
+        onDiscard={() => undefined}
+        onKeepEditing={() => undefined}
+      />
+    </>
+  );
+}
 
 /** Renders every component in every variant, size and state, and returns every class on the page. */
 async function renderEveryComponent(): Promise<string[]> {
@@ -237,7 +333,9 @@ async function renderEveryComponent(): Promise<string[]> {
 
   const classNames = new Set<string>();
   const collect = () => {
-    for (const element of container.querySelectorAll("[class]")) {
+    // The whole <body>: the components are in "container", and an overlay is next to it.
+    expect(document.body.contains(container)).toBe(true);
+    for (const element of document.body.querySelectorAll("[class]")) {
       for (const className of (element.getAttribute("class") ?? "").split(/\s+/)) {
         if (className !== "") {
           classNames.add(className);
@@ -251,6 +349,15 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: `More options, ${menuPlacement}` }));
     collect();
   }
+  // Phase 9: the floating panels, each one open.
+  render(<FloatingExamples />);
+  for (const buttonName of floatingButtonNames) {
+    await user.click(screen.getByRole("button", { name: buttonName }));
+    collect();
+  }
+  // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
+  render(<OverlayExamples />);
+  collect();
   return [...classNames];
 }
 
@@ -401,6 +508,25 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // StatCard: the padding and the size of the number of a wide screen win.
     ["p-4", "md:p-5"],
     ["text-2xl/8", "md:text-3xl/10"],
+    // Phase 9, Modal: the classes of a wide screen win over the classes of a narrow one.
+    ["items-end", "md:items-start"],
+    ["max-h-[92dvh]", "md:max-h-none"],
+    ["overflow-y-auto", "md:overflow-visible"],
+    ["rounded-t-2xl", "md:rounded-xl"],
+    ["pl-4", "md:pl-6"],
+    ["p-4", "md:p-6"],
+    // Phase 9, Drawer: the same, for the footer and the width.
+    ["px-4", "md:px-6"],
+    ["w-full", "md:max-w-lg"],
+    // Phase 9, DiscardConfirmation: the buttons are in a row on a wide screen.
+    ["flex-col-reverse", "sm:flex-row"],
+    // Phase 9, the menu of SplitButton and ActionMenu: the pointer over an action that cannot be chosen changes nothing.
+    ["hover:bg-subtle", "aria-disabled:hover:bg-transparent"],
+    // Phase 9, Tooltip: shown (the pointer over it, or the keyboard focus inside) wins over hidden.
+    ["invisible", "group-hover/tooltip:visible"],
+    ["opacity-0", "group-hover/tooltip:opacity-100"],
+    ["invisible", "group-has-focus-visible/tooltip:visible"],
+    ["opacity-0", "group-has-focus-visible/tooltip:opacity-100"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

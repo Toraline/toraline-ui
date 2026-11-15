@@ -144,6 +144,174 @@ Format of one entry:
 
 - Not verified: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, the Figma file (no access), and a phone.
 
+## 2026-11-15 - Phase 9: what was compared with Intraweb, and the check in a new app (TOR-1125)
+- Design source: the overlays of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
+- Decision: the comparison was done as in phase 7, with a temporary page outside both repositories that rendered Intraweb's own files next to the components of the two package files of `make pack`, and 2 Playwright scripts. The page and the scripts are not committed. The result is in `apps/playground/README.md`, section "The overlays next to Intraweb's": 50,320 computed values in both themes and 2 window widths, of which 270 differ in 6 kinds, each with its reason; and 84 steps of keyboard and pointer, of which 26 differ, each one a problem of Intraweb that the library fixes or a key it adds.
+- Found by the comparison and fixed: `useAnchoredPanel` measured the panel and the element around it with `offsetWidth` and `clientWidth`, which round to a whole pixel. A Popover lined up to the right was 0.42 pixels off. It now reads `getBoundingClientRect`.
+- Checked on 2026-11-15, with the 2 package files of `make pack`, in a new app made by `create-next-app` 16.4.6 (React 19.3.0, Tailwind CSS 4.3.3) that followed guide 1 of `docs/guide.md`: `next build` passes with a Server Component page that renders Popover and Tooltip itself and gives an IconButton its icon. In the built app, a Playwright script ran 32 checks, and all pass: Modal, Drawer, DiscardConfirmation and DeleteOverlay (the focus goes in, Tab and Shift+Tab stay inside, Escape closes, the focus goes back to the button that opened it); ActionMenu (4 pixels under its button, right edges lined up, in `<body>`, arrows, Enter, Escape); Popover (Tab into the panel, Escape, a click outside); Tooltip (pointer, keyboard focus, description, Escape); and no message in the browser console.
+- What a Server Component can render, and which props need a Client Component file in the app:
+
+| Component | From a Server Component | Props that need a Client Component file |
+|---|---|---|
+| CloseButton | Yes, with no `onClick` | `onClick` (a function) |
+| Tooltip | Yes: `label` and `children` are text and elements | None |
+| Popover | Yes, when `children` is elements | `children` as a function `(close) => ...`, `onClick` |
+| Modal, Drawer | No | `onClose` (a function, required). `title`, `actions`, `footer`, `children` and the texts of `discardConfirmation` can come from a Server Component |
+| DiscardConfirmation | No | `onDiscard`, `onKeepEditing` |
+| DeleteOverlay | No | `onDelete`, `onClose` |
+| ActionMenu | No | `items`: each action has `onSelect` (a function) and may have `icon` (a component) |
+| `useAnchoredPanel` | No: it is a hook | The component that calls it |
+
+- What Intraweb must change to use each component (not done; it is the work of a later phase):
+  - `Modal`, `Drawer`: add `closeLabel="Fechar"` and `discardConfirmation={...}` with its 4 Portuguese texts, from one file of Intraweb. `IGNORE_DIRTY_ATTRIBUTE` stays a constant of Intraweb with the same value (`data-overlay-ignore-dirty`); `data-overlay-autofocus` is unchanged. Its CSS rule for `body[data-drawer-open]` is unchanged.
+  - `CloseButton`: add `aria-label="Fechar"`.
+  - `DeleteOverlay`: keep its own file for the URL, the delete call, the API error and the list of blockers, and render the library's dialog inside it with the texts, `pending`, `error` and `blocked`.
+  - `ActionMenu`: `label` becomes `aria-label`; the trigger `button` gets its text as children (`Ações`).
+  - `Popover`: `ariaLabel` becomes `aria-label`.
+  - `Tooltip`: nothing. Screens that repeat the text as `aria-label` keep working.
+  - `useAnchoredPanel`: the same names; `align` and the result are unchanged.
+- Not verified: a real screen reader, browsers other than Chromium, a touch screen, Tailwind CSS versions other than 4.3.3 and 4.3.5, and Intraweb itself with the library installed.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Tooltip: shown by CSS, read by a screen reader (TOR-1163)
+- Decision: `Tooltip` has the elements and the classes of Intraweb's `Tooltip` (`components/ui/tooltip.tsx`): a `<span class="group/tooltip relative inline-flex">` around the element and the tooltip, the tooltip shown by CSS, and the sides `right` (default) and `top`.
+- Accessibility problems of Intraweb's Tooltip, fixed here:
+  1. The tooltip has `aria-hidden="true"`, so a screen reader never says its text; Intraweb asks each screen to repeat the text as the `aria-label` of the element. Here the tooltip has `role="tooltip"` and the element gets `aria-describedby` with its id. When the element already has the same text as its `aria-label` (what Intraweb's screens do today), the tooltip is not linked, so nothing is said twice.
+  2. Escape does not hide it (WCAG 1.4.13, "dismissible"). Here Escape hides it until the pointer or the focus leaves and comes back.
+  3. The pointer cannot move onto the tooltip: it has `pointer-events-none`, and a gap of 12 pixels (WCAG 1.4.13, "hoverable"). Here the tooltip takes the pointer while it is shown, and an invisible strip (`before:`) joins it to the element.
+  4. It is shown while the element has the focus after a mouse click too (`group-focus-within`), so it stays over the page after a click until the focus moves. Here it is shown for the keyboard focus only (`group-has-focus-visible`).
+- Decision: the hidden tooltip is `invisible opacity-0` (Intraweb: `opacity-0` and `pointer-events-none`). `visibility: hidden` takes it away from the pointer and from a screen reader that reads the page in order, and `aria-describedby` still gives its text to the element. The transition is `motion-safe:transition-[opacity,visibility]`.
+- Decision: the element gets `aria-describedby` with `cloneElement`, as Field does for a control. `children` is one element.
+- Decision (ticket TOR-1157): the tooltip stays inside the `<span>`, as in Intraweb, and is not rendered in `<body>`. When the pointer or the focus comes, the component measures with `computeAnchoredPosition`: with no room on the side asked for, the classes of the opposite side are used (`left`, `bottom`); when the centered place would leave the window, an inline `top` or `left` moves the tooltip along the element. With room, nothing is written and the classes of Intraweb place it.
+- Why not in `<body>`: the tooltip would not be on the page before the JavaScript runs, would need a state for "shown", and its markup would differ from Intraweb's. Limit, accepted: an element around it with `overflow: hidden` cuts it.
+- Decision: Escape is heard on the document before any other element (the capture phase), and stops there only when the tooltip was really shown (its computed `visibility`). So with a tooltip shown inside a Modal, the first Escape hides the tooltip and the second closes the Modal; with no tooltip shown, the first Escape closes the Modal.
+- Decision: `label` accepts text or elements (Intraweb: text). The exported list of sides is `["right", "top"]`, as in Intraweb.
+- Contrast: `text-inverse` on `bg-tooltip` is added to the contrast test of `packages/tokens/src/tokens.test.ts`; it passes in both themes.
+- States of the list "States to check": rest and closed (story "Closed"); open by hover and by keyboard focus (stories "Shown By The Pointer", "Shown By The Keyboard Focus"); pressed, disabled, read-only, loading, error, selected: do not apply (a disabled button gets no pointer and no focus, so its tooltip is never shown; the description is still linked); empty: an empty `label` shows an empty box, the app must not render a Tooltip with no text; long content: the text stays on one line (`whitespace-nowrap`), as in Intraweb, so a long text can be wider than the window; near the edge (story "Near The Edge"); right-to-left: considered, not supported, `right` is a physical side; both themes: every story test; reduced motion: the fade is `motion-safe:`.
+- Alternatives: `aria-label` set by the Tooltip on the element; the tooltip in `<body>` with `useAnchoredPanel`; a delay before it is shown; Base UI's Tooltip.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Popover: the panel stays next to its button in the page (TOR-1162)
+- Decision: `Popover` has the elements, the classes and the props of Intraweb's `Popover` (`components/ui/popover.tsx`): a `<div class="relative">` that holds a secondary Button and, while it is open, the panel. One rename: `ariaLabel` is `aria-label`.
+- Decision: the panel is not rendered in `<body>`. It stays right after the button, as in Intraweb, and is placed with `useAnchoredPanel({ strategy: "absolute" })`, measured from the `<div>` around it.
+- Why: with the panel after the button, the Tab key goes from the button into the panel with no code, and the panel needs no focus handling. This is the disclosure pattern of the WAI-ARIA Authoring Practices Guide (a button with `aria-expanded` that shows and hides content). A panel in `<body>` would need the focus moved into it and kept in order by hand, which is the hard part Base UI exists for.
+- Limit, accepted: an element around the Popover that hides what leaves it (`overflow: hidden` or a scroll area) cuts the panel, as in Intraweb. ActionMenu is in `<body>` and is not cut.
+- Added to Intraweb's behaviour (ticket TOR-1157): the panel opens above the button when there is no room below, and keeps 8 pixels to the left and right edges of the window. Intraweb's panel is always below and can leave the window.
+- Accessibility problems of Intraweb's Popover, fixed here:
+  1. Escape with the focus inside the panel removes the panel and leaves the focus on no element. Here the focus goes to the button.
+  2. The button has `aria-controls` with the id of a panel that is not on the page while the Popover is closed. Here it has `aria-controls` only while the panel is open.
+- Difference from Intraweb: the panel lines up with the edges of the button. In Intraweb it lines up with the edges of the `<div>` around the button (`left-0`, `right-0`), which is wider than the button when that `<div>` is a block in a wide container. The position is written as inline `top` and `left` (or `bottom`, `right`) in pixels, not as the classes `mt-2 left-0`.
+- Decision: the panel has no role, as in Intraweb. It is not a dialog: it does not take the focus.
+- Decision: no `icon` prop. Popover has `"use client"`, and a Server Component cannot give an icon component to a Client Component. `label` accepts elements, so an app puts an icon element in it.
+- States of the list "States to check": rest and closed (story "Closed"); open (story "Open"); hover, keyboard focus, pressed: the ones of Button; disabled (story "Disabled"); read-only, loading, error, selected: do not apply; empty: a panel with no content shows its padding; long content (story "Long Content"); near the edge (story "Near The Edge"); right-to-left: considered, not supported, `align` names a physical side as in Intraweb; both themes: every story test; reduced motion: no animation.
+- Alternatives: the panel in `<body>` with the focus moved into it; the HTML attribute `popover` with CSS anchor positioning, rejected because the anchor part is not in every browser in use (not verified on the web in this session).
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - ActionMenu, and the menu that it shares with SplitButton (TOR-1161)
+- Decision: the menu is one file, `packages/ui/src/shared/menu/Menu.tsx`: the element with `role="menu"`, its actions, their look, the focus when it opens, and the keys. SplitButton and ActionMenu render it. Each keeps what differs: the button that opens the menu, whether it is open, and where the menu is placed (SplitButton: inside its own element with CSS, as before; ActionMenu: in `<body>`, with `useAnchoredPanel`).
+- SplitButton after the move: its test file is unchanged and passes. One behaviour changed: Escape in the menu stops there (it did reach a listener of the page). Without this, Escape in the menu of a SplitButton inside a Modal would close the Modal too. The class `whitespace-nowrap` moved from each action to the menu; the computed style of an action is the same.
+- Decision: `ActionMenu` has the props of Intraweb's `ActionMenu` (`components/ui/action-menu.tsx`) with 2 renames: `label` is `aria-label` (rule 2 of the props, as in TabNav), and the fixed text "Ações" of the trigger `button` is `children`.
+- The keys of the shared menu are the ones SplitButton had. For ActionMenu they are more than Intraweb has: a letter that goes to an action, the Up and Down arrows on the button, and a first or last action that gets the focus.
+- Accessibility problems of Intraweb's ActionMenu, fixed here:
+  1. Tab in the menu closes it and leaves the focus on no element, because the menu is removed from `<body>` while it has the focus. The next Tab starts at the top of the page. Here the focus goes back to the button first, so Tab moves to the element after the button.
+  2. A click on an action leaves the focus on no element. A Modal that the action opens then has no element to give the focus back to. Here the focus goes back to the button before the action runs.
+  3. A disabled action is skipped by the arrow keys, so a person who uses a screen reader never hears it or its `hint`. Here it has `aria-disabled="true"`, can get the focus, and cannot be chosen, as the menu pattern of the WAI-ARIA Authoring Practices Guide says.
+  4. The actions are in the Tab order. Here they have `tabindex="-1"`: the arrows move between them.
+  5. A click on an action of a menu inside a Drawer with unsaved changes counts as a click behind the Drawer, and asks to discard the changes (read in the code, not run in Intraweb). The menu is in `<body>`, outside the panel. Here the menu has the attribute `data-overlay-panel`.
+- Decision: the keyboard focus ring of an action stays (Intraweb shows only the background), as decided for SplitButton in TOR-1145.
+- Decision: with no action, ActionMenu renders nothing. Intraweb renders a button that opens an empty box.
+- Decision: the 3 dots and the arrow are inline `<svg>` elements with the shapes of Lucide's `ellipsis` and `chevron-down`.
+- States of the list "States to check": rest and closed (story "Closed"); open (story "Open"); hover and keyboard focus of an action: a quiet background, and the ring for the keyboard (story "Keyboard"); pressed: does not apply; disabled (stories "Disabled", "Disabled Action"); read-only, loading, error, selected: do not apply; empty: renders nothing (test); long content (story "Long Content"); near the edge of the window (story "Near The Edge"); right-to-left: considered, not supported, the menu lines up with the right edge of the button; both themes: every story test; reduced motion: the menu has no animation.
+- Alternatives: moving SplitButton's menu to `<body>` too, rejected because the ticket asks for no change of its behaviour; 2 menus that share only their classes; `disabled` on an action, as in Intraweb.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - DiscardConfirmation and DeleteOverlay: every text is a prop (TOR-1160)
+- Decision: the 2 confirmation dialogs have no text of their own and no default text. The 4 texts of `DiscardConfirmation` (`title`, `description`, `discardLabel`, `keepEditingLabel`) and the texts of `DeleteOverlay` (`title`, `children`, `cancelLabel`, `deleteLabel`, `closeLabel`) are required props; the types refuse a dialog without them. Intraweb has them fixed in Portuguese.
+- Decision: Modal and Drawer ask before unsaved changes are lost only when the app gives the prop `discardConfirmation`, an object with the 4 texts. Without it they close at once. In Intraweb every Modal and Drawer asks.
+- Why: the question needs texts, and the library has none. One prop both turns the question on and gives its texts. Intraweb gives the same object to each overlay, from one file.
+- Kept from Intraweb (`components/ui/overlay.tsx`): what counts as a change (`input` and `change` events inside the panel), what clears it (`submit`), the attribute `data-overlay-ignore-dirty`, the click on the page behind a Drawer that is stopped and done again after "discard", the question of the browser before the page is left, the classes, the focus on "keep editing", and Escape that means "keep editing".
+- Problems of Intraweb's DiscardConfirmation, fixed here:
+  1. Accessibility: the Tab key leaves the question, which says `aria-modal="true"`. Here it stays inside.
+  2. Accessibility: the text under the title is not linked to the dialog. Here it is its `aria-describedby`, so a screen reader says it.
+  3. Accessibility: after "keep editing" the focus is on no element. Here it goes back to the element that had it, for example the field.
+  4. Behaviour, seen in a browser with Intraweb's own file: after a click on the dark layer of a Modal with changes, "discard" closes the question and not the Modal. The press on "discard" clears the mark that the dark layer was pressed, because the question is rendered inside the dark layer. Here the dark layer is part of the overlay (`data-overlay-panel`), so its click asks through the normal way of closing.
+- Decision: `DiscardConfirmation` is exported, so an app can ask the same question in another place. It is on the list of open overlays like a Modal: Escape and the Tab key belong to it while it is open.
+- Decision (DeleteOverlay): it is only the dialog. Intraweb's `DeleteOverlay` (`components/ui/delete-overlay.tsx`) also reads the record from the URL, calls the delete function, reads the error of the API, and builds the list of the records that block the delete with links of Next.js. Those parts stay in Intraweb, around the library's dialog: the library knows no URL, no API and no router.
+- What changes for Intraweb: its own file keeps `panel`, `items`, `getKey`, `describe`, `onDelete`, `links` and the states `pending` and `error`, and renders the library's `DeleteOverlay` with the texts, `pending`, `error`, and `blocked` (its `BlockerList`). The dialog "Registro não encontrado." stays a plain `Modal` in Intraweb.
+- Decision: while `pending` is true the button that deletes is in the state `loading` of Button (a spinner, `aria-busy`, a press does nothing). Intraweb disables it (`disabled`, half opacity).
+- Why: a disabled button loses the keyboard focus, and the person loses their place in the dialog (entry of TOR-1010 to TOR-1015).
+- Decision: `closeLabel` is also the text of the only button of the `blocked` view. Intraweb shows "Fechar" there, the same word as the name of the cross.
+- States of the list "States to check", for both: rest, open and closed (stories "Closed", "Open"); keyboard focus (story "Keyboard"); hover, pressed, disabled: the buttons are Buttons; read-only, selected: do not apply; loading (DeleteOverlay: story "Pending"); error (DeleteOverlay: story "With Error"); empty: no consequence and no error (test); long content and another language (story "Texts Of The App"); right-to-left: follows the direction of the page; both themes: every story test; reduced motion: no animation but the spinner of Button, which is `motion-safe:`.
+- Alternatives: English default texts, as `closeLabel` of Modal has; a translation function given once to the library; a DeleteOverlay that calls `onDelete` and keeps `pending` and `error` itself; a `blockers` prop with groups and links, drawn by the library.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Drawer: a side panel that leaves the page usable (TOR-1159)
+- Decision: `Drawer` has the elements, the classes and the rules of Intraweb's `Drawer` (`components/ui/overlay.tsx`): `footer`, `wide`, `actions`, no dark layer, `aria-modal="false"`, and the attribute `data-drawer-open` (`narrow` or `wide`) on `<body>` while it is open. The library ships no CSS for that attribute: making room for the panel is a rule of the layout of the app (Intraweb: `body[data-drawer-open="narrow"] main { padding-right: 34rem; }` from 1280 pixels).
+- Decision (the 3 focus rules of the ticket, for a panel that is not modal): the focus goes into the panel when it opens and back when it closes; Escape closes it; Tab and Shift+Tab stay inside the panel while the focus is in it. The pointer is not held: a click on the page next to the panel works, and the focus then stays on the page. The focus that lands outside is not brought back, unlike in Modal.
+- Why: the ticket asks for the same 3 rules as Modal, and Intraweb's Drawer exists so that the list next to it stays usable. Base UI has the same mode for its dialog (`modal="trap-focus"`). `aria-modal` stays `"false"`, because the page is not blocked.
+- Accessibility problems of Intraweb's Drawer, fixed here:
+  1. The Tab key leaves the panel to the address bar of the browser, because the panel is the last element of `<body>`. Here it goes around inside the panel.
+  2. Content that is only text and is taller than the panel cannot be scrolled with the keyboard in a browser that does not put a scrolling element in the Tab order (the rule `scrollable-region-focusable` of axe-core failed in the story "Long Content"). Here such content gets `tabindex="0"` and the focus ring.
+  3. The same server problem as Modal (`document.body` while the server renders).
+- Decision: `wide` stays a true or false prop, as in Intraweb, and is written as `data-wide`. It is not a list of sizes: there are 2 widths, and Intraweb's screens write `wide`.
+- States of the list "States to check": rest, open and closed (stories "Closed", "Open"); keyboard focus (story "Keyboard", tests); hover, pressed, disabled, read-only, loading, error, selected: do not apply to a panel; empty: no footer (story "Without Footer"); long content (story "Long Content"); right-to-left: considered, not supported, the panel is always on the right (`right-0`, `md:rounded-l-2xl`), as in Intraweb; both themes: every story test; reduced motion: the panel has no animation.
+- Alternatives: holding the focus as in Modal (`aria-modal="true"`), which would block the list; no Tab rule at all, as in Intraweb; a list `drawerSizes`.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Modal and CloseButton, and what every overlay that takes the focus shares (TOR-1158)
+- Decision: `Modal` has the elements, the classes and the rules of Intraweb's `Modal` (`components/ui/overlay.tsx`): the sizes `md`, `lg`, `xl`, `full` (default `lg`), the sheet at the bottom of a narrow screen, the dark layer that closes it, the page that does not scroll, the focus that goes to the element with `data-overlay-autofocus` or to the dialog, and Escape that closes only the newest overlay. The app renders the Modal while it is open, as in Intraweb. There is no prop `open`.
+- Decision: the shared code is in `packages/ui/src/shared/overlay/`. `use-overlay-layer.ts` has the list of open overlays, the focus on open and on close, Escape, and the Tab key. `OverlayHeader.tsx` is the header of Modal and Drawer.
+- Accessibility problems of Intraweb's Modal, fixed here:
+  1. The Tab key leaves the dialog and reaches the page behind, while the dialog says `aria-modal="true"`. Here Tab and Shift+Tab stay inside, and the focus that lands outside in another way is brought back. An element inside another element with `data-overlay-panel` (a menu rendered in `<body>`) counts as inside.
+  2. `createPortal(..., document.body)` runs while the server renders, where `document` does not exist. Here the Modal renders nothing on the server and during hydration (`useSyncExternalStore`).
+- Decision: `closeLabel` (default `"Close"`) is the name of the button with the cross. Intraweb has the fixed text "Fechar". `CloseButton` has `aria-label` with the same default, and accepts the props of IconButton.
+- Why a default: the library has English defaults for the few names it needs (`"Breadcrumb"`, `"More options"`). The texts of the 2 confirmation dialogs have no default (entry of TOR-1160).
+- Decision: `className`, the other props and `ref` go to the dialog (`<div role="dialog">`), not to the dark layer, which is the outermost element. An app changes the width or the corners of the dialog, not the layer.
+- Decision: the title is `font-heading text-lg/7 font-medium`, the values of Intraweb's text style `heading-section` (the text style classes are in `rem`, see the entry of TOR-1143).
+- Decision: the small bar of the sheet has `bg-(--border-strong)`. Intraweb has `bg-slate-300`, a Tailwind color, which the rules of the styles do not allow. In the light theme it is the same color (`#d0d5dd`). In the dark theme the library shows `#414651`; Intraweb shows `#d0d5dd`, a light bar on a dark sheet.
+- Decision: `max-w-lg`, `max-w-2xl`, `max-w-4xl` and `max-w-6xl` are Tailwind's own container widths, not tokens, as a breakpoint is.
+- Not built in this ticket: the question before unsaved changes are lost. It comes with DiscardConfirmation (TOR-1160).
+- States of the list "States to check": rest, open and closed (stories "Closed", "Open"); keyboard focus (story "Keyboard", tests); hover, pressed: the buttons inside are Buttons; disabled, read-only, loading, error, selected: do not apply to a dialog; empty: a Modal with no content shows its header (test "is a dialog"); long content (story "Long Content"); right-to-left: considered, the header follows the direction of the page except its paddings (`pr-3`, `pl-4`); both themes: every story test; reduced motion: the Modal has no animation.
+- Alternatives: the HTML element `<dialog>` with `showModal()`, which keeps the focus inside by itself, rejected because Intraweb's Drawer leaves the page usable and its overlays stack with their own rules, and because the markup would differ; a prop `open`; `inert` on the rest of the page.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Shared positioning: `useAnchoredPanel` and `computeAnchoredPosition` (TOR-1157)
+- Decision: the code that places a floating panel is in `packages/ui/src/anchored-panel/`, in 2 files. `anchored-position.ts` computes the position from 3 rectangles (the anchor, the panel, the window) and has no React and no browser code. `use-anchored-panel.ts` is Intraweb's hook `useAnchoredPanel` (`components/ui/use-anchored-panel.ts`): open or closed, the 2 refs, the press outside, Escape, and placing again on scroll and resize.
+- Why 2 files: the rule "below, above, near the edge" is then tested with plain numbers. jsdom, the browser-like page of the unit tests, does not lay out a page. The hook is tested too, with a button and a panel whose sizes the test gives.
+- Kept from Intraweb: the gap of 4 pixels, the 8 pixels to the left and right edges of the window, `align` (`"left"`, `"right"`, default `"right"`), the returned names (`open`, `toggle`, `close`, `triggerRef`, `panelRef`, `panelStyle`, `placed`, `handleEscape`), and the CSS it writes (a panel above is measured from the bottom, a panel lined up to the right from the right).
+- Added, each for a ticket of this phase:
+  - `side` (`"bottom"`, `"top"`) and `align: "center"`; the pure function also has the sides `"right"` and `"left"`, for Tooltip.
+  - `strategy: "absolute"`, for Popover, whose panel stays inside the element around the button, as in Intraweb.
+  - `show`, and `side` in the result.
+  - The panel is placed again when it changes its size (`ResizeObserver`), for a panel whose content changes.
+- Changed from Intraweb: when the panel fits on neither side, it opens on the side with more room. Intraweb always opens it above.
+- Decision: `useAnchoredPanel` and `computeAnchoredPosition` are exported. Intraweb's column filter (`components/ui/data-grid/column-filter.tsx`) calls the hook itself.
+- Alternatives: Floating UI (`@floating-ui/react-dom` 2.1.9), which handles more cases and is a dependency; CSS anchor positioning, which Firefox does not have in every version in use.
+- Not verified: CSS anchor positioning support was not looked up; it is named from memory.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - Overlays: written by hand, as in Intraweb, not with Base UI (TOR-1156)
+- Context: an overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip. Intraweb writes its overlays by hand (`components/ui/overlay.tsx`, `action-menu.tsx`, `popover.tsx`, `tooltip.tsx`, `use-anchored-panel.ts`, 830 lines with `delete-overlay.tsx`). The conventions (entry of TOR-1009) name Base UI (`@base-ui/react`) as the library for behaviour that is hard to write correctly.
+- Decision: the overlays of phase 9 (Modal, Drawer, DiscardConfirmation, DeleteOverlay, ActionMenu, Popover, Tooltip) are written by hand, from Intraweb's code. No dependency is added. The accessibility problems found in Intraweb's code are fixed in the library; each entry of this phase lists them.
+- Compared on 2026-11-15, for the dialog, the menu and the popover. Base UI: version 1.9.0 (npm, published 2026-10-09), its pages `base-ui.com/react/overview/quick-start` and `base-ui.com/react/components/dialog`.
+
+| What | By hand (Intraweb's code) | Base UI 1.9.0 |
+|---|---|---|
+| Focus of a dialog | Intraweb moves the focus in and gives it back, and closes only the top overlay with Escape. It does not keep the focus inside: the Tab key leaves a Modal that says `aria-modal="true"`. The library adds this (about 60 lines, tested with real key presses) | Keeps the focus inside (`modal`: `true`, `"trap-focus"`, `false`), `initialFocus`, `finalFocus`, nested dialogs. More cases covered, for example a touch screen reader |
+| Menu | Arrow keys, Home, End, Escape and Tab are a few key handlers. SplitButton already has them, with tests | The same keys, plus submenus and checkbox items, which no ticket asks for |
+| Position of a menu or popover | `use-anchored-panel.ts`: below the button, above it when there is no room, moved inside the screen edge. 100 lines | Floating UI (`@floating-ui/react-dom`), which handles more cases (arrows, any side, scrolling containers) |
+| What an app must set up | Nothing. The overlays use `z-index` classes | The quick start asks for `isolation: isolate` on the root element of the app, and `body { position: relative; }` for Safari on iOS 26 |
+| Size in an app (minified and compressed with gzip, React not counted, measured with esbuild) | Not measured before the build; the source of Intraweb is 830 lines | Dialog 24.2 kB, Menu 62.7 kB, Popover 41.8 kB, Tooltip 34.5 kB; the 4 together 73.7 kB |
+| React 19 | Yes | Yes (`react: ^17 || ^18 || ^19`) |
+| Server Components | The overlay files have `"use client"`. A Server Component renders them with texts and elements as props | The same: every part of Base UI is a Client Component |
+| Same behaviour and markup as Intraweb | The same code, so the same elements, classes and rules | Not the same. Intraweb's rules would be written again around Base UI: the question before unsaved changes are lost, the click behind a Drawer that is repeated after that question, the Drawer that leaves the page usable and sets `data-drawer-open` on `<body>`, the element with `data-overlay-autofocus`. Base UI also adds its own elements (a backdrop, a positioner, focus guards), so the markup and the computed styles differ |
+
+- Why: the task of this phase is that a screen of Intraweb behaves the same after it installs the library. Most of the code of Intraweb's overlays is its own rules, which Base UI does not have, so Base UI would be added to that code and would not replace it. The part Base UI does better, the focus kept inside a dialog, is short and is tested here. Base UI would also add a setup step to every app and about 74 kB.
+- What this replaces: for the dialog and the popup "that must move to stay on screen", the sentence of the entry of TOR-1009 "the library to use is Base UI". Base UI stays the choice for a select and a combobox.
+- Limit, accepted: the hand-written focus handling does not make the page behind a Modal inert (the HTML attribute `inert`). `aria-modal="true"` tells a screen reader to stay in the dialog, the backdrop stops the pointer, and the Tab key stays inside.
+- Alternatives: Base UI for everything; a mix (Base UI's Dialog for Modal and Drawer, hand-written menu, popover and tooltip), rejected because the dialog is where Intraweb has the most rules of its own; `focus-trap` 8.2.5 only for the focus, rejected because the need is one key handler.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

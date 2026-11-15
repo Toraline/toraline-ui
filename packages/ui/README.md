@@ -509,7 +509,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 
 1. A component uses the native HTML element that already has the behaviour: `<button>`, `<input>`, `<label>`, `<a>`, `<nav>`. The browser then gives the keyboard and the screen reader support.
 2. Behaviour that HTML does not have (arrow keys between tabs, a menu) is written by hand in the component, following the pattern of the WAI-ARIA Authoring Practices Guide (https://www.w3.org/WAI/ARIA/apg/patterns/). The package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles, for example Base UI, Radix or React Aria.
-3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
+3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`). The overlays of phase 9 (dialog, side panel, menu, popover, tooltip) are written by hand all the same, from Intraweb's code: the entry of TOR-1156 of `docs/decisions.md` has the comparison and the reasons.
 4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`). `outline-focus` is the class of the token `--border-focus`. One exception: a form control (TextInput) shows the focus look of Intraweb's controls, the border in the focus color and a ring of 3 pixels (`focus:border-focus focus:ring-3 focus:ring-info focus:outline-none`), from `src/shared/control.ts`.
 5. An icon that is only decoration has `aria-hidden="true"`. An icon is drawn with `currentColor`, so it has the color of the text.
 6. A class of a movement or a transition has the Tailwind variant `motion-safe:`, so a person who asked the device for less motion gets none.
@@ -846,3 +846,354 @@ import { ProgressBar, ProgressRing } from "@toraline.tech/ui";
 - `ProgressBar`: the outermost element is a `<div>` that holds the row of the label and the track. `className`, every other prop and `ref` go to it. It has `data-tone`; the inner parts have `data-slot`: `header`, `label`, `value`, `track`, `fill`.
 - `ProgressRing`: the outermost element is the `<div role="progressbar">`. `className`, every other prop and `ref` go to it. It has `data-size` and `data-tone`; the inner parts have `data-slot`: `drawing`, `track`, `fill`, `percent`.
 - The lists `progressTones` and `progressRingSizes` and the types `ProgressBarProps`, `ProgressRingProps`, `ProgressTone` and `ProgressRingSize` are exported. Neither has `"use client"`.
+
+## The overlays
+
+An overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip. They come from `@toraline.tech/ui`, as the other components, and were built in phase 9 (TOR-1125) from the overlays of the app Intraweb. They are written by hand, with no library of primitives: the reasons are in the entry of TOR-1156 of [`docs/decisions.md`](../../docs/decisions.md). An app sets up nothing for them. The page `/overlays` of [`apps/playground`](../../apps/playground/README.md) shows each one.
+
+### `useAnchoredPanel`
+
+A hook (a function a component calls) for a floating panel that belongs to a button: a menu, a popover, a filter. `ActionMenu` and `Popover` use it. An app uses it for a panel of its own.
+
+```tsx
+"use client";
+import { useAnchoredPanel } from "@toraline.tech/ui";
+
+export function ColumnFilter() {
+  const { open, toggle, triggerRef, panelRef, panelStyle, placed, handleEscape } = useAnchoredPanel({
+    align: "left",
+  });
+  return (
+    <>
+      <button ref={triggerRef} aria-expanded={open} onClick={toggle}>
+        Filter
+      </button>
+      {open ? (
+        <div
+          ref={panelRef}
+          style={panelStyle}
+          className={placed ? "fixed z-50" : "invisible fixed z-50"}
+          onKeyDown={handleEscape}
+        >
+          ...
+        </div>
+      ) : null}
+    </>
+  );
+}
+```
+
+| Option | Values | Meaning |
+|---|---|---|
+| `side` | `"bottom"` (default), `"top"` | The side of the button where the panel opens |
+| `align` | `"right"` (default), `"left"`, `"center"` | Which edges of the button and the panel line up |
+| `gap` | A number of pixels. When missing: 4 | The space between the button and the panel |
+| `strategy` | `"fixed"` (default), `"absolute"` | `fixed`: the panel has `position: fixed`, for a panel rendered in `<body>` with `createPortal`. `absolute`: the panel has `position: absolute` inside a positioned element |
+
+It returns `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (for the button), `panelRef` and `panelStyle` (for the panel), `placed` (`false` until the panel is measured: hide the panel with the class `invisible` until then), `side` (the side the panel is on) and `handleEscape` (for `onKeyDown` of the panel).
+
+- The panel opens on the side asked for. When it does not fit there, it opens on the other side, unless that side has less room.
+- The panel keeps 8 pixels to the left and right edges of the window.
+- The panel is placed again when the page scrolls, when the window changes its size and when the panel changes its size.
+- A press outside the panel and the button closes the panel. Escape closes it, gives the focus back to the button, and does not reach a Modal or a Drawer that is open under it.
+- The function `computeAnchoredPosition` computes the position from 3 rectangles, with no browser. It also has the sides `"right"` and `"left"`, which Tooltip uses.
+
+### `CloseButton`
+
+```tsx
+import { CloseButton } from "@toraline.tech/ui";
+
+<CloseButton aria-label="Fechar" onClick={close} />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `aria-label` | Text. When missing: `"Close"` | The name of the button for a screen reader |
+| `onClick` | A function | What the press does |
+| `variant`, `size`, `disabled` | The props of [`IconButton`](#iconbutton) | When missing: `ghost` and `md` (40 pixels) |
+
+- It is an `IconButton` whose icon is a cross, drawn by the library. Every other prop and `ref` go to its `<button>`.
+- It has no `"use client"`. The press is a function, so the file of the app that gives `onClick` is a Client Component.
+
+### `Modal`
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button, Modal } from "@toraline.tech/ui";
+
+export function NewClient() {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>New client</Button>
+      {isOpen ? (
+        <Modal title="New client" size="md" closeLabel="Close" onClose={() => setIsOpen(false)}>
+          ...
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+```
+
+A dialog above the page, for a task that needs the whole attention. The app renders the Modal while it is open, and stops rendering it in `onClose`. There is no prop `open`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the dialog. It is also its name for a screen reader |
+| `onClose` | A function. Required | Called when a person closes the dialog: the button with the cross, the Escape key, or a click on the dark layer |
+| `children` | Elements | The content |
+| `actions` | Elements | Buttons or links next to the title, before the button that closes |
+| `size` | `"md"`, `"lg"` (default), `"xl"`, `"full"` | The widest the dialog gets: 512, 672, 896 and 1152 pixels |
+| `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+| `discardConfirmation` | `{ title, description, discardLabel, keepEditingLabel }` | The 4 texts of the question before unsaved changes are lost. When missing: the dialog never asks. See [`DiscardConfirmation`](#discardconfirmation) |
+
+- Focus: when the dialog opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the dialog itself. When it closes, the focus goes back to the element that had it before, for example the button that opened it.
+- Keyboard: Tab and Shift+Tab stay inside the dialog; after the last element comes the first. Escape closes the dialog. With several overlays open, Escape closes only the newest one.
+- Pointer: a click on the dark layer closes the dialog. A press that starts inside the dialog and ends on the dark layer (a person selects text) does not. The page behind does not scroll.
+- Screen reader: the dialog has `role="dialog"`, `aria-modal="true"` and `aria-labelledby` with the id of its title.
+- On a screen less than 768 pixels wide the dialog is a sheet at the bottom of the screen, at most 92% of its height.
+- Main element: the `<div role="dialog">`. `className`, every other prop and `ref` go to it. This is an exception to "className goes on the outermost element": the outermost element is the dark layer. The parts have `data-slot`: `backdrop`, `handle`, `header`, `title`, `actions`, `body`.
+- The dialog is rendered in `<body>` (a portal), so it renders nothing on the server.
+- The list `modalSizes` and the types `ModalProps` and `ModalSize` are exported.
+- It is a Client Component. `onClose` is a function, so the file of the app that renders a Modal is a Client Component too. `title`, `actions` and `children` can be elements that a Server Component made.
+
+### `Drawer`
+
+```tsx
+"use client";
+import { Button, Drawer } from "@toraline.tech/ui";
+
+{isOpen ? (
+  <Drawer
+    title="Order 12"
+    onClose={close}
+    footer={
+      <Button type="submit" form="order-form">
+        Save
+      </Button>
+    }
+  >
+    <form id="order-form">...</form>
+  </Drawer>
+) : null}
+```
+
+A panel on the right side of the screen that leaves the page next to it visible and usable, for example the details of the row a person chose in a list. The app renders the Drawer while it is open, and stops rendering it in `onClose`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the panel. It is also its name for a screen reader |
+| `onClose` | A function. Required | Called when a person closes the panel: the button with the cross or the Escape key |
+| `children` | Elements | The content. It scrolls; the header and the footer stay in place |
+| `footer` | Elements | Stays at the bottom of the panel, outside the part that scrolls. Its content is lined up to the right |
+| `actions` | Elements | Buttons or links next to the title, before the button that closes |
+| `wide` | `true`, `false` (default) | `true`: the panel is 896 pixels wide at most, for a form with a table. `false`: 512 pixels |
+| `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+| `discardConfirmation` | `{ title, description, discardLabel, keepEditingLabel }` | The 4 texts of the question before unsaved changes are lost. When missing: the panel never asks. See [`DiscardConfirmation`](#discardconfirmation) |
+
+- Focus: when the panel opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the panel itself. When it closes, the focus goes back to the element that had it before.
+- Keyboard: Tab and Shift+Tab stay inside the panel while the focus is in it; after the last element (in the footer) comes the first. Escape closes the panel. With several overlays open, Escape closes only the newest one.
+- Pointer: the panel has no dark layer. A person can still click the page next to it, and the focus then stays where they clicked.
+- Screen reader: the panel has `role="dialog"`, `aria-modal="false"` and `aria-labelledby` with the id of its title.
+- Content with nothing to stop at (only text) is in the Tab order itself, so a person who uses the keyboard can scroll it.
+- While the panel is open, `<body>` has the attribute `data-drawer-open` with the value `narrow` or `wide`. The library adds no style for it. An app that wants the page to make room writes its own rule, as Intraweb does: `body[data-drawer-open="narrow"] main { padding-right: 34rem; }`.
+- On a screen less than 768 pixels wide the panel covers the screen.
+- Main element: the `<div role="dialog">`, which is also the outermost element. `className`, every other prop and `ref` go to it. The parts have `data-slot`: `header`, `title`, `actions`, `body`, `footer`.
+- The panel is rendered in `<body>` (a portal), so it renders nothing on the server.
+- It is a Client Component. `onClose` is a function, so the file of the app that renders a Drawer is a Client Component too.
+
+### `DiscardConfirmation`
+
+```tsx
+const discardTexts = {
+  title: "Discard the changes?",
+  description: "You typed something that is not saved yet. If you leave now, these changes are lost.",
+  discardLabel: "Discard",
+  keepEditingLabel: "Keep editing",
+};
+
+// Modal and Drawer show the question by themselves:
+<Drawer title="Order 12" discardConfirmation={discardTexts} onClose={close}>
+  <form>...</form>
+</Drawer>
+
+// An app shows it itself for another case:
+{isAsking ? <DiscardConfirmation {...discardTexts} onDiscard={leave} onKeepEditing={stay} /> : null}
+```
+
+The question a person gets before something they typed is lost. The library has no text of its own: the 4 texts are required props.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The question. It is the name of the dialog for a screen reader |
+| `description` | Text or elements. Required | What happens. A screen reader says it after the title |
+| `discardLabel` | Text or elements. Required | The text of the button that loses the changes |
+| `keepEditingLabel` | Text or elements. Required | The text of the button that goes back to the form |
+| `onDiscard` | A function. Required | Called when the person chooses to lose the changes |
+| `onKeepEditing` | A function. Required | Called when the person chooses to go on editing, with the button or with Escape |
+
+- Focus: the focus goes to the button that keeps editing, the safe choice. When the question closes, the focus goes back to the element that had it before.
+- Keyboard: Tab and Shift+Tab stay inside the question. Escape means "keep editing".
+- Pointer: a click on the dark layer does nothing. The person must choose.
+- Screen reader: `role="alertdialog"`, `aria-modal="true"`, `aria-labelledby` (the title) and `aria-describedby` (the description).
+- `className`, every other prop and `ref` go to the `<div role="alertdialog">`. The parts have `data-slot`: `backdrop`, `title`, `description`, `buttons`.
+- In a Modal or a Drawer with `discardConfirmation`:
+  - A person who typed in a field inside it (an `input` or `change` event) and did not send the form (a `submit` event) is asked before it closes: the button with the cross, Escape, or the dark layer of the Modal.
+  - A click on the page next to a Drawer is stopped and asks first. After "discard", the same click is done again.
+  - The browser asks before the page is left or loaded again.
+  - A field with the attribute `data-overlay-ignore-dirty`, or inside an element with it, does not count as a change, for example a search field.
+- The type `DiscardConfirmationTexts` is the 4 texts, for a file of the app that holds them once.
+- It is a Client Component, and renders nothing on the server.
+
+### `DeleteOverlay`
+
+```tsx
+{isOpen ? (
+  <DeleteOverlay
+    title="Delete"
+    cancelLabel="Cancel"
+    deleteLabel="Delete"
+    pendingLabel="Deleting…"
+    closeLabel="Close"
+    consequence="Its prices are deleted too."
+    pending={isDeleting}
+    error={deleteError}
+    onDelete={deleteProduct}
+    onClose={close}
+  >
+    Delete the product "Brownie"? This cannot be undone.
+  </DeleteOverlay>
+) : null}
+```
+
+The dialog that asks before something is deleted. It is a [`Modal`](#modal) in the size `md`. The library has no text of its own, and it does not delete: the app does, and gives `pending`, `error` and `blocked`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the dialog |
+| `children` | Text or elements. Required | The question, with the name of what is deleted |
+| `cancelLabel` | Text or elements. Required | The text of the button that goes back |
+| `deleteLabel` | Text or elements. Required | The text of the button that deletes |
+| `closeLabel` | Text. Required | The name of the button with the cross, and the text of the button of the `blocked` view |
+| `onDelete` | A function. Required | Called when the person presses the button that deletes |
+| `onClose` | A function. Required | Called when the person cancels: the button, the cross, Escape or the dark layer |
+| `consequence` | Text or elements | What else is deleted with it, in a quiet color |
+| `pending` | `true`, `false` (default) | `true` while the delete runs: the button that deletes is in the state `loading` of Button |
+| `pendingLabel` | Text or elements | The text of the button that deletes while `pending` is `true`. When missing: `deleteLabel` |
+| `error` | Text or elements | The message when the delete failed. It has `role="alert"` |
+| `blocked` | Elements | Give it when the record cannot be deleted: the explanation. It replaces the question and the 2 buttons, and one button with the text of `closeLabel` closes the dialog |
+| `blockedTitle` | Text or elements | The title while `blocked` is given. When missing: `title` |
+
+- Focus and keyboard: the rules of Modal. The focus goes to the button that cancels, the safe choice.
+- `className`, every other prop and `ref` go to the dialog, as in Modal. The parts have `data-slot`: `content`, `question`, `consequence`, `error`, `buttons`.
+- It is a Client Component, and renders nothing on the server.
+
+### `ActionMenu`
+
+```tsx
+"use client";
+import { Pencil, Trash2 } from "lucide-react";
+import { ActionMenu } from "@toraline.tech/ui";
+
+<ActionMenu
+  aria-label="Actions of Ana"
+  items={[
+    { key: "edit", label: "Edit", icon: Pencil, onSelect: editClient },
+    { key: "delete", label: "Delete", icon: Trash2, onSelect: askToDelete, disabled: hasOrders, hint: "Ana has open orders." },
+  ]}
+/>
+
+<ActionMenu aria-label="Actions of the list" trigger="button" items={items}>
+  Actions
+</ActionMenu>
+```
+
+A button that opens a menu of actions, for example the actions of one row of a table.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `items` | A list of `{ key, label, onSelect, icon, disabled, hint }`. Required | The actions. `key` is different for each action. `icon` is an icon component, shown before the text. `disabled: true` shows an action that cannot be chosen, and `hint` says why |
+| `aria-label` | Text. Required | The name of the button and of the menu for a screen reader, for example `"Actions of Ana"` |
+| `trigger` | `"icon"` (default), `"button"` | The button that opens the menu. `icon`: a small button with 3 dots. `button`: a small secondary button with a text and an arrow |
+| `children` | Text or elements | The text of the button, for the trigger `button`. Start `aria-label` with this text, so a person who controls the device with the voice can say what they see |
+| `disabled` | The HTML attribute | Disables the button |
+
+- The menu opens under the button, with the right edges lined up. It opens above when there is no room below, and keeps 8 pixels to the left and right edges of the window. It follows the button when the page scrolls. It is rendered in `<body>` (a portal), so a table or a Drawer that scrolls does not cut it.
+- Keyboard, on the button: Enter, Space and Down arrow open the menu with the focus on the first action. Up arrow opens it with the focus on the last action.
+- Keyboard, in the menu: the Up and Down arrows move between actions, and go around. Home goes to the first action, End to the last. A letter goes to the next action that starts with it. Enter and Space choose the action, close the menu and give the focus back to the button. Escape closes the menu and gives the focus back. Tab closes the menu and moves the focus to the element after the button.
+- A press outside the menu closes it.
+- An action with `disabled: true` has `aria-disabled="true"` and half of its opacity. It can get the focus with the arrow keys, so a screen reader says it and its `hint`. Choosing it does nothing.
+- Inside a Modal or a Drawer: Escape closes only the menu, and a click on an action is not a click "behind" the overlay.
+- Screen reader: the button has `aria-haspopup="menu"` and `aria-expanded`. The menu has the role `menu` and the name of `aria-label`, and each action the role `menuitem`.
+- With no action in `items`, the component renders nothing.
+- Main native element: the `<button>` that opens the menu. `className`, every other prop and `ref` go to it. The parts have `data-slot`: `trigger`, `arrow`, `menu`, `item`.
+- The menu is the same code as the menu of SplitButton (`src/shared/menu/Menu.tsx`): the same look and the same keys.
+- The list `actionMenuTriggers` and the types `ActionMenuProps`, `ActionMenuItem` and `ActionMenuTrigger` are exported.
+- It is a Client Component. The actions are functions and the icons are components, so the file of the app that gives `items` is a Client Component too.
+
+### `Popover`
+
+```tsx
+import { Popover } from "@toraline.tech/ui";
+
+<Popover label="Columns" align="right" panelClassName="w-64">
+  <ColumnList />
+</Popover>
+
+// With a button that closes the panel ("children" is a function, so this file is a Client Component):
+<Popover label="Filters">
+  {(close) => <FilterForm onApply={close} />}
+</Popover>
+```
+
+A button with a floating panel under it, for example the list of columns of a table or its filters.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements. Required | The text of the button that opens the panel |
+| `children` | Elements, or a function `(close) => elements`. Required | The content of the panel. The function form receives `close`, for a panel with a button that closes it |
+| `align` | `"left"` (default), `"right"` | Which edges of the button and the panel line up |
+| `panelClassName` | Classes | Classes for the panel, for example its width. They come after the library's classes |
+| `aria-label` | Text | The name of the button when `label` is not plain text |
+| `disabled` | The HTML attribute | Disables the button |
+
+- The button is a secondary Button in the size `md`.
+- Pointer: a press on the button opens the panel, and a second press closes it. A press outside the button and the panel closes it.
+- Keyboard: Enter and Space on the button open and close the panel. The panel comes right after the button in the page, so Tab goes from the button into it. Escape, with the focus on the button or inside the panel, closes the panel and gives the focus to the button. Escape does not reach a Modal or a Drawer that the Popover is in.
+- The panel opens 8 pixels under the button. It opens above when there is no room below, and keeps 8 pixels to the left and right edges of the window.
+- Screen reader: the button has `aria-expanded`, and `aria-controls` with the id of the panel while it is open.
+- Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to the outermost element, a `<div>` that holds the button and the panel. The parts have `data-slot`: `trigger`, `panel`.
+- The list `popoverAligns` and the types `PopoverProps` and `PopoverAlign` are exported.
+- It is a Client Component. A Server Component can render it when `label` and `children` are text or elements. `children` as a function, and `onClick`, need a Client Component file in the app.
+
+### `Tooltip`
+
+```tsx
+import { Settings } from "lucide-react";
+import { IconButton, Tooltip } from "@toraline.tech/ui";
+
+<Tooltip label="Settings of the shop" side="top">
+  <IconButton icon={Settings} aria-label="Settings" />
+</Tooltip>
+```
+
+A small label next to an element, shown while the pointer is over the element and while it has the keyboard focus.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements. Required | The text of the tooltip |
+| `children` | One element that can get the focus. Required | The element the tooltip belongs to, for example a button or a link |
+| `side` | `"right"` (default), `"top"` | The side of the element where the tooltip is shown: 12 pixels to its right, or 8 pixels above it, centered |
+
+- Shown by CSS: while the pointer is over the element or over the tooltip, and while the element has the keyboard focus (`:focus-visible`). A click with the mouse does not keep it shown after the pointer leaves.
+- Screen reader: the tooltip has `role="tooltip"`, and the element gets `aria-describedby` with its id. So the text is said after the name of the element, also while the tooltip is hidden. When the element has an `aria-label` with exactly the text of `label`, it is not linked, so the text is not said twice.
+- Keyboard: Escape hides the tooltip until the pointer or the focus leaves the element and comes back. That press of Escape does not close a Modal or a Drawer that the element is in.
+- Pointer: the pointer can move from the element onto the tooltip without hiding it.
+- When the side has no room in the window, the tooltip is shown on the opposite side (`left`, `bottom`). When its centered place would leave the window, it is moved along the element to keep 8 pixels to the edge.
+- The tooltip stays inside the `<span>` around the element. An element around it that hides what leaves it (`overflow: hidden`) cuts the tooltip.
+- `className`, every other prop and `ref` go to the outermost element, a `<span>` with `inline-flex`. The tooltip has `data-slot="tooltip"`, and the `<span>` has `data-side` with the side the tooltip is on.
+- A tooltip is not a replacement for a name: an element with only an icon still needs `aria-label`. Do not put a link or a button inside `label`.
+- The list `tooltipSides` and the types `TooltipProps` and `TooltipSide` are exported.
+- It is a Client Component. A Server Component can render it: `label` and `children` are text and elements.
