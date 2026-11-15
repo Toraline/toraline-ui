@@ -12,6 +12,24 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Tooltip: shown by CSS, read by a screen reader (TOR-1163)
+- Decision: `Tooltip` has the elements and the classes of Intraweb's `Tooltip` (`components/ui/tooltip.tsx`): a `<span class="group/tooltip relative inline-flex">` around the element and the tooltip, the tooltip shown by CSS, and the sides `right` (default) and `top`.
+- Accessibility problems of Intraweb's Tooltip, fixed here:
+  1. The tooltip has `aria-hidden="true"`, so a screen reader never says its text; Intraweb asks each screen to repeat the text as the `aria-label` of the element. Here the tooltip has `role="tooltip"` and the element gets `aria-describedby` with its id. When the element already has the same text as its `aria-label` (what Intraweb's screens do today), the tooltip is not linked, so nothing is said twice.
+  2. Escape does not hide it (WCAG 1.4.13, "dismissible"). Here Escape hides it until the pointer or the focus leaves and comes back.
+  3. The pointer cannot move onto the tooltip: it has `pointer-events-none`, and a gap of 12 pixels (WCAG 1.4.13, "hoverable"). Here the tooltip takes the pointer while it is shown, and an invisible strip (`before:`) joins it to the element.
+  4. It is shown while the element has the focus after a mouse click too (`group-focus-within`), so it stays over the page after a click until the focus moves. Here it is shown for the keyboard focus only (`group-has-focus-visible`).
+- Decision: the hidden tooltip is `invisible opacity-0` (Intraweb: `opacity-0` and `pointer-events-none`). `visibility: hidden` takes it away from the pointer and from a screen reader that reads the page in order, and `aria-describedby` still gives its text to the element. The transition is `motion-safe:transition-[opacity,visibility]`.
+- Decision: the element gets `aria-describedby` with `cloneElement`, as Field does for a control. `children` is one element.
+- Decision (ticket TOR-1157): the tooltip stays inside the `<span>`, as in Intraweb, and is not rendered in `<body>`. When the pointer or the focus comes, the component measures with `computeAnchoredPosition`: with no room on the side asked for, the classes of the opposite side are used (`left`, `bottom`); when the centered place would leave the window, an inline `top` or `left` moves the tooltip along the element. With room, nothing is written and the classes of Intraweb place it.
+- Why not in `<body>`: the tooltip would not be on the page before the JavaScript runs, would need a state for "shown", and its markup would differ from Intraweb's. Limit, accepted: an element around it with `overflow: hidden` cuts it.
+- Decision: Escape is heard on the document before any other element (the capture phase), and stops there only when the tooltip was really shown (its computed `visibility`). So with a tooltip shown inside a Modal, the first Escape hides the tooltip and the second closes the Modal; with no tooltip shown, the first Escape closes the Modal.
+- Decision: `label` accepts text or elements (Intraweb: text). The exported list of sides is `["right", "top"]`, as in Intraweb.
+- Contrast: `text-inverse` on `bg-tooltip` is added to the contrast test of `packages/tokens/src/tokens.test.ts`; it passes in both themes.
+- States of the list "States to check": rest and closed (story "Closed"); open by hover and by keyboard focus (stories "Shown By The Pointer", "Shown By The Keyboard Focus"); pressed, disabled, read-only, loading, error, selected: do not apply (a disabled button gets no pointer and no focus, so its tooltip is never shown; the description is still linked); empty: an empty `label` shows an empty box, the app must not render a Tooltip with no text; long content: the text stays on one line (`whitespace-nowrap`), as in Intraweb, so a long text can be wider than the window; near the edge (story "Near The Edge"); right-to-left: considered, not supported, `right` is a physical side; both themes: every story test; reduced motion: the fade is `motion-safe:`.
+- Alternatives: `aria-label` set by the Tooltip on the element; the tooltip in `<body>` with `useAnchoredPanel`; a delay before it is shown; Base UI's Tooltip.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Popover: the panel stays next to its button in the page (TOR-1162)
 - Decision: `Popover` has the elements, the classes and the props of Intraweb's `Popover` (`components/ui/popover.tsx`): a `<div class="relative">` that holds a secondary Button and, while it is open, the panel. One rename: `ariaLabel` is `aria-label`.
 - Decision: the panel is not rendered in `<body>`. It stays right after the button, as in Intraweb, and is placed with `useAnchoredPanel({ strategy: "absolute" })`, measured from the `<div>` around it.

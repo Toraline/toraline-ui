@@ -35,9 +35,11 @@ import {
   Drawer,
   Modal,
   Popover,
+  Tooltip,
   actionMenuTriggers,
   modalSizes,
   popoverAligns,
+  tooltipSides,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
@@ -130,6 +132,11 @@ function FloatingExamples() {
         <Popover key={align} label={`Columns, ${align}`} align={align}>
           The content
         </Popover>
+      ))}
+      {tooltipSides.map((side) => (
+        <Tooltip key={side} label={`A tooltip, ${side}`} side={side}>
+          <button>Help, {side}</button>
+        </Tooltip>
       ))}
     </>
   );
@@ -433,6 +440,11 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["flex-col-reverse", "sm:flex-row"],
     // Phase 9, the menu of SplitButton and ActionMenu: the pointer over an action that cannot be chosen changes nothing.
     ["hover:bg-subtle", "aria-disabled:hover:bg-transparent"],
+    // Phase 9, Tooltip: shown (the pointer over it, or the keyboard focus inside) wins over hidden.
+    ["invisible", "group-hover/tooltip:visible"],
+    ["opacity-0", "group-hover/tooltip:opacity-100"],
+    ["invisible", "group-has-focus-visible/tooltip:visible"],
+    ["opacity-0", "group-has-focus-visible/tooltip:opacity-100"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

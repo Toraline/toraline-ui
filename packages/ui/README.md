@@ -509,7 +509,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 
 1. A component uses the native HTML element that already has the behaviour: `<button>`, `<input>`, `<label>`, `<a>`, `<nav>`. The browser then gives the keyboard and the screen reader support.
 2. Behaviour that HTML does not have (arrow keys between tabs, a menu) is written by hand in the component, following the pattern of the WAI-ARIA Authoring Practices Guide (https://www.w3.org/WAI/ARIA/apg/patterns/). The package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles, for example Base UI, Radix or React Aria.
-3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
+3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`). The overlays of phase 9 (dialog, side panel, menu, popover, tooltip) are written by hand all the same, from Intraweb's code: the entry of TOR-1156 of `docs/decisions.md` has the comparison and the reasons.
 4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`). `outline-focus` is the class of the token `--border-focus`. One exception: a form control (TextInput) shows the focus look of Intraweb's controls, the border in the focus color and a ring of 3 pixels (`focus:border-focus focus:ring-3 focus:ring-info focus:outline-none`), from `src/shared/control.ts`.
 5. An icon that is only decoration has `aria-hidden="true"`. An icon is drawn with `currentColor`, so it has the color of the text.
 6. A class of a movement or a transition has the Tailwind variant `motion-safe:`, so a person who asked the device for less motion gets none.
@@ -867,3 +867,33 @@ A button with a floating panel under it, for example the list of columns of a ta
 - Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to the outermost element, a `<div>` that holds the button and the panel. The parts have `data-slot`: `trigger`, `panel`.
 - The list `popoverAligns` and the types `PopoverProps` and `PopoverAlign` are exported.
 - It is a Client Component. A Server Component can render it when `label` and `children` are text or elements. `children` as a function, and `onClick`, need a Client Component file in the app.
+
+### `Tooltip`
+
+```tsx
+import { Settings } from "lucide-react";
+import { IconButton, Tooltip } from "@toraline.tech/ui";
+
+<Tooltip label="Settings of the shop" side="top">
+  <IconButton icon={Settings} aria-label="Settings" />
+</Tooltip>
+```
+
+A small label next to an element, shown while the pointer is over the element and while it has the keyboard focus.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements. Required | The text of the tooltip |
+| `children` | One element that can get the focus. Required | The element the tooltip belongs to, for example a button or a link |
+| `side` | `"right"` (default), `"top"` | The side of the element where the tooltip is shown: 12 pixels to its right, or 8 pixels above it, centered |
+
+- Shown by CSS: while the pointer is over the element or over the tooltip, and while the element has the keyboard focus (`:focus-visible`). A click with the mouse does not keep it shown after the pointer leaves.
+- Screen reader: the tooltip has `role="tooltip"`, and the element gets `aria-describedby` with its id. So the text is said after the name of the element, also while the tooltip is hidden. When the element has an `aria-label` with exactly the text of `label`, it is not linked, so the text is not said twice.
+- Keyboard: Escape hides the tooltip until the pointer or the focus leaves the element and comes back. That press of Escape does not close a Modal or a Drawer that the element is in.
+- Pointer: the pointer can move from the element onto the tooltip without hiding it.
+- When the side has no room in the window, the tooltip is shown on the opposite side (`left`, `bottom`). When its centered place would leave the window, it is moved along the element to keep 8 pixels to the edge.
+- The tooltip stays inside the `<span>` around the element. An element around it that hides what leaves it (`overflow: hidden`) cuts the tooltip.
+- `className`, every other prop and `ref` go to the outermost element, a `<span>` with `inline-flex`. The tooltip has `data-slot="tooltip"`, and the `<span>` has `data-side` with the side the tooltip is on.
+- A tooltip is not a replacement for a name: an element with only an icon still needs `aria-label`. Do not put a link or a button inside `label`.
+- The list `tooltipSides` and the types `TooltipProps` and `TooltipSide` are exported.
+- It is a Client Component. A Server Component can render it: `label` and `children` are text and elements.

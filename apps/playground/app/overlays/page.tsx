@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { CloseButton, Popover, Toggle } from "@toraline.tech/ui";
+import { Settings } from "lucide-react";
+import { CloseButton, IconButton, Popover, Toggle, Tooltip, tooltipSides } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 import { ActionMenuExamples } from "./ActionMenuExamples";
 import { ConfirmationExamples } from "./ConfirmationExamples";
@@ -82,6 +83,28 @@ export default function OverlaysPage() {
           <Popover label="Columns, lined up to the right" align="right" panelClassName="w-64">
             <p className="text-sm/5 text-body">The right edges of the button and the panel line up.</p>
           </Popover>
+        </div>
+      </Section>
+
+      <Section title="Tooltip">
+        <p className="mt-2 text-sm/5 text-secondary">
+          This page, a Server Component, renders these Tooltips itself, with an IconButton that gets
+          its icon from the server. Move the pointer over a button, or press Tab.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-10">
+          {tooltipSides.map((side) => (
+            <Tooltip key={side} label={`Settings of the shop (${side})`} side={side}>
+              <IconButton icon={Settings} aria-label={`Settings, ${side}`} variant="secondary" />
+            </Tooltip>
+          ))}
+          <Tooltip label="Settings">
+            <IconButton icon={Settings} aria-label="Settings" />
+          </Tooltip>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <Tooltip label="Near the right edge: shown on the left">
+            <IconButton icon={Settings} aria-label="Settings at the edge" variant="secondary" />
+          </Tooltip>
         </div>
       </Section>
     </main>

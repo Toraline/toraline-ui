@@ -57,6 +57,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - ActionMenu: a button (3 dots, or a text with an arrow) that opens a menu of actions next to it. The menu and the menu of SplitButton are the same code.
 - SplitButton: Escape in its menu no longer reaches a Modal or a Drawer that the SplitButton is in, so the key closes only the menu. Nothing else changed.
 - Popover: a button with a floating panel under it. Escape and a press outside close it. It opens above when there is no room below, and stays inside the window.
+- Tooltip: a small label next to an element, shown on hover and on keyboard focus. A screen reader says its text as the description of the element. Escape hides it.
 
 ## 0.1.0 (2026-11-15)
 

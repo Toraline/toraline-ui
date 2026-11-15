@@ -89,3 +89,6 @@ export type { ActionMenuItem, ActionMenuProps, ActionMenuTrigger } from "./actio
 
 export { Popover, popoverAligns } from "./popover/index.js";
 export type { PopoverAlign, PopoverProps } from "./popover/index.js";
+
+export { Tooltip, tooltipSides } from "./tooltip/index.js";
+export type { TooltipProps, TooltipSide } from "./tooltip/index.js";

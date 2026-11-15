@@ -108,6 +108,8 @@ test.each([lightTheme, darkTheme])(
       // A placeholder, and the text of a disabled button or field.
       ["text-tertiary", "bg-surface"],
       ["text-tertiary", "bg-subtle"],
+      // Phase 9: the text of a tooltip.
+      ["text-inverse", "bg-tooltip"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
