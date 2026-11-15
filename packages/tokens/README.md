@@ -174,6 +174,8 @@ The fonts after the variable (`Georgia, serif`) are used while the font file loa
 @import "@toraline.tech/tokens/css/tailwind.css";
 ```
 
+An app that uses `@toraline.tech/ui` must import the preset: the components are styled with the classes it makes. Such an app adds a third line, `@import "@toraline.tech/ui/tailwind.css";`, described in [`packages/ui/README.md`](../ui/README.md).
+
 ```html
 <div class="rounded border border-border bg-surface-raised p-4 text-text shadow">
   <h2 class="font-heading text-primary">Title</h2>
@@ -278,7 +280,7 @@ Every theme gives a value to each of these 26 tokens.
 | `--text-sm` | Font size of small text: a small button, a label, an error message | `--font-size-sm` | `--font-size-sm` |
 | `--text-base` | Font size of normal text in a component | `--font-size-md` | `--font-size-md` |
 | `--text-lg` | Font size of large text: a large button | `--font-size-lg` | `--font-size-lg` |
-| `--spacing` | The spacing unit. A component writes every padding and gap as a multiple of it: `calc(var(--spacing) * 4)` | `--space-1` | `--space-1` |
+| `--spacing` | The spacing unit. Every padding and gap of a component is a multiple of it: the Tailwind class `px-4` is `calc(var(--spacing) * 4)` | `--space-1` | `--space-1` |
 | `--radius` | How round the corners of a component are | `--radius-size-md` | `--radius-size-md` |
 | `--shadow` | Shadow of a raised part | `--shadow-size-sm` | `--shadow-size-md` |
 

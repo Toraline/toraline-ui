@@ -1,0 +1,18 @@
+/*
+ * The Tailwind CSS 4 entry of @toraline.tech/ui.
+ *
+ * The components are styled with Tailwind classes, for example "bg-primary".
+ * Tailwind builds the CSS of a class only when it finds the class in a file it
+ * reads, and it does not read the folder node_modules by itself. The line
+ * below tells Tailwind to read the built files of this package.
+ *
+ * An app imports this file once, in its CSS file, after "tailwindcss" and
+ * after the preset of the tokens:
+ *
+ *   @import "tailwindcss";
+ *   @import "@toraline.tech/tokens/css/tailwind.css";
+ *   @import "@toraline.tech/ui/tailwind.css";
+ *
+ * The path is relative to this file. This package has no other CSS file.
+ */
+@source "../dist";

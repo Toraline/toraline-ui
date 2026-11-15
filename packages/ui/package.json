@@ -40,7 +40,7 @@
       "types": "./dist/theme/index.d.ts",
       "default": "./dist/theme/index.js"
     },
-    "./styles.css": "./css/styles.css",
+    "./tailwind.css": "./css/tailwind.css",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -54,15 +54,18 @@
   },
   "peerDependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0"
   },
   "dependencies": {
-    "@toraline.tech/tokens": "0.1.0"
+    "@toraline.tech/tokens": "0.1.0",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "tailwindcss": "4.3.5"
   }
 }

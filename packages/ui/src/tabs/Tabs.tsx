@@ -3,6 +3,26 @@
 import { useId, useRef, useState } from "react";
 import type { ComponentProps, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
+import { focusRingClass } from "../shared/focus-ring.js";
+
+/** The row of tabs, with a line under it. */
+const listClass = "flex flex-wrap border-b-2 border-b-border";
+
+/**
+ * One tab. The selected tab is selected by aria-selected, the attribute a
+ * screen reader reads: it has the main text color and a line in the primary
+ * color under it. The negative margin puts that line on the line of the row.
+ */
+const tabClass = classNames(
+  "m-0 -mb-[2px] cursor-pointer rounded-t rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-body text-base/normal font-bold text-text-muted",
+  "hover:bg-surface-muted hover:text-text",
+  "aria-selected:border-b-primary aria-selected:text-text",
+  "motion-safe:transition-[background-color,border-color,color] motion-safe:ease-[ease]",
+  focusRingClass,
+);
+
+/** The content of the selected tab. */
+const panelClass = classNames("px-0 py-4 text-base/normal text-text", focusRingClass);
 
 /** One tab: the button a person presses, and the content it shows. */
 export type TabItem = {
@@ -89,10 +109,11 @@ export function Tabs({
   const panelId = `${baseId}-panel`;
 
   return (
-    <div {...divProps} className={classNames("tui-tabs", className)}>
+    <div {...divProps} className={classNames("font-body", className)}>
       <div
         role="tablist"
-        className="tui-tabs__list"
+        className={listClass}
+        data-slot="list"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
       >
@@ -107,7 +128,8 @@ export function Tabs({
               type="button"
               role="tab"
               id={tabId(index)}
-              className="tui-tabs__tab"
+              className={tabClass}
+              data-slot="tab"
               aria-selected={isSelected}
               aria-controls={isSelected ? panelId : undefined}
               tabIndex={isSelected ? 0 : -1}
@@ -123,7 +145,8 @@ export function Tabs({
         <div
           role="tabpanel"
           id={panelId}
-          className="tui-tabs__panel"
+          className={panelClass}
+          data-slot="panel"
           aria-labelledby={tabId(selectedIndex)}
           tabIndex={0}
         >

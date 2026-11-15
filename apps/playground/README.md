@@ -30,7 +30,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 | `app/fonts.ts` | Loads the font Fraunces with `next/font/local` into the CSS variable `--font-fraunces` |
 | `app/fonts/` | The font file and its license (SIL Open Font License 1.1) |
 | `app/layout.tsx` | Reads the theme cookie on the server and writes `data-theme` on `<html>` |
-| `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file and the component styles. It has no other CSS |
+| `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file, and `@toraline.tech/ui/tailwind.css`, the line that makes Tailwind build the classes of the components. It has no other CSS |
 | `app/page.tsx` | The test page. It has no CSS of its own: only classes |
 | `app/components/page.tsx` | The page of the components, at `/components` |
 | `app/components/SplitButtonExamples.tsx` | The examples of SplitButton. It is a Client Component, because the actions of a menu are functions |
@@ -92,7 +92,7 @@ Checked on the built app on 2026-11-15 (Tailwind CSS 4.3.5), in a browser, with 
 | Added color | `bg-brand` | `rgb(179, 71, 0)` | `rgb(255, 179, 122)` |
 | Text on the added color | `text-brand-foreground` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
 
-The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a top margin of `16px`. This shows that a class of the app wins over the library's styles. The browser console had no error.
+The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a top margin of `16px`. This shows that a class of the app is applied on a component of the library. The browser console had no error.
 
 ## How the components were checked
 
@@ -107,6 +107,12 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3987/components   # 200
 pkill -f "next start -p 3987"
 ```
 
+The values below were read when the components were styled with CSS files (TOR-997). On 2026-11-15 the components changed to Tailwind classes (TOR-1205). The computed style of every element of `/` and `/components` was read before and after that change with a temporary Playwright script, in both themes: at rest, with the pointer over each control, and with the keyboard focus on each control. The screenshots of the 2 pages in the 2 themes are the same, byte for byte. The values that differ change nothing a person sees:
+
+- The thumb of an "on" switch is moved with the CSS property `translate` (`20px`), where it was `transform`. The arrow of a split button is turned with `rotate` (`180deg`), where it was `transform`. The transitions name the new properties.
+- The animation of the spinner has a new name, `spin`. It still takes `0.7s`.
+- A tab and an action of a menu have `border-style: solid` on the sides whose border is `0px` wide, where it was `none`.
+
 The page was then opened in a browser. The colors below were read with `getComputedStyle`, once with `data-theme="light"` and once with `data-theme="dark"` on `<html>`. Transitions were turned off while reading, because a color that is still changing gives a value between the two themes. In each cell: background, then text.
 
 ### Button (TOR-1010)
@@ -119,7 +125,7 @@ The page was then opened in a browser. The colors below were read with `getCompu
 | Disabled (every variant) | `rgb(255, 255, 255)`, `rgb(111, 117, 126)`, border `rgb(207, 209, 212)` | `rgb(15, 25, 40)`, `rgb(159, 163, 169)`, border `rgb(63, 71, 83)` |
 | Loading `primary` | The same as `primary` | The same as `primary` |
 
-Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The spinner of a loading button has the animation `tui-button-spin`. The button with `className="rounded-full"` has a fully round corner, where the library's style gives `8px`: the class of the app wins.
+Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The spinner of a loading button has the animation `spin`. The button with `className="rounded-full"` has a fully round corner, where the library's class `rounded` gives `8px`: the class of the app replaces it.
 
 ### Input (TOR-1011)
 
@@ -144,7 +150,7 @@ The track is the long rounded part of the switch. The thumb is the circle that m
 | On: track, border, thumb | `rgb(47, 111, 20)`, `rgb(47, 111, 20)`, `rgb(255, 255, 255)` | `rgb(126, 195, 109)`, `rgb(126, 195, 109)`, `rgb(15, 25, 40)` |
 | Disabled: track, border, thumb, label | `rgb(243, 243, 244)`, `rgb(207, 209, 212)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)`, `rgb(159, 163, 169)`, `rgb(159, 163, 169)` |
 
-Off, the thumb has no `transform` and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.
+Off, the thumb is not moved (`translate` is `none`) and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.
 
 ### Tabs (TOR-1013)
 
@@ -164,7 +170,7 @@ With the keyboard, starting with the focus on the tab "All": Right arrow selecte
 | Link and separator | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
 | Current page | `rgb(15, 25, 40)`, font size `18px` | `rgb(243, 243, 244)`, font size `18px` |
 
-In the first example the links go to `/` and `/components`, and the element with `aria-current="page"` has the text "BreadCrumbs". The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's style gives `700`.
+In the first example the links go to `/` and `/components`, and the element with `aria-current="page"` has the text "BreadCrumbs". The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's class `font-bold` gives `700`.
 
 ### SplitButton (TOR-1015)
 

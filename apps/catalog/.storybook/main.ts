@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/postcss";
 import type { StorybookConfig } from "@storybook/react-vite";
 import { mergeConfig } from "vite";
 
@@ -37,6 +38,12 @@ const config: StorybookConfig = {
 
   viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {
+      css: {
+        // Tailwind CSS 4 builds the classes of the components and of the stories.
+        postcss: {
+          plugins: [tailwindcss()],
+        },
+      },
       build: {
         rollupOptions: {
           // The build warns that a "use client" line may be lost when files are
@@ -57,20 +64,20 @@ const config: StorybookConfig = {
         // The catalog reads the source of the two packages, not their built
         // files. So the catalog opens with no build before it, a change in a
         // component shows at once, and the table of props reads the comments
-        // of the source. The CSS imports ("@toraline.tech/tokens/css",
-        // "@toraline.tech/ui/styles.css") are not in this list: they already
-        // point to files that need no build.
+        // of the source. The CSS import of the tokens
+        // ("@toraline.tech/tokens/css/tailwind.css", in preview.css) is not in
+        // this list: it already points to a file that needs no build.
         alias: [
           {
-            find: /^@toraline\/tokens$/,
+            find: /^@toraline\.tech\/tokens$/,
             replacement: fromRepositoryRoot("packages/tokens/src/index.ts"),
           },
           {
-            find: /^@toraline\/ui$/,
+            find: /^@toraline\.tech\/ui$/,
             replacement: fromRepositoryRoot("packages/ui/src/index.ts"),
           },
           {
-            find: /^@toraline\/ui\/theme$/,
+            find: /^@toraline\.tech\/ui\/theme$/,
             replacement: fromRepositoryRoot("packages/ui/src/theme/index.ts"),
           },
         ],

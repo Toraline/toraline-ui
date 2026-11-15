@@ -11,7 +11,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rolldownOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime", "@toraline.tech/tokens"],
+      external: ["react", "react-dom", "react/jsx-runtime", "@toraline.tech/tokens", "tailwind-merge"],
       // The build warns that a "use client" line may be lost when files are joined.
       // Files are not joined here (preserveModules), so the line is kept.
       onLog(level, log, defaultHandler) {

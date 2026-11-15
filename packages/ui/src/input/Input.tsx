@@ -1,6 +1,7 @@
 import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
+import { focusRingClass } from "../shared/focus-ring.js";
 
 export type InputProps = ComponentProps<"input"> & {
   /**
@@ -15,11 +16,27 @@ export type InputProps = ComponentProps<"input"> & {
   error?: ReactNode;
 };
 
+/**
+ * The classes of the field. The states are selected by the attribute a screen
+ * reader reads: "aria-invalid:" for an error, "disabled:" for a disabled field.
+ * With an error the border has the danger color, also while the field has the focus.
+ */
+const fieldClass = classNames(
+  "w-full rounded border border-border-strong bg-surface p-3 font-body text-base/normal text-text",
+  "placeholder:text-text-muted placeholder:opacity-100",
+  "hover:border-text focus-visible:border-primary",
+  "aria-invalid:enabled:border-danger",
+  "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted",
+  "motion-safe:transition-[border-color] motion-safe:ease-[ease]",
+  focusRingClass,
+);
+
 /** The icon of the error message: a circle with a cross. It is decoration, so a screen reader skips it. */
 function ErrorIcon() {
   return (
     <svg
-      className="tui-input__error-icon"
+      className="size-[1em] flex-none"
+      data-slot="error-icon"
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-hidden="true"
@@ -51,23 +68,36 @@ export function Input({
   const errorId = `${fieldId}-error`;
   const hasLabel = label !== undefined && label !== null && label !== false && label !== "";
   const hasError = error !== undefined && error !== null && error !== false && error !== "";
+  // The ids of the elements that describe the field: the app's own, then the error message.
+  const describedByIds = [describedBy, hasError ? errorId : undefined].filter(
+    (describedById) => describedById !== undefined && describedById !== "",
+  );
 
   return (
-    <div className={classNames("tui-input", className)}>
+    <div className={classNames("flex flex-col gap-1 font-body", className)}>
       {hasLabel ? (
-        <label className="tui-input__label" htmlFor={fieldId}>
+        <label
+          className="text-sm/normal font-medium text-text"
+          data-slot="label"
+          htmlFor={fieldId}
+        >
           {label}
         </label>
       ) : null}
       <input
         {...inputProps}
         id={fieldId}
-        className="tui-input__field"
+        className={fieldClass}
+        data-slot="field"
         aria-invalid={hasError ? true : invalid}
-        aria-describedby={classNames(describedBy, hasError && errorId) || undefined}
+        aria-describedby={describedByIds.length > 0 ? describedByIds.join(" ") : undefined}
       />
       {hasError ? (
-        <p className="tui-input__error" id={errorId}>
+        <p
+          className="m-0 flex items-center gap-1 text-sm/normal text-danger"
+          data-slot="error"
+          id={errorId}
+        >
           <ErrorIcon />
           {error}
         </p>

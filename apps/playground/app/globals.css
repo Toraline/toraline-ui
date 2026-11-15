@@ -4,5 +4,5 @@
 @import "@toraline.tech/tokens/css/tailwind.css";
 /* The themes of this app and the classes of the colors it added, built from theme.config.ts. */
 @import "./theme.generated.css";
-/* The styles of the library's components. */
-@import "@toraline.tech/ui/styles.css";
+/* Tells Tailwind where the classes of the library's components are, so it builds their CSS. */
+@import "@toraline.tech/ui/tailwind.css";

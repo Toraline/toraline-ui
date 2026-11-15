@@ -8,7 +8,7 @@
 // package. A failed check stops the publish. The release steps are in docs/releasing.md.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -84,7 +84,72 @@ for (const { folder, manifest } of manifests) {
   }
 }
 
-// 4. A source file that starts with "use client" keeps that line in its built file.
+// 4. @toraline.tech/ui is styled with Tailwind CSS 4 classes. An app's Tailwind must build the
+//    CSS of those classes, so: Tailwind is a required peer dependency; the package has one CSS
+//    file, css/tailwind.css, which tells Tailwind where the built files are; and Tailwind, given
+//    that file, really builds the CSS of the classes of the built components.
+{
+  const folder = "packages/ui";
+  const manifest = readJson(`${folder}/package.json`);
+  const tailwindEntry = "./css/tailwind.css";
+
+  if (!manifest.peerDependencies?.tailwindcss?.startsWith("^4.")) {
+    fail(`${folder}/package.json must have "tailwindcss": "^4.0.0" in "peerDependencies". The components are styled with Tailwind CSS 4 classes.`);
+  }
+  if (manifest.peerDependenciesMeta?.tailwindcss?.optional) {
+    fail(`${folder}/package.json marks the peer dependency "tailwindcss" as optional. The components have no style without Tailwind CSS.`);
+  }
+  if (!manifest.dependencies?.["tailwind-merge"]) {
+    fail(`${folder}/package.json must have "tailwind-merge" in "dependencies". The built files import it.`);
+  }
+  if (manifest.exports?.["./tailwind.css"] !== tailwindEntry) {
+    fail(`${folder}/package.json must have "./tailwind.css": "${tailwindEntry}" in "exports". An app imports it so that Tailwind builds the classes of the components.`);
+  }
+
+  const cssFiles = [...listFiles(`${folder}/css`), ...listFiles(`${folder}/src`)].filter((path) => path.endsWith(".css"));
+  const extraCssFiles = cssFiles.filter((path) => path !== join(folder, tailwindEntry));
+  if (extraCssFiles.length > 0) {
+    fail(`${folder} must have no CSS file but css/tailwind.css. A component is styled with Tailwind classes. Found: ${extraCssFiles.join(", ")}`);
+  }
+
+  const tailwindEntryPath = join(root, folder, tailwindEntry);
+  if (existsSync(tailwindEntryPath)) {
+    // The folder that the "@source" line names must exist and must be in the package ("files").
+    const sources = [...readFileSync(tailwindEntryPath, "utf8").matchAll(/@source\s+"([^"]+)"/g)].map((match) => match[1]);
+    if (sources.length === 0) {
+      fail(`${folder}/css/tailwind.css has no "@source" line. Without it, Tailwind does not read the package and builds no class of the components.`);
+    }
+    for (const source of sources) {
+      const sourcePath = resolve(dirname(tailwindEntryPath), source);
+      const topFolder = relative(join(root, folder), sourcePath).split("/")[0];
+      if (!existsSync(sourcePath)) {
+        fail(`${folder}/css/tailwind.css names the source "${source}", and that folder does not exist. Run: npm run build`);
+      } else if (!manifest.files.includes(topFolder)) {
+        fail(`${folder}/css/tailwind.css names the source "${source}", and the folder "${topFolder}" is not in "files" of package.json. It would be missing from the published package.`);
+      }
+    }
+
+    // Run Tailwind the way an app does, with no other source than the package's own entry.
+    const { default: postcss } = await import("postcss");
+    const { default: tailwind } = await import("@tailwindcss/postcss");
+    const appCss = [
+      '@import "tailwindcss" source(none);',
+      `@import "${join(root, "packages/tokens/css/tailwind.css")}";`,
+      `@import "${tailwindEntryPath}";`,
+    ].join("\n");
+    const built = await postcss([tailwind()]).process(appCss, { from: join(root, folder, "app.css") });
+    // One class of a Client Component (Button), one of a component that also renders
+    // on the server (Input), and one of the entry "@toraline.tech/ui/theme" (ThemeToggle).
+    const expectedSelectors = [".bg-primary", ".aria-invalid\\:enabled\\:border-danger", ".hover\\:bg-surface-muted"];
+    for (const selector of expectedSelectors) {
+      if (!built.css.includes(selector)) {
+        fail(`Tailwind did not build the class ${selector} from ${folder}/css/tailwind.css. An app would show the components with no style. Run: npm run build`);
+      }
+    }
+  }
+}
+
+// 5. A source file that starts with "use client" keeps that line in its built file.
 //    Next.js needs the line to know that a component runs in the browser.
 for (const { folder } of manifests) {
   const sourceFiles = listFiles(`${folder}/src`).filter(
@@ -100,7 +165,7 @@ for (const { folder } of manifests) {
   }
 }
 
-// 5. A relative import in a built type file names the file with ".js". TypeScript in an app
+// 6. A relative import in a built type file names the file with ".js". TypeScript in an app
 //    that uses the Node module rules ("moduleResolution": "node16") needs the full file name.
 for (const { folder } of manifests) {
   const typeFiles = listFiles(`${folder}/dist`).filter((path) => path.endsWith(".d.ts"));
@@ -114,7 +179,7 @@ for (const { folder } of manifests) {
   }
 }
 
-// 6. The files npm would put in each package: no test, no template, no source file, no source map.
+// 7. The files npm would put in each package: no test, no template, no source file, no source map.
 for (const { folder, manifest } of manifests) {
   const output = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
     cwd: join(root, folder),
@@ -136,7 +201,7 @@ for (const { folder, manifest } of manifests) {
   }
 }
 
-// 7. Only for "npm publish": the person asked for this version, on the release branch, with nothing uncommitted.
+// 8. Only for "npm publish": the person asked for this version, on the release branch, with nothing uncommitted.
 if (isPublish) {
   const asked = process.env.TORALINE_RELEASE;
   if (asked !== version) {

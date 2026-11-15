@@ -73,12 +73,17 @@ export function ThemedApp() {
   );
 }
 
-/** The result of guide 3: a class of the app on a Button, and on the inner field of an Input. */
+/**
+ * The result of guide 3: a Tailwind class of the app on a Button, a class of
+ * the app's own CSS on a Button, and a rule of the app's own CSS on the inner
+ * field of an Input.
+ */
 export function StyledOnTop() {
   return (
     <div className="guide-example">
       <Button>Save, as the library styles it</Button>
-      <Button className="guide-round">Save, with the class of the app</Button>
+      <Button className="rounded-full">Save, with a Tailwind class of the app</Button>
+      <Button className="guide-round">Save, with a class of the app's own CSS</Button>
       <Input className="guide-search" label="Search" name="search" />
     </div>
   );

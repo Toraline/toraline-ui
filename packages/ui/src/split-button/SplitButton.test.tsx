@@ -223,9 +223,11 @@ describe("SplitButton", () => {
     expect(screen.getByRole("menu", { name: "Other downloads" })).toBeTruthy();
   });
 
-  test("puts the app's className on the outermost element, after the library's class", () => {
+  test("puts the app's className on the outermost element, after the library's classes", () => {
     const { container } = renderSplitButton({ className: "mt-4" });
-    expect(container.firstElementChild?.className).toBe("tui-split-button mt-4");
+    const classes = container.firstElementChild?.className.split(" ") ?? [];
+    expect(classes.at(-1)).toBe("mt-4");
+    expect(classes).toContain("inline-flex");
   });
 
   test("passes other attributes to the main <button>, and ref points to it", () => {
