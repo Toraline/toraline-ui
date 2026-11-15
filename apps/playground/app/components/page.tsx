@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -66,10 +67,17 @@ export default function ComponentsPage() {
             </Button>
           ))}
         </Row>
-        <Row label="Sizes">
+        <Row label="Sizes: 32, 40 and 48 pixels high">
           {buttonSizes.map((size) => (
             <Button key={size} size={size}>
               Size {size}
+            </Button>
+          ))}
+        </Row>
+        <Row label="With an icon of lucide-react (icon={Plus}), given by this Server Component">
+          {buttonSizes.map((size) => (
+            <Button key={size} size={size} icon={Plus} variant="secondary">
+              New order
             </Button>
           ))}
         </Row>

@@ -4,6 +4,22 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
+## 0.2.0 (not published yet)
+
+The components get the shape of the same components of the app Intraweb: variants, sizes, props, measures and states (phase 7, TOR-1123). After this version a screen of Intraweb can import these components from the library and look the same.
+
+### Breaking changes, with what an app must change
+
+- **Button: new sizes.** The heights are now 32 pixels (`sm`), 40 (`md`) and 48 (`lg`), with the paddings of Intraweb. The font size is 14 pixels for `sm` and `md` (it was 16 for `md`) and 16 for `lg` (it was 18). The app changes nothing; a layout that depended on the old heights must be looked at.
+- **Button: a disabled button has half of its opacity**, in the colors of its variant, as in Intraweb. It was grey for every variant. An app that gave `disabled:` color classes to a Button can remove them.
+- **Button: no pointer cursor.** The pointer over a button is the normal arrow, as in Intraweb and as Tailwind CSS 4 sets it. An app that wants the hand gives `className="cursor-pointer"`.
+
+### New
+
+- Button: the variants `soft` (a quiet background in the brand color) and `ghost` (no background and no border). The list `buttonVariants` now has 5 values: `primary`, `secondary`, `soft`, `danger`, `ghost`.
+- Button: the prop `icon`, an icon component shown before the text: `<Button icon={Plus}>`. An icon of the package `lucide-react` works as it is. The library does not depend on `lucide-react`. The type is `IconComponent`.
+- Button has no `"use client"` any more, so a Server Component can give it an icon component. Only its `<button>` runs in the browser.
+
 ## 0.1.0 (2026-11-15)
 
 The first version of the new library. Inside Toraline it is called "V2". It is a pre-release: tested in Toraline's own apps, not used for real yet. Version `1.0.0` comes after the full rebrand. It replaces `@toraline/toraline-ui`, and nothing of the old package works unchanged with it.

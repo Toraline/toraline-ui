@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline.tech/ui/theme` | Built in phase 2 |
-| The components | `@toraline.tech/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton |
+| The components | `@toraline.tech/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Phase 7 (TOR-1123) gives them the variants, sizes and props of the same components of the app Intraweb |
 | The line that makes Tailwind CSS build the classes of everything above | `@toraline.tech/ui/tailwind.css` | One CSS file, imported once by the app |
 
 The components are styled with Tailwind CSS 4 classes that read the tokens of [`@toraline.tech/tokens`](../tokens/README.md). The package has no CSS of its own for a component. So the app must use Tailwind CSS 4.
@@ -123,26 +123,44 @@ All of them come from `@toraline.tech/ui`. They need the 3 CSS lines of step 1 a
 ### `Button`
 
 ```tsx
+import { Plus } from "lucide-react";
 import { Button } from "@toraline.tech/ui";
 
-<Button variant="danger" size="sm" onClick={deleteOrder}>
-  Delete
+<Button variant="secondary" size="sm" icon={Plus} onClick={addOrder}>
+  New order
 </Button>
 ```
 
 | Prop | Values | Meaning |
 |---|---|---|
-| `variant` | `"primary"` (default), `"secondary"`, `"danger"` | The look. `primary`: the main action. `secondary`: another action. `danger`: an action that deletes |
-| `size` | `"sm"`, `"md"` (default), `"lg"` | The size |
-| `loading` | `true`, `false` (default) | `true` while the action is running. The button shows a spinner (a small turning circle), and a press does nothing |
-| `disabled` | The HTML attribute | The button cannot get focus and cannot be pressed |
+| `variant` | `"primary"` (default), `"secondary"`, `"soft"`, `"danger"`, `"ghost"` | The look. `primary`: the main action. `secondary`: another action, with a border. `soft`: an action with a quiet background in the brand color. `danger`: an action that deletes. `ghost`: an action with no background and no border |
+| `size` | `"sm"`, `"md"` (default), `"lg"` | The size. The button is at least 32 pixels high for `sm`, 40 for `md` and 48 for `lg` |
+| `icon` | An icon component | An icon shown before the text. See [Icons](#icons). It is decoration: a screen reader skips it |
+| `loading` | `true`, `false` (default) | `true` while the action is running. The button shows a spinner (a small turning circle) in the place of the icon, and a press does nothing |
+| `disabled` | The HTML attribute | The button cannot get focus and cannot be pressed. It has half of its opacity |
 | `type` | `"button"` (default), `"submit"`, `"reset"` | The HTML attribute. The default is `"button"`, so a button inside a form does not send the form by accident |
 
+- The variants, the sizes, the paddings and the font (Poppins, weight 500) are the ones of the Button of the app Intraweb. The state `loading` is the library's own: Intraweb has none.
 - Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to it too. The spinner inside it has `data-slot="spinner"`.
 - Keyboard: Tab moves the focus to it, Enter and Space press it.
 - Screen reader: a loading button has `aria-busy="true"` and `aria-disabled="true"`. It keeps the keyboard focus, so a person who pressed it with the keyboard does not lose their place.
 - The lists `buttonVariants` and `buttonSizes` and the types `ButtonProps`, `ButtonVariant` and `ButtonSize` are exported.
-- It is a Client Component, because it has a click handler of its own.
+- It has no `"use client"`: a Server Component can render it and give it an icon component. Only its `<button>`, which stops the press of a loading button, runs in the browser. A function such as `onClick` still needs a Client Component, as every function does.
+
+### Icons
+
+The library has no icon set and does not depend on one. A component with the prop `icon` receives a React component that draws one icon as an `<svg>`:
+
+```tsx
+import { Plus } from "lucide-react";
+
+<Button icon={Plus}>New order</Button>
+```
+
+- The type is `IconComponent`, exported from `@toraline.tech/ui`: a component that accepts `className` and `aria-hidden`. Every icon of the package `lucide-react`, the icons the app Intraweb uses, has this shape. So does a small component of the app that returns an `<svg {...props}>`.
+- The library gives the icon its size (a class such as `size-4`, 16 pixels) and `aria-hidden="true"`. The icon is drawn with `currentColor`, so it has the color of the text.
+- Give the component, not an element: `icon={Plus}`, not `icon={<Plus />}`.
+- The icons the library draws itself (the error icon of Field, the arrow of SplitButton) are small `<svg>` elements inside the components.
 
 ### `Input`
 
@@ -338,7 +356,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
    - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
-4. A font size is `text-sm`, `text-base` or `text-lg`, written with the line height: `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
+4. A font size is `text-sm`, `text-base` or `text-lg`, written with the line height: `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a size in `em` or `%` (`size-[1em]`; a size in `em` follows the font size of the component), a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
 7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`. When that order is not the one needed, the class names both conditions: `aria-invalid:enabled:border-invalid`.

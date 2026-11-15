@@ -12,6 +12,23 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Button: the variants, sizes and icon of Intraweb; icons are components the app gives (TOR-1138)
+- Decision: Button has the 5 variants (`primary`, `secondary`, `soft`, `danger`, `ghost`), the 3 sizes and the class lists of Intraweb's `components/ui/button.tsx`. The smallest heights are 32, 40 and 48 pixels (`min-h-8`, `min-h-10`, `min-h-12`). The classes are in `packages/ui/src/button/button-class.ts`, which Button and ButtonLink share.
+- Decision (icons): the prop `icon` receives a component, as in Intraweb: `<Button icon={Plus}>`. Its type is `IconComponent` (`packages/ui/src/shared/icon.ts`): a component that accepts `className` and `aria-hidden`. `lucide-react` is not a dependency of the library. Intraweb's usage needs no change. Every later component with an icon uses this type.
+- Why: an app chooses its own icon set, and a dependency on `lucide-react` would put one version of it in every app. Checked on 2026-11-15 with `lucide-react` 1.73.0 in an app made with `create-next-app` 16.4.6: `icon={Plus}` type checks and renders.
+- Decision: the icons the library draws itself (the error icon of Field, the arrow of SplitButton) are small inline `<svg>` elements. Where the shape is an icon of Lucide, the source says so; Lucide has the ISC license, and `packages/ui/README.md` names it.
+- Decision: `lucide-react` 1.73.0 is a dependency of the two private apps only (`apps/catalog`, `apps/playground`), so the stories and the playground show the real icons Intraweb uses.
+- Decision: `Button.tsx` has no `"use client"`. The `<button>` with the click handler of the loading state is a second file, `ButtonElement.tsx`, which has `"use client"` and is not exported.
+- Why: Next.js does not let a Server Component give a function to a Client Component, and an icon component is a function. Intraweb's Button is not a Client Component, and Intraweb gives it icons from Server Components. Checked on 2026-11-15 with Next.js 16.4.6: a Server Component page with `<Button icon={Plus}>` builds and renders.
+- Decision: a disabled Button has `disabled:opacity-50`, in the colors of its variant, as in Intraweb. This replaces, in the entries of TOR-1010 and TOR-1131: "a disabled button has the same quiet look in every variant".
+- Why: the task of phase 7 is that a screen of Intraweb looks the same with the library's Button. The grey box would also give a ghost button and a soft button a background and a border they do not have. The accessibility rules (WCAG 1.4.3) do not ask a contrast of a disabled control, and axe-core does not check it.
+- Decision: Button has no `cursor-pointer`. Intraweb's has none, and Tailwind CSS 4 leaves the normal arrow on a button.
+- Decision: the library keeps 3 things Intraweb's Button does not have: the state `loading` (the spinner is in the place of the icon and has its size), the focus ring as a class (Intraweb has the same outline in its global CSS, for every button), and `motion-safe:` on the transition.
+- Decision: a font size is written with its line height as a spacing step: `text-sm/5` (20 pixels) and `text-base/6` (24 pixels). They give the same computed values as Intraweb's `text-sm` and `text-base`.
+- Why: with the preset, plain `text-sm` reads the line height from Tailwind's own variable `--text-sm--line-height`, which is not a token, so the test of the token rule fails.
+- Alternatives: `lucide-react` as a dependency or a peer dependency; an `icon` prop that receives an element (`icon={<Plus />}`), which Intraweb's usage would have to change to; keeping `"use client"` on Button and asking apps to wrap icons; the grey disabled look.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The themes cozy, old and glass stay in Intraweb, as app themes (TOR-1137)
 - Decision: the library has the themes `light` and `dark` only. Intraweb's 3 other themes, `cozy`, `old` and `glass`, stay in Intraweb. Intraweb builds them with the theme function `createTheme` of `@toraline.tech/tokens`, the same way any app builds its own themes.
 - Why: the 3 themes are the taste of one app (a cream and pink theme, a theme that looks like an old game, a glass theme), not the look of Toraline. A theme in the library is a promise to every app: each new component must be checked in it, and each story test runs once for each theme. `glass` also needs CSS rules that are not tokens (below), which the library would have to ship and keep.

@@ -1,12 +1,24 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createRef } from "react";
 import type { FormEvent } from "react";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Button, buttonSizes, buttonVariants } from "./index";
 
 afterEach(cleanup);
+
+/** A small icon component, with the props an icon of "lucide-react" accepts. */
+function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" | "false" }) {
+  return (
+    <svg {...props} data-testid="icon" viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5v14" />
+    </svg>
+  );
+}
 
 describe("Button", () => {
   test("is a real button with its text as the accessible name", () => {
@@ -25,9 +37,45 @@ describe("Button", () => {
     expect(screen.getByRole("button").getAttribute("data-variant")).toBe(variant);
   });
 
-  test.each(buttonSizes)('has the size "%s"', (size) => {
+  test("has the 5 variants and the 3 sizes of the app Intraweb", () => {
+    expect(buttonVariants).toEqual(["primary", "secondary", "soft", "danger", "ghost"]);
+    expect(buttonSizes).toEqual(["sm", "md", "lg"]);
+  });
+
+  test.each([
+    ["sm", "min-h-8"],
+    ["md", "min-h-10"],
+    ["lg", "min-h-12"],
+  ] as const)('has the size "%s", with the smallest height "%s"', (size, heightClass) => {
     render(<Button size={size}>Save</Button>);
-    expect(screen.getByRole("button").getAttribute("data-size")).toBe(size);
+    const button = screen.getByRole("button");
+    expect(button.getAttribute("data-size")).toBe(size);
+    expect(button.className.split(" ")).toContain(heightClass);
+  });
+
+  test("the font is the font of headings, in the medium weight", () => {
+    render(<Button>Save</Button>);
+    const classes = screen.getByRole("button").className.split(" ");
+    expect(classes).toContain("font-heading");
+    expect(classes).toContain("font-medium");
+  });
+
+  test("icon: the icon is before the text, has the size of the button's size, and a screen reader skips it", () => {
+    render(
+      <Button icon={PlusIcon} size="lg">
+        New order
+      </Button>,
+    );
+    const button = screen.getByRole("button", { name: "New order" });
+    const icon = screen.getByTestId("icon");
+    expect(button.firstElementChild).toBe(icon);
+    expect(icon.getAttribute("aria-hidden")).toBe("true");
+    expect(icon.getAttribute("class")).toBe("size-5 shrink-0");
+  });
+
+  test("no icon: the button has only its text", () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole("button").children).toHaveLength(0);
   });
 
   test("adds the app's className after the library's classes", () => {
@@ -54,7 +102,7 @@ describe("Button", () => {
     expect(classes).toContain("border-danger");
     expect(classes).toContain("text-danger");
     // The class of a state has another variant, so it stays.
-    expect(classes).toContain("disabled:bg-subtle");
+    expect(classes).toContain("disabled:opacity-50");
   });
 
   test("a loading button has no class for the pointer over it, so its colors stay", () => {
@@ -126,6 +174,8 @@ describe("Button", () => {
 
     const spinner = button.querySelector('[data-slot="spinner"]');
     expect(spinner?.getAttribute("aria-hidden")).toBe("true");
+    // The spinner has the size of the icon, so the text does not move when it replaces the icon.
+    expect(spinner?.className.split(" ")).toContain("size-4");
 
     await user.tab();
     expect(document.activeElement).toBe(button);
@@ -133,6 +183,16 @@ describe("Button", () => {
     await user.keyboard(" ");
     await user.click(button);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  test("loading: the spinner is in the place of the icon", () => {
+    render(
+      <Button loading icon={PlusIcon}>
+        Save
+      </Button>,
+    );
+    expect(screen.queryByTestId("icon")).toBeNull();
+    expect(screen.getByRole("button").querySelectorAll('[data-slot="spinner"]')).toHaveLength(1);
   });
 
   test("loading: a submit button does not send its form", async () => {
@@ -155,5 +215,17 @@ describe("Button", () => {
     );
     await user.click(screen.getByRole("button"));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  test("renders on the server, with its icon", () => {
+    const html = renderToString(<Button icon={PlusIcon}>Save</Button>);
+    expect(html).toMatch(/^<button [^>]*type="button"/);
+    expect(html).toContain('data-testid="icon"');
+  });
+
+  test('only the file of the <button> has "use client", so a Server Component can give an icon component', () => {
+    const readSource = (fileName: string) => readFileSync(join(import.meta.dirname, fileName), "utf8");
+    expect(readSource("Button.tsx").startsWith('"use client"')).toBe(false);
+    expect(readSource("ButtonElement.tsx").startsWith('"use client"')).toBe(true);
   });
 });

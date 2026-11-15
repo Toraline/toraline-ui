@@ -72,6 +72,15 @@ const crumbs = [
   { label: "No link" },
   { label: "Fernando Dias", href: "/clients/12" },
 ];
+/** A small icon component, with the props an icon of "lucide-react" accepts. */
+function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" | "false" }) {
+  return (
+    <svg {...props} viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5v14" />
+    </svg>
+  );
+}
+
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
 
 /** Renders every component in every variant, size and state, and returns every class on the page. */
@@ -81,7 +90,7 @@ async function renderEveryComponent(): Promise<string[]> {
     <ThemeProvider>
       {buttonVariants.map((variant) =>
         buttonSizes.map((size) => (
-          <Button key={`${variant}-${size}`} variant={variant} size={size}>
+          <Button key={`${variant}-${size}`} variant={variant} size={size} icon={PlusIcon}>
             Save
           </Button>
         )),
@@ -231,6 +240,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["text-danger", "disabled:text-tertiary"],
     ["bg-primary", "hover:bg-primary-hover"],
     ["bg-surface", "hover:bg-subtle"],
+    ["bg-primary-subtle", "hover:bg-primary-muted"],
+    ["text-body", "hover:text-primary"],
     // Input: the focus wins over the pointer, and disabled wins over both.
     ["border-default", "hover:border-hover"],
     ["hover:border-hover", "focus-visible:border-focus"],

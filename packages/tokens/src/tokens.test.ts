@@ -93,6 +93,11 @@ test.each([lightTheme, darkTheme])(
       // The primary button, at rest and with the pointer over it.
       ["text-inverse", "bg-primary"],
       ["text-inverse", "bg-primary-hover"],
+      // The soft button, at rest and with the pointer over it.
+      ["text-brand", "bg-primary-subtle"],
+      ["text-brand", "bg-primary-muted"],
+      // The ghost button with the pointer over it.
+      ["text-primary", "bg-muted"],
       // The danger button and the error message of a field.
       ["text-danger", "bg-page"],
       ["text-danger", "bg-surface"],

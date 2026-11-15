@@ -7,6 +7,8 @@
  */
 export const packageName = "@toraline.tech/ui";
 
+export type { IconComponent } from "./shared/icon.js";
+
 export { Button, buttonSizes, buttonVariants } from "./button/index.js";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./button/index.js";
 
