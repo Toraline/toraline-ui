@@ -1,0 +1,22 @@
+{
+  "name": "@toraline/tokens",
+  "version": "2.0.0-alpha.0",
+  "private": true,
+  "description": "Design tokens and themes of the Toraline component library.",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist"],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit --emitDeclarationOnly false"
+  }
+}
