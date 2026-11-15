@@ -12,6 +12,28 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Overlays: written by hand, as in Intraweb, not with Base UI (TOR-1156)
+- Context: an overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip. Intraweb writes its overlays by hand (`components/ui/overlay.tsx`, `action-menu.tsx`, `popover.tsx`, `tooltip.tsx`, `use-anchored-panel.ts`, 830 lines with `delete-overlay.tsx`). The conventions (entry of TOR-1009) name Base UI (`@base-ui/react`) as the library for behaviour that is hard to write correctly.
+- Decision: the overlays of phase 9 (Modal, Drawer, DiscardConfirmation, DeleteOverlay, ActionMenu, Popover, Tooltip) are written by hand, from Intraweb's code. No dependency is added. The accessibility problems found in Intraweb's code are fixed in the library; each entry of this phase lists them.
+- Compared on 2026-11-15, for the dialog, the menu and the popover. Base UI: version 1.9.0 (npm, published 2026-10-09), its pages `base-ui.com/react/overview/quick-start` and `base-ui.com/react/components/dialog`.
+
+| What | By hand (Intraweb's code) | Base UI 1.9.0 |
+|---|---|---|
+| Focus of a dialog | Intraweb moves the focus in and gives it back, and closes only the top overlay with Escape. It does not keep the focus inside: the Tab key leaves a Modal that says `aria-modal="true"`. The library adds this (about 60 lines, tested with real key presses) | Keeps the focus inside (`modal`: `true`, `"trap-focus"`, `false`), `initialFocus`, `finalFocus`, nested dialogs. More cases covered, for example a touch screen reader |
+| Menu | Arrow keys, Home, End, Escape and Tab are a few key handlers. SplitButton already has them, with tests | The same keys, plus submenus and checkbox items, which no ticket asks for |
+| Position of a menu or popover | `use-anchored-panel.ts`: below the button, above it when there is no room, moved inside the screen edge. 100 lines | Floating UI (`@floating-ui/react-dom`), which handles more cases (arrows, any side, scrolling containers) |
+| What an app must set up | Nothing. The overlays use `z-index` classes | The quick start asks for `isolation: isolate` on the root element of the app, and `body { position: relative; }` for Safari on iOS 26 |
+| Size in an app (minified and compressed with gzip, React not counted, measured with esbuild) | Not measured before the build; the source of Intraweb is 830 lines | Dialog 24.2 kB, Menu 62.7 kB, Popover 41.8 kB, Tooltip 34.5 kB; the 4 together 73.7 kB |
+| React 19 | Yes | Yes (`react: ^17 || ^18 || ^19`) |
+| Server Components | The overlay files have `"use client"`. A Server Component renders them with texts and elements as props | The same: every part of Base UI is a Client Component |
+| Same behaviour and markup as Intraweb | The same code, so the same elements, classes and rules | Not the same. Intraweb's rules would be written again around Base UI: the question before unsaved changes are lost, the click behind a Drawer that is repeated after that question, the Drawer that leaves the page usable and sets `data-drawer-open` on `<body>`, the element with `data-overlay-autofocus`. Base UI also adds its own elements (a backdrop, a positioner, focus guards), so the markup and the computed styles differ |
+
+- Why: the task of this phase is that a screen of Intraweb behaves the same after it installs the library. Most of the code of Intraweb's overlays is its own rules, which Base UI does not have, so Base UI would be added to that code and would not replace it. The part Base UI does better, the focus kept inside a dialog, is short and is tested here. Base UI would also add a setup step to every app and about 74 kB.
+- What this replaces: for the dialog and the popup "that must move to stay on screen", the sentence of the entry of TOR-1009 "the library to use is Base UI". Base UI stays the choice for a select and a combobox.
+- Limit, accepted: the hand-written focus handling does not make the page behind a Modal inert (the HTML attribute `inert`). `aria-modal="true"` tells a screen reader to stay in the dialog, the backdrop stops the pointer, and the Tab key stays inside.
+- Alternatives: Base UI for everything; a mix (Base UI's Dialog for Modal and Drawer, hand-written menu, popover and tooltip), rejected because the dialog is where Intraweb has the most rules of its own; `focus-trap` 8.2.5 only for the focus, rejected because the need is one key handler.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.
