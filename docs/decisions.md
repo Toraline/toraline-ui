@@ -12,6 +12,29 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The light and the dark theme have the values of Intraweb (TOR-1133)
+- Decision: every level 2 color token of the themes `light` and `dark` has the value of Intraweb's `styles/themes/light.css` and `styles/themes/dark.css`, written the same way: the light theme points to level 1 colors (`var(--color-slate-100)`), the dark theme has raw values (`#0c111d`).
+- Decision: copies of the two files are in `packages/tokens/src/intraweb-fixtures/light.css` and `dark.css`. The first comment of each copy names the source file, the commit of the repository `prontera-e-juno` (`f8ad4c2`) and the date of the copy (2026-11-15). The test `packages/tokens/src/intraweb.test.ts` compares the 59 color tokens of each theme with its copy: the names, the values and the order.
+- Why a copy: this repository cannot read the repository of Intraweb in the CI. When Intraweb changes a value, a person copies the file again, and the test then shows which tokens differ.
+- Decision: the first level 1 colors of the library (purple, grey, `--red-*`, `--green-*`, `--black`, `--white`) are removed. No level 2 token points to them any more.
+- Not copied from Intraweb's theme files, on purpose:
+  - The dark theme of Intraweb also gives dark values to Tailwind colors (`--color-white`, `--color-zinc-*`, `--color-red-*`, `--color-amber-*`, `--color-emerald-700`, `--color-sky-*`), for old screens of Intraweb that use those classes directly. The library has no such screen. Its level 1 colors are the same in every theme.
+  - The block `[data-theme] [data-theme="light"]` of `light.css`, which gives a light part inside another theme its font, radius sizes and small shadow back. In the library every theme block has every level 2 token, so an element with `data-theme="light"` inside a dark page already gets all of them.
+- Contrast: the values were not changed. These pairs are below the limits of the accessibility rules (WCAG AA: 4.5 for text, 3 for the border of a control). The test `packages/tokens/src/tokens.test.ts` records each number, and `packages/tokens/README.md` has the same table:
+
+| Pair | Light | Dark | Limit |
+|---|---|---|---|
+| `--text-tertiary` on `--bg-page` | 4.48 | 5.67 | 4.5 |
+| `--text-tertiary` on `--bg-muted` | 4.48 | 4.27 | 4.5 |
+| `--text-muted` on `--bg-surface` | 2.58 | 2.91 | 4.5 |
+| `--border-default` on `--bg-surface` | 1.24 | 1.45 | 3 |
+| `--border-strong` on `--bg-surface` | 1.47 | 1.82 | 3 |
+| `--border-hover` on `--bg-surface` | 2.58 | 2.91 | 3 |
+| `--border-danger` on `--bg-surface` | 1.42 | 1.75 | 3 |
+
+- What this means for the components: no component puts text that a person must read on a pair of this table. A tab or a link that is not selected is `text-secondary` (6.92 on the page), not `text-tertiary`. The label of a disabled switch is `text-tertiary` on the page (4.48); the rule does not cover a disabled control. The border of a field, of a secondary button, of a danger button and of a switch that is off is below 3. Before this phase the border of a field had a contrast above 3 (entry of TOR-1004); with the values of Intraweb it is 1.24 (light) and 1.45 (dark). The story tests (axe-core) pass in both themes; axe-core does not check the contrast of a border.
+- Decided by: agent, to be confirmed in review. The contrast table is for Juliana: the fix, if she wants one, is a change in Intraweb's design system.
+
 ## 2026-11-15 - Level 2 color tokens: the names of Intraweb, and one Tailwind class for each group (TOR-1131)
 - Decision: the level 2 color tokens of `@toraline.tech/tokens` have the names of the design system of the app Intraweb. There are 59, in 5 groups: 20 `--bg-*` (a background), 15 `--text-*` (a text), 14 `--border-*` (a border), 3 `--icon-*` (an icon) and 7 `--data-*` (a chart or a progress bar). The list is taken from Intraweb's files `styles/themes/light.css` and `styles/themes/dark.css`. No level 2 token named `--color-*` is left in `packages/tokens`.
 - Why: phase 6 (TOR-1122). A component copied from Intraweb then needs no change, and Intraweb can install the library with its own token names.

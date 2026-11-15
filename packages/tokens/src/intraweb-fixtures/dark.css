@@ -1,0 +1,117 @@
+/*
+ * A copy of the theme file "dark" of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/themes/dark.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+/*
+ * Tema Escuro. Contraste AA com o fundo dos cards (#161b26): texto terciário 4,6:1, marca 7,8:1.
+ * O botão primário fica claro com texto escuro (`--text-inverse`), e o tooltip também é claro.
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #0c111d;
+  --bg-surface: #161b26;
+  --bg-subtle: #1f242f;
+  --bg-muted: #252b37;
+  --bg-inverse: #8eaec5;
+  --bg-inverse-hover: #a9c2d4;
+  --bg-selected: #1c2733;
+  --bg-danger-subtle: #2a1614;
+  --bg-error: #2a1614;
+  --bg-success: #0f261b;
+  --bg-warning: #2b2112;
+  --bg-overlay: rgb(0 0 0 / 0.6);
+  --bg-primary: #8eaec5;
+  --bg-primary-hover: #a9c2d4;
+  --bg-primary-subtle: #1c2733;
+  --bg-primary-muted: #263545;
+  --bg-accent-subtle: #2b1f1c;
+  --bg-highlight: #2a2418;
+  --bg-info: #1c2733;
+  --bg-tooltip: #f1f3f6;
+
+  --text-primary: #f5f5f6;
+  --text-strong: #e4e7ec;
+  --text-body: #cecfd2;
+  --text-secondary: #a4a7ae;
+  --text-tertiary: #8a8d94;
+  --text-muted: #61646c;
+  --text-inverse: #0c111d;
+  --text-danger: #f97066;
+  --text-error: #f97066;
+  --text-success: #47cd89;
+  --text-warning: #fdb022;
+  --text-caution: #fdb022;
+  --text-brand: #a9c2d4;
+  --text-info: #a9c2d4;
+  --text-accent: #e3c2b8;
+
+  --border-default: #333741;
+  --border-strong: #414651;
+  --border-subtle: #1f242f;
+  --border-hover: #61646c;
+  --border-focus: #8eaec5;
+  --border-inverse: #8eaec5;
+  --border-brand: #8eaec5;
+  --border-danger: #7a271a;
+  --border-error: #7a271a;
+  --border-invalid: #f97066;
+  --border-changed: #fdb022;
+  --border-success: #085d3a;
+  --border-info: #344f63;
+  --border-warning: #93370d;
+
+  --icon-default: #8a8d94;
+  --icon-strong: #cecfd2;
+  --icon-brand: #a9c2d4;
+
+  --data-1: #8eaec5;
+  --data-2: #42637c;
+  --data-3: #d7ada1;
+  --data-success: #47cd89;
+  --data-warning: #fdb022;
+  --data-danger: #f97066;
+  --data-track: #333741;
+
+  /*
+   * Telas antigas ainda usam paletas cruas (`zinc-*`, `white`, `red-700`...). No escuro elas
+   * invertem: fundos claros viram escuros e textos escuros viram claros, sem editar cada tela.
+   */
+  --color-white: #161b26;
+  --color-zinc-50: #1f242f;
+  --color-zinc-100: #252b37;
+  --color-zinc-200: #333741;
+  --color-zinc-300: #414651;
+  --color-zinc-400: #61646c;
+  --color-zinc-500: #8a8d94;
+  --color-zinc-600: #a4a7ae;
+  --color-zinc-700: #cecfd2;
+  --color-zinc-800: #e4e7ec;
+  --color-zinc-900: #f5f5f6;
+}
+
+/* Cores de estado das telas antigas, iguais em todo tema escuro. */
+[data-theme="dark"],
+[data-theme="old"] {
+  --color-red-50: #2a1614;
+  --color-red-200: #7a271a;
+  --color-red-300: #912018;
+  --color-red-600: #f04438;
+  --color-red-700: #f97066;
+  --color-red-800: #fda29b;
+  --color-amber-50: #2b2112;
+  --color-amber-100: #3a2a12;
+  --color-amber-200: #93370d;
+  --color-amber-700: #fdb022;
+  --color-amber-800: #fec84b;
+  --color-amber-900: #fedf89;
+  --color-emerald-700: #47cd89;
+  --color-sky-50: #0b2235;
+  --color-sky-200: #0b4a6f;
+  --color-sky-700: #7cd4fd;
+  --color-sky-900: #b9e6fe;
+}

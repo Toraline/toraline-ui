@@ -21,7 +21,7 @@ Before the first release, an app can install the package file that `make pack` w
 
 ## The two levels
 
-- **Level 1: raw values.** The name says what the value is. Example: `--purple-500` is `#5e00a1`. File: [`css/primitives.css`](css/primitives.css).
+- **Level 1: raw values.** The name says what the value is. Example: `--color-brand-700` is `#42637c`. File: [`css/primitives.css`](css/primitives.css).
 - **Level 2: meanings.** The name says what the value is for. Example: `--bg-primary` is the background of the main action. Components use only level 2 tokens.
 
 The color tokens of level 2 have the names and the values of the design system of the app Intraweb, an app of Toraline. So the default look of the library is the look of Intraweb. A test compares the two themes with a copy of Intraweb's theme files.
@@ -365,6 +365,20 @@ Each theme also sets the CSS property `color-scheme` (`light` or `dark`). It tel
 
 A test checks the contrast of the colors that the components use, in both themes. Contrast is how different two colors are, from 1 (the same) to 21 (black on white). The test requires 4.5 or more for text on its background, and 3 or more for the focus outline and for the colors that mark a state.
 
+The values are Intraweb's, and some pairs are below these limits. The library does not change them. They are listed here, and a test records each number:
+
+| Pair | Light | Dark | Limit | Where it matters |
+|---|---|---|---|---|
+| `--text-tertiary` on `--bg-page` | 4.48 | 5.67 | 4.5 | A hint written on the page and not on a card. The components do this only for the label of a disabled switch, and the accessibility rule does not cover a disabled control |
+| `--text-tertiary` on `--bg-muted` | 4.48 | 4.27 | 4.5 | A hint on a muted background. The components do not do this |
+| `--text-muted` on `--bg-surface` | 2.58 | 2.91 | 4.5 | Intraweb uses this color for decoration only. The components use it only for the thumb of a disabled switch |
+| `--border-default` on `--bg-surface` | 1.24 | 1.45 | 3 | The border of a field and of a secondary button |
+| `--border-strong` on `--bg-surface` | 1.47 | 1.82 | 3 | The border of a switch that is off |
+| `--border-hover` on `--bg-surface` | 2.58 | 2.91 | 3 | The border of a field under the pointer |
+| `--border-danger` on `--bg-surface` | 1.42 | 1.75 | 3 | The border of a danger button |
+
+The limit of 3 for a border comes from the accessibility rule for the parts of a control that are not text (WCAG 1.4.11).
+
 ## Level 1 tokens
 
 | Group | Tokens |
@@ -376,11 +390,6 @@ A test checks the contrast of the colors that the components use, in both themes
 | Green (success) | `--color-green-50`, `--color-green-200`, `--color-green-500`, `--color-green-700` |
 | Orange (warning) | `--color-orange-50`, `--color-orange-200`, `--color-orange-400`, `--color-orange-700` |
 | Red (error and danger) | `--color-red-50`, `--color-red-200`, `--color-red-600`, `--color-red-700` |
-| Purple | `--purple-50`, `--purple-100`, `--purple-200`, `--purple-300`, `--purple-400`, `--purple-500`, `--purple-600`, `--purple-700` |
-| Grey | `--grey-100` (white) to `--grey-900` (darkest), in steps of 100 |
-| Red | `--red-200`, `--red-300`, `--red-500`, `--red-600`, `--red-700` |
-| Green | `--green-300`, `--green-400`, `--green-500`, `--green-700` |
-| Black and white | `--black`, `--white` |
 | Spacing | `--space-1`, `--space-2`, `--space-3`, `--space-4`, `--space-6`, `--space-8`, `--space-12`, `--space-16`. The number is a multiple of `0.25rem` |
 | Font sizes | `--font-size-xs`, `--font-size-sm`, `--font-size-md`, `--font-size-lg`, `--font-size-xl`, `--font-size-2xl`, `--font-size-3xl` |
 | Font stacks | `--font-stack-sans`, `--font-stack-mono`. A font stack is a list of fonts; the browser uses the first one the device has |
@@ -395,28 +404,8 @@ The 7 scales whose names start with `--color-` are the color scales of the desig
 
 With the Tailwind preset each one is also a Tailwind color: `--color-brand-700` gives the classes `bg-brand-700`, `text-brand-700`, `border-brand-700` and the others. Where Tailwind has a color with the same name (`red-600`, `green-500`), the value of Intraweb replaces the value of Tailwind. The other colors of Tailwind (`red-500`, `blue-600`) stay as Tailwind defines them.
 
-The scales purple, grey, red (`--red-*`) and green (`--green-*`), and `--black` and `--white`, are the colors of the first version of this library. The level 2 tokens still point to them. They are removed when the themes get the values of Intraweb (TOR-1133).
-
-### Where the first colors come from
-
-The colors of the old library (`legacy/src/lib/config/theme.ts`) are the starting point. The grey scale keeps the old numbers. The other scales have new numbers:
-
-| Old name | New token |
-|---|---|
-| `primary` (`#5e00a1`) | `--purple-500` |
-| `purple500` (`#3d0069`) | `--purple-700` |
-| `purple400` (`#51009b`) | `--purple-600` |
-| `purple300` (`#833cda`) | `--purple-300` |
-| `purple200` (`#b593ea`) | `--purple-200` |
-| `purple100` (`#d0b1ff`) | `--purple-100` |
-| `grey100` to `grey900` | `--grey-100` to `--grey-900` |
-| `red` (`#f04848`) | `--red-500` |
-| `green` (`#84D235`) | `--green-300` |
-| `green100` (`#7EC36D`) | `--green-400` |
-| `greenSlider` (`#68A15F`) | `--green-500` |
-
-These 7 colors are new: `--purple-50`, `--purple-400`, `--red-200`, `--red-300`, `--red-600`, `--red-700`, `--green-700`. The old colors `purpleSlider`, `greyTransparent` and `blackTransparent` have no token.
-
 ## Rule for changes
 
 The CSS files and the TypeScript files hold the same values. `src/tokens.test.ts` fails when they differ, or when this README does not name a level 2 token.
+
+The colors are Intraweb's. `src/intraweb.test.ts` fails when a level 1 color, a color token of the light or the dark theme, or the Tailwind class of a color token differs from the copies of Intraweb's files in `src/intraweb-fixtures/`. To take a new value of Intraweb: copy the file again, change the date in its first comment, and change the token in the CSS file and in the TypeScript file.

@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { primitives } from "./primitives";
 import { getTailwindColorMapping } from "./tailwind-variables";
+import { colorTokenNames, darkTheme, lightTheme } from "./themes";
+import type { ThemeDefinition } from "./themes";
 
 /**
  * The default look of this library is the look of the app Intraweb.
@@ -73,5 +75,68 @@ describe("the Tailwind classes of the color tokens", () => {
       Object.entries(getTailwindColorMapping()).map(([name, value]) => [name.slice(2), value]),
     );
     expect(libraryMapping).toEqual(intrawebColorMapping);
+  });
+});
+
+describe("the light theme and the dark theme", () => {
+  /** The first parts of the names of Intraweb's semantic tokens: the level 2 color tokens. */
+  const isSemanticToken = (name: string) => /^(bg|text|border|icon|data)-/.test(name);
+
+  /** The text between "{" and "}" of the first block of a CSS file that has this selector. */
+  const readBlock = (css: string, selector: string) => {
+    const clean = withoutComments(css);
+    const start = clean.indexOf(`${selector} {`);
+    expect(start, `the selector ${selector}`).toBeGreaterThan(-1);
+    return clean.slice(start, clean.indexOf("}", start));
+  };
+
+  const colorTokensOf = (theme: ThemeDefinition) =>
+    pickByName(theme.tokens, (name) => (colorTokenNames as readonly string[]).includes(name));
+
+  test.each([
+    ["light.css", ':root,\n[data-theme="light"]', lightTheme],
+    ["dark.css", '[data-theme="dark"]', darkTheme],
+  ])("every color token has the value of Intraweb's %s", (fileName, selector, theme) => {
+    const block = readBlock(readFixture(fileName), selector);
+    const intrawebTokens = pickByName(readCssVariables(block), isSemanticToken);
+
+    expect(Object.keys(intrawebTokens)).toHaveLength(59);
+    expect(colorTokensOf(theme)).toEqual(intrawebTokens);
+    // The same order, so the two files can be read side by side.
+    expect(Object.keys(colorTokensOf(theme))).toEqual(Object.keys(intrawebTokens));
+    expect(block).toContain(`color-scheme: ${theme.colorScheme};`);
+  });
+
+  test("the light block of Intraweb has only semantic tokens", () => {
+    const block = readBlock(readFixture("light.css"), ':root,\n[data-theme="light"]');
+    expect(Object.keys(pickByName(readCssVariables(block), (name) => !isSemanticToken(name)))).toEqual([]);
+  });
+
+  test("the dark block of Intraweb also changes level 1 colors for its old screens, and the library does not copy that", () => {
+    // Old screens of Intraweb use Tailwind colors directly ("bg-white", "text-zinc-700").
+    // Its dark theme gives those colors dark values. The library has no such screen:
+    // its level 1 colors are the same in every theme.
+    const block = readBlock(readFixture("dark.css"), '[data-theme="dark"]');
+    const otherNames = Object.keys(pickByName(readCssVariables(block), (name) => !isSemanticToken(name)));
+    expect(otherNames.length).toBeGreaterThan(0);
+    for (const name of otherNames) {
+      expect(name).toMatch(/^color-(white|zinc-\d+)$/);
+    }
+  });
+
+  test("a level 1 color that a theme points to has the value Intraweb gives it", () => {
+    // Follows "var(--color-slate-100)" in both places, and compares the raw values.
+    const intrawebScales = readCssVariables(readFixture("globals-theme.css"));
+    const block = readBlock(readFixture("light.css"), ':root,\n[data-theme="light"]');
+    const intrawebTokens = pickByName(readCssVariables(block), isSemanticToken);
+    const resolve = (value: string, scales: Record<string, string>) => {
+      const reference = /^var\(--([a-z0-9-]+)\)$/.exec(value)?.[1];
+      return reference === undefined ? value : scales[reference];
+    };
+    for (const [name, value] of Object.entries(intrawebTokens)) {
+      const libraryValue = (lightTheme.tokens as Record<string, string>)[name] as string;
+      expect(resolve(libraryValue, primitives), name).toBe(resolve(value, intrawebScales));
+      expect(resolve(libraryValue, primitives), name).toMatch(/^(#[0-9a-f]{6}|rgb\(.+\))$/);
+    }
   });
 });

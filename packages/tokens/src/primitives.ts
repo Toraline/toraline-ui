@@ -62,43 +62,6 @@ export const primitives = {
   "color-red-600": "#d92d20",
   "color-red-700": "#b42318",
 
-  /*
-   * The colors of the first version of this library. The level 2 tokens still
-   * point to them. They are removed when the themes get the Intraweb values (TOR-1133).
-   */
-  "purple-50": "#f6efff",
-  "purple-100": "#d0b1ff",
-  "purple-200": "#b593ea",
-  "purple-300": "#833cda",
-  "purple-400": "#6f1dc0",
-  "purple-500": "#5e00a1",
-  "purple-600": "#51009b",
-  "purple-700": "#3d0069",
-
-  "grey-100": "#ffffff",
-  "grey-200": "#f3f3f4",
-  "grey-300": "#e7e8e9",
-  "grey-400": "#cfd1d4",
-  "grey-500": "#9fa3a9",
-  "grey-600": "#6f757e",
-  "grey-700": "#3f4753",
-  "grey-800": "#27303e",
-  "grey-900": "#0f1928",
-
-  "red-200": "#f8a3a3",
-  "red-300": "#f47878",
-  "red-500": "#f04848",
-  "red-600": "#d92d2d",
-  "red-700": "#b42020",
-
-  "green-300": "#84d235",
-  "green-400": "#7ec36d",
-  "green-500": "#68a15f",
-  "green-700": "#2f6f14",
-
-  black: "#000000",
-  white: "#ffffff",
-
   "space-1": "0.25rem",
   "space-2": "0.5rem",
   "space-3": "0.75rem",

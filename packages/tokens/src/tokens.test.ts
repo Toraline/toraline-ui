@@ -139,6 +139,40 @@ test.each([lightTheme, darkTheme])(
   },
 );
 
+/**
+ * The pairs of Intraweb's values that are below the limit. The values are not
+ * changed in the library: they are Intraweb's. This test is the record of them.
+ * It fails when a value changes, so the record cannot go out of date.
+ * The components of @toraline.tech/ui do not put text on these backgrounds.
+ * The list is also in docs/decisions.md (TOR-1133).
+ */
+test.each<[themeName: "light" | "dark", foreground: ThemeTokenName, background: ThemeTokenName, limit: number, contrast: number]>([
+  // Text. The limit is 4.5.
+  ["light", "text-tertiary", "bg-page", 4.5, 4.48],
+  ["light", "text-tertiary", "bg-muted", 4.5, 4.48],
+  ["dark", "text-tertiary", "bg-muted", 4.5, 4.27],
+  // Intraweb uses --text-muted for decoration only.
+  ["light", "text-muted", "bg-surface", 4.5, 2.58],
+  ["dark", "text-muted", "bg-surface", 4.5, 2.91],
+  // The border of a field, a button or a switch. The limit is 3.
+  ["light", "border-default", "bg-surface", 3, 1.24],
+  ["dark", "border-default", "bg-surface", 3, 1.45],
+  ["light", "border-strong", "bg-surface", 3, 1.47],
+  ["dark", "border-strong", "bg-surface", 3, 1.82],
+  ["light", "border-hover", "bg-surface", 3, 2.58],
+  ["dark", "border-hover", "bg-surface", 3, 2.91],
+  ["light", "border-danger", "bg-surface", 3, 1.42],
+  ["dark", "border-danger", "bg-surface", 3, 1.75],
+])(
+  "known, in the %s theme: %s on %s is below %s (contrast %s)",
+  (themeName, foreground, background, limit, contrast) => {
+    const theme = themeName === "light" ? lightTheme : darkTheme;
+    const ratio = contrastRatio(theme, foreground, background);
+    expect(ratio).toBeLessThan(limit);
+    expect(Number(ratio.toFixed(2))).toBe(contrast);
+  },
+);
+
 test("packages/tokens/README.md documents every level 2 token", () => {
   const readme = readPackageFile("README.md");
   for (const name of themeTokenNames) {
