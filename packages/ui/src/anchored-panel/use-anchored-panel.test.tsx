@@ -21,12 +21,13 @@ function setWindowSize(width: number, height: number) {
 beforeEach(() => {
   buttonRect = { top: 100, left: 300, width: 100, height: 40 };
   setWindowSize(1000, 800);
-  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(panelSize.width);
-  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(panelSize.height);
-  vi.spyOn(HTMLButtonElement.prototype, "getBoundingClientRect").mockImplementation(function (
-    this: HTMLButtonElement,
-  ) {
-    const rect = this.dataset.anchor === undefined ? { top: 0, left: 0, width: 0, height: 0 } : buttonRect;
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
+    let rect = { top: 0, left: 0, width: 0, height: 0 };
+    if (this instanceof HTMLElement && this.dataset.anchor !== undefined) {
+      rect = buttonRect;
+    } else if (this.getAttribute("role") === "group") {
+      rect = { top: 0, left: 0, ...panelSize };
+    }
     return {
       ...rect,
       right: rect.left + rect.width,

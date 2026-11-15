@@ -53,12 +53,15 @@ function containerBox(panel: HTMLElement, strategy: "fixed" | "absolute"): Ancho
     return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
   }
   // "position: absolute" is measured from inside the border of the container.
+  // The rectangle keeps the parts of a pixel, which clientWidth rounds away.
   const rect = container.getBoundingClientRect();
+  const borderWidth = container instanceof HTMLElement ? container.offsetWidth - container.clientWidth : 0;
+  const borderHeight = container instanceof HTMLElement ? container.offsetHeight - container.clientHeight : 0;
   return {
     top: rect.top + container.clientTop,
     left: rect.left + container.clientLeft,
-    width: container.clientWidth,
-    height: container.clientHeight,
+    width: rect.width - borderWidth,
+    height: rect.height - borderHeight,
   };
 }
 
@@ -105,7 +108,9 @@ export function useAnchoredPanel<
       return;
     }
     const rect = trigger.getBoundingClientRect();
-    const panelSize = { width: panel.offsetWidth, height: panel.offsetHeight };
+    // The rectangle of the panel keeps the parts of a pixel, which offsetWidth rounds away.
+    const panelRect = panel.getBoundingClientRect();
+    const panelSize = { width: panelRect.width, height: panelRect.height };
     const position = computeAnchoredPosition({
       anchor: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
       panel: panelSize,

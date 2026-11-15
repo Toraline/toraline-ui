@@ -12,6 +12,35 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Phase 9: what was compared with Intraweb, and the check in a new app (TOR-1125)
+- Design source: the overlays of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
+- Decision: the comparison was done as in phase 7, with a temporary page outside both repositories that rendered Intraweb's own files next to the components of the two package files of `make pack`, and 2 Playwright scripts. The page and the scripts are not committed. The result is in `apps/playground/README.md`, section "The overlays next to Intraweb's": 50,320 computed values in both themes and 2 window widths, of which 270 differ in 6 kinds, each with its reason; and 84 steps of keyboard and pointer, of which 26 differ, each one a problem of Intraweb that the library fixes or a key it adds.
+- Found by the comparison and fixed: `useAnchoredPanel` measured the panel and the element around it with `offsetWidth` and `clientWidth`, which round to a whole pixel. A Popover lined up to the right was 0.42 pixels off. It now reads `getBoundingClientRect`.
+- Checked on 2026-11-15, with the 2 package files of `make pack`, in a new app made by `create-next-app` 16.4.6 (React 19.3.0, Tailwind CSS 4.3.3) that followed guide 1 of `docs/guide.md`: `next build` passes with a Server Component page that renders Popover and Tooltip itself and gives an IconButton its icon. In the built app, a Playwright script ran 32 checks, and all pass: Modal, Drawer, DiscardConfirmation and DeleteOverlay (the focus goes in, Tab and Shift+Tab stay inside, Escape closes, the focus goes back to the button that opened it); ActionMenu (4 pixels under its button, right edges lined up, in `<body>`, arrows, Enter, Escape); Popover (Tab into the panel, Escape, a click outside); Tooltip (pointer, keyboard focus, description, Escape); and no message in the browser console.
+- What a Server Component can render, and which props need a Client Component file in the app:
+
+| Component | From a Server Component | Props that need a Client Component file |
+|---|---|---|
+| CloseButton | Yes, with no `onClick` | `onClick` (a function) |
+| Tooltip | Yes: `label` and `children` are text and elements | None |
+| Popover | Yes, when `children` is elements | `children` as a function `(close) => ...`, `onClick` |
+| Modal, Drawer | No | `onClose` (a function, required). `title`, `actions`, `footer`, `children` and the texts of `discardConfirmation` can come from a Server Component |
+| DiscardConfirmation | No | `onDiscard`, `onKeepEditing` |
+| DeleteOverlay | No | `onDelete`, `onClose` |
+| ActionMenu | No | `items`: each action has `onSelect` (a function) and may have `icon` (a component) |
+| `useAnchoredPanel` | No: it is a hook | The component that calls it |
+
+- What Intraweb must change to use each component (not done; it is the work of a later phase):
+  - `Modal`, `Drawer`: add `closeLabel="Fechar"` and `discardConfirmation={...}` with its 4 Portuguese texts, from one file of Intraweb. `IGNORE_DIRTY_ATTRIBUTE` stays a constant of Intraweb with the same value (`data-overlay-ignore-dirty`); `data-overlay-autofocus` is unchanged. Its CSS rule for `body[data-drawer-open]` is unchanged.
+  - `CloseButton`: add `aria-label="Fechar"`.
+  - `DeleteOverlay`: keep its own file for the URL, the delete call, the API error and the list of blockers, and render the library's dialog inside it with the texts, `pending`, `error` and `blocked`.
+  - `ActionMenu`: `label` becomes `aria-label`; the trigger `button` gets its text as children (`Ações`).
+  - `Popover`: `ariaLabel` becomes `aria-label`.
+  - `Tooltip`: nothing. Screens that repeat the text as `aria-label` keep working.
+  - `useAnchoredPanel`: the same names; `align` and the result are unchanged.
+- Not verified: a real screen reader, browsers other than Chromium, a touch screen, Tailwind CSS versions other than 4.3.3 and 4.3.5, and Intraweb itself with the library installed.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Tooltip: shown by CSS, read by a screen reader (TOR-1163)
 - Decision: `Tooltip` has the elements and the classes of Intraweb's `Tooltip` (`components/ui/tooltip.tsx`): a `<span class="group/tooltip relative inline-flex">` around the element and the tooltip, the tooltip shown by CSS, and the sides `right` (default) and `top`.
 - Accessibility problems of Intraweb's Tooltip, fixed here:
@@ -73,7 +102,7 @@ Format of one entry:
   1. Accessibility: the Tab key leaves the question, which says `aria-modal="true"`. Here it stays inside.
   2. Accessibility: the text under the title is not linked to the dialog. Here it is its `aria-describedby`, so a screen reader says it.
   3. Accessibility: after "keep editing" the focus is on no element. Here it goes back to the element that had it, for example the field.
-  4. Behaviour, read in the code and not run in Intraweb: after a click on the dark layer of a Modal with changes, "discard" closes the question and not the Modal. The press on "discard" clears the mark that the dark layer was pressed, because the question is rendered inside the dark layer. Here the dark layer is part of the overlay (`data-overlay-panel`), so its click asks through the normal way of closing.
+  4. Behaviour, seen in a browser with Intraweb's own file: after a click on the dark layer of a Modal with changes, "discard" closes the question and not the Modal. The press on "discard" clears the mark that the dark layer was pressed, because the question is rendered inside the dark layer. Here the dark layer is part of the overlay (`data-overlay-panel`), so its click asks through the normal way of closing.
 - Decision: `DiscardConfirmation` is exported, so an app can ask the same question in another place. It is on the list of open overlays like a Modal: Escape and the Tab key belong to it while it is open.
 - Decision (DeleteOverlay): it is only the dialog. Intraweb's `DeleteOverlay` (`components/ui/delete-overlay.tsx`) also reads the record from the URL, calls the delete function, reads the error of the API, and builds the list of the records that block the delete with links of Next.js. Those parts stay in Intraweb, around the library's dialog: the library knows no URL, no API and no router.
 - What changes for Intraweb: its own file keeps `panel`, `items`, `getKey`, `describe`, `onDelete`, `links` and the states `pending` and `error`, and renders the library's `DeleteOverlay` with the texts, `pending`, `error`, and `blocked` (its `BlockerList`). The dialog "Registro não encontrado." stays a plain `Modal` in Intraweb.

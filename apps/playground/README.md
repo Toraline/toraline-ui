@@ -240,3 +240,53 @@ What the script cannot see, and differs on purpose: with "reduce motion" on in t
 - The server was stopped after the checks.
 
 Not checked: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, and the theme `paper` on the page `/components`.
+
+## The overlays (phase 9, TOR-1125)
+
+An overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip.
+
+| File | What it is |
+|---|---|
+| `app/overlays/page.tsx` | The page of the overlays, at `/overlays`. It is a Server Component. It renders CloseButton, Popover and Tooltip itself, and gives an IconButton inside a Tooltip its icon |
+| `app/overlays/ModalExamples.tsx` | Modal in its 4 sizes, and a second Modal above the first. A Client Component, because `onClose` is a function |
+| `app/overlays/DrawerExamples.tsx` | Drawer, narrow and wide, with a footer, next to a button of the page that still works |
+| `app/overlays/ConfirmationExamples.tsx` | DiscardConfirmation alone, a Modal and a Drawer that ask before unsaved changes are lost, and DeleteOverlay (pending, and blocked) |
+| `app/overlays/ActionMenuExamples.tsx` | ActionMenu with both triggers, a disabled action, a menu at the right edge, and a menu inside a Modal |
+
+Checked on 2026-11-15 in the built app (`next start`), with a Playwright script, in the light and the dark theme: `/overlays` answers 200; a Modal opens; a Drawer sets `data-drawer-open="narrow"` on `<body>` and the button of the page next to it still counts a press; the menu at the right edge stays 8 pixels inside the window; a Popover and a Tooltip that the Server Component rendered open; the browser console had no message.
+
+### The overlays next to Intraweb's
+
+A temporary page, outside both repositories, rendered Intraweb's own files (`overlay.tsx`, `delete-overlay.tsx`, `action-menu.tsx`, `popover.tsx`, `tooltip.tsx`, with Intraweb's `globals.css` and theme files, commit `f8ad4c2` of `prontera-e-juno`) next to a second page with the components of the two package files of `make pack`. Both pages were built with Tailwind CSS 4.3.5. The page and the scripts are not committed.
+
+**Computed styles.** A Playwright script opened 15 samples on both pages and read 64 computed CSS properties and the rectangle of every element of each overlay: Modal in its 4 sizes, Drawer narrow and wide with a footer, the question "discard the changes?" above a Drawer, the delete confirmation, the menu with each trigger (open, and with the pointer over an action), Popover lined up to the left and to the right, and Tooltip on the right and on top. In the light and the dark theme, in windows 1280 and 390 pixels wide: 50,320 values. The two pages have the same elements in the same order (0 differences of structure). 270 values differ, of 6 kinds:
+
+| Where | Intraweb | Library | Why |
+|---|---|---|---|
+| An action of the menu: `text-align` (180 values) | `left` | `start` | The class is `text-start`, as in SplitButton. The same side in a page read from left to right |
+| The icon of an action: `flex-shrink` (36) | `1` | `0` | The library adds `shrink-0`, so a long text cannot squash the icon |
+| The first action right after the menu opens with a click: background (12) | none | `bg-subtle` | The action that has the focus has the quiet background after a click too (`focus:`), as in SplitButton. Intraweb shows it only for the keyboard (`focus-visible:`) |
+| The small bar of the Modal sheet, dark theme: background (10) | `rgb(208, 213, 221)` | `rgb(65, 70, 81)` | Intraweb has a fixed Tailwind color (`bg-slate-300`). The library reads the token `--border-strong`, which is the same color in the light theme |
+| The panel of Popover: `top` and `margin-top` (16) | `40px` and `8px` | `48px` and `0px` | The same place. The library writes the position in pixels, because it also moves the panel when there is no room |
+| Tooltip: `pointer-events` and `transition-property` (16) | `none`; `opacity` | `auto`; `opacity, visibility` | The pointer can move onto the tooltip, and the hidden tooltip is `visibility: hidden` |
+
+**Behaviour.** A second script did the same 84 steps on both pages (a click, Tab, Shift+Tab, the arrows, Home, End, a letter, Enter, Escape, the pointer over and away) and wrote down, after each step, which element had the focus and what was open. 58 steps give the same result. 26 differ. Each one is a problem of Intraweb that the library fixes, or a key the library adds:
+
+| What | Intraweb | Library |
+|---|---|---|
+| Tab after the last element of a Modal, a Drawer, the delete confirmation and the question | The focus leaves the page, then lands on the first button of the page behind | The focus goes to the first element of the overlay |
+| "Descartar" after a click on the dark layer of a Modal with unsaved changes | The question closes, the Modal stays open, the focus is on no element | The Modal closes, the focus is on the button that opened it |
+| "Continuar editando", and Escape in the question | The focus is on no element, or on the button that opened the Drawer | The focus is back where it was (the field) |
+| Enter on "Excluir" in the delete confirmation | The button is disabled and loses the focus | The button is busy and keeps the focus |
+| Arrow keys in a menu with a disabled action | The disabled action is skipped | It gets the focus, and cannot be chosen |
+| Tab in the menu | The focus goes to the first button of the page | The focus goes to the element after the button of the menu |
+| A click on an action of the menu | The focus is on no element | The focus is on the button of the menu |
+| Down arrow on the button of the menu | Nothing | The menu opens |
+| Escape with the focus inside the panel of a Popover | The focus is on no element | The focus is on the button |
+| The button of a closed Popover | Has `aria-controls` with the id of a panel that is not on the page | Has no `aria-controls` |
+| The pointer moved from the element onto its tooltip | The tooltip hides | It stays |
+| Escape while a tooltip is shown | It stays | It hides |
+| A mouse click on the element, then the pointer away | The tooltip stays while the element has the focus | It hides |
+| The tooltip for a screen reader | `aria-hidden="true"` | `role="tooltip"`, linked with `aria-describedby` unless the element has the same text as its `aria-label` |
+
+Not checked: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, a touch screen, Intraweb's themes `cozy`, `old` and `glass`, and Intraweb's `DeleteOverlay` in its "blocked" state.

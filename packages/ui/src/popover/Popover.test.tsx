@@ -19,22 +19,23 @@ beforeEach(() => {
   buttonRect = { top: 100, left: 300, width: 100, height: 40 };
   Object.defineProperty(window, "innerWidth", { configurable: true, value: 1000 });
   Object.defineProperty(window, "innerHeight", { configurable: true, value: 800 });
-  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(200);
-  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(120);
   // The element around the button and the panel starts where the button starts, and is as large.
   vi.spyOn(HTMLElement.prototype, "offsetParent", "get").mockImplementation(function (this: HTMLElement) {
     return this.parentElement;
   });
-  vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(100);
-  vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(40);
-  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(() => ({
-    ...buttonRect,
-    right: buttonRect.left + buttonRect.width,
-    bottom: buttonRect.top + buttonRect.height,
-    x: buttonRect.left,
-    y: buttonRect.top,
-    toJSON: () => buttonRect,
-  }));
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
+    // The panel is 200 by 120 pixels. Every other element has the rectangle of the button.
+    const rect =
+      this.getAttribute("data-slot") === "panel" ? { top: 0, left: 0, width: 200, height: 120 } : buttonRect;
+    return {
+      ...rect,
+      right: rect.left + rect.width,
+      bottom: rect.top + rect.height,
+      x: rect.left,
+      y: rect.top,
+      toJSON: () => rect,
+    };
+  });
 });
 
 afterEach(() => {
