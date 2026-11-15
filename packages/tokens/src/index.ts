@@ -10,3 +10,5 @@ export { primitives } from "./primitives";
 export type { PrimitiveName } from "./primitives";
 export { darkTheme, lightTheme, themeTokenNames } from "./themes";
 export type { ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes";
+export { createTheme, getAddedColorNames } from "./create-theme";
+export type { ThemeColorName, ThemeInput } from "./create-theme";

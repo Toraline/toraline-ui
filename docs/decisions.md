@@ -12,6 +12,16 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Shape of the theme function (TOR-1005)
+- Decision: `createTheme(input)` in `packages/tokens/src/create-theme.ts` returns the CSS of one theme as text: one `[data-theme="<name>"]` block with every level 2 token. The input type is `ThemeInput`: `name`, `base` (`"light"` or `"dark"`, the default theme that gives the missing values), `isDefault`, `colors`, `fonts`, `radius`.
+- Why: text works everywhere. An app can put it in a `<style>` element on the server, or write it to a CSS file. The block always has every token, so a theme never depends on which other theme was loaded before it.
+- Decision: a color key is the token name without `color-`. A key the library has changes that token. Any other key adds the token `--color-<key>`.
+- Why: one rule, and the key maps to the CSS variable letter by letter.
+- Decision: `createTheme` throws an error for a name that is not lowercase letters, digits and dashes, and for a value that has `;`, `{`, `}`, `<`, `>`, `\` or `/*`.
+- Why: an app may build a theme from values it did not write (for example a color a user picked). Such a value must not close the CSS block or the `<style>` element.
+- Alternatives: returning an object of variables for the app to turn into CSS; returning only the values that differ from the default theme; separate fields for changed colors and added colors.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Token names, token files and the values of the two themes (TOR-1004)
 - Decision: the tokens are plain CSS files in `packages/tokens/css/`: `primitives.css` (level 1), `themes/light.css`, `themes/dark.css`, and `index.css`, which imports the three. The same values are TypeScript objects in `packages/tokens/src/` (`primitives`, `lightTheme`, `darkTheme`). A test fails when a CSS file and its TypeScript object differ.
 - Why: an app with no build step can use the CSS files as they are, and the theme function (TOR-1005) needs the default values in TypeScript. Writing both by hand, with a test that compares them, needs no generator script.

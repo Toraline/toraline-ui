@@ -51,6 +51,57 @@ lightTheme.tokens["color-primary"]; // "var(--purple-500)"
 primitives["purple-500"]; // "#5e00a1"
 ```
 
+## Build a theme for an app: `createTheme`
+
+`createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts and change the radius. A value the app does not give comes from the default theme.
+
+```ts
+import { createTheme } from "@toraline/tokens";
+
+const css = createTheme({
+  name: "ocean",
+  colors: {
+    primary: "#0055aa", // changes --color-primary
+    brand: "#ff6600", // adds the new token --color-brand
+  },
+  fonts: { heading: "Georgia, serif" }, // changes --font-heading
+});
+```
+
+`css` is this text. The 18 lines that are not shown have the values of the light theme:
+
+```css
+[data-theme="ocean"] {
+  color-scheme: light;
+  --color-surface: var(--grey-100);
+  /* ... */
+  --color-primary: #0055aa;
+  /* ... */
+  --font-heading: Georgia, serif;
+  /* ... */
+  --color-brand: #ff6600;
+}
+```
+
+Put the text in the page after the CSS of this package, for example in a `<style>` element or in a CSS file. Then select the theme with `<html data-theme="ocean">`.
+
+The input, type `ThemeInput`:
+
+| Field | Required | Meaning |
+|---|---|---|
+| `name` | Yes | The name of the theme, used in `data-theme="<name>"`. Lowercase letters, digits and dashes |
+| `base` | No | `"light"` or `"dark"`: the default theme that gives the values the app does not give. When missing: `"light"` |
+| `isDefault` | No | `true`: the theme also applies when `<html>` has no `data-theme` |
+| `colors` | No | The key is a color name without `color-`. A key the library has (`primary`, `text-muted`, ...) changes that color. Any other key (`brand`) adds the token `--color-<key>`. The value is any CSS color |
+| `fonts` | No | `body`, `heading`, `mono`. The value is any CSS `font-family` value |
+| `radius` | No | Any CSS length |
+
+To change the light or the dark theme of the library, use its name: `createTheme({ name: "dark", base: "dark", colors: { primary: "#88ccff" } })`. The block comes later in the page than the library's block, so its values win.
+
+`createTheme` throws an error when a name has other characters, or when a value has one of `;`, `{`, `}`, `<`, `>`, `\` or `/*`. This stops a value from closing the CSS block.
+
+`getAddedColorNames(input)` returns the colors of an input that the library does not have. For the example above: `["brand"]`.
+
 ## Level 2 tokens: the full list
 
 Every theme gives a value to each of these 21 tokens.
