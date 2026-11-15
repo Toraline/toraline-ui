@@ -2,7 +2,11 @@ import type { ComponentProps, ElementType, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
 
-const rootClass = "font-body text-base/normal font-bold text-secondary";
+/**
+ * The text has the small size and the medium weight of the labels of the app
+ * Intraweb, which has no breadcrumbs of its own.
+ */
+const rootClass = "font-body text-sm/5 font-medium text-secondary";
 
 const listClass = "m-0 flex list-none flex-wrap items-baseline gap-2 p-0";
 
@@ -13,8 +17,8 @@ const linkClass = classNames(
   focusRingClass,
 );
 
-/** The current page: the main text color, and larger. */
-const currentClass = "text-lg/normal text-primary";
+/** The current page: the main text color. */
+const currentClass = "text-primary";
 
 /** One step of the path. */
 export type Crumb = {

@@ -2,14 +2,11 @@
 
 import type { ButtonHTMLAttributes, MouseEvent } from "react";
 import { classNames } from "../shared/class-names.js";
-import { focusRingClass } from "../shared/focus-ring.js";
+import { buttonClassNames } from "../button/button-class.js";
 import { useTheme } from "./ThemeProvider.js";
 
-const themeToggleClass = classNames(
-  "inline-flex cursor-pointer items-center gap-2 rounded-md border border-default bg-surface px-4 py-2 font-heading text-base/normal font-medium text-strong",
-  "hover:border-hover hover:bg-subtle",
-  focusRingClass,
-);
+/** The look of the secondary Button in the size "md", from the classes of Button. */
+const themeToggleClass = buttonClassNames({ variant: "secondary", size: "md" });
 
 export type ThemeToggleProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
   /**

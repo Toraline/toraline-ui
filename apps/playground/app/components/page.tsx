@@ -221,8 +221,8 @@ export default function ComponentsPage() {
         <Row label="With no visible label (aria-label)">
           <Toggle aria-label="Send e-mails" name="no-label" />
         </Row>
-        <Row label="With a class of the app (text-lg)">
-          <Toggle label="Larger" name="app-class" className="text-lg" />
+        <Row label="With a class of the app (text-base/6): a larger label">
+          <Toggle label="Larger label" name="app-class" className="text-base/6" />
         </Row>
       </Section>
 

@@ -12,6 +12,19 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Toggle, BreadCrumbs, SplitButton and ThemeToggle with the Intraweb look (TOR-1145)
+- Context: Intraweb has none of these components. They get the sizes, fonts, focus and disabled looks of the components above. No prop and no behaviour changed.
+- Decision (Toggle): the switch is 36 by 20 pixels, the height of Intraweb's checkbox, with its border of 1.5 pixels. The label has `text-sm/5 text-body`, as the label of Intraweb's checkbox. A disabled switch has `opacity-50` on the track, as the checkbox; the cursor over it is `not-allowed`.
+- Decision (Toggle): the sizes are steps of the spacing scale (`h-5`, `w-9`, `size-3.5`), not `em`. This replaces "the switch has its size in `em`" of the first version: a font size class on Toggle no longer changes the size of the switch.
+- Why: every other component has fixed heights on the scale of Intraweb (20, 32, 40, 48 pixels). With `em` the switch was 21 pixels high at the text size of 14 pixels. Intraweb changes the size of the whole interface through the root font size, which the spacing scale follows.
+- Decision (BreadCrumbs): `text-sm/5 font-medium`, and the current page has the same size as the links, in `text-primary`. The colors do not change (entry of TOR-1131).
+- Decision (SplitButton): the two buttons have the look of the primary Button in the size `md` (at least 40 pixels high, `text-sm/5`, `disabled:opacity-50`, no `cursor-pointer`). The menu and its actions have the look of Intraweb's `ActionMenu` (`components/ui/action-menu.tsx`): `py-1` on the menu, `px-3 py-2 text-sm/5` and the normal weight on an action, an icon of 16 pixels in `text-icon`. The arrow is the shape of Lucide's `chevron-down`, which Intraweb shows on a button that opens a menu. The focus ring of an action stays (Intraweb shows only the background) and is drawn inside the action.
+- Decision (SplitButton): no prop `size`. The ticket asks for no new behaviour; the height is the default height of a Button.
+- Decision (ThemeToggle): it reads the classes of the secondary Button in the size `md` from `button-class.ts`. The ticket does not name it; it is changed so that it does not keep the old sizes next to the new Buttons.
+- Decision: `rounded-full` is used for a pill and a circle (the track and the thumb of Toggle). It has no token: a full round shape does not change with the theme.
+- Alternatives: keeping the `em` sizes of Toggle; a `size` prop on SplitButton and Toggle; leaving ThemeToggle unchanged.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Tabs: the segmented look, and `value` / `onChange` (TOR-1144)
 - Decision: `Tabs` has one look, the segmented control of Intraweb's `SegmentedTabs`, from `packages/ui/src/shared/segmented.ts`. The look with a line under the selected tab is no longer in Tabs: in Intraweb that look belongs to tabs that are links (`TabNav`, variant `primary`).
 - Decision: the props of the selected tab are `value`, `onChange` and `defaultValue`. They replace `selectedId`, `onSelectedIdChange` and `defaultSelectedId` (entry of TOR-1010 to TOR-1015). The old names are removed, not kept next to the new ones.

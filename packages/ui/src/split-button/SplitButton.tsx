@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, FocusEvent, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
+import type { SplitButtonMenuPlacement } from "./split-button-options.js";
 
 /*
  * The classes of SplitButton: the main button, the button that opens the menu
@@ -16,25 +17,29 @@ import { focusRingClass } from "../shared/focus-ring.js";
 
 const rootClass = "group/split-button relative inline-flex gap-1 font-body";
 
-/** What the main button and the trigger share. */
+/**
+ * What the main button and the trigger share: the look of the primary Button
+ * in the size "md" (40 pixels high, the font of headings in the medium weight,
+ * half of the opacity when disabled).
+ */
 const buttonClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-heading text-base/normal font-medium text-inverse",
+  "inline-flex min-h-10 shrink-0 items-center justify-center bg-primary py-2 font-heading text-sm/5 font-medium text-inverse",
   "hover:bg-primary-hover",
-  "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
-  "motion-safe:transition-[background-color] motion-safe:ease-[ease]",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+  "motion-safe:transition-colors",
   focusRingClass,
 );
 
-const mainClass = classNames(buttonClass, "rounded-l-md rounded-r-none px-4 py-2");
+const mainClass = classNames(buttonClass, "rounded-l-md rounded-r-none px-4");
 
 const triggerClass = classNames(
   buttonClass,
-  "group/trigger rounded-l-none rounded-r-md px-3 py-2 enabled:aria-expanded:bg-primary-hover",
+  "group/trigger rounded-l-none rounded-r-md px-3 enabled:aria-expanded:bg-primary-hover",
 );
 
-/** The arrow points to where the menu opens, and turns over while the menu is open. */
+/** The arrow points to where the menu opens, and turns over while the menu is open. It has the size of the icon of a Button. */
 const arrowClass = classNames(
-  "size-[0.875em]",
+  "size-4",
   "group-data-[placement=top]/split-button:rotate-180",
   "group-data-[placement=bottom]/split-button:group-aria-expanded/trigger:rotate-180",
   "group-data-[placement=top]/split-button:group-aria-expanded/trigger:rotate-none",
@@ -43,22 +48,28 @@ const arrowClass = classNames(
 
 /**
  * The menu sits above the page and does not move the content around it.
- * Its colors, and the colors of an action, are the ones of the menu of actions of the app Intraweb.
+ * Its look, and the look of an action, are the ones of the menu of actions of
+ * the app Intraweb (components/ui/action-menu.tsx).
  */
 const menuClass = classNames(
-  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded-lg border border-subtle bg-surface p-1 shadow-lg",
+  "absolute top-full left-0 z-10 mx-0 my-1 box-border flex min-w-full flex-col rounded-lg border border-subtle bg-surface py-1 shadow-lg",
   "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
 );
 
-/** One action. The action under the pointer and the action that has the keyboard focus have a quiet background. */
+/**
+ * One action. The action under the pointer and the action that has the
+ * keyboard focus have a quiet background. The focus ring is drawn inside the
+ * action, because the actions touch each other.
+ */
 const itemClass = classNames(
-  "flex cursor-pointer items-center gap-3 rounded-md border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-body",
+  "flex w-full items-center gap-2 px-3 py-2 text-start font-body text-sm/5 whitespace-nowrap text-body",
   "hover:bg-subtle focus:bg-subtle",
   focusRingClass,
+  "focus-visible:-outline-offset-2",
 );
 
-const itemIconClass = "inline-flex size-[1em] flex-none";
-import type { SplitButtonMenuPlacement } from "./split-button-options.js";
+/** The icon of an action: 16 pixels, in the color of an icon. */
+const itemIconClass = "inline-flex size-4 flex-none items-center justify-center text-icon";
 
 /** One action of the menu. */
 export type SplitButtonItem = {
@@ -247,14 +258,19 @@ export function SplitButton({
         onClick={() => (isOpen ? closeMenu(false) : openMenu("first"))}
         onKeyDown={handleTriggerKeyDown}
       >
+        {/* The shape is the icon "chevron-down" of Lucide (https://lucide.dev, ISC license), the arrow Intraweb shows on a button that opens a menu. */}
         <svg
           className={arrowClass}
           data-slot="arrow"
-          viewBox="0 0 20 13"
-          fill="currentColor"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M10 8.273 17.778 0 20 2.363 10 13 0 2.363 2.222 0 10 8.273Z" />
+          <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
       {isOpen ? (

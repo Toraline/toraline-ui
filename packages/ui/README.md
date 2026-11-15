@@ -114,6 +114,7 @@ A button. Each press shows the next theme of `themes`. After the last theme it g
 - It shows the current theme as text: `Theme: dark`.
 - A screen reader says the current theme and what a press does: `Theme: dark. Switch to light.` The prop `formatLabel={(theme, nextTheme) => "..."}` changes this text. Keep the text the button shows (`Theme: dark`) in it: a person who controls the device with the voice says the text they see.
 - `children` replaces the text that is shown, for example with an icon.
+- It has the look of the secondary Button in the size `md`.
 - `className` adds classes, as described in [Styling on top](#styling-on-top). The button also accepts every other prop of `<button>`.
 
 ## The components
@@ -299,10 +300,10 @@ import { Toggle } from "@toraline.tech/ui";
 | `label` | Text or elements | The visible name of the switch, shown next to it. It says what the switch controls and does not change with the state. A switch with no `label` needs `aria-label` |
 | `checked` and `onChange` | The HTML attribute and the React event | The app holds the state: `checked` is `true` when the switch is on |
 | `defaultChecked` | `true`, `false` | The state the switch starts in, when the app does not hold the state |
-| `disabled` | The HTML attribute | The switch cannot get focus and cannot be changed |
+| `disabled` | The HTML attribute | The switch cannot get focus and cannot be changed. The track has half of its opacity |
 
 - Main native element: an `<input type="checkbox" role="switch">`. Every other prop (`name`, `value`, `id`) and `ref` go to it.
-- `className` goes to the outermost element, a `<label>` that holds the switch and its text. The inner parts have the attribute `data-slot` with the values `input`, `track`, `thumb`, `check` and `label`. The switch has its size in `em`, so a font size on the outermost element changes its size.
+- `className` goes to the outermost element, a `<label>` that holds the switch and its text. The inner parts have the attribute `data-slot` with the values `input`, `track`, `thumb`, `check` and `label`. The switch is 36 pixels wide and 20 pixels high, the height of the checkbox of the app Intraweb, and its label has the small text size.
 - Keyboard: Tab moves the focus to it, Space changes it. A click on the label also changes it.
 - Screen reader: the role `switch` with the state of the checkbox, read as "on" or "off".
 - A person who cannot see colors still sees the state: the circle is on the left when off, and on the right with a check mark when on.
@@ -409,7 +410,7 @@ import { BreadCrumbs } from "@toraline.tech/ui";
 
 | Prop | Values | Meaning |
 |---|---|---|
-| `crumbs` | A list of `{ label, href }` | The steps of the path, in order. The last step is the current page: it is shown as text, larger, and its `href` is not used. A step with no `href` is also text |
+| `crumbs` | A list of `{ label, href }` | The steps of the path, in order. The last step is the current page: it is shown as text in the main text color, and its `href` is not used. A step with no `href` is also text |
 | `linkComponent` | A component. When missing: `"a"` | The component that renders each link. It receives `href`, `className` and `children`. A Next.js app gives the `Link` of `next/link`, so a press does not load the whole page again |
 | `aria-label` | Text. When missing: `"Breadcrumb"` | The name of the region for a screen reader |
 
@@ -445,8 +446,9 @@ import { SplitButton } from "@toraline.tech/ui";
 | `items` | A list of `{ label, onSelect, icon }` | The actions of the menu. `onSelect` is called when a person chooses the action. `icon` is optional and is shown before the text |
 | `menuPlacement` | `"bottom"` (default), `"top"` | Where the menu opens: under the buttons, or above them (upwards) |
 | `menuLabel` | Text. When missing: `"More options"` | The name a screen reader says for the button that opens the menu, and for the menu |
-| `disabled` | The HTML attribute | Disables both buttons |
+| `disabled` | The HTML attribute | Disables both buttons. They have half of their opacity |
 
+- The two buttons have the look of the primary Button in the size `md`: 40 pixels high. The menu has the look of the menu of actions of the app Intraweb.
 - Main native element: the main `<button>`. Every other prop and `ref` go to it.
 - `className` goes to the outermost element, a `<div>` that holds the two buttons and the menu. The inner parts have the attribute `data-slot` with the values `main`, `trigger`, `arrow`, `menu`, `item` and `item-icon`.
 - Keyboard, on the button that opens the menu: Enter, Space and Down arrow open the menu with the focus on the first action. Up arrow opens it with the focus on the last action.
@@ -483,20 +485,25 @@ These rules were decided in TOR-1009, and the rules about styles in TOR-1205. Th
 
 A variant is one of the looks of a component, for example `primary` or `danger`.
 
+The sizes have the names and the heights of Intraweb. A button (Button, ButtonLink, IconButton) is `sm`, `md` or `lg`: 32, 40 or 48 pixels high. A form control (TextInput) is `md` or `sm`, from the list `controlSizes`: `md` is 48 pixels on a small screen and 40 pixels from the breakpoint `lg`, and `sm` is 32 pixels. The default is `md`. A component that sits next to a button has the height of a button size: the two buttons of SplitButton and ThemeToggle are 40 pixels high.
+
 1. The variants are one list in the component's file, and the type comes from the list: `export const buttonVariants = ["primary", "secondary"] as const`. Sizes work the same way (`buttonSizes`). The lists are exported, so a test or a catalog can show every value. When the component's file starts with `"use client"`, the lists are in a second file with no `"use client"`, `src/<name>/<name>-options.ts`. Next.js does not let a Server Component read a value that a `"use client"` file exports; it can only render its components.
 2. The classes of each variant and of each size are one object in the component's file, with one text of Tailwind classes for each value: `const variantClass: Record<ButtonVariant, string> = { primary: "bg-primary text-inverse", ... }`. The type makes the build fail when a value has no classes. The objects are not exported.
 3. The component also writes the variant and the size on its element as the attributes `data-variant` and `data-size`, so a test or the CSS of an app can select them.
-4. A state (disabled, loading, error, selected, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The class of the state has the Tailwind variant that selects the same attribute: `disabled:bg-subtle`, `aria-invalid:enabled:border-invalid`, `aria-selected:text-brand`, `peer-checked:bg-primary`. The look and what a screen reader says cannot differ, because both come from one attribute. The component does not choose the classes of a state in its code. One exception: a loading Button leaves out the class of the pointer over it (`hover:`), so that a color the app gave stays while it loads.
+4. A state (disabled, loading, error, selected, current, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `aria-current`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The class of the state has the Tailwind variant that selects the same attribute: `disabled:opacity-50`, `aria-invalid:border-invalid`, `aria-selected:bg-surface`, `aria-[current=page]:text-brand`, `peer-checked:bg-primary`. The look and what a screen reader says cannot differ, because both come from one attribute. The component does not choose the classes of a state in its code. One exception: a loading Button leaves out the class of the pointer over it (`hover:`), so that a color the app gave stays while it loads.
 
 ### Props
 
 1. The props type is the props of the native HTML element plus the component's own props: `ComponentProps<"button"> & { variant?: ButtonVariant }`. Each own prop has a short comment.
 2. A prop has the name HTML or React already uses when one exists: `disabled`, `checked`, `href`, `onChange`.
-3. `className` is joined after the library's classes with the helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` from `src/shared/class-names.ts`, and goes on the outermost element. One exception: the `className` of TextInput goes to its `<input>`, also when an icon puts the `<input>` inside a wrapper. The helper removes a class of the library when a later class sets the same CSS property.
-4. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
-5. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
-6. A relative import names the file with `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. The built type files keep the import as written, and TypeScript in an app that uses the Node module rules needs the full file name. `make check` fails when a built type file has a relative import without `.js`.
-7. A file starts with `"use client"` only when the component uses React state, an effect, or an event handler of its own. `"use client"` tells Next.js that the file runs in the browser. A component without it can also render in a Server Component.
+3. An icon is the prop `icon`, of the type `IconComponent` (`src/shared/icon.ts`): a component the app gives, never an element and never an icon set of the library. See [Icons](#icons).
+4. `className` is joined after the library's classes with the helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` from `src/shared/class-names.ts`, and goes on the outermost element. One exception: the `className` of TextInput goes to its `<input>`, also when an icon puts the `<input>` inside a wrapper. The helper removes a class of the library when a later class sets the same CSS property.
+5. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
+6. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
+7. A relative import names the file with `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. The built type files keep the import as written, and TypeScript in an app that uses the Node module rules needs the full file name. `make check` fails when a built type file has a relative import without `.js`.
+8. A file starts with `"use client"` only when the component uses React state, an effect, or an event handler of its own. `"use client"` tells Next.js that the file runs in the browser. A component without it can also render in a Server Component. A component that has the prop `icon` must not have `"use client"`: Next.js does not let a Server Component give an icon component to a Client Component. When such a component needs code that runs in the browser, that code is a second file with `"use client"`, as `src/button/ButtonElement.tsx`.
+9. A component that renders a link (ButtonLink, TabNav, BreadCrumbs) has the prop `linkComponent`, with the default `"a"`. The library never imports Next.js.
+10. A form control is linked to its label, hint and error message by [`Field`](#field), which gives it `id`, `aria-describedby` and `aria-invalid`. A control only has to pass these to its native element. Its box has the classes of `controlClassNames` (`src/shared/control.ts`).
 
 ### Behaviour and accessibility
 
@@ -513,10 +520,10 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
    - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
-4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg`, written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
+4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg`, written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
-6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a size in `em` or `%` (`size-[1em]`; a size in `em` follows the font size of the component), a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
-7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`. When that order is not the one needed, the class names both conditions: `aria-invalid:enabled:border-invalid`.
+6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a width in pixels that is not a step of the spacing scale (`border-[1.5px]`), a size in `em` or `%`, a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
+7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`, then a breakpoint (`md:`, `lg:`). When that order is not the one needed, the class names both conditions: `disabled:hover:border-default`.
 8. An element that another class must select gets a marker class with the name of the component: `group/toggle`, `group/split-button`. `peer` needs no name.
 9. An inner element has the attribute `data-slot` with the name of the part, so an app can select it.
 10. Text on its background has a contrast of 4.5 or more in both themes. Each pair of text token and background token that a component uses is in the contrast test of `packages/tokens/src/tokens.test.ts`.

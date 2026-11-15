@@ -284,22 +284,16 @@ describe("the class of the state that must win comes later in the built CSS", ()
   // Each pair: [the class that loses, the class that wins]. Both set the same
   // property and can match one element at the same time.
   test.each([
-    // Button, and the two buttons of SplitButton: disabled wins over the pointer over it.
-    ["hover:bg-primary-hover", "disabled:bg-subtle"],
-    ["hover:bg-subtle", "disabled:bg-subtle"],
-    ["hover:bg-danger-subtle", "disabled:bg-subtle"],
-    ["hover:border-hover", "disabled:border-default"],
-    ["border-danger", "disabled:border-default"],
-    ["text-danger", "disabled:text-tertiary"],
+    // Button, ButtonLink, IconButton and the two buttons of SplitButton: the pointer over it wins over the look at rest.
     ["bg-primary", "hover:bg-primary-hover"],
     ["bg-surface", "hover:bg-subtle"],
+    ["bg-surface", "hover:bg-danger-subtle"],
+    ["border-default", "hover:border-hover"],
     ["bg-primary-subtle", "hover:bg-primary-muted"],
     ["text-body", "hover:text-primary"],
-    // IconButton: the pointer over it wins over the look at rest.
     ["text-icon", "hover:text-icon-strong"],
     // TextInput: the focus wins over the pointer, a field that is not valid wins over
     // both, and the pointer over a disabled field changes nothing.
-    ["border-default", "hover:border-hover"],
     ["hover:border-hover", "focus:border-focus"],
     ["focus:border-focus", "aria-invalid:border-invalid"],
     ["hover:border-hover", "disabled:hover:border-default"],
@@ -309,16 +303,10 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["min-h-12", "lg:min-h-10"],
     ["py-2.5", "lg:py-2"],
     ["text-base/6", "lg:text-sm/5"],
-    // Toggle: on wins over off, and disabled wins over on.
+    // Toggle: on wins over off.
     ["bg-surface", "peer-checked:bg-primary"],
     ["border-strong", "peer-checked:border-brand"],
-    ["peer-checked:bg-primary", "peer-disabled:bg-subtle"],
-    ["peer-checked:border-brand", "peer-disabled:border-default"],
     ["bg-current", "group-has-checked/toggle:bg-surface"],
-    ["group-has-checked/toggle:bg-surface", "group-has-disabled/toggle:bg-current"],
-    ["text-icon", "group-has-disabled/toggle:text-muted"],
-    ["text-brand", "group-has-disabled/toggle:text-inverse"],
-    ["text-body", "has-disabled:text-tertiary"],
     // TabNav: the current tab wins over the look at rest and over the pointer over it.
     ["hover:text-primary", "aria-[current=page]:text-brand"],
     ["hover:text-primary", "aria-[current=page]:text-primary"],
@@ -328,7 +316,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // Tabs: the selected tab wins over the pointer over it.
     ["text-secondary", "aria-selected:text-primary"],
     ["hover:text-primary", "aria-selected:text-primary"],
-    // SplitButton: the keyboard focus ring wins over the plain focus.
+    // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
+    ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
