@@ -26,6 +26,8 @@ import {
   splitButtonMenuPlacements,
   tabNavVariants,
 } from "./index";
+// Phase 8: forms and feedback.
+import { Select } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -166,6 +168,12 @@ async function renderEveryComponent(): Promise<string[]> {
           </Example>
         )),
       )}
+      {/* Phase 8: forms and feedback. */}
+      {controlSizes.map((size) => (
+        <Select key={size} size={size} aria-label={`Kind of contract, ${size}`}>
+          <option>Monthly</option>
+        </Select>
+      ))}
     </ThemeProvider>,
   );
 

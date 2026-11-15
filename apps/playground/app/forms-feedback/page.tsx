@@ -1,0 +1,83 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Field, Select, controlSizes } from "@toraline.tech/ui";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
+
+/**
+ * The route /forms-feedback: the form controls and the feedback components of
+ * phase 8 (TOR-1124), each with every variant, size and state. Press the theme
+ * button to see them in the other theme. The page is a Server Component.
+ */
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="mt-8 rounded-xl border border-default bg-surface p-4">
+      <h2 className="font-heading text-xl font-semibold">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="mt-4">
+      <h3 className="text-sm text-secondary">{label}</h3>
+      <div className="mt-2 flex flex-wrap items-center gap-3">{children}</div>
+    </div>
+  );
+}
+
+const contractKinds = (
+  <>
+    <option value="monthly">Monthly</option>
+    <option value="hourly">By the hour</option>
+    <option value="fixed">Fixed price</option>
+  </>
+);
+
+export default function FormsFeedbackPage() {
+  return (
+    <main className="mx-auto max-w-3xl p-8">
+      <h1 className="font-heading text-3xl font-semibold text-brand">Forms and feedback</h1>
+      <p className="mt-4">
+        The form controls and the feedback components of the library, with the look of the app
+        Intraweb.
+      </p>
+      <p className="mt-2">
+        <Link className="text-brand underline" href="/components">
+          Back to the components
+        </Link>
+      </p>
+      <ThemeToggle className="mt-4" />
+
+      <Section title="Select">
+        <Row label="Sizes">
+          {controlSizes.map((size) => (
+            <Select key={size} size={size} aria-label={`Kind of contract, ${size}`}>
+              {contractKinds}
+            </Select>
+          ))}
+        </Row>
+        <Row label="States">
+          <Select aria-label="Not valid" aria-invalid="true">
+            {contractKinds}
+          </Select>
+          <Select aria-label="Disabled" disabled>
+            {contractKinds}
+          </Select>
+          <Select aria-label="As wide as its content" className="w-auto">
+            {contractKinds}
+          </Select>
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Kind of contract" hint="It decides how the hours are counted.">
+            <Select name="kind">{contractKinds}</Select>
+          </Field>
+          <Field label="State" error="Choose a state.">
+            <Select name="state">{contractKinds}</Select>
+          </Field>
+        </div>
+      </Section>
+    </main>
+  );
+}

@@ -546,3 +546,41 @@ The tests use Vitest, Testing Library and `@testing-library/user-event`, which p
 
 1. The component is on the page of `apps/playground`, with every variant and state.
 2. This file has the component's props and one short example.
+
+## The form controls and the feedback components of phase 8
+
+These components were added in phase 8 (TOR-1124). They come from `@toraline.tech/ui`, need the 3 CSS lines of [How to use the theme in a Next.js app](#how-to-use-the-theme-in-a-nextjs-app), and follow the [rules every component follows](#rules-every-component-follows). Each one has the parts, the classes and the measures of the same component of the app Intraweb. The page `/forms-feedback` of [`apps/playground`](../../apps/playground/README.md) shows each one with every variant and state.
+
+### `Select`
+
+A select: a control where a person chooses one value of a list. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+import { Field, Select } from "@toraline.tech/ui";
+
+<Field label="Kind of contract" error={kindError}>
+  <Select name="kind" defaultValue="monthly">
+    <option value="monthly">Monthly</option>
+    <option value="hourly">By the hour</option>
+  </Select>
+</Field>
+
+<Select aria-label="State" size="sm" className="w-auto" value={state} onChange={changeState}>
+  <option value="open">Open</option>
+  <option value="closed">Closed</option>
+</Select>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `size` | `"md"` (default), `"sm"` | The sizes of every form control (`controlSizes`): `md` is 48 pixels high on a small screen and 40 pixels from the breakpoint `lg`, `sm` is 32 pixels. It replaces the HTML attribute `size` |
+| `children` | `<option>` and `<optgroup>` elements | The choices |
+| `aria-invalid` | `true` | The select has the red border of a field that is not valid. Field sets it when it has an error |
+| `disabled` | The HTML attribute | The select cannot get the focus and cannot be changed. It has a quiet background and a quiet text |
+
+- It is a native `<select>`: the browser shows the list of choices and handles the keyboard. The library hides the arrow of the browser and shows its own, 12 pixels from the right edge.
+- The box, the sizes and the focus, disabled and not valid looks are the ones of TextInput (`controlClassNames`), as in Intraweb.
+- The arrow is an image inside a class, as in Intraweb. An image in a class cannot read a token, so its line is the grey `#667085` in every theme.
+- Main native element: the `<select>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `required`) and `ref` go to it. A width class of the app (`w-auto`, `w-40`) replaces the full width.
+- Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
+- The type `SelectProps` is exported. It has no `"use client"`.

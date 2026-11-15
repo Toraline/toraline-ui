@@ -12,6 +12,18 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Phase 8: the form controls and the feedback components of Intraweb (TOR-1124)
+- Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`, folder `apps/intraweb/src/components/ui/`) and the text of the tickets. Figma was not read: this session had no access to it.
+- This is the one entry of phase 8. It has one part for each sub-ticket.
+- Decided by: agent, to be confirmed in review.
+
+### Select (TOR-1146)
+- Decision: `Select` is a native `<select>` with the box of every form control (`controlClassNames`) and the classes of Intraweb's `Select`: `appearance-none pr-9` and the arrow. `className` goes to the `<select>`. It has no wrapper element.
+- Why no wrapper: Intraweb's screens give width classes to a select (`w-auto`, `w-40`, `flex-1`) in 16 places. With a wrapper around the `<select>` these classes would not change the width of what the person sees.
+- Decision (the arrow): Intraweb draws the arrow with the class `select-chevron` of its `globals.css`, a background image. The library has no CSS file for a component, so the same image is written as Tailwind classes with a value in brackets: `bg-[url(data:image/svg+xml,...)]`, `bg-[position:right_calc(var(--spacing)*3)_center]`, `bg-[size:calc(var(--spacing)*4)]` and `bg-no-repeat`. The image has no quote and no space (`%27`, `%20`), so the class is one word that Tailwind finds in the built files. The two lengths are multiples of `--spacing`, with the values of Intraweb (12 and 16 pixels).
+- Exception to rule 3 of "Styles" (a color is always a token class): the line of the arrow has the color `#667085`, written inside the image, in every theme. It is Intraweb's value. An image inside a class cannot read a CSS variable. In the dark theme the arrow on `--bg-surface` has a contrast of 3.4.
+- Alternatives: a wrapper `<div>` with an inline `<svg>` in `text-icon`, which follows the theme and changes the layout of every select with a width class; a CSS file in the package with the class `select-chevron`; the arrow of the browser.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

@@ -46,3 +46,7 @@ export type {
   SplitButtonMenuPlacement,
   SplitButtonProps,
 } from "./split-button/index.js";
+
+// Phase 8: forms and feedback
+export { Select } from "./select/index.js";
+export type { SelectProps } from "./select/index.js";
