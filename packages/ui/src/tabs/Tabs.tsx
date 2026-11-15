@@ -4,55 +4,68 @@ import { useId, useRef, useState } from "react";
 import type { ComponentProps, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
+import { segmentedItemClass, segmentedTrackClass } from "../shared/segmented.js";
 
-/** The row of tabs, with a line under it. */
-const listClass = "flex flex-wrap border-b-2 border-b-default";
-
-/**
- * One tab. The selected tab is selected by aria-selected, the attribute a
- * screen reader reads: it has the brand color, and a line in the brand color
- * under it. The negative margin puts that line on the line of the row.
- * The colors, the font of headings and the medium weight are the ones of the
- * tabs of the app Intraweb.
+/*
+ * The look is the segmented control of the app Intraweb (SegmentedTabs in
+ * components/ui/tab-nav.tsx): a quiet rounded track, where the selected tab is
+ * a raised white piece. TabNav (variant "secondary") has the same look.
  */
+
+/** The row of tabs: the track. */
+const listClass = segmentedTrackClass;
+
+/** One tab. The selected tab is selected by aria-selected, the attribute a screen reader reads. */
 const tabClass = classNames(
-  "m-0 -mb-[2px] cursor-pointer rounded-t-md rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-heading text-base/normal font-medium text-secondary",
-  "hover:text-primary",
-  "aria-selected:border-b-brand aria-selected:text-brand",
-  "motion-safe:transition-[border-color,color] motion-safe:ease-[ease]",
-  focusRingClass,
+  segmentedItemClass,
+  "aria-selected:bg-surface aria-selected:text-primary aria-selected:shadow-sm",
 );
 
 /** The content of the selected tab. */
 const panelClass = classNames("px-0 py-4 text-base/normal text-primary", focusRingClass);
 
 /** One tab: the button a person presses, and the content it shows. */
-export type TabItem = {
+export type TabItem<TabId extends string = string> = {
   /** A name for the tab that no other tab of the list has. */
-  id: string;
+  id: TabId;
   /** The text of the tab's button. */
   label: ReactNode;
-  /** What the page shows while the tab is selected. */
-  content: ReactNode;
+  /**
+   * What the page shows under the row while the tab is selected. It is
+   * optional: an app that shows the content itself, somewhere else on the
+   * page, gives no content and reads the selected tab from "value".
+   */
+  content?: ReactNode;
 };
 
-export type TabsProps = ComponentProps<"div"> & {
+export type TabsProps<TabId extends string = string> = Omit<
+  ComponentProps<"div">,
+  "onChange" | "defaultValue"
+> & {
   /** The tabs, in the order they are shown. */
-  tabs: readonly TabItem[];
-  /** The id of the tab that is selected at the start. When missing: the first tab. */
-  defaultSelectedId?: string;
+  tabs: readonly TabItem<TabId>[];
   /**
-   * The id of the selected tab, when the app holds the state.
-   * Give it together with "onSelectedIdChange".
+   * The id of the selected tab, when the app holds the state (controlled).
+   * Give it together with "onChange".
    */
-  selectedId?: string;
+  value?: TabId;
   /** Called with the id of a tab when a person selects it. */
-  onSelectedIdChange?: (selectedId: string) => void;
+  onChange?: (value: TabId) => void;
+  /**
+   * The id of the tab that is selected at the start, when the component holds
+   * the state (uncontrolled). When missing: the first tab.
+   */
+  defaultValue?: TabId;
 };
 
 /**
- * A row of tabs, and under it the content of the selected tab.
+ * A row of tabs that changes the content inside one page. To move between
+ * pages, use TabNav.
  *
+ * - Two ways to hold the state. Uncontrolled: the component holds it, and
+ *   "defaultValue" names the first selected tab. Controlled: the app gives
+ *   "value" and "onChange".
+ * - When the selected tab has "content", the component shows it under the row.
  * - Keyboard: Tab moves the focus to the selected tab. The Left and Right arrow
  *   keys move to the tab before or after it and select it; after the last tab
  *   comes the first. Home selects the first tab and End the last.
@@ -60,21 +73,21 @@ export type TabsProps = ComponentProps<"div"> & {
  * - "aria-label" and "aria-labelledby" name the row of tabs.
  * - "className" and every other prop go to the outermost <div>, and "ref" points to it.
  */
-export function Tabs({
+export function Tabs<TabId extends string = string>({
   tabs,
-  defaultSelectedId,
-  selectedId,
-  onSelectedIdChange,
+  value,
+  onChange,
+  defaultValue,
   className,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   ...divProps
-}: TabsProps) {
+}: TabsProps<TabId>) {
   const baseId = useId();
-  const [ownSelectedId, setOwnSelectedId] = useState(defaultSelectedId);
+  const [ownValue, setOwnValue] = useState(defaultValue);
   const tabElements = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const wantedId = selectedId ?? ownSelectedId;
+  const wantedId = value ?? ownValue;
   const foundIndex = tabs.findIndex((tab) => tab.id === wantedId);
   const selectedIndex = foundIndex === -1 ? 0 : foundIndex;
   const selectedTab = tabs[selectedIndex];
@@ -84,9 +97,9 @@ export function Tabs({
     if (tab === undefined) {
       return;
     }
-    setOwnSelectedId(tab.id);
+    setOwnValue(tab.id);
     if (tab.id !== selectedTab?.id) {
-      onSelectedIdChange?.(tab.id);
+      onChange?.(tab.id);
     }
   };
 
@@ -109,6 +122,8 @@ export function Tabs({
 
   const tabId = (index: number) => `${baseId}-tab-${index}`;
   const panelId = `${baseId}-panel`;
+  // A tab with no content has no panel: the app shows the content itself.
+  const hasPanel = selectedTab !== undefined && selectedTab.content !== undefined;
 
   return (
     <div {...divProps} className={classNames("font-body", className)}>
@@ -133,7 +148,7 @@ export function Tabs({
               className={tabClass}
               data-slot="tab"
               aria-selected={isSelected}
-              aria-controls={isSelected ? panelId : undefined}
+              aria-controls={isSelected && hasPanel ? panelId : undefined}
               tabIndex={isSelected ? 0 : -1}
               onClick={() => select(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
@@ -143,7 +158,7 @@ export function Tabs({
           );
         })}
       </div>
-      {selectedTab === undefined ? null : (
+      {hasPanel ? (
         <div
           role="tabpanel"
           id={panelId}
@@ -154,7 +169,7 @@ export function Tabs({
         >
           {selectedTab.content}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

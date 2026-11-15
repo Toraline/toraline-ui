@@ -326,8 +326,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // TabNav: the classes of a wide screen win over the classes of a narrow one.
     ["overflow-x-auto", "md:overflow-visible"],
     // Tabs: the selected tab wins over the pointer over it.
-    ["hover:text-primary", "aria-selected:text-brand"],
-    ["border-b-transparent", "aria-selected:border-b-brand"],
+    ["text-secondary", "aria-selected:text-primary"],
+    ["hover:text-primary", "aria-selected:text-primary"],
     // SplitButton: the keyboard focus ring wins over the plain focus.
     ["focus:bg-subtle", "focus-visible:outline-2"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {

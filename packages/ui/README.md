@@ -348,31 +348,48 @@ export function SalesTabs() {
 
 ### `Tabs`
 
-A row of tabs, and under it the content of the selected tab.
+A row of tabs that changes the content inside one page. It has the segmented look: the selected tab is a raised white piece. To move between pages, use [`TabNav`](#tabnav).
 
 ```tsx
 import { Tabs } from "@toraline.tech/ui";
 
+// Uncontrolled: the component holds the state and shows the content.
 <Tabs
   aria-label="Orders by kind"
+  defaultValue="open"
   tabs={[
     { id: "all", label: "All", content: <AllOrders /> },
     { id: "open", label: "Open", content: <OpenOrders /> },
+  ]}
+/>
+
+// Controlled: the app holds the state, and here it also shows the content.
+<Tabs
+  aria-label="Mode of the editor"
+  value={mode}
+  onChange={setMode}
+  tabs={[
+    { id: "write", label: "Write" },
+    { id: "preview", label: "Preview" },
   ]}
 />
 ```
 
 | Prop | Values | Meaning |
 |---|---|---|
-| `tabs` | A list of `{ id, label, content }` | The tabs, in the order they are shown. `id` is a name no other tab has. `label` is the text of the tab. `content` is what the page shows while the tab is selected |
-| `defaultSelectedId` | The `id` of a tab | The tab that is selected at the start. When missing: the first tab |
-| `selectedId` and `onSelectedIdChange` | The `id` of a tab, and a function that receives an `id` | The app holds the state. Without them, the component holds it |
+| `tabs` | A list of `{ id, label, content }`. Required | The tabs, in the order they are shown. `id` is a name no other tab has. `label` is the text of the tab. `content` is optional: what the component shows under the row while the tab is selected |
+| `value` and `onChange` | The `id` of a tab, and a function that receives an `id` | Controlled: the app holds the state |
+| `defaultValue` | The `id` of a tab | Uncontrolled: the component holds the state, and this tab is selected at the start. When missing: the first tab |
 | `aria-label` or `aria-labelledby` | Text, or the id of an element | The name of the row of tabs for a screen reader |
 
+- The look is the one of the `SegmentedTabs` of the app Intraweb. To move from it: `label` becomes `aria-label`, `items` becomes `tabs`, and the `key` of an item becomes `id`. `value` and `onChange` keep their names.
+- When the `id`s are written as fixed texts (`as const`), TypeScript knows them: `onChange` receives `"write" | "preview"`, not any text.
 - Main native element: the outermost `<div>`. `className`, every other prop and `ref` go to it. The inner parts have the attribute `data-slot` with the values `list`, `tab` and `panel`.
 - Keyboard: Tab moves the focus to the selected tab, and Tab again moves it to the content. The Left and Right arrow keys move to the tab before or after and select it; after the last tab comes the first. Home selects the first tab, End the last.
 - Screen reader: the row has the role `tablist`, each tab the role `tab`, and the content the role `tabpanel`. The selected tab has `aria-selected="true"`, the others `"false"`. The content takes its name from the selected tab.
-- Only the content of the selected tab is on the page.
+- Only the content of the selected tab is on the page. A selected tab with no `content` has no `tabpanel`.
+- Many tabs: the row scrolls sideways when it is wider than its container.
+- The types `TabsProps` and `TabItem` are exported.
 - It is a Client Component, because it holds state.
 
 ### `BreadCrumbs`

@@ -47,34 +47,34 @@ describe("Tabs", () => {
     expect(panel.tabIndex).toBe(0);
   });
 
-  test("defaultSelectedId selects another tab at the start", () => {
-    render(<Tabs tabs={tabs} defaultSelectedId="support" />);
+  test("uncontrolled: defaultValue selects another tab at the start", () => {
+    render(<Tabs tabs={tabs} defaultValue="support" />);
     expect(selectedTabName()).toBe("Support");
     expect(screen.getByText("Support requests")).toBeTruthy();
   });
 
   test("an id that no tab has selects the first tab", () => {
-    render(<Tabs tabs={tabs} defaultSelectedId="unknown" />);
+    render(<Tabs tabs={tabs} defaultValue="unknown" />);
     expect(selectedTabName()).toBe("All");
   });
 
   test("a click selects a tab and shows its content", async () => {
     const user = userEvent.setup();
-    const onSelectedIdChange = vi.fn();
-    render(<Tabs tabs={tabs} onSelectedIdChange={onSelectedIdChange} />);
+    const onChange = vi.fn();
+    render(<Tabs tabs={tabs} onChange={onChange} />);
 
     await user.click(getTab("Orders"));
     expect(selectedTabName()).toBe("Orders");
     expect(screen.getByRole("tabpanel", { name: "Orders" }).textContent).toBe("Open orders");
-    expect(onSelectedIdChange).toHaveBeenCalledExactlyOnceWith("orders");
+    expect(onChange).toHaveBeenCalledExactlyOnceWith("orders");
 
     await user.click(getTab("Orders"));
-    expect(onSelectedIdChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledTimes(1);
   });
 
   test("the keyboard: Tab goes to the selected tab, then to the content", async () => {
     const user = userEvent.setup();
-    render(<Tabs tabs={tabs} defaultSelectedId="orders" />);
+    render(<Tabs tabs={tabs} defaultValue="orders" />);
 
     expect(getTab("All").tabIndex).toBe(-1);
     expect(getTab("Orders").tabIndex).toBe(0);
@@ -113,7 +113,7 @@ describe("Tabs", () => {
 
   test("the keyboard: Home selects the first tab and End the last", async () => {
     const user = userEvent.setup();
-    render(<Tabs tabs={tabs} defaultSelectedId="orders" />);
+    render(<Tabs tabs={tabs} defaultValue="orders" />);
     await user.tab();
 
     await user.keyboard("{End}");
@@ -125,14 +125,14 @@ describe("Tabs", () => {
     expect(selectedTabName()).toBe("All");
   });
 
-  test("the app can hold the state with selectedId and onSelectedIdChange", async () => {
+  test("controlled: the app holds the state with value and onChange", async () => {
     const user = userEvent.setup();
     function Controlled() {
-      const [selectedId, setSelectedId] = useState("orders");
+      const [value, setValue] = useState("orders");
       return (
         <>
-          <Tabs tabs={tabs} selectedId={selectedId} onSelectedIdChange={setSelectedId} />
-          <button onClick={() => setSelectedId("all")}>Back to all</button>
+          <Tabs tabs={tabs} value={value} onChange={setValue} />
+          <button onClick={() => setValue("all")}>Back to all</button>
         </>
       );
     }
@@ -146,12 +146,12 @@ describe("Tabs", () => {
     expect(selectedTabName()).toBe("All");
   });
 
-  test("with selectedId and no change from the app, the selected tab stays", async () => {
+  test("with value and no change from the app, the selected tab stays", async () => {
     const user = userEvent.setup();
-    const onSelectedIdChange = vi.fn();
-    render(<Tabs tabs={tabs} selectedId="all" onSelectedIdChange={onSelectedIdChange} />);
+    const onChange = vi.fn();
+    render(<Tabs tabs={tabs} value="all" onChange={onChange} />);
     await user.click(getTab("Orders"));
-    expect(onSelectedIdChange).toHaveBeenCalledWith("orders");
+    expect(onChange).toHaveBeenCalledWith("orders");
     expect(selectedTabName()).toBe("All");
   });
 
@@ -175,5 +175,47 @@ describe("Tabs", () => {
     render(<Tabs tabs={[]} />);
     expect(screen.getByRole("tablist")).toBeTruthy();
     expect(screen.queryByRole("tabpanel")).toBeNull();
+  });
+
+  test("has the segmented look: a track, and the selected tab is a raised piece", () => {
+    render(<Tabs tabs={tabs} />);
+    expect(screen.getByRole("tablist").className.split(" ")).toEqual(
+      expect.arrayContaining(["inline-flex", "bg-muted", "p-1"]),
+    );
+    expect(getTab("All").className.split(" ")).toEqual(
+      expect.arrayContaining([
+        "text-secondary",
+        "aria-selected:bg-surface",
+        "aria-selected:text-primary",
+        "aria-selected:shadow-sm",
+      ]),
+    );
+  });
+
+  test("tabs with no content: no panel, and the app reads the selected tab from value", async () => {
+    const user = userEvent.setup();
+    const modes = [
+      { id: "write", label: "Write" },
+      { id: "preview", label: "Preview" },
+    ] as const;
+    function Editor() {
+      // The type of the state is the ids of the tabs: "write" | "preview".
+      const [mode, setMode] = useState<(typeof modes)[number]["id"]>("write");
+      return (
+        <>
+          <Tabs tabs={modes} value={mode} onChange={setMode} aria-label="Mode" />
+          <p>Current mode: {mode}</p>
+        </>
+      );
+    }
+    render(<Editor />);
+    expect(screen.queryByRole("tabpanel")).toBeNull();
+    expect(getTab("Write").hasAttribute("aria-controls")).toBe(false);
+
+    await user.click(getTab("Preview"));
+    expect(screen.getByText("Current mode: preview")).toBeTruthy();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByText("Current mode: write")).toBeTruthy();
+    expect(document.activeElement).toBe(getTab("Write"));
   });
 });

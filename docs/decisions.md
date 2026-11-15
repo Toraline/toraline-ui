@@ -12,6 +12,18 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Tabs: the segmented look, and `value` / `onChange` (TOR-1144)
+- Decision: `Tabs` has one look, the segmented control of Intraweb's `SegmentedTabs`, from `packages/ui/src/shared/segmented.ts`. The look with a line under the selected tab is no longer in Tabs: in Intraweb that look belongs to tabs that are links (`TabNav`, variant `primary`).
+- Decision: the props of the selected tab are `value`, `onChange` and `defaultValue`. They replace `selectedId`, `onSelectedIdChange` and `defaultSelectedId` (entry of TOR-1010 to TOR-1015). The old names are removed, not kept next to the new ones.
+- Why: the ticket asks for a controlled `value` / `onChange`, the names of Intraweb's `SegmentedTabs` and of a form control in HTML and React (rule 2 of the props). Two names for one prop would have to be documented and tested twice, and no app uses version `0.1.0` for real yet.
+- Decision: `content` of a tab is optional. A selected tab with no content has no `tabpanel` and no `aria-controls`.
+- Why: Intraweb's `SegmentedTabs` has no content: the screen shows it. With optional content one component covers both uses.
+- Decision: `Tabs` is generic on the id of a tab (`Tabs<TabId extends string>`), as Intraweb's `SegmentedTabs<K>`. `onChange` then receives the exact ids, so `onChange={setMode}` type checks with a state of the type `"write" | "preview"`.
+- What changes for Intraweb: `label` → `aria-label`, `items` → `tabs`, the `key` of an item → `id`. `value` and `onChange` are the same.
+- Kept from the library: the keys Home and End, the focus that goes around, `aria-controls`, the `tabpanel`, and a tab that is selected as soon as it gets the focus with an arrow key. Intraweb's handles the Left and Right arrows only. All earlier keyboard tests still pass, with the renamed props.
+- Alternatives: a prop `variant` with the old line look next to the segmented look; keeping `selectedId` and `onSelectedIdChange` as second names; a separate component `SegmentedTabs` next to `Tabs`.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - TabNav: the app gives the current path and the link component (TOR-1143)
 - Decision: `TabNav` has the two looks (`primary`, `secondary`) and the class lists of Intraweb's `TabNav` (`components/ui/tab-nav.tsx`). The segmented look is in `packages/ui/src/shared/segmented.ts`, which Tabs also reads.
 - Decision: the app gives the path of the current page in the prop `currentPath`, and its link component in `linkComponent`. The rule for the current tab is Intraweb's: the route of the tab, or a route under it, unless the item has `exact: true`.

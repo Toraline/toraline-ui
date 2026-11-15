@@ -25,6 +25,8 @@ The components get the shape of the same components of the app Intraweb: variant
 
   What looks different: the field is 48 pixels high on a small screen and 40 pixels on a screen 1024 pixels wide or more (it was about 50 pixels everywhere). With the focus it shows a border and a ring (it showed an outline). The error icon is a triangle (it was a circle with a cross). A field with an error keeps its red border while it is disabled.
 
+- **Tabs: the props of the selected tab have new names.** `selectedId` is now `value`, `onSelectedIdChange` is now `onChange`, and `defaultSelectedId` is now `defaultValue`. The app renames the 3 props. The behaviour is the same.
+- **Tabs: the look is the segmented control of Intraweb.** The row is a quiet rounded track, and the selected tab is a raised white piece. It was a row with a line under the selected tab; that look is now the variant `primary` of TabNav, for tabs that are links to routes. The font size of a tab is 14 pixels (it was 16).
 - **Button: new sizes.** The heights are now 32 pixels (`sm`), 40 (`md`) and 48 (`lg`), with the paddings of Intraweb. The font size is 14 pixels for `sm` and `md` (it was 16 for `md`) and 16 for `lg` (it was 18). The app changes nothing; a layout that depended on the old heights must be looked at.
 - **Button: a disabled button has half of its opacity**, in the colors of its variant, as in Intraweb. It was grey for every variant. An app that gave `disabled:` color classes to a Button can remove them.
 - **Button: no pointer cursor.** The pointer over a button is the normal arrow, as in Intraweb and as Tailwind CSS 4 sets it. An app that wants the hand gives `className="cursor-pointer"`.
@@ -39,6 +41,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - Field: wraps any form control with a label, a hint, an error message with its icon, and the mark of an optional field. It links them to the control for a screen reader: `id`, `aria-describedby` and `aria-invalid`.
 - TextInput: a text field with the sizes `md` and `sm`, an icon on the left (`icon`), and the focus, disabled and not valid looks of Intraweb's text field. The list `controlSizes` and the type `ControlSize` are the sizes of every form control.
 - TabNav: tabs where each tab is a link to a route, in two looks: `primary` (a line under the current tab) and `secondary` (the segmented control). The app gives the current path (`currentPath`) and its link component (`linkComponent`). The current tab has `aria-current="page"`.
+- Tabs: `content` of a tab is optional. An app that shows the content itself gives no content and reads the selected tab from `value`. The type of `value` is the ids of the tabs when they are written as fixed texts.
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 
 ## 0.1.0 (2026-11-15)

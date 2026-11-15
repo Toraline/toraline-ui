@@ -16,6 +16,7 @@ import {
   iconButtonVariants,
 } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
+import { ControlledTabsExample } from "./ControlledTabsExample";
 import { SplitButtonExamples } from "./SplitButtonExamples";
 
 /**
@@ -237,13 +238,16 @@ export default function ComponentsPage() {
         <Row label="The first tab is selected. Use the Left and Right arrow keys">
           <Tabs tabs={orderTabs} aria-label="Orders by kind" className="w-full" />
         </Row>
-        <Row label='Starts on the tab "Premium" (defaultSelectedId), with a class of the app (mt-6)'>
+        <Row label='Starts on the tab "Premium" (defaultValue), with a class of the app (mt-6)'>
           <Tabs
             tabs={orderTabs}
-            defaultSelectedId="premium"
+            defaultValue="premium"
             aria-label="Orders by kind, second example"
             className="mt-6 w-full"
           />
+        </Row>
+        <Row label="Controlled (value and onChange), with no content: the app shows the content">
+          <ControlledTabsExample />
         </Row>
       </Section>
 
