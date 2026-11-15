@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 8: forms and feedback.
-import { Select } from "./index";
+import { Select, Textarea } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -174,6 +174,7 @@ async function renderEveryComponent(): Promise<string[]> {
           <option>Monthly</option>
         </Select>
       ))}
+      <Textarea aria-label="Notes" />
     </ThemeProvider>,
   );
 

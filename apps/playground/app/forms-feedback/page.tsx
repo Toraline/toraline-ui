@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Field, Select, controlSizes } from "@toraline.tech/ui";
+import { Field, Select, Textarea, controlSizes } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 
 /**
@@ -75,6 +75,26 @@ export default function FormsFeedbackPage() {
           </Field>
           <Field label="State" error="Choose a state.">
             <Select name="state">{contractKinds}</Select>
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="Textarea">
+        <Row label="Rows">
+          <Textarea aria-label="Notes, 2 rows" rows={2} placeholder="2 rows" />
+          <Textarea aria-label="Notes, 4 rows" rows={4} defaultValue="4 rows" />
+        </Row>
+        <Row label="States">
+          <Textarea aria-label="Not valid" aria-invalid="true" defaultValue="Not valid" />
+          <Textarea aria-label="Disabled" disabled defaultValue="Disabled" />
+          <Textarea aria-label="Read-only" readOnly defaultValue="Read-only" />
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Notes" optional hint="200 characters at most.">
+            <Textarea name="notes" rows={3} />
+          </Field>
+          <Field label="Reason" error="The reason is required.">
+            <Textarea name="reason" rows={3} />
           </Field>
         </div>
       </Section>

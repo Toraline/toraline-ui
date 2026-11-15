@@ -50,3 +50,6 @@ export type {
 // Phase 8: forms and feedback
 export { Select } from "./select/index.js";
 export type { SelectProps } from "./select/index.js";
+
+export { Textarea } from "./textarea/index.js";
+export type { TextareaProps } from "./textarea/index.js";

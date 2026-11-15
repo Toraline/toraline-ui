@@ -584,3 +584,27 @@ import { Field, Select } from "@toraline.tech/ui";
 - Main native element: the `<select>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `required`) and `ref` go to it. A width class of the app (`w-auto`, `w-40`) replaces the full width.
 - Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
 - The type `SelectProps` is exported. It has no `"use client"`.
+
+### `Textarea`
+
+A text field with more than one line. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+import { Field, Textarea } from "@toraline.tech/ui";
+
+<Field label="Notes" optional hint="200 characters at most.">
+  <Textarea name="notes" rows={3} maxLength={200} />
+</Field>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `rows` | The HTML attribute | The height, in lines of text. When missing: 2, the value of the browser |
+| `aria-invalid` | `true` | The textarea has the red border of a field that is not valid. Field sets it when it has an error |
+| `disabled` | The HTML attribute | The textarea cannot get the focus and cannot be changed. It has a quiet background and a quiet text |
+
+- It is a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput, as in Intraweb. It has one size and no prop `size`: text of 16 pixels on a small screen and 14 pixels from the breakpoint `lg`.
+- Main native element: the `<textarea>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) and `ref` go to it.
+- A person can change its size with the corner the browser shows. `className="resize-none"` removes it.
+- Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
+- The type `TextareaProps` is exported. It has no `"use client"`.

@@ -24,6 +24,12 @@ Format of one entry:
 - Exception to rule 3 of "Styles" (a color is always a token class): the line of the arrow has the color `#667085`, written inside the image, in every theme. It is Intraweb's value. An image inside a class cannot read a CSS variable. In the dark theme the arrow on `--bg-surface` has a contrast of 3.4.
 - Alternatives: a wrapper `<div>` with an inline `<svg>` in `text-icon`, which follows the theme and changes the layout of every select with a width class; a CSS file in the package with the class `select-chevron`; the arrow of the browser.
 
+### Textarea (TOR-1147)
+- Decision: `Textarea` is a native `<textarea>` with the box of a form control and the classes of Intraweb's `Textarea`: `py-2.5 text-base/6 lg:text-sm/5`. It has no prop `size` and no smallest height, as in Intraweb: `rows` gives the height.
+- Decision: `packages/ui/src/shared/control.ts` has a second function, `controlBoxClassNames`, which gives the classes of the box with no size. `controlClassNames` did not change.
+- Decision: the corner that changes the size of the textarea is the browser's, as in Intraweb. No class turns it off.
+- Alternatives: the sizes `md` and `sm` of the other controls (Intraweb's Textarea has none); a prop that makes the textarea grow with its text (needs code that runs in the browser; the ticket does not ask for it).
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

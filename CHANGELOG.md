@@ -48,6 +48,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - Tabs: `content` of a tab is optional. An app that shows the content itself gives no content and reads the selected tab from `value`. The type of `value` is the ids of the tabs when they are written as fixed texts.
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 - Select (phase 8, TOR-1124): a native `<select>` with the box, the sizes `md` and `sm` and the focus, disabled and not valid looks of TextInput, and the arrow of Intraweb's select. It goes inside Field.
+- Textarea (phase 8): a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput. It goes inside Field.
 
 ## 0.1.0 (2026-11-15)
 
