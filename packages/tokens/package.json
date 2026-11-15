@@ -4,8 +4,13 @@
   "private": true,
   "description": "Design tokens and themes of the Toraline component library.",
   "type": "module",
-  "sideEffects": false,
-  "files": ["dist"],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "css"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,7 +18,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./css": "./css/index.css",
+    "./css/primitives.css": "./css/primitives.css",
+    "./css/themes/light.css": "./css/themes/light.css",
+    "./css/themes/dark.css": "./css/themes/dark.css"
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.json",

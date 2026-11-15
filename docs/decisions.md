@@ -12,6 +12,19 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Token names, token files and the values of the two themes (TOR-1004)
+- Decision: the tokens are plain CSS files in `packages/tokens/css/`: `primitives.css` (level 1), `themes/light.css`, `themes/dark.css`, and `index.css`, which imports the three. The same values are TypeScript objects in `packages/tokens/src/` (`primitives`, `lightTheme`, `darkTheme`). A test fails when a CSS file and its TypeScript object differ.
+- Why: an app with no build step can use the CSS files as they are, and the theme function (TOR-1005) needs the default values in TypeScript. Writing both by hand, with a test that compares them, needs no generator script.
+- Decision: there are 21 level 2 tokens: 16 colors, 3 fonts, `--radius` and `--shadow`. The full list is in `packages/tokens/README.md`. Spacing and font sizes exist only at level 1; phase 3 adds a level 2 token when a component needs one.
+- Decision: level 1 names that are not colors are `--space-*`, `--font-size-*`, `--font-stack-*`, `--radius-size-*` and `--shadow-size-*`.
+- Why: Tailwind 4 uses the names `--radius-*`, `--shadow-*`, `--text-*` and `--spacing` for its own values. Different names mean a level 1 token never changes a Tailwind class by accident.
+- Decision: the purple scale has new numbers, with the old `primary` (`#5e00a1`) as `--purple-500`. The grey scale keeps the old numbers. 5 colors are new (`--purple-50`, `--purple-400`, `--red-300`, `--red-600`, `--green-700`).
+- Why: in the old code `purple500` was darker than `primary`, so the numbers were not in order. The new red and green exist because white text on the old red (`#f04848`) has a contrast of 3.67, which is below the 4.5 that accessibility rules (WCAG AA) ask for.
+- Decision: in the dark theme `--color-primary` is `--purple-200`, not `--purple-500`.
+- Why: `--purple-500` on the dark background has too little contrast to read. A test checks the contrast of 11 text and background pairs in both themes.
+- Alternatives: generating the CSS files from TypeScript with a script; keeping the old purple numbers; one `--color-background` token and no `--color-surface-raised` and `--color-surface-muted`.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Tooling of version 2 (TOR-1001)
 - Decision: npm workspaces as the package manager; Vite 8 in library mode to build the packages, with `tsc` writing the type files; Vitest 5 as the test runner; ESLint 10 with typescript-eslint as the linter; TypeScript 6.0; Node 24.
 - Why: npm is already installed and is what the other Toraline repositories use, so nobody installs a new tool. Vite and Vitest share one configuration style, and Storybook (phase 4) can build with Vite too. All five were installed and run on 2026-11-15: build, type check, lint and tests pass.

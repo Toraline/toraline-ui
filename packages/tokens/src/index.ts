@@ -1,7 +1,12 @@
 /**
  * @toraline/tokens
  *
- * The design tokens and themes arrive in phase 2 (TOR-996).
- * This file only proves that the package builds, lints and tests.
+ * The design tokens and the themes of the Toraline component library.
+ * This package has no React code. The CSS files are in the folder css/.
  */
 export const packageName = "@toraline/tokens";
+
+export { primitives } from "./primitives";
+export type { PrimitiveName } from "./primitives";
+export { darkTheme, lightTheme, themeTokenNames } from "./themes";
+export type { ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes";

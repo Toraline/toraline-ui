@@ -8,7 +8,7 @@ The component library of Toraline: styled React components, with configurable th
 
 | Path | Content | State |
 |---|---|---|
-| `packages/tokens` | Design tokens, themes, and the function that builds a theme | Skeleton. Built in phase 2 |
+| `packages/tokens` | Design tokens, themes, and the function that builds a theme | Phase 2, in progress. See [its README](packages/tokens/README.md) |
 | `packages/ui` | The styled components, published as `@toraline/ui` | Skeleton. Built in phase 3 |
 | `apps/catalog` | The catalog (Storybook) | Placeholder. Built in phase 4 |
 | `legacy/` | The old library: Create React App, styled-components 5, Storybook 6 | Unchanged |
