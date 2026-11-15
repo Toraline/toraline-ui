@@ -32,6 +32,7 @@ import {
   CheckboxControl,
   CountBadge,
   DecimalInput,
+  EmptyState,
   Panel,
   Select,
   StatusBadge,
@@ -201,6 +202,10 @@ async function renderEveryComponent(): Promise<string[]> {
       <Panel title="Contract" subtitle="Signed in March" actions={<Button size="sm">Edit</Button>}>
         Content
       </Panel>
+      <EmptyState title="No order yet" action={<Button>New order</Button>}>
+        The orders are shown here.
+      </EmptyState>
+      <EmptyState title="No client yet" icon={PlusIcon} />
     </ThemeProvider>,
   );
 
@@ -365,6 +370,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // Panel: the classes of a wide screen win over the classes of a narrow one.
     ["rounded-lg", "md:rounded-xl"],
     ["p-4", "md:p-6"],
+    // EmptyState: the padding of a wide screen wins.
+    ["px-4", "md:px-8"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

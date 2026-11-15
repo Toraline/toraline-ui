@@ -72,6 +72,14 @@ Format of one entry:
 - Decision: the props type is the props of `<section>` without the HTML attribute `title`, plus the component's own. So `aria-label`, `data-*` and `ref` work, which Intraweb's Panel does not accept.
 - Alternatives: a prop for the level of the heading; `aria-labelledby` on the `<section>`.
 
+### EmptyState (TOR-1153)
+- Decision: `EmptyState` has the props (`title`, `icon`, `action`, `children`), the elements and the class lists of Intraweb's `components/ui/empty-state.tsx`. `title` accepts text or elements.
+- Decision: `icon` has the type `IconComponent`. When the app gives none, the library draws the icon `inbox` of Lucide as an inline `<svg>`, the default icon of Intraweb's EmptyState. The library does not depend on `lucide-react` (entry of TOR-1138).
+- Decision: the title is `font-heading text-base/6 font-medium`, the computed values of Intraweb's text style `heading-card`. It is always an `<h2>`, as in Intraweb.
+- Decision: the component has no `"use client"`, so a Server Component can give it an icon component. The action is an element the app gives, with its own click handler.
+- Decision: it also accepts `className`, the other props of `<section>` and `ref` (Intraweb's accepts none).
+- Alternatives: a required `icon` with no default; a prop for the level of the heading.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

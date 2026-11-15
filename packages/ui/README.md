@@ -746,3 +746,29 @@ import { Button, Panel } from "@toraline.tech/ui";
 - The title is always an `<h2>`, as in Intraweb. A page whose cards are under a heading of another level gives no `title` and writes its own heading in `children`.
 - Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title` (a tooltip). The inner parts have `data-slot`: `header`, `titles`, `title`, `subtitle`, `actions`.
 - The type `PanelProps` is exported. It has no `"use client"`.
+
+### `EmptyState`
+
+What a list, a table or a page shows when it has nothing to show: an icon, a title, a short text and one action.
+
+```tsx
+import { Plus, Users } from "lucide-react";
+import { Button, EmptyState } from "@toraline.tech/ui";
+
+<EmptyState title="No client yet" icon={Users} action={<Button icon={Plus}>New client</Button>}>
+  Add the first client to start a contract.
+</EmptyState>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements, required | What is missing, in a few words: a heading of level 2 (`<h2>`) |
+| `icon` | An icon component | The icon in the circle above the title. See [Icons](#icons). When missing: an empty tray, drawn by the library. It is decoration: a screen reader skips it |
+| `children` | Text or elements | The text under the title: why the place is empty, or what will be shown here. At most 448 pixels wide |
+| `action` | An element | The next step, under the text: one button or link |
+
+- It has the look of a card: the background `bg-surface`, the shadow `shadow-card`, and everything in the middle. The corner and the side padding are larger from the breakpoint `md` of Tailwind CSS.
+- The same component shows "could not load": the app gives another icon, title and text, and an action that tries again.
+- Every text is given by the app. The library has no default title.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title`. The inner parts have `data-slot`: `icon`, `title`, `description`, `action`.
+- The type `EmptyStateProps` is exported. It has no `"use client"`, so a Server Component can give it an icon component.

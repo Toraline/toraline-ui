@@ -1,3 +1,4 @@
+import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -6,6 +7,7 @@ import {
   CheckboxControl,
   CountBadge,
   DecimalInput,
+  EmptyState,
   Field,
   Panel,
   Select,
@@ -218,6 +220,15 @@ export default function FormsFeedbackPage() {
         <Panel actions={<Button size="sm">Edit</Button>}>
           <p className="text-sm text-body">A panel with an action and no title.</p>
         </Panel>
+      </div>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">EmptyState</h2>
+      <div className="mt-4 grid gap-4">
+        <EmptyState title="No order yet" />
+        <EmptyState title="No client yet" icon={Users} action={<Button icon={Plus}>New client</Button>}>
+          Add the first client to start a contract. The icon comes from this page, a Server
+          Component.
+        </EmptyState>
       </div>
     </main>
   );

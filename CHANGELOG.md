@@ -54,6 +54,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - StatusBadge (phase 8): a badge with the state of a thing, in the variants `neutral`, `success`, `warning`, `error` and `info`, with an optional dot.
 - CountBadge (phase 8): a small pill with a number, in the variants `warning` and `brand`. `label` says what the number means to a screen reader.
 - Panel (phase 8): the card that groups content, with an optional title, subtitle and actions.
+- EmptyState (phase 8): what a list or a page shows when it has nothing to show: an icon, a title, a text and one action.
 
 ## 0.1.0 (2026-11-15)
 
