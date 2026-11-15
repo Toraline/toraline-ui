@@ -641,3 +641,33 @@ const priceError = price !== null && Number.isNaN(price) ? "Type a number, for e
 - The two functions follow the way a number is written in Brazil, the language of Intraweb. An English number with a comma between thousands (`"1,234.5"`) is not read correctly.
 - Main native element: the `<input>`. `className`, every other prop and `ref` go to it, as in TextInput.
 - The type `DecimalInputProps` is exported. It has no `"use client"`.
+
+### `Checkbox` and `CheckboxControl`
+
+`Checkbox` is a checkbox with its label. `CheckboxControl` is only the box, for a list or a table that has its own label.
+
+```tsx
+import { Checkbox, CheckboxControl } from "@toraline.tech/ui";
+
+<Checkbox label="Send the invoice by e-mail" name="send" checked={send} onChange={changeSend} />
+
+<CheckboxControl id="task-12" checked={done} onChange={changeDone} />
+<label htmlFor="task-12">Buy the flowers</label>
+
+<CheckboxControl aria-label="Select the order 12" />
+```
+
+| Prop | Component | Values | Meaning |
+|---|---|---|---|
+| `label` | `Checkbox` | Text or elements, required | The visible name, shown after the box. A press on it changes the box |
+| `changed` | `CheckboxControl` | `true`, `false` (default) | `true` for a value a person changed that is not saved yet, for example in a table that is edited in place. The box has an orange border and ring |
+| `checked`, `defaultChecked`, `onChange` | Both | The HTML attributes, as React uses them | `checked` with `onChange` controls the box from the app. `defaultChecked` sets only how it starts |
+| `disabled` | Both | The HTML attribute | The box cannot get the focus and cannot be changed. It has half of its opacity |
+
+- The box is a real `<input type="checkbox">`, drawn by the library: 20 pixels, a corner of 6 pixels, a border of 1.5 pixels. Checked, it has the color of the main action and a check mark. The Tab key moves the focus to it, the Space key changes it, and a screen reader says "checked" or "not checked".
+- The keyboard focus shows the focus ring of the library (the outline), not the ring of a text field.
+- `Checkbox`: the outermost element is the `<label>`, and `className` goes to it. `CheckboxControl`: the outermost element is a `<span>` with the size of the box, and `className` goes to it. In both, every other prop (`name`, `value`, `id`, `required`) and `ref` go to the `<input>`.
+- `CheckboxControl` has no name of its own. Give it `aria-label`, or the `id` that a `<label>` of the app points to. Inside [`Field`](#field) it gets the label, the hint and the error message of the Field.
+- A checkbox has no look for "not valid" and no state "partly checked" (indeterminate): Intraweb has neither.
+- A box with `changed` has the attribute `data-changed="true"`.
+- The types `CheckboxProps` and `CheckboxControlProps` are exported. Neither has `"use client"`.

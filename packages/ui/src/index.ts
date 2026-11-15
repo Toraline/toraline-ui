@@ -56,3 +56,6 @@ export type { TextareaProps } from "./textarea/index.js";
 
 export { DecimalInput, decimalToInput, parseDecimalInput } from "./decimal-input/index.js";
 export type { DecimalInputProps } from "./decimal-input/index.js";
+
+export { Checkbox, CheckboxControl } from "./checkbox/index.js";
+export type { CheckboxControlProps, CheckboxProps } from "./checkbox/index.js";

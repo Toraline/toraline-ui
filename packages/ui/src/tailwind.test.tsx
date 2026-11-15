@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 8: forms and feedback.
-import { DecimalInput, Select, Textarea } from "./index";
+import { Checkbox, CheckboxControl, DecimalInput, Select, Textarea } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -178,6 +178,9 @@ async function renderEveryComponent(): Promise<string[]> {
       {controlSizes.map((size) => (
         <DecimalInput key={size} size={size} icon={PlusIcon} aria-label={`Price, ${size}`} />
       ))}
+      <Checkbox label="Send the invoice by e-mail" />
+      <CheckboxControl aria-label="Paid" />
+      <CheckboxControl aria-label="Paid, changed" changed />
     </ThemeProvider>,
   );
 
@@ -331,6 +334,14 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
     ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
+    // Phase 8: forms and feedback.
+    // Checkbox: checked wins over the look at rest and over the border of a changed value. The pointer over
+    // it wins over checked for the border, as in Intraweb, and a checked box has its own darker background.
+    ["border-strong", "checked:border-brand"],
+    ["border-changed", "checked:border-brand"],
+    ["bg-surface", "checked:bg-primary"],
+    ["checked:border-brand", "hover:border-hover"],
+    ["checked:bg-primary", "checked:hover:bg-primary-hover"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

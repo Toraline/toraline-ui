@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  Checkbox,
+  CheckboxControl,
   DecimalInput,
   Field,
   Select,
@@ -134,6 +136,29 @@ export default function FormsFeedbackPage() {
             <DecimalInput name="quantity" defaultValue="12x" />
           </Field>
         </div>
+      </Section>
+
+      <Section title="Checkbox and CheckboxControl">
+        <Row label="Checkbox: not checked, checked, disabled">
+          <Checkbox label="Send the invoice by e-mail" name="send" />
+          <Checkbox label="Checked" name="checked" defaultChecked />
+          <Checkbox label="Disabled" name="disabled" disabled />
+          <Checkbox label="Disabled, checked" name="disabled-checked" disabled defaultChecked />
+        </Row>
+        <Row label="CheckboxControl: only the box">
+          <CheckboxControl aria-label="Not checked" />
+          <CheckboxControl aria-label="Checked" defaultChecked />
+          <CheckboxControl aria-label="Disabled" disabled />
+          <CheckboxControl aria-label="Disabled, checked" disabled defaultChecked />
+          <CheckboxControl aria-label="Changed" changed />
+          <CheckboxControl aria-label="Changed, checked" changed defaultChecked />
+        </Row>
+        <Row label="CheckboxControl with a label of the app">
+          <CheckboxControl id="task-flowers" name="task-flowers" />
+          <label htmlFor="task-flowers" className="text-sm text-body">
+            Buy the flowers
+          </label>
+        </Row>
       </Section>
     </main>
   );

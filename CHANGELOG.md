@@ -50,6 +50,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - Select (phase 8, TOR-1124): a native `<select>` with the box, the sizes `md` and `sm` and the focus, disabled and not valid looks of TextInput, and the arrow of Intraweb's select. It goes inside Field.
 - Textarea (phase 8): a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput. It goes inside Field.
 - DecimalInput (phase 8): a TextInput for a number with decimals, with the decimal keyboard of a phone. The functions `parseDecimalInput` (the typed text as a number, with a comma or a point as the decimal mark) and `decimalToInput` (a number as the text of the field) come with it.
+- Checkbox and CheckboxControl (phase 8): a checkbox with its label, and only the box (20 pixels) for a list or a table. The box is a real `<input type="checkbox">`. `changed` on CheckboxControl marks a value that is not saved yet.
 
 ## 0.1.0 (2026-11-15)
 
