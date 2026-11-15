@@ -86,3 +86,6 @@ export type { DeleteOverlayProps } from "./delete-overlay/index.js";
 
 export { ActionMenu, actionMenuTriggers } from "./action-menu/index.js";
 export type { ActionMenuItem, ActionMenuProps, ActionMenuTrigger } from "./action-menu/index.js";
+
+export { Popover, popoverAligns } from "./popover/index.js";
+export type { PopoverAlign, PopoverProps } from "./popover/index.js";

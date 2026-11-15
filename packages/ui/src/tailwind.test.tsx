@@ -34,8 +34,10 @@ import {
   DiscardConfirmation,
   Drawer,
   Modal,
+  Popover,
   actionMenuTriggers,
   modalSizes,
+  popoverAligns,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
@@ -103,7 +105,10 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
 
 /** The floating panels of phase 9: each one opens with a press on its button. */
-const floatingButtonNames = actionMenuTriggers.map((trigger) => `Actions, ${trigger}`);
+const floatingButtonNames = [
+  ...actionMenuTriggers.map((trigger) => `Actions, ${trigger}`),
+  ...popoverAligns.map((align) => `Columns, ${align}`),
+];
 
 function FloatingExamples() {
   return (
@@ -120,6 +125,11 @@ function FloatingExamples() {
         >
           Actions
         </ActionMenu>
+      ))}
+      {popoverAligns.map((align) => (
+        <Popover key={align} label={`Columns, ${align}`} align={align}>
+          The content
+        </Popover>
       ))}
     </>
   );

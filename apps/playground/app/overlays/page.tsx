@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CloseButton } from "@toraline.tech/ui";
+import { CloseButton, Popover, Toggle } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 import { ActionMenuExamples } from "./ActionMenuExamples";
 import { ConfirmationExamples } from "./ConfirmationExamples";
@@ -62,6 +62,27 @@ export default function OverlaysPage() {
 
       <Section title="ActionMenu">
         <ActionMenuExamples />
+      </Section>
+
+      <Section title="Popover">
+        <p className="mt-2 text-sm/5 text-secondary">
+          This page, a Server Component, renders these Popovers itself: the label and the content
+          are elements, not functions.
+        </p>
+        <div className="mt-4 flex flex-wrap items-start justify-between gap-6">
+          <Popover label="Columns">
+            <div className="flex flex-col gap-3">
+              <Toggle label="Price" defaultChecked />
+              <Toggle label="Stock" />
+            </div>
+          </Popover>
+          <Popover label="Disabled" disabled>
+            Never shown
+          </Popover>
+          <Popover label="Columns, lined up to the right" align="right" panelClassName="w-64">
+            <p className="text-sm/5 text-body">The right edges of the button and the panel line up.</p>
+          </Popover>
+        </div>
       </Section>
     </main>
   );

@@ -12,6 +12,22 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Popover: the panel stays next to its button in the page (TOR-1162)
+- Decision: `Popover` has the elements, the classes and the props of Intraweb's `Popover` (`components/ui/popover.tsx`): a `<div class="relative">` that holds a secondary Button and, while it is open, the panel. One rename: `ariaLabel` is `aria-label`.
+- Decision: the panel is not rendered in `<body>`. It stays right after the button, as in Intraweb, and is placed with `useAnchoredPanel({ strategy: "absolute" })`, measured from the `<div>` around it.
+- Why: with the panel after the button, the Tab key goes from the button into the panel with no code, and the panel needs no focus handling. This is the disclosure pattern of the WAI-ARIA Authoring Practices Guide (a button with `aria-expanded` that shows and hides content). A panel in `<body>` would need the focus moved into it and kept in order by hand, which is the hard part Base UI exists for.
+- Limit, accepted: an element around the Popover that hides what leaves it (`overflow: hidden` or a scroll area) cuts the panel, as in Intraweb. ActionMenu is in `<body>` and is not cut.
+- Added to Intraweb's behaviour (ticket TOR-1157): the panel opens above the button when there is no room below, and keeps 8 pixels to the left and right edges of the window. Intraweb's panel is always below and can leave the window.
+- Accessibility problems of Intraweb's Popover, fixed here:
+  1. Escape with the focus inside the panel removes the panel and leaves the focus on no element. Here the focus goes to the button.
+  2. The button has `aria-controls` with the id of a panel that is not on the page while the Popover is closed. Here it has `aria-controls` only while the panel is open.
+- Difference from Intraweb: the panel lines up with the edges of the button. In Intraweb it lines up with the edges of the `<div>` around the button (`left-0`, `right-0`), which is wider than the button when that `<div>` is a block in a wide container. The position is written as inline `top` and `left` (or `bottom`, `right`) in pixels, not as the classes `mt-2 left-0`.
+- Decision: the panel has no role, as in Intraweb. It is not a dialog: it does not take the focus.
+- Decision: no `icon` prop. Popover has `"use client"`, and a Server Component cannot give an icon component to a Client Component. `label` accepts elements, so an app puts an icon element in it.
+- States of the list "States to check": rest and closed (story "Closed"); open (story "Open"); hover, keyboard focus, pressed: the ones of Button; disabled (story "Disabled"); read-only, loading, error, selected: do not apply; empty: a panel with no content shows its padding; long content (story "Long Content"); near the edge (story "Near The Edge"); right-to-left: considered, not supported, `align` names a physical side as in Intraweb; both themes: every story test; reduced motion: no animation.
+- Alternatives: the panel in `<body>` with the focus moved into it; the HTML attribute `popover` with CSS anchor positioning, rejected because the anchor part is not in every browser in use (not verified on the web in this session).
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - ActionMenu, and the menu that it shares with SplitButton (TOR-1161)
 - Decision: the menu is one file, `packages/ui/src/shared/menu/Menu.tsx`: the element with `role="menu"`, its actions, their look, the focus when it opens, and the keys. SplitButton and ActionMenu render it. Each keeps what differs: the button that opens the menu, whether it is open, and where the menu is placed (SplitButton: inside its own element with CSS, as before; ActionMenu: in `<body>`, with `useAnchoredPanel`).
 - SplitButton after the move: its test file is unchanged and passes. One behaviour changed: Escape in the menu stops there (it did reach a listener of the page). Without this, Escape in the menu of a SplitButton inside a Modal would close the Modal too. The class `whitespace-nowrap` moved from each action to the menu; the computed style of an action is the same.

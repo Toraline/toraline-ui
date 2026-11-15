@@ -832,3 +832,38 @@ A button that opens a menu of actions, for example the actions of one row of a t
 - The menu is the same code as the menu of SplitButton (`src/shared/menu/Menu.tsx`): the same look and the same keys.
 - The list `actionMenuTriggers` and the types `ActionMenuProps`, `ActionMenuItem` and `ActionMenuTrigger` are exported.
 - It is a Client Component. The actions are functions and the icons are components, so the file of the app that gives `items` is a Client Component too.
+
+### `Popover`
+
+```tsx
+import { Popover } from "@toraline.tech/ui";
+
+<Popover label="Columns" align="right" panelClassName="w-64">
+  <ColumnList />
+</Popover>
+
+// With a button that closes the panel ("children" is a function, so this file is a Client Component):
+<Popover label="Filters">
+  {(close) => <FilterForm onApply={close} />}
+</Popover>
+```
+
+A button with a floating panel under it, for example the list of columns of a table or its filters.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements. Required | The text of the button that opens the panel |
+| `children` | Elements, or a function `(close) => elements`. Required | The content of the panel. The function form receives `close`, for a panel with a button that closes it |
+| `align` | `"left"` (default), `"right"` | Which edges of the button and the panel line up |
+| `panelClassName` | Classes | Classes for the panel, for example its width. They come after the library's classes |
+| `aria-label` | Text | The name of the button when `label` is not plain text |
+| `disabled` | The HTML attribute | Disables the button |
+
+- The button is a secondary Button in the size `md`.
+- Pointer: a press on the button opens the panel, and a second press closes it. A press outside the button and the panel closes it.
+- Keyboard: Enter and Space on the button open and close the panel. The panel comes right after the button in the page, so Tab goes from the button into it. Escape, with the focus on the button or inside the panel, closes the panel and gives the focus to the button. Escape does not reach a Modal or a Drawer that the Popover is in.
+- The panel opens 8 pixels under the button. It opens above when there is no room below, and keeps 8 pixels to the left and right edges of the window.
+- Screen reader: the button has `aria-expanded`, and `aria-controls` with the id of the panel while it is open.
+- Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to the outermost element, a `<div>` that holds the button and the panel. The parts have `data-slot`: `trigger`, `panel`.
+- The list `popoverAligns` and the types `PopoverProps` and `PopoverAlign` are exported.
+- It is a Client Component. A Server Component can render it when `label` and `children` are text or elements. `children` as a function, and `onClick`, need a Client Component file in the app.
