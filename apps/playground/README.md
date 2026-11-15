@@ -1,6 +1,6 @@
 # playground
 
-A Next.js 16 app that tests the tokens, the themes and the theme toggle of the library in a real page. It is private: it is never published. `make check` builds it.
+A Next.js 16 app, with React 19 and Tailwind CSS 4, that tests the tokens, the themes and the theme toggle of the library in a real page. It is private: it is never published. `make check` builds it.
 
 ## How to run it
 
@@ -17,18 +17,20 @@ npm run dev -w @toraline/playground         # development server on http://local
 |---|---|
 | TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
 | TOR-1007 | The headings use the font Fraunces. The rest of the text uses the default font of the library |
+| TOR-1008 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-brand` is a color this app added. Changing the theme changes all of them |
 
 ## The files
 
 | File | What it is |
 |---|---|
 | `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline/tokens` |
-| `scripts/write-theme-css.ts` | Runs `createTheme` for each input and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
+| `scripts/write-theme-css.ts` | Runs `createTailwindTheme` and `createTheme` on the inputs and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
+| `postcss.config.mjs` | Tells Next.js to run Tailwind CSS 4 |
 | `app/fonts.ts` | Loads the font Fraunces with `next/font/local` into the CSS variable `--font-fraunces` |
 | `app/fonts/` | The font file and its license (SIL Open Font License 1.1) |
 | `app/layout.tsx` | Reads the theme cookie on the server and writes `data-theme` on `<html>` |
-| `app/globals.css` | Imports the CSS of the library and the generated theme file |
-| `app/page.tsx` | The test page |
+| `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file and the component styles. It has no other CSS |
+| `app/page.tsx` | The test page. It has no CSS of its own: only classes |
 
 ## How "no flash of the wrong theme" was checked
 
@@ -65,3 +67,26 @@ The same server was then opened in a browser. With the keyboard: Tab moved the f
 | `<code>` | `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace` (the default of the library) |
 
 The browser reported the font `fraunces` as loaded (`document.fonts`).
+
+## How the token classes were checked
+
+The classes of the page (`app/layout.tsx` and `app/page.tsx`):
+
+- Token classes: `bg-surface`, `bg-surface-raised`, `bg-surface-muted`, `bg-primary`, `bg-danger`, `bg-success`, `bg-brand`, `text-text`, `text-text-muted`, `text-primary`, `text-primary-foreground`, `text-danger-foreground`, `text-success-foreground`, `text-brand-foreground`, `border-border`, `font-heading`, `font-mono`, `rounded`, `shadow`.
+- Standard Tailwind classes for spacing, size and layout, which have no token: `mx-auto`, `max-w-2xl`, `p-4`, `p-8`, `px-3`, `py-1`, `mt-2`, `mt-4`, `mt-6`, `flex`, `flex-wrap`, `gap-3`, `border`, `font-bold`, `text-xl`, `text-3xl`.
+
+Checked on the built app on 2026-11-15 (Tailwind CSS 4.3.5), in a browser, with `getComputedStyle`, before and after one press of the toggle:
+
+| What | Class | Light theme | Dark theme |
+|---|---|---|---|
+| Page background | `bg-surface` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
+| Page text | `text-text` | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
+| Heading color | `text-primary` | `rgb(94, 0, 161)` | `rgb(181, 147, 234)` |
+| Card background | `bg-surface-raised` | `rgb(255, 255, 255)` | `rgb(39, 48, 62)` |
+| Card border | `border-border` | `rgb(207, 209, 212)` | `rgb(63, 71, 83)` |
+| Card corner | `rounded` | `8px` | `8px` |
+| Card shadow | `shadow` | `rgba(15, 25, 40, 0.12) 0px 1px 2px` | `rgba(15, 25, 40, 0.16) 0px 4px 12px` |
+| Added color | `bg-brand` | `rgb(179, 71, 0)` | `rgb(255, 179, 122)` |
+| Text on the added color | `text-brand-foreground` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
+
+The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a top margin of `16px`. This shows that a class of the app wins over the library's styles. The browser console had no error.

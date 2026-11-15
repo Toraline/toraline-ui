@@ -146,6 +146,65 @@ An app sets its own fonts through `createTheme`. The app loads the font itself, 
 
 The fonts after the variable (`Georgia, serif`) are used while the font file loads. `next/font/google` works the same way: it also has the option `variable`. The working example is [`apps/playground`](../../apps/playground/README.md).
 
+## Tailwind CSS 4
+
+`css/tailwind.css` is a preset: one CSS file that makes every level 2 token a Tailwind CSS 4 class. Import it after Tailwind, in the global CSS file of the app. It also loads the tokens and the two themes, so the import of `@toraline/tokens/css` is not needed:
+
+```css
+@import "tailwindcss";
+@import "@toraline/tokens/css/tailwind.css";
+```
+
+```html
+<div class="rounded border border-border bg-surface-raised p-4 text-text shadow">
+  <h2 class="font-heading text-primary">Title</h2>
+</div>
+```
+
+Each class reads the CSS variable when the page is shown. Changing `data-theme` changes the colors of the page, with no other class.
+
+| Token | Classes |
+|---|---|
+| Each `--color-<name>` | Every Tailwind color class with `<name>`: `bg-<name>`, `text-<name>`, `border-<name>`, `outline-<name>`, `ring-<name>`, `fill-<name>` and the others. Examples: `bg-primary`, `text-surface`, `text-text-muted`, `border-border`, `outline-focus-ring` |
+| `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page |
+| `--radius` | `rounded`, and the classes for one side or one corner, for example `rounded-t` |
+| `--shadow` | `shadow` |
+
+The preset also makes the Tailwind variant `dark:` follow `data-theme="dark"`. Example: `dark:hidden` hides an element in the dark theme. The other Tailwind classes, for example `p-4`, `bg-red-500` and `rounded-lg`, stay as Tailwind defines them.
+
+### A color the app added
+
+Tailwind builds its classes from CSS files, before the page exists. A color that an app adds through `createTheme` becomes a class when Tailwind finds it in a CSS file. `createTailwindTheme` returns that CSS:
+
+```ts
+import { createTailwindTheme, createTheme } from "@toraline/tokens";
+
+const themeInputs = [
+  { name: "light", isDefault: true, colors: { brand: "#b34700" } },
+  { name: "dark", base: "dark" as const, colors: { brand: "#ffb37a" } },
+];
+
+const css = [createTailwindTheme(themeInputs), ...themeInputs.map(createTheme)].join("\n");
+```
+
+The first part of `css` is:
+
+```css
+@theme {
+  --color-brand: #b34700;
+}
+```
+
+Write `css` to a file before the build, and import the file after the preset:
+
+```css
+@import "tailwindcss";
+@import "@toraline/tokens/css/tailwind.css";
+@import "./theme.generated.css";
+```
+
+The classes `bg-brand`, `text-brand` and the others now exist, and each theme gives them its own value. The working example is [`apps/playground`](../../apps/playground/README.md): `theme.config.ts` has the inputs and `scripts/write-theme-css.ts` writes the file.
+
 ## Save the theme a person chose
 
 The choice is saved in a cookie named `toraline-theme`. A cookie is a small named value that the browser keeps and sends to the server with every request. The React provider in `@toraline/ui/theme` writes the cookie. This package has the functions that read it, with no React:

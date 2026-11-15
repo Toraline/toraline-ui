@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="en" data-theme={theme} className={fraunces.variable}>
-      <body>
+      <body className="bg-surface text-text">
         <ThemeProvider themes={themes} initialTheme={theme}>
           {children}
         </ThemeProvider>

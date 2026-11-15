@@ -12,6 +12,20 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Tailwind 4 preset (TOR-1008)
+- Decision: the preset is the CSS file `packages/tokens/css/tailwind.css` (`@toraline/tokens/css/tailwind.css`). An app imports it after `tailwindcss`. It imports the tokens and the two themes, declares every level 2 token inside `@theme`, sets `--font-body` as the font of the page, and makes the variant `dark:` follow `data-theme="dark"` with `@custom-variant`.
+- Why: Tailwind 4 is configured in CSS. The level 2 names (`--color-*`, `--font-*`, `--radius`, `--shadow`) are the names Tailwind's `@theme` already uses, so each token becomes a class with no mapping: `--color-primary` gives `bg-primary`, `--radius` gives `rounded`. Each class reads the CSS variable in the browser, so `data-theme` changes it.
+- Decision: the values in `@theme` are the values of the light theme. A test compares them with `lightTheme`. The shadow alone uses `@theme inline { --shadow: var(--shadow); }`.
+- Why: Tailwind copies a shadow's value into the class `shadow` at build time. Checked with Tailwind 4.3.5: with a plain `@theme` the class had the light theme's shadow in both themes. With `inline` the class has `var(--shadow)` and follows the theme.
+- Decision: the preset keeps Tailwind's own colors and sizes (`bg-red-500`, `rounded-lg`, `p-4`).
+- Why: an app may style on top of a component with any class. Removing Tailwind's defaults would take classes away from the app.
+- Decision: a color an app added becomes a class through `createTailwindTheme(themeInputs)`, which returns an `@theme` block with the added colors. The app writes it to a CSS file before the build, together with the output of `createTheme`.
+- Why: Tailwind builds classes only from CSS files it reads at build time. A `<style>` element made at request time is too late.
+- Decision: `tailwindcss` is an optional peer dependency of `@toraline/tokens` (`^4.0.0`). The tests run Tailwind 4.3.5 through `@tailwindcss/postcss` on the preset and check the classes it builds.
+- Known limit: the color classes have the token's name after the Tailwind prefix, so the text colors are `text-text` and `text-text-muted`, and the border color is `border-border`.
+- Alternatives: `@theme inline` with a different name on each side (for example `--color-primary: var(--tui-primary)`), which needs a prefix on every level 2 token; a JavaScript Tailwind plugin; one extra `@theme` line written by hand in the app for each added color; `@theme reference`, which is not in Tailwind's documentation.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Fonts: default stack, and how an app sets its own (TOR-1007)
 - Decision: the default fonts are system font stacks, held in the level 1 tokens `--font-stack-sans` and `--font-stack-mono`. The library ships no font file and does not use Montserrat, the font of the old library.
 - Why: a system font stack works with no setup and loads nothing. An app that wants Montserrat, or any font, sets it through the theme function.

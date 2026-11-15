@@ -23,3 +23,4 @@ export {
   serializeThemeCookie,
 } from "./theme-storage";
 export type { ThemeScriptOptions } from "./theme-storage";
+export { createTailwindTheme } from "./tailwind";

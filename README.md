@@ -8,7 +8,7 @@ The component library of Toraline: styled React components, with configurable th
 
 | Path | Content | State |
 |---|---|---|
-| `packages/tokens` | Design tokens, themes, and the function that builds a theme | Phase 2, in progress. See [its README](packages/tokens/README.md) |
+| `packages/tokens` | Design tokens, the light and dark themes, the function that builds a theme, and the Tailwind CSS 4 preset | Built in phase 2. See [its README](packages/tokens/README.md) |
 | `packages/ui` | The styled components, published as `@toraline/ui` | Has the theme provider and toggle. See [its README](packages/ui/README.md). The other components are built in phase 3 |
 | `apps/catalog` | The catalog (Storybook) | Placeholder. Built in phase 4 |
 | `apps/playground` | A private Next.js app that tests the themes in a real page | See [its README](apps/playground/README.md) |

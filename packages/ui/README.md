@@ -9,9 +9,12 @@ A theme is a set of colors, fonts and corner sizes. The page selects a theme wit
 1. Import the CSS once, in the global CSS file (`app/globals.css`):
 
    ```css
-   @import "@toraline/tokens/css";
+   @import "tailwindcss";
+   @import "@toraline/tokens/css/tailwind.css";
    @import "@toraline/ui/styles.css";
    ```
+
+   An app with no Tailwind CSS imports `@toraline/tokens/css` in place of the first two lines.
 
 2. In the root layout (`app/layout.tsx`), read the saved theme on the server, write it on `<html>`, and give it to the provider:
 
