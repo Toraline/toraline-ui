@@ -12,6 +12,14 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Phases 7 to 10 are joined into one branch and one version, 0.2.0 (TOR-1123, TOR-1124, TOR-1125, TOR-1126)
+- Decision: the 4 phases are delivered as one pull request. Phase 7 was built first. Phases 8, 9 and 10 were built at the same time, each on its own branch started from phase 7, and then merged into the branch of phase 7. The conflicts were only in files that every phase adds to (`CHANGELOG.md`, `docs/decisions.md`, `packages/ui/README.md`, `packages/ui/src/index.ts`, the test of the class order, the first page of the playground); each side's additions were kept.
+- Decision: the version of both packages is `0.2.0`. Phase 7 removes `Input` and renames props of Tabs, which breaks an app that uses `0.1.0`. While the version starts with `0`, a breaking change raises the middle number.
+- Decision: the DataGrid of phase 10 was built with two slots that had the controls of the browser as defaults, because the checkbox and the select of phase 8 were not in its branch. After the join the defaults are `CheckboxControl` and `Select` of this library. The slots `checkboxComponent` and `selectComponent` stay, so an app can still give its own. The entry of TOR-1165 below describes the browser defaults; this entry replaces that part.
+- Checked after the join: `make check` passes on the joined branch.
+- Not done in this batch, listed in the entry of TOR-1165: the column filter, the column picker and cell editing of Intraweb's grid. They need a follow-up ticket now that Popover, Checkbox and the form controls exist.
+- Decided by: Juliana for the single pull request and the version rule (2026-11-15); agent for the rest, to be confirmed in review.
+
 ## 2026-11-15 - Phase 8: the form controls and the feedback components of Intraweb (TOR-1124)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`, folder `apps/intraweb/src/components/ui/`) and the text of the tickets. Figma was not read: this session had no access to it.
 - This is the one entry of phase 8. It has one part for each sub-ticket.
