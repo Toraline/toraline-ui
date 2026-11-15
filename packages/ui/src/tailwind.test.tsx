@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 8: forms and feedback.
-import { Select, Textarea } from "./index";
+import { DecimalInput, Select, Textarea } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -175,6 +175,9 @@ async function renderEveryComponent(): Promise<string[]> {
         </Select>
       ))}
       <Textarea aria-label="Notes" />
+      {controlSizes.map((size) => (
+        <DecimalInput key={size} size={size} icon={PlusIcon} aria-label={`Price, ${size}`} />
+      ))}
     </ThemeProvider>,
   );
 

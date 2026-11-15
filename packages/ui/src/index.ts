@@ -53,3 +53,6 @@ export type { SelectProps } from "./select/index.js";
 
 export { Textarea } from "./textarea/index.js";
 export type { TextareaProps } from "./textarea/index.js";
+
+export { DecimalInput, decimalToInput, parseDecimalInput } from "./decimal-input/index.js";
+export type { DecimalInputProps } from "./decimal-input/index.js";

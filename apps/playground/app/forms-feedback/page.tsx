@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Field, Select, Textarea, controlSizes } from "@toraline.tech/ui";
+import {
+  DecimalInput,
+  Field,
+  Select,
+  Textarea,
+  controlSizes,
+  parseDecimalInput,
+} from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 
 /**
@@ -95,6 +102,36 @@ export default function FormsFeedbackPage() {
           </Field>
           <Field label="Reason" error="The reason is required.">
             <Textarea name="reason" rows={3} />
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="DecimalInput">
+        <Row label="Sizes">
+          {controlSizes.map((size) => (
+            <DecimalInput key={size} size={size} aria-label={`Price, ${size}`} placeholder="0,00" />
+          ))}
+        </Row>
+        <Row label="A comma and a point as the decimal mark, and the number the app reads">
+          {["1.234,50", "1234.50", "12x"].map((text) => (
+            <div key={text} className="grid gap-1">
+              <DecimalInput aria-label={`Price ${text}`} defaultValue={text} className="w-40" />
+              <span className="text-sm text-secondary" data-testid={`number-${text}`}>
+                {String(parseDecimalInput(text))}
+              </span>
+            </div>
+          ))}
+        </Row>
+        <Row label="States">
+          <DecimalInput aria-label="Not valid" aria-invalid="true" defaultValue="12x" />
+          <DecimalInput aria-label="Disabled" disabled defaultValue="12,50" />
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Price" hint="With a comma or a point.">
+            <DecimalInput name="price" />
+          </Field>
+          <Field label="Quantity" error="Type a number, for example 12,50.">
+            <DecimalInput name="quantity" defaultValue="12x" />
           </Field>
         </div>
       </Section>

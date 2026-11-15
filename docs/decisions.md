@@ -19,7 +19,7 @@ Format of one entry:
 
 ### Select (TOR-1146)
 - Decision: `Select` is a native `<select>` with the box of every form control (`controlClassNames`) and the classes of Intraweb's `Select`: `appearance-none pr-9` and the arrow. `className` goes to the `<select>`. It has no wrapper element.
-- Why no wrapper: Intraweb's screens give width classes to a select (`w-auto`, `w-40`, `flex-1`) in 16 places. With a wrapper around the `<select>` these classes would not change the width of what the person sees.
+- Why no wrapper: Intraweb's screens give width classes to a select (`w-auto`, `w-40`, `flex-1`). With a wrapper around the `<select>` these classes would not change the width of what the person sees.
 - Decision (the arrow): Intraweb draws the arrow with the class `select-chevron` of its `globals.css`, a background image. The library has no CSS file for a component, so the same image is written as Tailwind classes with a value in brackets: `bg-[url(data:image/svg+xml,...)]`, `bg-[position:right_calc(var(--spacing)*3)_center]`, `bg-[size:calc(var(--spacing)*4)]` and `bg-no-repeat`. The image has no quote and no space (`%27`, `%20`), so the class is one word that Tailwind finds in the built files. The two lengths are multiples of `--spacing`, with the values of Intraweb (12 and 16 pixels).
 - Exception to rule 3 of "Styles" (a color is always a token class): the line of the arrow has the color `#667085`, written inside the image, in every theme. It is Intraweb's value. An image inside a class cannot read a CSS variable. In the dark theme the arrow on `--bg-surface` has a contrast of 3.4.
 - Alternatives: a wrapper `<div>` with an inline `<svg>` in `text-icon`, which follows the theme and changes the layout of every select with a width class; a CSS file in the package with the class `select-chevron`; the arrow of the browser.
@@ -29,6 +29,13 @@ Format of one entry:
 - Decision: `packages/ui/src/shared/control.ts` has a second function, `controlBoxClassNames`, which gives the classes of the box with no size. `controlClassNames` did not change.
 - Decision: the corner that changes the size of the textarea is the browser's, as in Intraweb. No class turns it off.
 - Alternatives: the sizes `md` and `sm` of the other controls (Intraweb's Textarea has none); a prop that makes the textarea grow with its text (needs code that runs in the browser; the ticket does not ask for it).
+
+### DecimalInput (TOR-1148)
+- Decision: `DecimalInput` is `TextInput` with `type="text"` and `inputMode="decimal"`, as in Intraweb. Its value is the text the person typed. It does not format the text, does not refuse a character and does not mark itself as not valid: the app reads the number and gives the error message to Field, as Intraweb's forms do.
+- Decision: the types refuse the prop `type` (Intraweb's accept it; no screen of Intraweb gives it). `inputMode` can be changed.
+- Decision (helpers brought from Intraweb): two functions of Intraweb's `lib/format/number.ts` are copied into `packages/ui/src/decimal-input/decimal.ts` and exported, with the same names and the same results: `parseDecimalInput` and `decimalToInput`. Only the names of the variables inside changed. Intraweb's comment on DecimalInput names `parseDecimalInput` as the way to read its value, and 37 files of Intraweb call it. `decimalToInput` is its pair: it writes the number of a saved record back into the field. The other functions of that file (money, percent, CPF) are not brought.
+- Known limit: the two functions follow the Brazilian way of writing a number. With a comma in the text every point is removed, so the English `"1,234.5"` is read as `1.2345`. `decimalToInput` always writes a comma. The library has no translations, so this is the first place where a rule of one language is inside it. To confirm in review: keep the functions as they are, give them an option for the decimal mark, or leave them in Intraweb.
+- Alternatives: `type="number"` (a browser refuses a comma in some languages); a field that formats the number while the person types (needs `"use client"` and is not in Intraweb); bringing only `parseDecimalInput`.
 
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.

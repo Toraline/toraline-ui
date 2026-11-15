@@ -608,3 +608,36 @@ import { Field, Textarea } from "@toraline.tech/ui";
 - A person can change its size with the corner the browser shows. `className="resize-none"` removes it.
 - Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
 - The type `TextareaProps` is exported. It has no `"use client"`.
+
+### `DecimalInput`
+
+A text field for a number with decimals: a price, a quantity, a rate. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+"use client";
+import { useState } from "react";
+import { DecimalInput, Field, parseDecimalInput } from "@toraline.tech/ui";
+
+const [priceText, setPriceText] = useState("");
+const price = parseDecimalInput(priceText); // a number, null for an empty text, NaN for a text that is not a number
+const priceError = price !== null && Number.isNaN(price) ? "Type a number, for example 12,50." : undefined;
+
+<Field label="Price" error={priceError}>
+  <DecimalInput name="price" value={priceText} onChange={(event) => setPriceText(event.target.value)} />
+</Field>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `size` | `"md"` (default), `"sm"` | The sizes of every form control, as in [`TextInput`](#textinput) |
+| `icon` | An icon component | An icon shown inside the field, on the left. See [Icons](#icons) |
+| `inputMode` | `"decimal"` (default), and the other values of the HTML attribute | The keyboard a phone shows. `decimal`: the digits and the decimal mark |
+| `aria-invalid`, `disabled` | As in TextInput | The looks of a field that is not valid and of a disabled field |
+
+- It is a [`TextInput`](#textinput) with `type="text"` and `inputMode="decimal"`, as in Intraweb. The types refuse the prop `type`. It is not `type="number"`: in some languages a browser refuses a comma in such a field, and the mouse wheel changes its value.
+- Its value is the text the person typed. The field does not change the text and does not refuse a character. The app reads the number, and shows its own error message through Field.
+- `parseDecimalInput(text)` reads the text as a number, the way Intraweb does. With a comma in the text, the comma is the decimal mark and every point is a mark between thousands: `"1.234,5"` is `1234.5`. With no comma, a point is the decimal mark: `"2.5"` is `2.5`. An empty text is `null`. A text that is not a number is `NaN`.
+- `decimalToInput(value)` writes a number as the text of the field, with a comma: `0.4` is `"0,4"`. `null` and `undefined` are the empty text.
+- The two functions follow the way a number is written in Brazil, the language of Intraweb. An English number with a comma between thousands (`"1,234.5"`) is not read correctly.
+- Main native element: the `<input>`. `className`, every other prop and `ref` go to it, as in TextInput.
+- The type `DecimalInputProps` is exported. It has no `"use client"`.
