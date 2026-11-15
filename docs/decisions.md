@@ -12,6 +12,19 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Fonts: default stack, and how an app sets its own (TOR-1007)
+- Decision: the default fonts are system font stacks, held in the level 1 tokens `--font-stack-sans` and `--font-stack-mono`. The library ships no font file and does not use Montserrat, the font of the old library.
+- Why: a system font stack works with no setup and loads nothing. An app that wants Montserrat, or any font, sets it through the theme function.
+- Decision: an app sets a font by giving `createTheme` a CSS `font-family` value in `fonts.body`, `fonts.heading` or `fonts.mono`. For a font the app loads with `next/font`, the value is the CSS variable of that font, for example `var(--font-fraunces), Georgia, serif`. The library has no font loading code.
+- Why: `next/font` already loads, hosts and preloads the file. The library only needs the name.
+- Decision: a test (`packages/ui/src/fonts.test.ts`) reads every CSS and code file of the two packages and fails when a `font-family` is not `--font-body`, `--font-heading` or `--font-mono`, or when a font name appears outside the level 1 files.
+- Decision: the playground loads Fraunces with `next/font/local` from a file committed in `apps/playground/app/fonts/` (36,620 bytes, SIL Open Font License 1.1, copied from the npm package `@fontsource-variable/fraunces` 5.3.0).
+- Why: `next/font/google` downloads the font from Google at build time. `make check` and the CI would then fail with no network. A local file always builds.
+- Decision: an app's themes are built before the build, not at request time. In the playground, `theme.config.ts` holds the inputs and `scripts/write-theme-css.ts` writes `app/theme.generated.css` (ignored by git) before `dev` and `build`. Node 24 runs the TypeScript script directly.
+- Why: Tailwind (TOR-1008) reads CSS files when it builds. A color that an app adds can become a Tailwind class only when it is in a CSS file at build time. One generated file keeps the theme values and the Tailwind classes in one place.
+- Alternatives: a `<style>` element in the layout, filled by `createTheme` on each request; shipping a default web font with the library; `next/font/google` in the playground.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Where the theme code lives and how the choice is saved (TOR-1006)
 - Decision: the React provider (`ThemeProvider`), the hook (`useTheme`) and the toggle (`ThemeToggle`) are in `packages/ui/src/theme/`, published as the entry `@toraline/ui/theme`. The code with no React (cookie name, `resolveTheme`, `readThemeCookie`, `serializeThemeCookie`, `createThemeScript`) is in `packages/tokens/src/theme-storage.ts`.
 - Why: `packages/tokens` stays free of React. The entry `@toraline/ui/theme` starts with `"use client"`, which Next.js needs for code that runs in the browser. A server file (the root layout) cannot call a function from a `"use client"` file, so the functions the server calls are in `@toraline/tokens`.

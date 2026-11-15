@@ -10,6 +10,10 @@ dist/
 storybook-static/
 .next/
 next-env.d.ts
+*.tsbuildinfo
+
+# written by a script before each build
+apps/playground/app/theme.generated.css
 
 # made per user, never committed
 local-docs/

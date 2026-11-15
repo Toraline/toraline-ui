@@ -16,6 +16,19 @@ npm run dev -w @toraline/playground         # development server on http://local
 | Ticket | What to look at |
 |---|---|
 | TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
+| TOR-1007 | The headings use the font Fraunces. The rest of the text uses the default font of the library |
+
+## The files
+
+| File | What it is |
+|---|---|
+| `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline/tokens` |
+| `scripts/write-theme-css.ts` | Runs `createTheme` for each input and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
+| `app/fonts.ts` | Loads the font Fraunces with `next/font/local` into the CSS variable `--font-fraunces` |
+| `app/fonts/` | The font file and its license (SIL Open Font License 1.1) |
+| `app/layout.tsx` | Reads the theme cookie on the server and writes `data-theme` on `<html>` |
+| `app/globals.css` | Imports the CSS of the library and the generated theme file |
+| `app/page.tsx` | The test page |
 
 ## How "no flash of the wrong theme" was checked
 
@@ -40,3 +53,15 @@ Results:
 | With a cookie value that is not a theme | `<html lang="en" data-theme="light">` |
 
 The same server was then opened in a browser. With the keyboard: Tab moved the focus to the button, Enter changed `data-theme` to `dark`, the page background changed from `rgb(255, 255, 255)` to `rgb(15, 25, 40)`, and the cookie `toraline-theme=dark` was saved. After a reload the page had `data-theme="dark"` and the dark background. The browser console had no error.
+
+## How the heading font was checked
+
+`theme.config.ts` gives `fonts: { heading: "var(--font-fraunces), Georgia, serif" }` to the theme function, in both themes. Checked on the built app on 2026-11-15, in a browser, with `getComputedStyle`:
+
+| Element | Its font (`font-family`) |
+|---|---|
+| `<h1>` | `fraunces, "fraunces Fallback", Georgia, serif` |
+| `<body>` | `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` (the default of the library) |
+| `<code>` | `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace` (the default of the library) |
+
+The browser reported the font `fraunces` as loaded (`document.fonts`).

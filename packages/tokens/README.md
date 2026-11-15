@@ -102,6 +102,50 @@ To change the light or the dark theme of the library, use its name: `createTheme
 
 `getAddedColorNames(input)` returns the colors of an input that the library does not have. For the example above: `["brand"]`.
 
+## Fonts
+
+Three level 2 tokens decide every font of the library:
+
+| Token | Used for | Default |
+|---|---|---|
+| `--font-body` | Normal text | `--font-stack-sans`: the font of the device's operating system |
+| `--font-heading` | Headings | `--font-stack-sans` |
+| `--font-mono` | Code | `--font-stack-mono`: the fixed-width font of the device |
+
+The defaults need no setup: they load no font file. No file of the library names a font outside `css/primitives.css` and `src/primitives.ts`. A test (`packages/ui/src/fonts.test.ts`) checks this.
+
+An app sets its own fonts through `createTheme`. The app loads the font itself, and gives the theme function a CSS `font-family` value. Example with `next/font` in a Next.js app:
+
+1. Load the font and give it a CSS variable name (`app/fonts.ts`):
+
+   ```ts
+   import localFont from "next/font/local";
+
+   export const fraunces = localFont({
+     src: "./fonts/fraunces-latin-wght-normal.woff2",
+     weight: "100 900",
+     variable: "--font-fraunces",
+   });
+   ```
+
+2. Put the class that defines the variable on `<html>` (`app/layout.tsx`):
+
+   ```tsx
+   <html lang="en" data-theme={theme} className={fraunces.variable}>
+   ```
+
+3. Give the variable to the theme function, in every theme of the app:
+
+   ```ts
+   createTheme({
+     name: "light",
+     isDefault: true,
+     fonts: { heading: "var(--font-fraunces), Georgia, serif" },
+   });
+   ```
+
+The fonts after the variable (`Georgia, serif`) are used while the font file loads. `next/font/google` works the same way: it also has the option `variable`. The working example is [`apps/playground`](../../apps/playground/README.md).
+
 ## Save the theme a person chose
 
 The choice is saved in a cookie named `toraline-theme`. A cookie is a small named value that the browser keeps and sends to the server with every request. The React provider in `@toraline/ui/theme` writes the cookie. This package has the functions that read it, with no React:

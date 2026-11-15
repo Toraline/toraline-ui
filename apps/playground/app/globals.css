@@ -1,5 +1,7 @@
 /* The level 1 tokens, the light theme and the dark theme. */
 @import "@toraline/tokens/css";
+/* The themes of this app, built by the theme function from theme.config.ts. */
+@import "./theme.generated.css";
 /* The styles of the library's components (today: the theme toggle). */
 @import "@toraline/ui/styles.css";
 
@@ -17,7 +19,8 @@ main {
   padding: 2rem 1rem;
 }
 
-h1 {
+h1,
+h2 {
   font-family: var(--font-heading);
 }
 

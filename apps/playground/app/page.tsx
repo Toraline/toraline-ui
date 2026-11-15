@@ -12,6 +12,10 @@ export default function Page() {
       <section className="card">
         <h2>A card</h2>
         <p>Its colors, border, radius and shadow come from level 2 tokens.</p>
+        <p>
+          The headings use the font Fraunces. This app loads it with <code>next/font</code> and
+          sets it as <code>--font-heading</code> through the theme function.
+        </p>
         <p className="muted">
           This text uses <code>--color-text-muted</code>.
         </p>

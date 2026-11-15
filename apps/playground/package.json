@@ -5,7 +5,10 @@
   "description": "A Next.js app that tests the tokens, the themes and the theme toggle of the Toraline component library. It is never published.",
   "type": "module",
   "scripts": {
+    "theme": "node scripts/write-theme-css.ts",
+    "predev": "npm run theme",
     "dev": "next dev",
+    "prebuild": "npm run theme",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit"
