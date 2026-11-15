@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const packageFolders = ["packages/tokens", "packages/ui"];
-const releaseBranch = "v2";
+const releaseBranch = "main";
 const isPublish = process.argv.includes("--publish");
 const failures = [];
 

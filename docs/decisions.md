@@ -12,6 +12,14 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The branch `v2` is renamed `main`, and the old `main` is renamed `old-package` (TOR-1191)
+- Decision: on GitHub, the branch with the 2023 code (`main` until today) is now `old-package`. The branch with version 2 (`v2` until today) is now `main` and is the default branch. Earlier entries of this file say `v2` and `main` with their old meaning.
+- Why: GitHub starts a workflow by hand only when its file is on the default branch. The release workflow was only on `v2`, so the first release could not start.
+- What changed with it: the profile's `base_branch`, the branches in `check.yml`, the branch that `release.yml` and `scripts/check-packages.mjs` accept, and the `homepage` of both packages are now `main`.
+- Known and not changed: the branch protection rule of the old `main` moved with it to `old-package`. The new `main` has no protection rule.
+- Alternatives: make `v2` the default branch and keep the names; merge `v2` into `main`.
+- Decided by: Juliana, 2026-11-15.
+
 ## 2026-11-15 - The packages are published in the npm scope `@toraline.tech` (TOR-1180)
 - Decision: the packages are named `@toraline.tech/ui` and `@toraline.tech/tokens`. Every earlier entry of this file now shows the new names; when those entries were written the names were `@toraline/ui` and `@toraline/tokens`.
 - Why: the scope `@toraline` belongs to an npm organization whose only member is the account `toralineproject`. Juliana cannot sign in to that account (password and two-factor code lost). She created the npm organization `toraline.tech`. Nothing was published under the old names, so no app has to change.

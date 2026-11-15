@@ -82,12 +82,12 @@ The examples use `2.0.0-beta.1` as the new version.
    - No file name has `.test.`, `template` or `.map`.
    - The numbers are close to these: `@toraline.tech/tokens` 14 files, 13 kB; `@toraline.tech/ui` 42 files, 19 kB. A new component adds about 4 files.
 
-6. **Commit, open the pull request to `v2`, and merge it** after `Check` passes on GitHub. From here on the branch `v2` has the version.
+6. **Commit, open the pull request to `main`, and merge it** after `Check` passes on GitHub. From here on the branch `main` has the version.
 
 7. **Publish. A person does this step, never an agent.**
 
    1. On GitHub open **Actions** > **Release version 2** > **Run workflow**.
-   2. **Use workflow from**: choose the branch `v2`.
+   2. **Use workflow from**: choose the branch `main`.
    3. **version**: type the version, for example `2.0.0-beta.1`.
    4. Leave the box **publish** off. Press **Run workflow**. This is the test run: it does everything except send the packages. Wait for the green check mark.
    5. Run the workflow again with the same values and the box **publish** on.
@@ -115,7 +115,7 @@ The examples use `2.0.0-beta.1` as the new version.
 
    ```bash
    git fetch origin
-   git tag v2.0.0-beta.1 origin/v2
+   git tag v2.0.0-beta.1 origin/main
    git push origin v2.0.0-beta.1
    ```
 
@@ -127,7 +127,7 @@ The examples use `2.0.0-beta.1` as the new version.
 
 Use this only when GitHub Actions cannot be used. The packages then have no provenance.
 
-1. Be on the branch `v2`, with nothing uncommitted, after `git pull`.
+1. Be on the branch `main`, with nothing uncommitted, after `git pull`.
 2. `npm login` (npm asks for your password and your 2FA code).
 3. Run, with the real version and with `next` or `latest` as in step 7:
 
@@ -168,11 +168,11 @@ A published version cannot be changed, and its number cannot be used again, even
 `@toraline/toraline-ui` is released by the workflow `.github/workflows/npm-publish.yml`, named "Node.js Package". This ticket did not change it.
 
 - It starts when someone creates a **Release** on the GitHub page of the repository. It runs the file `npm-publish.yml` of the commit that the release's tag points to.
-- On `main` it runs `npm ci`, `npm test` and `npm publish` at the repository root, with Node 16 and the secret `npm_token`.
-- To release the old package: on `main`, raise `version` in `package.json` above the newest version on npm, merge, then create a GitHub Release whose tag is on `main`.
-- A GitHub Release whose tag is on `v2` runs the copy of that workflow on `v2`, which works inside `legacy/` and tries to publish the old package from there. That is why step 9 forbids a GitHub Release for version 2.
+- On `old-package` it runs `npm ci`, `npm test` and `npm publish` at the repository root, with Node 16 and the secret `npm_token`.
+- To release the old package: on `old-package`, raise `version` in `package.json` above the newest version on npm, merge, then create a GitHub Release whose tag is on `old-package`.
+- A GitHub Release whose tag is on `main` runs the copy of that workflow on `main`, which works inside `legacy/` and tries to publish the old package from there. That is why step 9 forbids a GitHub Release for version 2.
 
-Found on 2026-11-15, not changed: npm has `@toraline/toraline-ui` 1.1.5, published on 2023-04-27. `package.json` on `main` (and `legacy/package.json` on `v2`) says 0.1.35, which is already on npm. The branch `v1` says 1.1.5. So a release from `main` as it is today fails, because 0.1.35 exists. `gh release list` showed no GitHub Release in the repository.
+Found on 2026-11-15, not changed: npm has `@toraline/toraline-ui` 1.1.5, published on 2023-04-27. `package.json` on `old-package` (and `legacy/package.json` on `main`) says 0.1.35, which is already on npm. The branch `v1` says 1.1.5. So a release from `old-package` as it is today fails, because 0.1.35 exists. `gh release list` showed no GitHub Release in the repository.
 
 ## Status
 
@@ -188,5 +188,5 @@ Found on 2026-11-15, not changed: npm has `@toraline/toraline-ui` 1.1.5, publish
 **What you must do**
 1. Choose a license, or decide to publish with none.
 2. Do the [One-time setup](#one-time-setup).
-3. Merge the branch of TOR-999 into `v2`.
+3. Merge the branch of TOR-999 into `main`.
 4. Do steps 7 to 10 of [Steps of a release](#steps-of-a-release) for `2.0.0-beta.0`.
