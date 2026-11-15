@@ -12,6 +12,64 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - DataGrid: the features of Intraweb's grid, what moved and what stays (TOR-1165)
+- Design source: Intraweb's `components/ui/data-grid/` (9 files, commit `f8ad4c2` of `prontera-e-juno`), the 30 files of Intraweb that import it, and the text of the ticket. Figma was not read: this session had no access to it.
+- The features of Intraweb's DataGrid, written before any code. "Files" is the number of Intraweb files outside `components/ui/` that have the prop or the field, counted with a text search on 2026-11-15, so it is approximate.
+
+| # | Feature | Files | Generic, or what it depends on | In the library now |
+|---|---|---|---|---|
+| 1 | Columns: `id`, `header`, `cell`, `align` | 30 | Generic | Moved. `align` also accepts `center` |
+| 2 | The name of the table (`caption`), the key and the label of a record (`getRowKey`, `getRowLabel`) | 30 | Generic | Moved |
+| 3 | Sort by a press on the header (`sortValue`): ascending, descending, none; `null` at the end; `aria-sort` | 17 | Generic, except the language `pt-BR` written in the code and 3 icons of `lucide-react` | Moved. The language is the prop `locale`; the icons are inline `<svg>` |
+| 4 | Search field over the columns with `searchValue`, with no difference for accents | 16 | Generic. Uses TextInput (phase 7) | Moved |
+| 5 | Pages: page size, page before and after | 15 | The page size field is Intraweb's `Select` (phase 8) | Moved. The field is the slot `selectComponent`; the default is the `<select>` of the browser |
+| 6 | Selection: a checkbox in each row and in the header, and a bar of actions | 5 | Intraweb's `CheckboxControl` (phase 8) | Moved. The checkbox is the slot `checkboxComponent`; the default is the checkbox of the browser |
+| 7 | Footer row with a result for each column (`footer`) | 18 or fewer | Generic | Moved |
+| 8 | Buttons of each row (`rowActions`) and the header of that column | 16 | Generic | Moved |
+| 9 | The row of the open record (`isRowSelected`) | 17 | Generic | Moved, as `aria-current="true"` |
+| 10 | Toolbar of the screen (`toolbar`) | 17 | Generic | Moved |
+| 11 | Empty table (`emptyMessage`) and "no result with these filters" with a button that clears them | 19 | Generic | Moved |
+| 12 | Groups of rows with a header row (`groups`) | 7 | Generic | Moved |
+| 13 | A row of extra content under a row (`renderExpanded`) | 1 | Generic | Moved |
+| 14 | Props for the `<tr>` of a row (`rowProps`), used for drag and drop | 1 | The prop is generic. The drag itself is Intraweb's hook `useDragReorder` and its class `DRAG_ROW_CLASS` | The prop moved. The hook stays in Intraweb, which gives the class in `rowProps` |
+| 15 | Each row is a block on a narrow screen (`stackOnMobile`, `data-label` on each cell) | 30 | Generic | Moved |
+| 16 | The texts (in Portuguese, written in the code) | 30 | The library has no translations | Moved as the prop `labels`, with English defaults |
+| 17 | The search, the sort, the filters and the page are read from the address of the page and written to it (`?busca=`, `?ordem=`, `?f-<column>=`, `?pagina=`, `?por-pagina=`) | 30 | `next/navigation` and Intraweb's hook `useUrlParams` | Not moved. The library gives `defaultState` and `onStateChange`; the app reads and writes the address |
+| 18 | Filter in the header of a column (`filter`: a list of options with defaults, or a text) | 13 | The panel is Intraweb's `useAnchoredPanel` (the Popover of phase 9) and its `Checkbox` (phase 8). The rule that matches a row is generic | Not moved |
+| 19 | Menu "Columns" that hides and shows columns (`required`, `defaultHidden`), remembered in `localStorage` by `tableId` | 9 | Intraweb's `Popover` (phase 9) and `Checkbox` (phase 8); the storage key starts with `intraweb:` | Not moved |
+| 20 | Mode "Edit table": every cell with an `editor` becomes a field, and one button saves the changed rows (`onSaveRow`) | 1 | Intraweb's `Select`, `DecimalInput`, `CheckboxControl` (phase 8) and its function `apiErrorSummary`, which reads the errors of Intraweb's API | Not moved |
+| 21 | Edit one cell with a press (`editOnClick`, `onSaveCell`) | 6 | The same as 20 | Not moved |
+| 22 | Rows inside a row, opened by an arrow (`subRows`) | 1 | Generic as a table, but its cells use the editing of 21 | Not moved |
+| 23 | Another view in the place of the table, for example a calendar (`renderView`) | 1 | It moves the filters of 18 to the toolbar | Not moved |
+| 24 | Loading | 0 | Intraweb's grid has none: a screen shows the grid after the data arrived | New in the library: `loading` |
+
+- Decision: features 1 to 16 moved, with tests and stories. They need no large redesign: the rows, the sort, the search and the pages are plain functions and React state.
+- Decision: features 18 to 23 are not built, and no API is guessed for them. Proposal for after the 3 phases are joined, one ticket each: (a) the filter of a column, with the Popover and the Checkbox of the library; `DataGridState` then gets `filters`. (b) The choice of columns, with a prop for the hidden columns and `onHiddenColumnsChange`, so the app decides where it is remembered. (c) The editing, which first needs a decision: the grid shows the text of an error the app throws (`Error.message`), or the app gives a function that turns an error into a text. (d) The rows inside a row, after (c). (e) Another view, after (a).
+- For the coordinator, after the join. 2 places take a component of phase 8 as a slot, and 1 line each makes it the default:
+  1. `checkboxComponent` (file `packages/ui/src/data-grid/DataGrid.tsx`, the function `NativeCheckbox`): replace the default with the Checkbox of phase 8 that renders only the box. It must accept `checked`, `disabled`, `onChange`, `aria-label` and `ref` to its `<input>` (type `DataGridCheckboxProps`).
+  2. `selectComponent` (same file, the function `NativeSelect`): replace the default with the Select of phase 8. It receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`).
+  Nothing in the grid needs a component of phase 9. The filter and the choice of columns, which need the Popover, are not built.
+- Decision (state): the grid holds the search text, the sort, the page and the page size itself. `defaultState` gives the first values and `onStateChange` is called after each change with the full state. This is what Intraweb's hook `useTableState` does with the address of the page: it reads it once and writes each change.
+- Decision (names): the sort is `{ columnId, descending }` (Intraweb: `{ id, desc }`), with no shortened word.
+- Decision (states as attributes): the header cell of a sorted column has `aria-sort`, and its button and icon are styled by `in-aria-[sort=ascending]:` and `in-aria-[sort=descending]:` classes. A row whose checkbox is checked has `data-checked` and the class `data-checked:bg-selected`; a row cannot have `aria-selected` in a plain table, and a screen reader reads the state from the checkbox. Tests check that both win over the hover.
+- Decision: the corner of the sort button is `rounded-[4px]`, the value of Intraweb's class `rounded`. It is not a radius token: the smallest token is 8 pixels (`--radius-md`). It follows the choice of TOR-1143 for the 10 pixels of the segmented track.
+- Decision: the texts with the text style `label` in Intraweb (the count of the selected rows, the title of a group) are `font-heading text-sm/5 font-medium`, as in TOR-1143.
+- Decision: the row above the table (search field, toolbar, "Clear filters") is rendered only when it has content. Intraweb always renders it, so a grid with no search and no toolbar has 12 pixels of empty space above its table there.
+- Decision: the sort button has the focus ring of the library (Intraweb has the same outline in its global CSS).
+- Decision: `pageSize` is added to the choices of the page size when it is not one of `pageSizeOptions`. Intraweb's choices are fixed (10, 25, 50, 100).
+- Compared with Intraweb on 2026-11-15, with the temporary page and script of TOR-1164 (not committed), which rendered Intraweb's own `data-grid/` files next to the library's DataGrid: the `<table>` of 4 grids (every feature; only columns; groups; empty), in both themes, at 1280 and 375 pixels, at rest and with the pointer over a row: 1,161,614 computed values, 0 differ. The header with the pointer over a sort button, and the grid sorted by its first column: 0 differ. The bar of the selected rows and the page controls differ only in what is listed next.
+- Differences from Intraweb that stay:
+  1. The page size field: Intraweb's Select has its own arrow and 36 pixels of padding on the right; the default of the library is the `<select>` of the browser in the box of a form control. It goes away when the Select of phase 8 is the default.
+  2. The checkbox: Intraweb's is a box of 20 pixels with its own check mark; the default of the library is the checkbox of the browser, 16 pixels. It goes away when the Checkbox of phase 8 is the default.
+  3. The empty row above the table (above).
+  4. The line above the footer row: equal to Intraweb as it is drawn (`border-subtle`). Intraweb's source asks for `border-default` there, but its two border color classes are on one element and the other one wins. The library draws what Intraweb draws. To be decided by Juliana: keep it, or draw the line Intraweb's source asks for.
+  5. Widths that differ by less than 0.1 pixel in two texts ("1 selecionado", "Mostrando 1–10 de 23"): Intraweb writes them as several pieces of text, the library as one.
+- Contrast: no new pair below the limits. The count of the selected rows is `text-primary` on `bg-selected`; the page texts are `text-secondary` on the page; the title of a group is `text-primary` and its count `text-tertiary` on `bg-subtle` (all in the contrast test). The border of the bar of the selected rows is `border-brand` on `bg-selected` (3 or more, in the test).
+- The states of the list "States to check": rest: story. Hover: a row and a sort button, compared with Intraweb. Keyboard focus: native controls; a test presses the sort button with Enter. Pressed: does not apply. Disabled: the buttons of the first and last page, and the header checkbox of a grid with no row (tests). Read-only, error, open and closed: do not apply. Loading: story "Loading". Empty: stories "Empty" and "No Results". Selected: stories "Selection" (checked rows) and "Selected Row" (the open record). Long content: stories "Long Text" and "Many Columns In A Narrow Container". Right-to-left text: considered, not supported: a sort button of a column aligned to the right puts its arrow on the left with `flex-row-reverse`, as in Intraweb. Light and dark theme: every story test runs in both. Reduced motion: no transition of its own.
+- What changes for Intraweb to use it: remove `tableId`; give `labels` with its Portuguese texts and `locale="pt-BR"` (one wrapper file can do both for every screen); give `checkboxComponent` and `selectComponent` until they are the defaults; read the address of the page into `defaultState` and write it in `onStateChange` (its hook `useTableState` becomes that small adapter); `rowProps` must include its class `DRAG_ROW_CLASS`. A screen that uses a column filter, the choice of columns, the editing, `subRows` or `renderView` cannot move yet: a text search finds one of them in 16 of the 30 files.
+- Alternatives: a controlled state (`state` and `onStateChange` with no state inside); copying Intraweb's checkbox and select into the grid; a dependency on a table library (TanStack Table), which Intraweb does not use; moving the filter with its own small panel, which would be a second popover in the library next to the one of phase 9.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DataTable: the parts, the name, the scroll and the table as blocks (TOR-1164)
 - Design source: Intraweb's `components/ui/data-table.tsx` (commit `f8ad4c2` of `prontera-e-juno`), the 23 files of Intraweb that import it, and the text of the ticket. Figma was not read: this session had no access to it.
 - What the 23 files do with it, counted on 2026-11-15: every table has a `caption`; 57 header cells and 64 cells have `text-right`, and 53 of those cells also have `tabular-nums`; 7 files use the actions column (`ActionsTh`, 10 times); 3 screens mark the row of the open record with `selectedRowClass`; 1 screen and the DataGrid use `stackOnMobile`; no screen writes a `<tfoot>` by hand (only the DataGrid does); the simple tables have no row hover (only the DataGrid has `hover:bg-subtle`).

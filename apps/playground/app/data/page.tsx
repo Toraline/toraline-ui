@@ -11,10 +11,13 @@ import {
   Tr,
 } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
+import { ProductsGrid } from "./ProductsGrid";
+import type { Product } from "./ProductsGrid";
 
 /**
  * The page of the data components of phase 10 (TOR-1126). This file is a
- * Server Component: DataTable and its parts render on the server.
+ * Server Component: DataTable and its parts render on the server. DataGrid
+ * holds state, so it is used through the Client Component ProductsGrid.
  */
 
 const orders = [
@@ -22,6 +25,15 @@ const orders = [
   { id: 1042, date: "12/11/2026", client: "Marina Lopes", channel: "Delivery", total: "R$ 24,00" },
   { id: 1043, date: "13/11/2026", client: "Rafael Souza", channel: "Counter", total: "R$ 1.310,90" },
 ];
+
+const productNames = ["Pão de queijo", "Espresso coffee", "Orange juice", "Carrot cake", "Chicken pie"];
+const products: Product[] = Array.from({ length: 23 }, (_, index) => ({
+  id: index + 1,
+  name: `${productNames[index % productNames.length]} ${index + 1}`,
+  category: index % 2 === 0 ? "Bakery" : "Drinks",
+  stock: (index * 37) % 120,
+  price: 4.5 + index,
+}));
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -127,6 +139,10 @@ export default function DataPage() {
             ))}
           </tbody>
         </DataTable>
+      </Section>
+
+      <Section title="DataGrid">
+        <ProductsGrid products={products} />
       </Section>
     </main>
   );

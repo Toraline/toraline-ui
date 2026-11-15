@@ -599,6 +599,96 @@ import { ActionsTh, DataTable, DataTableMessage, IconButton, Td, Th, Tr } from "
 - Each part (`Tr`, `Th`, `Td`) gives `className`, every other prop and `ref` to its own element. A plain `<tr>` works too. `DataTableMessage` gives them to its `<td>`.
 - A table wider than its box scrolls sideways. While it is wider, the box can get the keyboard focus (`tabindex="0"`), so the arrow keys scroll it, and it has `role="group"` and the name of the table. A table that fits adds no stop for the Tab key.
 - A table whose rows are loading: give `aria-busy="true"` to `DataTable` and the text in a `DataTableMessage`.
-- A footer row is a `<tfoot>` with classes of the app, for example `<tr className="bg-subtle font-medium">` and `<Td className="border-t border-default text-strong">`.
+- A footer row is a `<tfoot>` with classes of the app, for example `<tr className="bg-subtle font-medium">` and `<Td className="border-t text-strong">`.
 - The list `tableCellAlignments` and the types `DataTableProps`, `TrProps`, `ThProps`, `TdProps`, `ActionsThProps`, `DataTableMessageProps` and `TableCellAlignment` are exported.
 - They have no `"use client"`: they also render in a Server Component. Only the box around the table runs in the browser, to measure its width.
+
+### `DataGrid`
+
+A table of records with a search field, a sort by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
+
+```tsx
+"use client";
+
+import { DataGrid } from "@toraline.tech/ui";
+import type { DataGridColumn } from "@toraline.tech/ui";
+
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    sortValue: (product) => product.name,
+    searchValue: (product) => product.name,
+  },
+  {
+    id: "stock",
+    header: "Stock",
+    align: "right",
+    cell: (product) => product.stock,
+    sortValue: (product) => product.stock,
+    footer: (rows) => rows.reduce((sum, product) => sum + product.stock, 0),
+  },
+];
+
+<DataGrid
+  caption="Products"
+  columns={columns}
+  rows={products}
+  getRowKey={(product) => product.id}
+  getRowLabel={(product) => product.name}
+  search={{ placeholder: "Search the products" }}
+  pageSize={25}
+  rowActions={(product) => <IconButton icon={Pencil} size="sm" aria-label={`Edit ${product.name}`} />}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `caption` | Text. Required | The name of the table. A screen reader says it; it is not shown |
+| `columns` | A list of columns. Required | See the table of a column below |
+| `rows` | A list of records. Required | Every record, not one page of them |
+| `getRowKey` | A function. Required | A value no other record has, for example its id |
+| `getRowLabel` | A function. Required | The name of the record for a screen reader, for example in the name of its checkbox |
+| `search` | `{ placeholder }` | Turns on the search field. It looks in the columns with `searchValue`, with no difference for capital letters and accents |
+| `toolbar` | Elements | The filters and the buttons of the screen, shown above the table, after the search field |
+| `pageSize` | A number | Turns on the pages: the number of rows of a page until the person chooses another |
+| `pageSizeOptions` | A list of numbers. Default `10, 25, 50, 100` | The numbers a person can choose. `pageSize` is added when it is not in the list |
+| `selection` | `{ actions: (rows, clear) => elements }` | Turns on a checkbox in each row and one in the header, which selects every row the search found. While a row is selected, a bar shows the number of selected rows and what `actions` returns. `clear()` clears the selection |
+| `rowActions` | A function | The buttons of the last column of a row |
+| `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
+| `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
+| `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
+| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no selection and no pages |
+| `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
+| `loading` | `true`, `false` (default) | `true` while the records load: the table has `aria-busy="true"` and shows the text of `labels.loading` in the place of the rows |
+| `defaultState` | `{ search, sort, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null` |
+| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, the page or the page size, for example to write them in the address of the page |
+| `locale` | A language, for example `"pt-BR"` | The language that orders the texts of a sort. When missing: the language of the browser |
+| `labels` | An object | The texts of the grid. Each one that is missing has its English default. See below |
+| `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the checkbox of the browser |
+| `selectComponent` | A component | The field of the page size. When missing: the `<select>` of the browser, in the box of a form control |
+| `className` | Classes | They go to the element around the whole grid (`data-slot="data-grid"`) |
+
+A column (`DataGridColumn<Row>`):
+
+| Field | Values | Meaning |
+|---|---|---|
+| `id` | Text. Required | A name no other column has |
+| `header` | Text. Required | The text of the header cell, and the name of the column in a row shown as a block |
+| `cell` | A function. Required | What the cell shows for a record |
+| `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers |
+| `sortValue` | A function that returns a text, a number or `null` | Turns on the sort by this column. A press on the header sorts ascending, a second press descending, a third press removes the sort. A record with `null` is always at the end. A text with a number is ordered by the number (`P9` before `P10`) |
+| `searchValue` | A function that returns a text | The text of this column that the search looks in |
+| `footer` | A function that receives the rows after the search | The content of the footer cell. The footer row is shown when a column has `footer` |
+
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`).
+
+- The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
+- The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
+- Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
+- Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
+- `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
+- Not in the library yet, and still only in Intraweb: the filter of a column, the menu that chooses the columns, the editing of cells, the rows inside a row, another view in the place of the table, and saving the state in the address of the page or in the browser. The reasons are in the entry of TOR-1165 of [`docs/decisions.md`](../../docs/decisions.md).
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.

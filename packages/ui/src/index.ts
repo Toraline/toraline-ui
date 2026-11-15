@@ -66,3 +66,14 @@ export type {
   ThProps,
   TrProps,
 } from "./data-table/index.js";
+export { DataGrid, dataGridPageSizes } from "./data-grid/index.js";
+export type {
+  DataGridCheckboxProps,
+  DataGridColumn,
+  DataGridGroup,
+  DataGridLabels,
+  DataGridProps,
+  DataGridSelectProps,
+  DataGridSort,
+  DataGridState,
+} from "./data-grid/index.js";

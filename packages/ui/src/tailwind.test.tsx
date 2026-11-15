@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 10: data
-import { ActionsTh, DataTable, DataTableMessage, Td, Th, Tr, tableCellAlignments } from "./index";
+import { ActionsTh, DataGrid, DataTable, DataTableMessage, Td, Th, Tr, tableCellAlignments } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -90,6 +90,30 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
     </svg>
   );
 }
+
+// Phase 10: data
+type GridRow = { id: number; name: string; price: number };
+const gridRows: GridRow[] = [
+  { id: 1, name: "Coffee", price: 7 },
+  { id: 2, name: "Cheese bread", price: 9.5 },
+];
+const gridColumns = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (row: GridRow) => row.name,
+    sortValue: (row: GridRow) => row.name,
+    searchValue: (row: GridRow) => row.name,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right" as const,
+    cell: (row: GridRow) => row.price,
+    sortValue: (row: GridRow) => row.price,
+    footer: (rows: GridRow[]) => rows.length,
+  },
+];
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
 
@@ -194,6 +218,47 @@ async function renderEveryComponent(): Promise<string[]> {
           </tbody>
         </DataTable>
       ))}
+      {/* A grid with every feature, then a grid with groups, an empty grid and a loading grid. */}
+      <DataGrid
+        caption="Products"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        isRowSelected={(row) => row.id === 2}
+        rowActions={() => <button type="button">Edit</button>}
+        renderExpanded={(row) => (row.id === 1 ? "More about the product" : null)}
+        toolbar={<button type="button">New product</button>}
+        search={{ placeholder: "Search the products" }}
+        selection={{ actions: () => <button type="button">Archive</button> }}
+        pageSize={10}
+        defaultState={{ sort: { columnId: "name", descending: false } }}
+      />
+      <DataGrid
+        caption="Products by category"
+        columns={gridColumns}
+        rows={gridRows}
+        groups={[{ key: "drinks", title: "Drinks", actions: <button type="button">Rename</button>, rows: gridRows }]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+      />
+      <DataGrid
+        caption="Products that match"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        search={{ placeholder: "Search" }}
+        defaultState={{ search: "no product has this text" }}
+      />
+      <DataGrid
+        caption="Products that load"
+        columns={gridColumns}
+        rows={[]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        loading
+      />
     </ThemeProvider>,
   );
 
@@ -207,6 +272,9 @@ async function renderEveryComponent(): Promise<string[]> {
       }
     }
   };
+  collect();
+  // Phase 10: the bar of the selected rows is on the page only while a row is selected.
+  await user.click(screen.getByRole("checkbox", { name: "Select all" }));
   collect();
   // An open menu is on the page only while it is open.
   for (const menuPlacement of splitButtonMenuPlacements) {
@@ -354,6 +422,11 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // DataTable with stackOnMobile: the classes of a narrow screen win over the classes of a cell.
     ["border-b", "max-md:[&_td]:[border:0]"],
     ["py-2.5", "max-md:[&_td]:py-1.5"],
+    // DataGrid: a row whose checkbox is checked wins over the row under the pointer,
+    // and the header of the sorted column wins over the look at rest.
+    ["hover:bg-subtle", "data-checked:bg-selected"],
+    ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
+    ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

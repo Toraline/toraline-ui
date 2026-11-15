@@ -185,16 +185,16 @@ export const WithFooter: Story = {
       </tbody>
       <tfoot>
         <tr className="bg-subtle font-medium">
-          <Td className="border-t border-default text-strong" colSpan={3}>
+          <Td className="border-t text-strong" colSpan={3}>
             Total
           </Td>
-          <Td className="border-t border-default text-strong" align="right">
+          <Td className="border-t text-strong" align="right">
             18
           </Td>
-          <Td className="border-t border-default text-strong" align="right">
+          <Td className="border-t text-strong" align="right">
             R$ 1.479,20
           </Td>
-          <Td className="border-t border-default" />
+          <Td className="border-t" />
         </tr>
       </tfoot>
     </DataTable>
