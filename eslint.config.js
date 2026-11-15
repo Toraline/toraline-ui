@@ -19,6 +19,11 @@ export default tseslint.config(
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // The scripts in scripts/ run in Node, which has these two global names.
+  {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: { globals: { console: "readonly", process: "readonly" } },
+  },
   // The rules of Storybook for story files and for .storybook/main.ts.
   ...storybook.configs["flat/recommended"],
 );

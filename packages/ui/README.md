@@ -12,6 +12,23 @@ The rules every component follows are in [Rules every component follows](#rules-
 
 A theme is a set of colors, fonts and corner sizes. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline/tokens`](../tokens/README.md).
 
+## Installation
+
+**The package is not published yet.** Today (2026-11-15) `@toraline/ui` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+
+After the first release:
+
+```bash
+npm install @toraline/ui@next @toraline/tokens@next
+```
+
+- Install both packages, in the same version. `@toraline/ui` needs exactly its own version of `@toraline/tokens`.
+- `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
+- The app needs React 19 (`react` and `react-dom`). Tailwind CSS 4 is optional.
+- The package has ES modules only (files read with `import`), with type files for TypeScript.
+
+Before the first release, an app can install the package files that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
+
 ## How to use the theme in a Next.js app
 
 1. Import the CSS once, in the global CSS file (`app/globals.css`):
@@ -296,7 +313,8 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 3. `className` is joined with the helper `classNames("tui-<name>", className)` from `src/shared/class-names.ts`, and goes on the outermost element.
 4. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
 5. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
-6. A file starts with `"use client"` only when the component uses React state, an effect, or an event handler of its own. `"use client"` tells Next.js that the file runs in the browser. A component without it can also render in a Server Component.
+6. A relative import names the file with `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. The built type files keep the import as written, and TypeScript in an app that uses the Node module rules needs the full file name. `make check` fails when a built type file has a relative import without `.js`.
+7. A file starts with `"use client"` only when the component uses React state, an effect, or an event handler of its own. `"use client"` tells Next.js that the file runs in the browser. A component without it can also render in a Server Component.
 
 ### Behaviour and accessibility
 

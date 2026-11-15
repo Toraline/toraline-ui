@@ -1,6 +1,6 @@
 # toraline-ui: run every command from the repository root.
 .DEFAULT_GOAL := help
-.PHONY: help setup install check build typecheck lint test catalog catalog-build catalog-browser catalog-test
+.PHONY: help setup install check build typecheck lint test catalog catalog-build catalog-browser catalog-test packages-check pack version
 
 -include agent/core.mk
 
@@ -37,4 +37,16 @@ catalog-browser: ## Download the browser that runs the story tests (does nothing
 catalog-test: catalog-browser ## Run only the story tests: every story in each theme, with the accessibility check
 	@npx vitest run --project 'stories-*'
 
-check: build typecheck lint test ## What must pass before a commit (the profile's check_command)
+packages-check: ## Check the two published packages: same version, files of "exports", "use client", no extra file
+	@node scripts/check-packages.mjs
+
+pack: ## Build the two published packages, write their tarballs into .pack/ and list the files of each
+	@rm -rf .pack/tarballs && mkdir -p .pack/tarballs
+	@npm pack --workspace @toraline/tokens --workspace @toraline/ui --pack-destination .pack/tarballs
+	@ls -l .pack/tarballs
+
+version: ## Set the version of the two published packages (VERSION=2.0.0-beta.1)
+	@node scripts/set-version.mjs "$(VERSION)"
+	@npm install --no-audit --no-fund
+
+check: build typecheck lint packages-check test ## What must pass before a commit (the profile's check_command)

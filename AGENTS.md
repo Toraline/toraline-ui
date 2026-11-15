@@ -39,6 +39,7 @@ A value of `<ask>` is not set yet. The `start` skill asks for it the first time 
 - Where each kind of thing lives: [docs/workflow/sources-of-truth.md](docs/workflow/sources-of-truth.md).
 - Technical decisions, newest first: [docs/decisions.md](docs/decisions.md). The plan and its phases are in the Linear project `toraline-ui`.
 - Never change `legacy/`. It is the old library, kept until version 2 is fully released.
+- Never run `npm publish` or `npm login`, and never handle an npm token. A person publishes, with the steps in [docs/releasing.md](docs/releasing.md).
 
 ## Skills
 
@@ -56,6 +57,8 @@ make check       # what must pass before a commit
 make catalog     # open the catalog (Storybook) on http://localhost:6006
 make catalog-build # build the static catalog into apps/catalog/storybook-static
 make catalog-test  # run every story as a test, in each theme, with the accessibility check
+make pack        # build the two published packages, write their tarballs into .pack/tarballs/, list their files
+make version VERSION=2.0.0-beta.1 # set the version of the two published packages
 make sync-skills # copy the current core from the boilerplate
 ```
 

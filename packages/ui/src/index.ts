@@ -7,24 +7,24 @@
  */
 export const packageName = "@toraline/ui";
 
-export { Button, buttonSizes, buttonVariants } from "./button";
-export type { ButtonProps, ButtonSize, ButtonVariant } from "./button";
+export { Button, buttonSizes, buttonVariants } from "./button/index.js";
+export type { ButtonProps, ButtonSize, ButtonVariant } from "./button/index.js";
 
-export { Input } from "./input";
-export type { InputProps } from "./input";
+export { Input } from "./input/index.js";
+export type { InputProps } from "./input/index.js";
 
-export { Toggle } from "./toggle";
-export type { ToggleProps } from "./toggle";
+export { Toggle } from "./toggle/index.js";
+export type { ToggleProps } from "./toggle/index.js";
 
-export { Tabs } from "./tabs";
-export type { TabItem, TabsProps } from "./tabs";
+export { Tabs } from "./tabs/index.js";
+export type { TabItem, TabsProps } from "./tabs/index.js";
 
-export { BreadCrumbs } from "./breadcrumbs";
-export type { BreadCrumbsProps, Crumb } from "./breadcrumbs";
+export { BreadCrumbs } from "./breadcrumbs/index.js";
+export type { BreadCrumbsProps, Crumb } from "./breadcrumbs/index.js";
 
-export { SplitButton, splitButtonMenuPlacements } from "./split-button";
+export { SplitButton, splitButtonMenuPlacements } from "./split-button/index.js";
 export type {
   SplitButtonItem,
   SplitButtonMenuPlacement,
   SplitButtonProps,
-} from "./split-button";
+} from "./split-button/index.js";

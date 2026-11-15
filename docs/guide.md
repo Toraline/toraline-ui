@@ -23,7 +23,16 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-**The package is not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline/ui` and `@toraline/tokens` are not on the npm registry. The commands below are the commands as they will be after the first release. Until then, only an app inside this repository can use the library. The app `apps/playground` does everything this guide shows.
+**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline/ui` and `@toraline/tokens` are not on the npm registry. The first version will be a test version, `2.0.0-beta.0`, and the command of step 2 is written for it.
+
+To use the library before the release, build the two package files in this repository and install them in the app:
+
+```bash
+make pack     # in this repository; writes 2 files into .pack/tarballs/
+npm install <path>/.pack/tarballs/toraline-tokens-2.0.0-beta.0.tgz <path>/.pack/tarballs/toraline-ui-2.0.0-beta.0.tgz     # in the app, in place of step 2
+```
+
+Replace `<path>` with the folder of this repository. Guide 1 and steps 1 to 10 of guide 2 were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6.
 
 What you need: Node 24 and React 19.
 
@@ -39,10 +48,12 @@ What you need: Node 24 and React 19.
 2. Install the two packages.
 
    ```bash
-   npm install @toraline/ui @toraline/tokens
+   npm install @toraline/ui@next @toraline/tokens@next
    ```
 
-   `@toraline/ui` has the components. `@toraline/tokens` has the tokens, the themes and the function that builds a theme.
+   `@toraline/ui` has the components. `@toraline/tokens` has the tokens, the themes and the function that builds a theme. Install both, always in the same version.
+
+   `@next` selects the newest test version. After the full release `2.0.0`, the command is `npm install @toraline/ui @toraline/tokens`.
 
 3. Open `app/globals.css`. Delete everything in it, and write these 3 lines:
 
@@ -236,6 +247,14 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    ```
 
    The server writes `data-theme` in the HTML it sends, so the page never shows the wrong theme first.
+
+   Open `next.config.ts`. When it has the line `cacheComponents: true` (`create-next-app` 16.4.6 writes it), add this line to `app/layout.tsx`, under the imports:
+
+   ```tsx
+   export const instant = false;
+   ```
+
+   Without it, `npm run build` stops with the error `Next.js encountered uncached or runtime data during prerendering`. With `cacheComponents`, Next.js wants a part of every page built before any request, and this layout reads a cookie, which exists only during a request. The line tells Next.js that this layout may wait for the request. When `next.config.ts` does not have `cacheComponents: true`, the line is not needed.
 
 9. Add the theme button to `app/page.tsx`:
 

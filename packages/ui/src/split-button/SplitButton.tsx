@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, FocusEvent, KeyboardEvent, ReactNode } from "react";
-import { classNames } from "../shared/class-names";
-import type { SplitButtonMenuPlacement } from "./split-button-options";
+import { classNames } from "../shared/class-names.js";
+import type { SplitButtonMenuPlacement } from "./split-button-options.js";
 
 /** One action of the menu. */
 export type SplitButtonItem = {

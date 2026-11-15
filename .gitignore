@@ -15,6 +15,9 @@ next-env.d.ts
 # written by a script before each build
 apps/playground/app/theme.generated.css
 
+# written by "make pack": the tarballs of the published packages, and test apps
+.pack/
+
 # made per user, never committed
 local-docs/
 

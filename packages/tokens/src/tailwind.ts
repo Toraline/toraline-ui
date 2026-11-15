@@ -1,5 +1,5 @@
-import { createTheme, getAddedColorNames } from "./create-theme";
-import type { ThemeInput } from "./create-theme";
+import { createTheme, getAddedColorNames } from "./create-theme.js";
+import type { ThemeInput } from "./create-theme.js";
 
 /**
  * Builds the CSS that makes the colors an app added available as Tailwind CSS 4 classes.

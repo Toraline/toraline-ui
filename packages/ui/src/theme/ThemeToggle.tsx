@@ -1,7 +1,7 @@
 "use client";
 
 import type { ButtonHTMLAttributes, MouseEvent } from "react";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "./ThemeProvider.js";
 
 export type ThemeToggleProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
   /**

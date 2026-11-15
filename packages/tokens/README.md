@@ -2,6 +2,23 @@
 
 The design tokens and the themes of the Toraline component library. A design token is a named value of the design, for example a color or a font, stored as a CSS variable. This package has no React code.
 
+## Installation
+
+**The package is not published yet.** Today (2026-11-15) `@toraline/tokens` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+
+After the first release:
+
+```bash
+npm install @toraline/tokens@next
+```
+
+- `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
+- An app that also uses `@toraline/ui` installs both packages in the same version.
+- The package needs no React. Tailwind CSS 4 is optional.
+- The package has ES modules only (files read with `import`), with type files for TypeScript.
+
+Before the first release, an app can install the package file that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
+
 ## The two levels
 
 - **Level 1: raw values.** The name says what the value is. Example: `--purple-500` is `#5e00a1`. File: [`css/primitives.css`](css/primitives.css).

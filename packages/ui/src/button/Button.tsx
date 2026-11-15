@@ -1,8 +1,8 @@
 "use client";
 
 import type { ComponentProps, MouseEvent } from "react";
-import { classNames } from "../shared/class-names";
-import type { ButtonSize, ButtonVariant } from "./button-options";
+import { classNames } from "../shared/class-names.js";
+import type { ButtonSize, ButtonVariant } from "./button-options.js";
 
 
 export type ButtonProps = ComponentProps<"button"> & {
