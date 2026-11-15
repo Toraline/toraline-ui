@@ -12,6 +12,27 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - ListItem: a link, a button or a plain row, and the app's link component (TOR-1166)
+- Design source: Intraweb's `components/ui/list-item.tsx` and its test (commit `f8ad4c2` of `prontera-e-juno`), and the text of the ticket. No screen of Intraweb uses the component yet (a text search on 2026-11-15 finds it only in its own file and test). Figma was not read: this session had no access to it.
+- Decision: `ListItem` has the parts and the class lists of Intraweb's: an icon in a box of 40 pixels, a title and a second line that stay on one line, a value and a status on the right, and an arrow when the item can be pressed. With `href` it is a link, with only `onClick` a `<button>`, with neither a `<div>`.
+- Decision: the link is an `<a>`, or the component the app gives in `linkComponent` (entry of TOR-1139). Intraweb's imports `next/link`.
+- Decision: the selected item is written as `aria-current="true"` and styled by `aria-[current=true]:` classes, also on the `<div>` that cannot be pressed. Intraweb chooses the classes in its code and gives no `aria-current` to the `<div>`.
+- Decision: `title` accepts text or elements (Intraweb: text only). The HTML attribute `title` (a tooltip) is therefore not a prop of ListItem.
+- Decision: the icon is the prop `icon` of the type `IconComponent`; the arrow is an inline `<svg>` with the shape of Lucide's `chevron-right`. The file has no `"use client"`: it has no state, and `onClick` goes straight to the element.
+- Decision: a link and a button show the focus ring of the library, drawn inside the item (`focus-visible:-outline-offset-2`). Intraweb's global outline is 2 pixels outside. A list is usually inside a card with `overflow-hidden`, which would cut a ring outside the item.
+- Decision: the corner of the icon box is `rounded-[10px]`, the value of Intraweb (as the segmented track, entry of TOR-1143). The line of the selected item is 3 pixels wide (`w-[3px]`), a width that is not a step of the spacing scale.
+- Decision: the component renders no `<li>`. The app puts each item inside an `<li>` of its list, so the same component works in a list, in a card and alone.
+- Compared with Intraweb on 2026-11-15, with the temporary page and script of TOR-1164 (not committed): 6 items (a link, a selected link, a button, a selected button, a plain item, a selected plain item with a long title), in both themes, at 1280 and 375 pixels, at rest and with the pointer over a link, a button and the selected link: 254,568 computed values each time.
+- Differences from Intraweb that stay:
+  1. The selected item under the pointer keeps the background `bg-selected`. In Intraweb it gets `bg-subtle`: its source writes `hover:bg-selected` for this, but `hover:bg-subtle` is on the same element and wins. The library draws what Intraweb's source asks for.
+  2. The focus ring is inside the item (above).
+  Every other value is equal.
+- Contrast: all pairs are 4.5 or more in both themes and are in `packages/tokens/src/tokens.test.ts`: the title and the value (`text-primary`) and the second line (`text-tertiary`) on `bg-surface`, on `bg-subtle` (under the pointer) and on `bg-selected`. The arrow is `text-icon` (3 or more on the three backgrounds).
+- The states of the list "States to check": rest: story. Hover: compared with Intraweb. Keyboard focus: story "Focused". Pressed, disabled, read-only, loading, error, open and closed: do not apply (Intraweb's has none). Empty: story "Only A Title". Selected: stories "List With A Selected Item" and "Buttons". Long content: story "Long Text". Right-to-left text: considered, not supported: the line of the selected item is on the left and the arrow points to the right, as in Intraweb. Light and dark theme: every story test runs in both. Reduced motion: the transition of the background has `motion-safe:`.
+- What changes for Intraweb: `import { ListItem } from "@toraline.tech/ui"` and `linkComponent={Link}` on an item with `href`. Every other prop has the same name and meaning.
+- Alternatives: a `disabled` state; rendering the `<li>` inside the component; `aria-selected` (not allowed on a link or a button outside a listbox).
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DataGrid: the features of Intraweb's grid, what moved and what stays (TOR-1165)
 - Design source: Intraweb's `components/ui/data-grid/` (9 files, commit `f8ad4c2` of `prontera-e-juno`), the 30 files of Intraweb that import it, and the text of the ticket. Figma was not read: this session had no access to it.
 - The features of Intraweb's DataGrid, written before any code. "Files" is the number of Intraweb files outside `components/ui/` that have the prop or the field, counted with a text search on 2026-11-15, so it is approximate.

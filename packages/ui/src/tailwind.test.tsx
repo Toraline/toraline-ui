@@ -27,7 +27,17 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 10: data
-import { ActionsTh, DataGrid, DataTable, DataTableMessage, Td, Th, Tr, tableCellAlignments } from "./index";
+import {
+  ActionsTh,
+  DataGrid,
+  DataTable,
+  DataTableMessage,
+  ListItem,
+  Td,
+  Th,
+  Tr,
+  tableCellAlignments,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -259,6 +269,9 @@ async function renderEveryComponent(): Promise<string[]> {
         getRowLabel={(row) => row.name}
         loading
       />
+      <ListItem title="Day off request" meta="12/10" value="8 h" status={<span>Open</span>} icon={PlusIcon} href="/requests/1" selected />
+      <ListItem title="Ana" onClick={() => undefined} />
+      <ListItem title="No action" />
     </ThemeProvider>,
   );
 

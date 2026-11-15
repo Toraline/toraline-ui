@@ -77,3 +77,5 @@ export type {
   DataGridSort,
   DataGridState,
 } from "./data-grid/index.js";
+export { ListItem } from "./list-item/index.js";
+export type { ListItemProps } from "./list-item/index.js";

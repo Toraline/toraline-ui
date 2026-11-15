@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { CalendarDays, Pencil } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -6,6 +6,7 @@ import {
   DataTable,
   DataTableMessage,
   IconButton,
+  ListItem,
   Td,
   Th,
   Tr,
@@ -143,6 +144,35 @@ export default function DataPage() {
 
       <Section title="DataGrid">
         <ProductsGrid products={products} />
+      </Section>
+
+      <Section title="ListItem">
+        <ul className="max-w-md overflow-hidden rounded-xl bg-surface shadow-card">
+          <li className="border-b border-subtle">
+            <ListItem
+              title="Day off request"
+              meta="12/10/2026 · Ana Ribeiro"
+              value="8 h"
+              icon={CalendarDays}
+              href="/data"
+              linkComponent={Link}
+            />
+          </li>
+          <li className="border-b border-subtle">
+            <ListItem
+              title="Extra hours"
+              meta="14/10/2026 · Fernando Dias"
+              value="2,5 h"
+              icon={CalendarDays}
+              href="/data"
+              linkComponent={Link}
+              selected
+            />
+          </li>
+          <li>
+            <ListItem title="Vacation" meta="An item that cannot be pressed" value="80 h" />
+          </li>
+        </ul>
       </Section>
     </main>
   );

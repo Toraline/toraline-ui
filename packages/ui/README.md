@@ -692,3 +692,51 @@ The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilter
 - Not in the library yet, and still only in Intraweb: the filter of a column, the menu that chooses the columns, the editing of cells, the rows inside a row, another view in the place of the table, and saving the state in the address of the page or in the browser. The reasons are in the entry of TOR-1165 of [`docs/decisions.md`](../../docs/decisions.md).
 - The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
+
+### `ListItem`
+
+One row of a list of records: an icon, a title and a second line, and a value and a status on the right.
+
+```tsx
+import { CalendarDays } from "lucide-react";
+import Link from "next/link";
+import { ListItem } from "@toraline.tech/ui";
+
+<ul>
+  {requests.map((request) => (
+    <li key={request.id}>
+      <ListItem
+        title={request.title}
+        meta={request.date}
+        value={request.hours}
+        icon={CalendarDays}
+        href={`/requests/${request.id}`}
+        linkComponent={Link}
+        selected={request.id === openRequestId}
+      />
+    </li>
+  ))}
+</ul>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The main text. One line: a long text ends with "…" |
+| `meta` | Text or elements | The second line, for example a date. One line: a long text ends with "…" |
+| `value` | Text or elements | The value on the right, for example `"8 h"`. Its digits all have the same width |
+| `status` | Elements | Shown under the value, usually a badge with the status of the record |
+| `icon` | An icon component | An icon shown before the text, in a box of 40 pixels. See [Icons](#icons). It is decoration: a screen reader skips it |
+| `selected` | `true`, `false` (default) | The item that is open, for example in a panel next to the list. It gets `aria-current="true"`, the background `bg-selected` and a short line in the brand color on its left |
+| `href` | An address | With it, the item is a link |
+| `onClick` | A function | Called on a press. With it and no `href`, the item is a `<button>` |
+| `linkComponent` | A component. Default `"a"` | The component that renders the link. A Next.js app gives the `Link` of `next/link` |
+
+- The parts and the classes are the ones of the ListItem of the app Intraweb (`components/ui/list-item.tsx`). The item is at least 64 pixels high.
+- With no `href` and no `onClick` the item is a `<div>` that cannot be pressed: it has no arrow on the right and no background under the pointer.
+- Main native element: the `<a>`, the `<button>` or the `<div>`. `className`, every other prop and `ref` go to it. The HTML attribute `title` is not accepted: `title` is the main text.
+- The component renders no `<li>`: put each item inside an `<li>` of a list.
+- Keyboard: Tab moves the focus to a link or a button; Enter follows the link; Enter and Space press the button. The focus ring is drawn inside the item.
+- Screen reader: it reads the title, the second line, the value and the status as the name of the link or the button. The selected item has `aria-current="true"`.
+- The inner parts have `data-slot`: `icon`, `text`, `title`, `meta`, `end`, `value`, `chevron`.
+- The type `ListItemProps` is exported.
+- It has no `"use client"`: it also renders in a Server Component. An item with `onClick` needs a Client Component around it, because a function cannot go from a Server Component to the browser.
