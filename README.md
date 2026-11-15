@@ -6,7 +6,7 @@ The component library of Toraline: styled React components, with configurable th
 
 **The new packages are not published yet.** `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be `2.0.0-beta.0`. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
-**This is the branch `v2`.** Version 2 is being built here. The old library is unchanged in [`legacy/`](legacy/), and is still released from the branch `main` as `@toraline/toraline-ui`.
+**This is the branch `main`**, the new library (version 2). Until 2026-11-15 it was named `v2`. The old library is unchanged in [`legacy/`](legacy/), and on the branch `old-package`, which was named `main` until that day. Its package is `@toraline/toraline-ui`.
 
 ## What is where
 

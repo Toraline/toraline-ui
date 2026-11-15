@@ -1,7 +1,7 @@
 # Publishes @toraline.tech/tokens and @toraline.tech/ui (version 2) to the public npm registry.
 #
 # It runs ONLY when a person starts it by hand: GitHub > Actions > "Release version 2" >
-# "Run workflow", with the branch v2. It never runs on a push, on a tag or on a GitHub release.
+# "Run workflow", with the branch main. It never runs on a push, on a tag or on a GitHub release.
 # The steps for a person are in docs/releasing.md.
 #
 # The old package @toraline/toraline-ui is not released here. Its workflow is npm-publish.yml.
@@ -42,10 +42,10 @@ jobs:
     env:
       VERSION: ${{ inputs.version }}
     steps:
-      - name: Stop when the branch is not v2
-        if: github.ref != 'refs/heads/v2'
+      - name: Stop when the branch is not main
+        if: github.ref != 'refs/heads/main'
         run: |
-          echo "::error::Version 2 is released only from the branch v2. This run uses ${GITHUB_REF}. Start the workflow again and choose the branch v2."
+          echo "::error::Version 2 is released only from the branch main. This run uses ${GITHUB_REF}. Start the workflow again and choose the branch main."
           exit 1
 
       - name: Stop when the npm token is missing
@@ -69,7 +69,7 @@ jobs:
         run: |
           package_version="$(node -p "require('./packages/ui/package.json').version")"
           if [ "${VERSION}" != "${package_version}" ]; then
-            echo "::error::You asked for version ${VERSION}, and the packages on v2 have version ${package_version}. Change the version first (docs/releasing.md), or start again with ${package_version}."
+            echo "::error::You asked for version ${VERSION}, and the packages on main have version ${package_version}. Change the version first (docs/releasing.md), or start again with ${package_version}."
             exit 1
           fi
 

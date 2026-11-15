@@ -7,7 +7,7 @@ on:
   release:
     types: [created]
 
-# On the v2 branch the old library lives in legacy/. This workflow still releases
+# On the branch main the old library lives in legacy/. This workflow still releases
 # the old package @toraline/toraline-ui, so every step runs inside that folder.
 defaults:
   run:

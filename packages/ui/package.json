@@ -11,7 +11,7 @@
     "nextjs",
     "tailwindcss"
   ],
-  "homepage": "https://github.com/Toraline/toraline-ui/tree/v2/packages/ui#readme",
+  "homepage": "https://github.com/Toraline/toraline-ui/tree/main/packages/ui#readme",
   "bugs": {
     "url": "https://github.com/Toraline/toraline-ui/issues"
   },

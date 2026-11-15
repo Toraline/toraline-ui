@@ -1,6 +1,6 @@
 # toraline-ui: instructions for agents
 
-The component library of Toraline, as a monorepo: `packages/tokens` (design tokens and themes), `packages/ui` (styled React components, published as `@toraline.tech/ui`) `apps/catalog` (Storybook) and `apps/playground` (a private Next.js app that is the test page for themes, fonts and the Tailwind preset). Version 2 is built on the branch `v2`; the old library is unchanged in `legacy/`.
+The component library of Toraline, as a monorepo: `packages/tokens` (design tokens and themes), `packages/ui` (styled React components, published as `@toraline.tech/ui`) `apps/catalog` (Storybook) and `apps/playground` (a private Next.js app that is the test page for themes, fonts and the Tailwind preset). Version 2 is built on the branch `main` (named `v2` until 2026-11-15); the old library is unchanged in `legacy/` and on the branch `old-package`.
 
 ## Project profile
 
@@ -10,7 +10,7 @@ Skills and scripts read these values. They are the only place where this project
 |---|---|---|
 | `packs` | `core` | Which skill packs are on |
 | `ticket_prefix` | `TOR` | Linear team key, for example `TOR` |
-| `base_branch` | `v2` | Branch that worktrees start from and pull requests target |
+| `base_branch` | `main` | Branch that worktrees start from and pull requests target |
 | `worktree_path` | `../<repo>-<prefix>-<n>` | Where a ticket's worktree is created |
 | `main_checkout` | `protected` | `protected`: no git changes on the main checkout. `open`: allowed |
 | `spec_location` | `both` | The Linear ticket is the source of truth; a local file tracks the data and linked tickets |
