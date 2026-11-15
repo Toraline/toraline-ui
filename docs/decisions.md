@@ -12,6 +12,31 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
+- Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
+- Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.
+- The states of the list "States to check" (`agent/skills/design-component/reference.md`), for each component of this phase. "Story" means a story of the catalog shows it, in both themes.
+
+| State | Button, ButtonLink, IconButton | Field, TextInput | TabNav | Tabs | Toggle, BreadCrumbs, SplitButton |
+|---|---|---|---|---|---|
+| Rest | Story | Story | Story | Story | Story |
+| Hover | Classes of Intraweb, compared by the script | Compared by the script | Compared by the script | Compared by the script | Colors unchanged since phase 6 |
+| Keyboard focus | The outline of the library, equal to Intraweb's global outline. Compared by the script | Border and ring of Intraweb. Story "Focused" | Story "Focused". `primary` draws the ring inside the tab | The outline of the library | The outline of the library |
+| Pressed | Does not apply: Intraweb has no look for it | Does not apply | Does not apply | Does not apply | Does not apply |
+| Disabled | Story. Half opacity. ButtonLink: does not apply, a link cannot be disabled | Story. Quiet background and text | Does not apply: a tab that must not be offered is left out of `items` | Does not apply | Story for Toggle and SplitButton. Half opacity. BreadCrumbs: does not apply |
+| Read-only | Does not apply | Story "Read Only". No look of its own, as in Intraweb | Does not apply | Does not apply | Does not apply |
+| Loading | Button: story. ButtonLink and IconButton: none, as in Intraweb | Does not apply | Does not apply | Does not apply | Does not apply |
+| Error | Does not apply | Story "With Error" (Field) and "Invalid" (TextInput) | Does not apply | Does not apply | Does not apply |
+| Empty | A Button with no icon: test | An empty field: story. A Field with no hint and no error: story | No item: it renders nothing (test) | No tab: the row and no content (test). A tab with no content: story "Controlled" | Unchanged |
+| Selected or current | Does not apply | Does not apply | `aria-current="page"`: stories, and the routes of the playground | `aria-selected`: stories | Toggle on: story. BreadCrumbs current page: story |
+| Open and closed | Does not apply | Does not apply | Does not apply | Does not apply | SplitButton: story "Menu Open" |
+| Long content | Story "Long Text" | Story "Long Content" (Field) | Story "Many Tabs" | Story "Many Tabs" | Unchanged |
+| Right-to-left text | Considered, not supported: the icon is before the text in the order of the page, so it follows the direction | Considered, not supported: the icon of TextInput is always on the left (`left-3`, `pl-9`), as in Intraweb | Considered: the fade of the right edge of `primary` does not follow the direction | Follows the direction of the page | Unchanged |
+| Light and dark theme | Every story test runs in both | Every story test runs in both | Every story test runs in both | Every story test runs in both | Every story test runs in both |
+| Reduced motion | No transition (`motion-safe:`) | No transition | No transition | No transition | No transition |
+
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Toggle, BreadCrumbs, SplitButton and ThemeToggle with the Intraweb look (TOR-1145)
 - Context: Intraweb has none of these components. They get the sizes, fonts, focus and disabled looks of the components above. No prop and no behaviour changed.
 - Decision (Toggle): the switch is 36 by 20 pixels, the height of Intraweb's checkbox, with its border of 1.5 pixels. The label has `text-sm/5 text-body`, as the label of Intraweb's checkbox. A disabled switch has `opacity-50` on the track, as the checkbox; the cursor over it is `not-allowed`.
