@@ -48,6 +48,14 @@ const controlSizeClass: Record<ControlSize, string> = {
   sm: "min-h-8 py-1 text-sm/5",
 };
 
+/**
+ * The classes of the box of a control that has no size of its own (Textarea).
+ * The later values, the app's className last, replace the earlier ones.
+ */
+export function controlBoxClassNames(...classValues: ClassNameValue[]): string {
+  return classNames(controlBaseClass, ...classValues);
+}
+
 /** The classes of the box of a control with this size. The later values, the app's className last, replace the earlier ones. */
 export function controlClassNames(size: ControlSize, ...classValues: ClassNameValue[]): string {
   return classNames(controlBaseClass, controlSizeClass[size], ...classValues);

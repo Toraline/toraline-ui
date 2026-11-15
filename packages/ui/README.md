@@ -520,7 +520,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
    - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
-4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg`, written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
+4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg` (and `text-2xl` and `text-3xl` for the large number of StatCard), written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a width in pixels that is not a step of the spacing scale (`border-[1.5px]`), a size in `em` or `%`, a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
 7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`, then a breakpoint (`md:`, `lg:`). When that order is not the one needed, the class names both conditions: `disabled:hover:border-default`.
@@ -546,3 +546,303 @@ The tests use Vitest, Testing Library and `@testing-library/user-event`, which p
 
 1. The component is on the page of `apps/playground`, with every variant and state.
 2. This file has the component's props and one short example.
+
+## The form controls and the feedback components of phase 8
+
+These components were added in phase 8 (TOR-1124). They come from `@toraline.tech/ui`, need the 3 CSS lines of [How to use the theme in a Next.js app](#how-to-use-the-theme-in-a-nextjs-app), and follow the [rules every component follows](#rules-every-component-follows). Each one has the parts, the classes and the measures of the same component of the app Intraweb. The page `/forms-feedback` of [`apps/playground`](../../apps/playground/README.md) shows each one with every variant and state.
+
+### `Select`
+
+A select: a control where a person chooses one value of a list. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+import { Field, Select } from "@toraline.tech/ui";
+
+<Field label="Kind of contract" error={kindError}>
+  <Select name="kind" defaultValue="monthly">
+    <option value="monthly">Monthly</option>
+    <option value="hourly">By the hour</option>
+  </Select>
+</Field>
+
+<Select aria-label="State" size="sm" className="w-auto" value={state} onChange={changeState}>
+  <option value="open">Open</option>
+  <option value="closed">Closed</option>
+</Select>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `size` | `"md"` (default), `"sm"` | The sizes of every form control (`controlSizes`): `md` is 48 pixels high on a small screen and 40 pixels from the breakpoint `lg`, `sm` is 32 pixels. It replaces the HTML attribute `size` |
+| `children` | `<option>` and `<optgroup>` elements | The choices |
+| `aria-invalid` | `true` | The select has the red border of a field that is not valid. Field sets it when it has an error |
+| `disabled` | The HTML attribute | The select cannot get the focus and cannot be changed. It has a quiet background and a quiet text |
+
+- It is a native `<select>`: the browser shows the list of choices and handles the keyboard. The library hides the arrow of the browser and shows its own, 12 pixels from the right edge.
+- The box, the sizes and the focus, disabled and not valid looks are the ones of TextInput (`controlClassNames`), as in Intraweb.
+- The arrow is an image inside a class, as in Intraweb. An image in a class cannot read a token, so its line is the grey `#667085` in every theme.
+- Main native element: the `<select>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `required`) and `ref` go to it. A width class of the app (`w-auto`, `w-40`) replaces the full width.
+- Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
+- The type `SelectProps` is exported. It has no `"use client"`.
+
+### `Textarea`
+
+A text field with more than one line. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+import { Field, Textarea } from "@toraline.tech/ui";
+
+<Field label="Notes" optional hint="200 characters at most.">
+  <Textarea name="notes" rows={3} maxLength={200} />
+</Field>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `rows` | The HTML attribute | The height, in lines of text. When missing: 2, the value of the browser |
+| `aria-invalid` | `true` | The textarea has the red border of a field that is not valid. Field sets it when it has an error |
+| `disabled` | The HTML attribute | The textarea cannot get the focus and cannot be changed. It has a quiet background and a quiet text |
+
+- It is a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput, as in Intraweb. It has one size and no prop `size`: text of 16 pixels on a small screen and 14 pixels from the breakpoint `lg`.
+- Main native element: the `<textarea>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) and `ref` go to it.
+- A person can change its size with the corner the browser shows. `className="resize-none"` removes it.
+- Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
+- The type `TextareaProps` is exported. It has no `"use client"`.
+
+### `DecimalInput`
+
+A text field for a number with decimals: a price, a quantity, a rate. It has no label of its own: put it inside [`Field`](#field).
+
+```tsx
+"use client";
+import { useState } from "react";
+import { DecimalInput, Field, parseDecimalInput } from "@toraline.tech/ui";
+
+const [priceText, setPriceText] = useState("");
+const price = parseDecimalInput(priceText); // a number, null for an empty text, NaN for a text that is not a number
+const priceError = price !== null && Number.isNaN(price) ? "Type a number, for example 12,50." : undefined;
+
+<Field label="Price" error={priceError}>
+  <DecimalInput name="price" value={priceText} onChange={(event) => setPriceText(event.target.value)} />
+</Field>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `size` | `"md"` (default), `"sm"` | The sizes of every form control, as in [`TextInput`](#textinput) |
+| `icon` | An icon component | An icon shown inside the field, on the left. See [Icons](#icons) |
+| `inputMode` | `"decimal"` (default), and the other values of the HTML attribute | The keyboard a phone shows. `decimal`: the digits and the decimal mark |
+| `aria-invalid`, `disabled` | As in TextInput | The looks of a field that is not valid and of a disabled field |
+
+- It is a [`TextInput`](#textinput) with `type="text"` and `inputMode="decimal"`, as in Intraweb. The types refuse the prop `type`. It is not `type="number"`: in some languages a browser refuses a comma in such a field, and the mouse wheel changes its value.
+- Its value is the text the person typed. The field does not change the text and does not refuse a character. The app reads the number, and shows its own error message through Field.
+- `parseDecimalInput(text)` reads the text as a number, the way Intraweb does. With a comma in the text, the comma is the decimal mark and every point is a mark between thousands: `"1.234,5"` is `1234.5`. With no comma, a point is the decimal mark: `"2.5"` is `2.5`. An empty text is `null`. A text that is not a number is `NaN`.
+- `decimalToInput(value)` writes a number as the text of the field, with a comma: `0.4` is `"0,4"`. `null` and `undefined` are the empty text.
+- The two functions follow the way a number is written in Brazil, the language of Intraweb. An English number with a comma between thousands (`"1,234.5"`) is not read correctly.
+- Main native element: the `<input>`. `className`, every other prop and `ref` go to it, as in TextInput.
+- The type `DecimalInputProps` is exported. It has no `"use client"`.
+
+### `Checkbox` and `CheckboxControl`
+
+`Checkbox` is a checkbox with its label. `CheckboxControl` is only the box, for a list or a table that has its own label.
+
+```tsx
+import { Checkbox, CheckboxControl } from "@toraline.tech/ui";
+
+<Checkbox label="Send the invoice by e-mail" name="send" checked={send} onChange={changeSend} />
+
+<CheckboxControl id="task-12" checked={done} onChange={changeDone} />
+<label htmlFor="task-12">Buy the flowers</label>
+
+<CheckboxControl aria-label="Select the order 12" />
+```
+
+| Prop | Component | Values | Meaning |
+|---|---|---|---|
+| `label` | `Checkbox` | Text or elements, required | The visible name, shown after the box. A press on it changes the box |
+| `changed` | `CheckboxControl` | `true`, `false` (default) | `true` for a value a person changed that is not saved yet, for example in a table that is edited in place. The box has an orange border and ring |
+| `checked`, `defaultChecked`, `onChange` | Both | The HTML attributes, as React uses them | `checked` with `onChange` controls the box from the app. `defaultChecked` sets only how it starts |
+| `disabled` | Both | The HTML attribute | The box cannot get the focus and cannot be changed. It has half of its opacity |
+
+- The box is a real `<input type="checkbox">`, drawn by the library: 20 pixels, a corner of 6 pixels, a border of 1.5 pixels. Checked, it has the color of the main action and a check mark. The Tab key moves the focus to it, the Space key changes it, and a screen reader says "checked" or "not checked".
+- The keyboard focus shows the focus ring of the library (the outline), not the ring of a text field.
+- `Checkbox`: the outermost element is the `<label>`, and `className` goes to it. `CheckboxControl`: the outermost element is a `<span>` with the size of the box, and `className` goes to it. In both, every other prop (`name`, `value`, `id`, `required`) and `ref` go to the `<input>`.
+- `CheckboxControl` has no name of its own. Give it `aria-label`, or the `id` that a `<label>` of the app points to. Inside [`Field`](#field) it gets the label, the hint and the error message of the Field.
+- A checkbox has no look for "not valid" and no state "partly checked" (indeterminate): Intraweb has neither.
+- A box with `changed` has the attribute `data-changed="true"`.
+- The types `CheckboxProps` and `CheckboxControlProps` are exported. Neither has `"use client"`.
+
+### `StatusBadge`
+
+A badge that shows the state of a thing: a short text on a pill in the color of its meaning.
+
+```tsx
+import { StatusBadge } from "@toraline.tech/ui";
+
+<StatusBadge label="Paid" variant="success" dot />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements, required | The text of the badge |
+| `variant` | `"neutral"` (default), `"success"`, `"warning"`, `"error"`, `"info"` | The look. `neutral`: a state with no meaning of good or bad. `success`: done or good. `warning`: needs attention. `error`: failed or bad. `info`: a fact |
+| `dot` | `true`, `false` (default) | `true` shows a dot of 6 pixels in the stronger color of the variant, before the text |
+
+- The text is 12 pixels in the weight 500 of the heading font, and stays on one line.
+- The text must say the state by itself. The color and the dot are decoration; a screen reader skips the dot.
+- Main native element: the `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The dot has `data-slot="dot"`.
+- The list `statusBadgeVariants` and the types `StatusBadgeProps` and `StatusBadgeVariant` are exported. It has no `"use client"`.
+
+### `CountBadge`
+
+A small pill with a number: how many things wait, for example next to the text of a tab or a link of a menu.
+
+```tsx
+import { CountBadge } from "@toraline.tech/ui";
+
+<CountBadge count={pendingOrders} label={`${pendingOrders} pending orders`} />
+<CountBadge count={12} label="12 messages not read" variant="brand" />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `count` | A number, required | The number the badge shows |
+| `label` | Text, required | What the number means, with the number in it (`"3 pending orders"`). It is not shown. A screen reader reads it in the place of the number |
+| `variant` | `"warning"` (default), `"brand"` | The look. `warning`: things that need attention. `brand`: a plain count, in the color of the main action |
+
+- The badge is 20 pixels high and at least 20 pixels wide: one digit is a circle, and a longer number makes it wider. The text is 12 pixels in the weight 500 of the heading font, with digits of the same width.
+- Screen reader: the number that is shown has `aria-hidden="true"`, and `label` is on the page as text that is not shown (`sr-only`). Intraweb writes `label` as `aria-label` on the `<span>`; a screen reader does not always read `aria-label` on an element with no role.
+- The app writes `label`, in its own language. The library does not format the number: `count={1234}` shows `1234`.
+- Main native element: the outermost `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The inner parts have `data-slot="count"` and `data-slot="label"`.
+- The list `countBadgeVariants` and the types `CountBadgeProps` and `CountBadgeVariant` are exported. It has no `"use client"`.
+
+### `Panel`
+
+A card that groups content: the box with a shadow that holds one part of a page.
+
+```tsx
+import { Button, Panel } from "@toraline.tech/ui";
+
+<Panel
+  id="contract"
+  title="Contract"
+  subtitle="What the client pays for each month"
+  actions={<Button variant="secondary" size="sm">Edit</Button>}
+>
+  <p>Monthly contract, signed in March.</p>
+</Panel>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements | The title of the card: a heading of level 2 (`<h2>`) at its top |
+| `subtitle` | Text or elements | A quiet line under the title. It is shown only when the card has a title |
+| `actions` | Elements | Buttons or links at the top right of the card. In a narrow card they go under the title |
+| `children` | Elements | The content of the card |
+| `id` | The HTML attribute | Makes the card the target of a link (`href="#contract"`). The card stops 24 pixels under the top of the window |
+
+- The card has the background `bg-surface`, the shadow `shadow-card`, a corner of 12 pixels and a padding of 16 pixels. From the breakpoint `md` of Tailwind CSS (a screen 768 pixels wide or more) the corner is 16 pixels and the padding 24 pixels. Its parts are 16 pixels apart.
+- With no title and no actions the card has no header.
+- The title is always an `<h2>`, as in Intraweb. A page whose cards are under a heading of another level gives no `title` and writes its own heading in `children`.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title` (a tooltip). The inner parts have `data-slot`: `header`, `titles`, `title`, `subtitle`, `actions`.
+- The type `PanelProps` is exported. It has no `"use client"`.
+
+### `EmptyState`
+
+What a list, a table or a page shows when it has nothing to show: an icon, a title, a short text and one action.
+
+```tsx
+import { Plus, Users } from "lucide-react";
+import { Button, EmptyState } from "@toraline.tech/ui";
+
+<EmptyState title="No client yet" icon={Users} action={<Button icon={Plus}>New client</Button>}>
+  Add the first client to start a contract.
+</EmptyState>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements, required | What is missing, in a few words: a heading of level 2 (`<h2>`) |
+| `icon` | An icon component | The icon in the circle above the title. See [Icons](#icons). When missing: an empty tray, drawn by the library. It is decoration: a screen reader skips it |
+| `children` | Text or elements | The text under the title: why the place is empty, or what will be shown here. At most 448 pixels wide |
+| `action` | An element | The next step, under the text: one button or link |
+
+- It has the look of a card: the background `bg-surface`, the shadow `shadow-card`, and everything in the middle. The corner and the side padding are larger from the breakpoint `md` of Tailwind CSS.
+- The same component shows "could not load": the app gives another icon, title and text, and an action that tries again.
+- Every text is given by the app. The library has no default title.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title`. The inner parts have `data-slot`: `icon`, `title`, `description`, `action`.
+- The type `EmptyStateProps` is exported. It has no `"use client"`, so a Server Component can give it an icon component.
+
+### `StatCard`
+
+A card with one number: a label, the number, and how it changed since an earlier period.
+
+```tsx
+import { ShoppingCart } from "lucide-react";
+import { StatCard } from "@toraline.tech/ui";
+
+<StatCard
+  label="Sales of the month"
+  value="R$ 12.400"
+  icon={ShoppingCart}
+  tone="tinted"
+  trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements, required | What the number is: a heading of level 3 (`<h3>`) |
+| `value` | Text, a number or elements, required | The number, already written as the app wants it shown |
+| `icon` | An icon component | An icon in a box of 40 pixels before the label. See [Icons](#icons). It is decoration: a screen reader skips it |
+| `tone` | `"default"` (default), `"tinted"` | `default`: a white card. `tinted`: the quiet brand color, for the number that matters most |
+| `trend` | An object, see below | How the number changed, shown under the number |
+| `progress` | `{ value, max, label, tone }` | A [`ProgressBar`](#progressbar-and-progressring) at the bottom of the card, for a number that goes towards a goal. The keys are the props of ProgressBar with the same names; `label` is shown above the bar |
+
+The object of `trend` (the type `StatCardTrend`):
+
+| Key | Values | Meaning |
+|---|---|---|
+| `direction` | `"up"`, `"down"`, required | `up`: the number grew. `down`: it fell. It gives the arrow and the sign before the value: `+` or `−` |
+| `value` | Text, required | How much it changed, with no sign: `"12%"`, `"3 h"` |
+| `comparison` | Text | What it is compared with: `"vs. last month"` |
+| `upIsGood` | `true` (default), `false` | `true` when a number that grows is good (sales), `false` when it is bad (costs). It gives the color: green for good, red for bad |
+
+- The number is 24 pixels, and 32 pixels from the breakpoint `md` of Tailwind CSS, in the weight 600 of the heading font, with digits of the same width.
+- The app writes every text and formats every number. The card adds only the sign of the change.
+- The color of the change says good or bad. The sign says the direction, so the color is not the only way to read it. A screen reader reads the sign, the value and the comparison.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. It has `data-tone`. The inner parts have `data-slot`: `header`, `icon`, `label`, `value`, `trend`, `trend-value` (with `data-direction` and `data-meaning`), `trend-icon`, `trend-comparison`.
+- The list `statCardTones` and the types `StatCardProps`, `StatCardTone`, `StatCardTrend` and `StatCardProgress` are exported. It has no `"use client"`.
+
+### `ProgressBar` and `ProgressRing`
+
+How much of a whole is done: as a filled part of a line (`ProgressBar`) or of a circle (`ProgressRing`).
+
+```tsx
+import { ProgressBar, ProgressRing } from "@toraline.tech/ui";
+
+<ProgressBar label="Hours of the month" value={30} max={40} valueText="30 of 40 h" />
+<ProgressBar label="Goal" value={82} tone="success" hideLabel />
+
+<ProgressRing label="Ideal stock" value={1} max={4} tone="warning" />
+<ProgressRing label="Ideal stock" value={1} max={4} size="sm" />
+```
+
+| Prop | Component | Values | Meaning |
+|---|---|---|---|
+| `value` | Both | A number, required | How much is done, from 0 to `max`. A value outside is shown as 0 or as `max` |
+| `max` | Both | A number. Default: `100` | The value that means "all done" |
+| `label` | Both | Text, required | What it measures. ProgressBar shows it above the bar. ProgressRing does not show it. In both it is the name a screen reader says |
+| `tone` | Both | `"brand"` (default), `"success"`, `"warning"`, `"danger"` | The color of the filled part. `brand`: a plain measure. `success`: good. `warning`: needs attention. `danger`: bad |
+| `valueText` | `ProgressBar` | Text. Default: the percentage, `"75%"` | The text of the value, shown on the right of the label and read by a screen reader |
+| `hideLabel` | `ProgressBar` | `true`, `false` (default) | `true` shows only the bar. A screen reader still says the label and the value |
+| `size` | `ProgressRing` | `"md"` (default), `"sm"` | `md`: 64 pixels, with the percentage in the middle. `sm`: 40 pixels, with no text, for a row of a list or a table |
+
+- Screen reader: the track of ProgressBar and the outermost element of ProgressRing have `role="progressbar"`, `aria-label` (the label), `aria-valuemin="0"`, `aria-valuemax`, `aria-valuenow` (the value, kept between 0 and `max`) and `aria-valuetext` (the percentage, or `valueText`). A screen reader says, for example, "Hours of the month, 75%". The drawing of the ring and the percentage in its middle have `aria-hidden="true"`.
+- The percentage is a whole number: `value / max`, rounded. A `max` of 0 or less shows 0%.
+- The bar is 8 pixels high and as wide as its container. The app writes `label` and `valueText`, in its own language.
+- The filled part does not move by itself: there is no animation. Neither component shows "loading with no known end".
+- Contrast: in the light theme the filled part of the tones `success` and `warning` has a contrast below 3 on the track and on a card (the values are in [`docs/decisions.md`](../../docs/decisions.md)). The value is always there as text for a screen reader; for a person who sees, use these tones with the label shown, or the ring `md`.
+- `ProgressBar`: the outermost element is a `<div>` that holds the row of the label and the track. `className`, every other prop and `ref` go to it. It has `data-tone`; the inner parts have `data-slot`: `header`, `label`, `value`, `track`, `fill`.
+- `ProgressRing`: the outermost element is the `<div role="progressbar">`. `className`, every other prop and `ref` go to it. It has `data-size` and `data-tone`; the inner parts have `data-slot`: `drawing`, `track`, `fill`, `percent`.
+- The lists `progressTones` and `progressRingSizes` and the types `ProgressBarProps`, `ProgressRingProps`, `ProgressTone` and `ProgressRingSize` are exported. Neither has `"use client"`.

@@ -1,0 +1,291 @@
+import { Plus, ShoppingCart, Users } from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import {
+  Button,
+  Checkbox,
+  CheckboxControl,
+  CountBadge,
+  DecimalInput,
+  EmptyState,
+  Field,
+  Panel,
+  ProgressBar,
+  ProgressRing,
+  Select,
+  StatCard,
+  StatusBadge,
+  Textarea,
+  controlSizes,
+  countBadgeVariants,
+  parseDecimalInput,
+  progressRingSizes,
+  progressTones,
+  statCardTones,
+  statusBadgeVariants,
+} from "@toraline.tech/ui";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
+
+/**
+ * The route /forms-feedback: the form controls and the feedback components of
+ * phase 8 (TOR-1124), each with every variant, size and state. Press the theme
+ * button to see them in the other theme. The page is a Server Component.
+ */
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="mt-8 rounded-xl border border-default bg-surface p-4">
+      <h2 className="font-heading text-xl font-semibold">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="mt-4">
+      <h3 className="text-sm text-secondary">{label}</h3>
+      <div className="mt-2 flex flex-wrap items-center gap-3">{children}</div>
+    </div>
+  );
+}
+
+const contractKinds = (
+  <>
+    <option value="monthly">Monthly</option>
+    <option value="hourly">By the hour</option>
+    <option value="fixed">Fixed price</option>
+  </>
+);
+
+export default function FormsFeedbackPage() {
+  return (
+    <main className="mx-auto max-w-3xl p-8">
+      <h1 className="font-heading text-3xl font-semibold text-brand">Forms and feedback</h1>
+      <p className="mt-4">
+        The form controls and the feedback components of the library, with the look of the app
+        Intraweb.
+      </p>
+      <p className="mt-2">
+        <Link className="text-brand underline" href="/components">
+          Back to the components
+        </Link>
+      </p>
+      <ThemeToggle className="mt-4" />
+
+      <Section title="Select">
+        <Row label="Sizes">
+          {controlSizes.map((size) => (
+            <Select key={size} size={size} aria-label={`Kind of contract, ${size}`}>
+              {contractKinds}
+            </Select>
+          ))}
+        </Row>
+        <Row label="States">
+          <Select aria-label="Not valid" aria-invalid="true">
+            {contractKinds}
+          </Select>
+          <Select aria-label="Disabled" disabled>
+            {contractKinds}
+          </Select>
+          <Select aria-label="As wide as its content" className="w-auto">
+            {contractKinds}
+          </Select>
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Kind of contract" hint="It decides how the hours are counted.">
+            <Select name="kind">{contractKinds}</Select>
+          </Field>
+          <Field label="State" error="Choose a state.">
+            <Select name="state">{contractKinds}</Select>
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="Textarea">
+        <Row label="Rows">
+          <Textarea aria-label="Notes, 2 rows" rows={2} placeholder="2 rows" />
+          <Textarea aria-label="Notes, 4 rows" rows={4} defaultValue="4 rows" />
+        </Row>
+        <Row label="States">
+          <Textarea aria-label="Not valid" aria-invalid="true" defaultValue="Not valid" />
+          <Textarea aria-label="Disabled" disabled defaultValue="Disabled" />
+          <Textarea aria-label="Read-only" readOnly defaultValue="Read-only" />
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Notes" optional hint="200 characters at most.">
+            <Textarea name="notes" rows={3} />
+          </Field>
+          <Field label="Reason" error="The reason is required.">
+            <Textarea name="reason" rows={3} />
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="DecimalInput">
+        <Row label="Sizes">
+          {controlSizes.map((size) => (
+            <DecimalInput key={size} size={size} aria-label={`Price, ${size}`} placeholder="0,00" />
+          ))}
+        </Row>
+        <Row label="A comma and a point as the decimal mark, and the number the app reads">
+          {["1.234,50", "1234.50", "12x"].map((text) => (
+            <div key={text} className="grid gap-1">
+              <DecimalInput aria-label={`Price ${text}`} defaultValue={text} className="w-40" />
+              <span className="text-sm text-secondary" data-testid={`number-${text}`}>
+                {String(parseDecimalInput(text))}
+              </span>
+            </div>
+          ))}
+        </Row>
+        <Row label="States">
+          <DecimalInput aria-label="Not valid" aria-invalid="true" defaultValue="12x" />
+          <DecimalInput aria-label="Disabled" disabled defaultValue="12,50" />
+        </Row>
+        <div className="mt-4 grid max-w-sm gap-4">
+          <Field label="Price" hint="With a comma or a point.">
+            <DecimalInput name="price" />
+          </Field>
+          <Field label="Quantity" error="Type a number, for example 12,50.">
+            <DecimalInput name="quantity" defaultValue="12x" />
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="Checkbox and CheckboxControl">
+        <Row label="Checkbox: not checked, checked, disabled">
+          <Checkbox label="Send the invoice by e-mail" name="send" />
+          <Checkbox label="Checked" name="checked" defaultChecked />
+          <Checkbox label="Disabled" name="disabled" disabled />
+          <Checkbox label="Disabled, checked" name="disabled-checked" disabled defaultChecked />
+        </Row>
+        <Row label="CheckboxControl: only the box">
+          <CheckboxControl aria-label="Not checked" />
+          <CheckboxControl aria-label="Checked" defaultChecked />
+          <CheckboxControl aria-label="Disabled" disabled />
+          <CheckboxControl aria-label="Disabled, checked" disabled defaultChecked />
+          <CheckboxControl aria-label="Changed" changed />
+          <CheckboxControl aria-label="Changed, checked" changed defaultChecked />
+        </Row>
+        <Row label="CheckboxControl with a label of the app">
+          <CheckboxControl id="task-flowers" name="task-flowers" />
+          <label htmlFor="task-flowers" className="text-sm text-body">
+            Buy the flowers
+          </label>
+        </Row>
+      </Section>
+
+      <Section title="StatusBadge">
+        <Row label="Variants">
+          {statusBadgeVariants.map((variant) => (
+            <StatusBadge key={variant} variant={variant} label={variant} />
+          ))}
+        </Row>
+        <Row label="With a dot">
+          {statusBadgeVariants.map((variant) => (
+            <StatusBadge key={variant} variant={variant} label={variant} dot />
+          ))}
+        </Row>
+      </Section>
+
+      <Section title="CountBadge">
+        <Row label="Variants">
+          {countBadgeVariants.map((variant) => (
+            <CountBadge key={variant} variant={variant} count={3} label={`3 pending orders, ${variant}`} />
+          ))}
+        </Row>
+        <Row label="Counts">
+          {[0, 42, 1234].map((count) => (
+            <CountBadge key={count} count={count} label={`${count} messages`} />
+          ))}
+        </Row>
+      </Section>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">Panel</h2>
+      <div className="mt-4 grid gap-4">
+        <Panel>
+          <p className="text-sm text-body">A panel with only its content.</p>
+        </Panel>
+        <Panel
+          id="contract"
+          title="Contract"
+          subtitle="What the client pays for each month"
+          actions={
+            <>
+              <Button variant="secondary" size="sm">
+                Edit
+              </Button>
+              <Button size="sm">New contract</Button>
+            </>
+          }
+        >
+          <p className="text-sm text-body">
+            A panel with a title, a subtitle and two actions. Its id is &quot;contract&quot;.
+          </p>
+        </Panel>
+        <Panel actions={<Button size="sm">Edit</Button>}>
+          <p className="text-sm text-body">A panel with an action and no title.</p>
+        </Panel>
+      </div>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">EmptyState</h2>
+      <div className="mt-4 grid gap-4">
+        <EmptyState title="No order yet" />
+        <EmptyState title="No client yet" icon={Users} action={<Button icon={Plus}>New client</Button>}>
+          Add the first client to start a contract. The icon comes from this page, a Server
+          Component.
+        </EmptyState>
+      </div>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">StatCard</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {statCardTones.map((tone) => (
+          <StatCard
+            key={tone}
+            tone={tone}
+            label={`Sales of the month, ${tone}`}
+            value="R$ 12.400"
+            icon={ShoppingCart}
+            trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+          />
+        ))}
+        <StatCard label="Orders" value={86} />
+        <StatCard
+          label="Costs of the month"
+          value="R$ 3.100"
+          trend={{ direction: "up", value: "5%", comparison: "vs. last month", upIsGood: false }}
+        />
+        <StatCard label="Late orders" value={2} trend={{ direction: "down", value: "8%" }} />
+        <StatCard
+          label="Hours of the month"
+          value="30 h"
+          progress={{ value: 30, max: 40, label: "Goal of the month", tone: "success" }}
+        />
+      </div>
+
+      <Section title="ProgressBar and ProgressRing">
+        <div className="mt-4 grid max-w-sm gap-4">
+          {progressTones.map((tone) => (
+            <ProgressBar key={tone} tone={tone} label={`Hours of the month, ${tone}`} value={30} max={40} />
+          ))}
+          <ProgressBar label="With its own text" value={30} max={40} valueText="30 of 40 h" />
+          <ProgressBar label="Only the bar" value={30} max={40} hideLabel />
+        </div>
+        {progressRingSizes.map((size) => (
+          <Row key={size} label={`ProgressRing, size ${size}`}>
+            {progressTones.map((tone) => (
+              <ProgressRing
+                key={tone}
+                size={size}
+                tone={tone}
+                label={`Ideal stock, ${tone}, ${size}`}
+                value={3}
+                max={4}
+              />
+            ))}
+          </Row>
+        ))}
+      </Section>
+    </main>
+  );
+}

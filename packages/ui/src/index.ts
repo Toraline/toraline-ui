@@ -46,3 +46,44 @@ export type {
   SplitButtonMenuPlacement,
   SplitButtonProps,
 } from "./split-button/index.js";
+
+// Phase 8: forms and feedback
+export { Select } from "./select/index.js";
+export type { SelectProps } from "./select/index.js";
+
+export { Textarea } from "./textarea/index.js";
+export type { TextareaProps } from "./textarea/index.js";
+
+export { DecimalInput, decimalToInput, parseDecimalInput } from "./decimal-input/index.js";
+export type { DecimalInputProps } from "./decimal-input/index.js";
+
+export { Checkbox, CheckboxControl } from "./checkbox/index.js";
+export type { CheckboxControlProps, CheckboxProps } from "./checkbox/index.js";
+
+export { StatusBadge, statusBadgeVariants } from "./status-badge/index.js";
+export type { StatusBadgeProps, StatusBadgeVariant } from "./status-badge/index.js";
+
+export { CountBadge, countBadgeVariants } from "./count-badge/index.js";
+export type { CountBadgeProps, CountBadgeVariant } from "./count-badge/index.js";
+
+export { Panel } from "./panel/index.js";
+export type { PanelProps } from "./panel/index.js";
+
+export { EmptyState } from "./empty-state/index.js";
+export type { EmptyStateProps } from "./empty-state/index.js";
+
+export { StatCard, statCardTones } from "./stat-card/index.js";
+export type {
+  StatCardProgress,
+  StatCardProps,
+  StatCardTone,
+  StatCardTrend,
+} from "./stat-card/index.js";
+
+export { ProgressBar, ProgressRing, progressRingSizes, progressTones } from "./progress/index.js";
+export type {
+  ProgressBarProps,
+  ProgressRingProps,
+  ProgressRingSize,
+  ProgressTone,
+} from "./progress/index.js";

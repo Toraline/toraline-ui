@@ -26,6 +26,26 @@ import {
   splitButtonMenuPlacements,
   tabNavVariants,
 } from "./index";
+// Phase 8: forms and feedback.
+import {
+  Checkbox,
+  CheckboxControl,
+  CountBadge,
+  DecimalInput,
+  EmptyState,
+  Panel,
+  ProgressBar,
+  ProgressRing,
+  Select,
+  StatCard,
+  StatusBadge,
+  Textarea,
+  countBadgeVariants,
+  progressRingSizes,
+  progressTones,
+  statCardTones,
+  statusBadgeVariants,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -164,6 +184,52 @@ async function renderEveryComponent(): Promise<string[]> {
           <Example key={`${variant}-${size}`} variant={variant} size={size}>
             New
           </Example>
+        )),
+      )}
+      {/* Phase 8: forms and feedback. */}
+      {controlSizes.map((size) => (
+        <Select key={size} size={size} aria-label={`Kind of contract, ${size}`}>
+          <option>Monthly</option>
+        </Select>
+      ))}
+      <Textarea aria-label="Notes" />
+      {controlSizes.map((size) => (
+        <DecimalInput key={size} size={size} icon={PlusIcon} aria-label={`Price, ${size}`} />
+      ))}
+      <Checkbox label="Send the invoice by e-mail" />
+      <CheckboxControl aria-label="Paid" />
+      <CheckboxControl aria-label="Paid, changed" changed />
+      {statusBadgeVariants.map((variant) => (
+        <StatusBadge key={variant} variant={variant} label="State" dot />
+      ))}
+      {countBadgeVariants.map((variant) => (
+        <CountBadge key={variant} variant={variant} count={3} label="3 pending orders" />
+      ))}
+      <Panel title="Contract" subtitle="Signed in March" actions={<Button size="sm">Edit</Button>}>
+        Content
+      </Panel>
+      <EmptyState title="No order yet" action={<Button>New order</Button>}>
+        The orders are shown here.
+      </EmptyState>
+      <EmptyState title="No client yet" icon={PlusIcon} />
+      {statCardTones.map((tone) => (
+        <StatCard
+          key={tone}
+          tone={tone}
+          label="Sales"
+          value="R$ 1.200"
+          icon={PlusIcon}
+          trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+        />
+      ))}
+      <StatCard label="Costs" value="R$ 300" trend={{ direction: "up", value: "5%", upIsGood: false }} />
+      <StatCard label="Hours" value="30 h" progress={{ value: 30, max: 40, label: "Goal of the month" }} />
+      {progressTones.map((tone) => (
+        <ProgressBar key={tone} tone={tone} label={`Goal, ${tone}`} value={30} max={40} />
+      ))}
+      {progressTones.map((tone) =>
+        progressRingSizes.map((size) => (
+          <ProgressRing key={`${tone}-${size}`} tone={tone} size={size} label={`Stock, ${tone}, ${size}`} value={1} max={4} />
         )),
       )}
     </ThemeProvider>,
@@ -319,6 +385,22 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
     ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
+    // Phase 8: forms and feedback.
+    // Checkbox: checked wins over the look at rest and over the border of a changed value. The pointer over
+    // it wins over checked for the border, as in Intraweb, and a checked box has its own darker background.
+    ["border-strong", "checked:border-brand"],
+    ["border-changed", "checked:border-brand"],
+    ["bg-surface", "checked:bg-primary"],
+    ["checked:border-brand", "hover:border-hover"],
+    ["checked:bg-primary", "checked:hover:bg-primary-hover"],
+    // Panel: the classes of a wide screen win over the classes of a narrow one.
+    ["rounded-lg", "md:rounded-xl"],
+    ["p-4", "md:p-6"],
+    // EmptyState: the padding of a wide screen wins.
+    ["px-4", "md:px-8"],
+    // StatCard: the padding and the size of the number of a wide screen win.
+    ["p-4", "md:p-5"],
+    ["text-2xl/8", "md:text-3xl/10"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
