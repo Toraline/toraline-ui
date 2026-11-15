@@ -31,6 +31,9 @@ export type { ControlSize } from "./shared/control.js";
 export { Toggle } from "./toggle/index.js";
 export type { ToggleProps } from "./toggle/index.js";
 
+export { TabNav, tabNavVariants } from "./tab-nav/index.js";
+export type { TabNavItem, TabNavProps, TabNavVariant } from "./tab-nav/index.js";
+
 export { Tabs } from "./tabs/index.js";
 export type { TabItem, TabsProps } from "./tabs/index.js";
 

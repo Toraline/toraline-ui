@@ -12,6 +12,21 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - TabNav: the app gives the current path and the link component (TOR-1143)
+- Decision: `TabNav` has the two looks (`primary`, `secondary`) and the class lists of Intraweb's `TabNav` (`components/ui/tab-nav.tsx`). The segmented look is in `packages/ui/src/shared/segmented.ts`, which Tabs also reads.
+- Decision: the app gives the path of the current page in the prop `currentPath`, and its link component in `linkComponent`. The rule for the current tab is Intraweb's: the route of the tab, or a route under it, unless the item has `exact: true`.
+- Why: Intraweb's TabNav calls `usePathname` of `next/navigation` and renders `Link` of `next/link`. The library must not import Next.js. With `currentPath` as a prop the component has no hook, so it needs no `"use client"`.
+- What changes for Intraweb: one small Client Component in Intraweb calls `usePathname()` and renders `<TabNav currentPath={pathname} linkComponent={Link} aria-label={label} ... />`. `items` and `variant` have the same shape. The prop `label` is `aria-label`, the name HTML uses (rule 2 of the props).
+- Decision: `aria-label` is required by the types, as `label` is in Intraweb. A page often has more than one navigation region, and a screen reader needs a name for each.
+- Decision: the current tab is styled by `aria-[current=page]:` classes. Intraweb chooses the classes in its code. This follows the convention that a state is written once, as the attribute a screen reader reads. A test checks that these classes come after the `hover:` classes in the built CSS.
+- Decision: the text of a tab is written as `font-heading text-sm/5 font-medium`, not as the text style class `label` that Intraweb uses. The computed values are the same (Poppins, 14 pixels, a line of 20 pixels, weight 500).
+- Why: the text style classes have their sizes in `rem`, and the test of the styles refuses a length in `rem` in the classes of a component. The three classes also follow the token `--text-sm` when a theme of an app changes it.
+- Decision: the corner of the segmented track is `rounded-[10px]`, the value Intraweb writes. It is not a radius token. No radius token has 10 pixels (`--radius-md` is 8, `--radius-lg` is 12).
+- Decision: the fade of the right edge of `primary` is `calc(100% - var(--spacing) * 8)`, 32 pixels. Intraweb writes `2rem`, the same length.
+- Decision: the playground has 3 routes under `/tab-nav` (`/tab-nav`, `/tab-nav/orders`, `/tab-nav/clients`), joined by a TabNav in each look with the `Link` of Next.js.
+- Alternatives: a hook prop (`usePathname`) given by the app; a `current` flag on each item, computed by the app; the roles `tablist` and `tab` (wrong for links to pages: the WAI-ARIA tabs pattern is for content inside one page); a radius token of 10 pixels.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - TextInput replaces Input; the sizes and classes every form control shares (TOR-1142)
 - Decision: `Input` is removed. `TextInput` is only the text field, with the class lists of Intraweb's `TextInput` (`components/ui/form-controls.tsx`), and `Field` (entry of TOR-1141) has the label, the hint and the error message. `CHANGELOG.md` has the table that moves an app from `Input` to `Field` + `TextInput`.
 - Why: version `0.1.0` is on npm since 2026-11-15, and no app uses it for real yet. Two components that do the same thing would have to be kept alike.

@@ -19,6 +19,11 @@ export default function Page() {
           The components of the library
         </a>
       </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/tab-nav">
+          TabNav: tabs that are links to routes
+        </a>
+      </p>
 
       <section className="mt-6 rounded-xl border border-default bg-surface p-4 shadow-card">
         <h2 className="font-heading text-xl font-bold">A card</h2>

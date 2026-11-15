@@ -225,6 +225,14 @@ export default function ComponentsPage() {
         </Row>
       </Section>
 
+      <Section title="TabNav">
+        <Row label="Tabs that are links to routes. They are on their own pages, because they need routes">
+          <ButtonLink linkComponent={Link} href="/tab-nav" variant="secondary" icon={ArrowRight}>
+            Open the pages of TabNav
+          </ButtonLink>
+        </Row>
+      </Section>
+
       <Section title="Tabs">
         <Row label="The first tab is selected. Use the Left and Right arrow keys">
           <Tabs tabs={orderTabs} aria-label="Orders by kind" className="w-full" />

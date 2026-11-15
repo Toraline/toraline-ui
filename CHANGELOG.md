@@ -38,6 +38,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - IconButton: a button that shows only an icon, with the variants `ghost`, `secondary`, `soft` and `primary` and the sizes `sm`, `md` and `lg` (32, 40 and 48 pixels). The types require `aria-label`.
 - Field: wraps any form control with a label, a hint, an error message with its icon, and the mark of an optional field. It links them to the control for a screen reader: `id`, `aria-describedby` and `aria-invalid`.
 - TextInput: a text field with the sizes `md` and `sm`, an icon on the left (`icon`), and the focus, disabled and not valid looks of Intraweb's text field. The list `controlSizes` and the type `ControlSize` are the sizes of every form control.
+- TabNav: tabs where each tab is a link to a route, in two looks: `primary` (a line under the current tab) and `secondary` (the segmented control). The app gives the current path (`currentPath`) and its link component (`linkComponent`). The current tab has `aria-current="page"`.
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 
 ## 0.1.0 (2026-11-15)

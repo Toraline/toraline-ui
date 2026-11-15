@@ -308,6 +308,44 @@ import { Toggle } from "@toraline.tech/ui";
 - A person who cannot see colors still sees the state: the circle is on the left when off, and on the right with a check mark when on.
 - It has no `"use client"`: it also renders in a Server Component. With `onChange`, the file of the app that gives the function is a Client Component.
 
+### `TabNav`
+
+Tabs where each tab is a link to a route of the app. Use it to move between pages. To change the content inside one page, use [`Tabs`](#tabs).
+
+```tsx
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { TabNav } from "@toraline.tech/ui";
+
+const items = [
+  { href: "/sales", label: "Overview", exact: true },
+  { href: "/sales/orders", label: "Orders" },
+  { href: "/sales/clients", label: "Clients" },
+];
+
+export function SalesTabs() {
+  return <TabNav items={items} currentPath={usePathname()} linkComponent={Link} aria-label="Sales" />;
+}
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `items` | A list of `{ href, label, exact }`. Required | The tabs, in the order they are shown. `href` is the address of the route. `label` is the text. `exact` is optional, see below |
+| `currentPath` | Text. Required | The path of the page the person is on, for example `"/sales/orders/12"`. A Next.js app gives the result of `usePathname()` |
+| `aria-label` | Text. Required | The name of the group of tabs for a screen reader |
+| `variant` | `"primary"` (default), `"secondary"` | The look. `primary`: a row with a line under it, and a line in the brand color under the current tab. `secondary`: the segmented look, where the current tab is a raised white piece |
+| `linkComponent` | A component. When missing: `"a"` | The component that renders each link. It receives `href`, `className`, `aria-current` and `children`. A Next.js app gives the `Link` of `next/link` |
+
+- Which tab is the current one: the tab whose `href` is `currentPath`, or the start of it followed by `/`. So the tab `/sales/orders` is the current one on `/sales/orders/12`. A tab with `exact: true` is the current one only on its own route; give it to a first tab whose route is the start of the others (`/sales`).
+- The two looks and their classes are the ones of the `TabNav` of the app Intraweb. Intraweb's `TabNav` reads the path itself with `usePathname` of Next.js. The library does not import Next.js, so the app gives `currentPath` and `linkComponent`, and the name is `aria-label` (Intraweb: `label`).
+- Main native element: the `<nav>`. `className`, every other prop and `ref` go to it. Each link has `data-slot="link"`. With no item, the component renders nothing.
+- Keyboard: Tab goes through the links, Enter follows one.
+- Screen reader: a navigation region with links. The link of the current page has `aria-current="page"`. The tabs do not have the roles `tablist` and `tab`: those are for tabs that change the content inside one page.
+- Many tabs: `primary` scrolls sideways on a narrow screen, with its right edge faded out, and goes to a second line from the breakpoint `md` of Tailwind CSS (768 pixels). `secondary` scrolls sideways.
+- The list `tabNavVariants` and the types `TabNavProps`, `TabNavItem` and `TabNavVariant` are exported.
+- It has no `"use client"`. The file of the app that calls `usePathname()` is a Client Component.
+
 ### `Tabs`
 
 A row of tabs, and under it the content of the selected tab.

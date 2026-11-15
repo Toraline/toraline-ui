@@ -14,6 +14,7 @@ import {
   Field,
   IconButton,
   SplitButton,
+  TabNav,
   Tabs,
   TextInput,
   Toggle,
@@ -23,6 +24,7 @@ import {
   iconButtonSizes,
   iconButtonVariants,
   splitButtonMenuPlacements,
+  tabNavVariants,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
@@ -132,6 +134,18 @@ async function renderEveryComponent(): Promise<string[]> {
         <TextInput key={size} size={size} icon={PlusIcon} aria-label={`Search, ${size}`} />
       ))}
       <Toggle label="Send e-mails" />
+      {tabNavVariants.map((variant) => (
+        <TabNav
+          key={variant}
+          variant={variant}
+          items={[
+            { href: "/orders", label: "Orders" },
+            { href: "/clients", label: "Clients" },
+          ]}
+          currentPath="/orders"
+          aria-label={`Sales, ${variant}`}
+        />
+      ))}
       <Tabs tabs={tabs} />
       <BreadCrumbs crumbs={crumbs} />
       {splitButtonMenuPlacements.map((menuPlacement) => (
@@ -305,6 +319,12 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["text-icon", "group-has-disabled/toggle:text-muted"],
     ["text-brand", "group-has-disabled/toggle:text-inverse"],
     ["text-body", "has-disabled:text-tertiary"],
+    // TabNav: the current tab wins over the look at rest and over the pointer over it.
+    ["hover:text-primary", "aria-[current=page]:text-brand"],
+    ["hover:text-primary", "aria-[current=page]:text-primary"],
+    ["border-transparent", "aria-[current=page]:border-brand"],
+    // TabNav: the classes of a wide screen win over the classes of a narrow one.
+    ["overflow-x-auto", "md:overflow-visible"],
     // Tabs: the selected tab wins over the pointer over it.
     ["hover:text-primary", "aria-selected:text-brand"],
     ["border-b-transparent", "aria-selected:border-b-brand"],
