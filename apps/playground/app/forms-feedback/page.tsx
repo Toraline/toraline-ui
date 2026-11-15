@@ -1,4 +1,4 @@
-import { Plus, Users } from "lucide-react";
+import { Plus, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -11,11 +11,13 @@ import {
   Field,
   Panel,
   Select,
+  StatCard,
   StatusBadge,
   Textarea,
   controlSizes,
   countBadgeVariants,
   parseDecimalInput,
+  statCardTones,
   statusBadgeVariants,
 } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
@@ -229,6 +231,27 @@ export default function FormsFeedbackPage() {
           Add the first client to start a contract. The icon comes from this page, a Server
           Component.
         </EmptyState>
+      </div>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">StatCard</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {statCardTones.map((tone) => (
+          <StatCard
+            key={tone}
+            tone={tone}
+            label={`Sales of the month, ${tone}`}
+            value="R$ 12.400"
+            icon={ShoppingCart}
+            trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+          />
+        ))}
+        <StatCard label="Orders" value={86} />
+        <StatCard
+          label="Costs of the month"
+          value="R$ 3.100"
+          trend={{ direction: "up", value: "5%", comparison: "vs. last month", upIsGood: false }}
+        />
+        <StatCard label="Late orders" value={2} trend={{ direction: "down", value: "8%" }} />
       </div>
     </main>
   );

@@ -207,6 +207,14 @@ test.each([lightTheme, darkTheme])(
       ["text-warning", "bg-warning"],
       ["text-error", "bg-error"],
       ["text-info", "bg-info"],
+      // StatCard in the tone "tinted": the label, the number, the change and what it is compared with.
+      ["text-secondary", "bg-primary-subtle"],
+      ["text-primary", "bg-primary-subtle"],
+      ["text-success", "bg-primary-subtle"],
+      ["text-danger", "bg-primary-subtle"],
+      ["text-tertiary", "bg-primary-subtle"],
+      // StatCard in the tone "default": a change that is good.
+      ["text-success", "bg-surface"],
     ];
     for (const [foreground, background] of pairs) {
       expect(

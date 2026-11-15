@@ -44,6 +44,8 @@ export type ThemeInput = {
     sm?: string;
     base?: string;
     lg?: string;
+    "2xl"?: string;
+    "3xl"?: string;
   };
   /**
    * The spacing unit. Every padding and gap of a component is a multiple of it.
@@ -170,9 +172,9 @@ export function createTheme(input: ThemeInput): string {
   }
 
   for (const [sizeName, value] of Object.entries(input.textSizes ?? {})) {
-    if (!["xs", "sm", "base", "lg"].includes(sizeName)) {
+    if (!["xs", "sm", "base", "lg", "2xl", "3xl"].includes(sizeName)) {
       throw new Error(
-        `createTheme: "${sizeName}" is not a text size of the library. The text sizes are "xs", "sm", "base" and "lg".`,
+        `createTheme: "${sizeName}" is not a text size of the library. The text sizes are "xs", "sm", "base", "lg", "2xl" and "3xl".`,
       );
     }
     assertValue(value, `the text size "${sizeName}"`);

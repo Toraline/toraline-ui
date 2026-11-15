@@ -520,7 +520,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
    - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
-4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg`, written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
+4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg` (and `text-2xl` and `text-3xl` for the large number of StatCard), written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a width in pixels that is not a step of the spacing scale (`border-[1.5px]`), a size in `em` or `%`, a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
 7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`, then a breakpoint (`md:`, `lg:`). When that order is not the one needed, the class names both conditions: `disabled:hover:border-default`.
@@ -772,3 +772,43 @@ import { Button, EmptyState } from "@toraline.tech/ui";
 - Every text is given by the app. The library has no default title.
 - Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title`. The inner parts have `data-slot`: `icon`, `title`, `description`, `action`.
 - The type `EmptyStateProps` is exported. It has no `"use client"`, so a Server Component can give it an icon component.
+
+### `StatCard`
+
+A card with one number: a label, the number, and how it changed since an earlier period.
+
+```tsx
+import { ShoppingCart } from "lucide-react";
+import { StatCard } from "@toraline.tech/ui";
+
+<StatCard
+  label="Sales of the month"
+  value="R$ 12.400"
+  icon={ShoppingCart}
+  tone="tinted"
+  trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements, required | What the number is: a heading of level 3 (`<h3>`) |
+| `value` | Text, a number or elements, required | The number, already written as the app wants it shown |
+| `icon` | An icon component | An icon in a box of 40 pixels before the label. See [Icons](#icons). It is decoration: a screen reader skips it |
+| `tone` | `"default"` (default), `"tinted"` | `default`: a white card. `tinted`: the quiet brand color, for the number that matters most |
+| `trend` | An object, see below | How the number changed, shown under the number |
+
+The object of `trend` (the type `StatCardTrend`):
+
+| Key | Values | Meaning |
+|---|---|---|
+| `direction` | `"up"`, `"down"`, required | `up`: the number grew. `down`: it fell. It gives the arrow and the sign before the value: `+` or `−` |
+| `value` | Text, required | How much it changed, with no sign: `"12%"`, `"3 h"` |
+| `comparison` | Text | What it is compared with: `"vs. last month"` |
+| `upIsGood` | `true` (default), `false` | `true` when a number that grows is good (sales), `false` when it is bad (costs). It gives the color: green for good, red for bad |
+
+- The number is 24 pixels, and 32 pixels from the breakpoint `md` of Tailwind CSS, in the weight 600 of the heading font, with digits of the same width.
+- The app writes every text and formats every number. The card adds only the sign of the change.
+- The color of the change says good or bad. The sign says the direction, so the color is not the only way to read it. A screen reader reads the sign, the value and the comparison.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. It has `data-tone`. The inner parts have `data-slot`: `header`, `icon`, `label`, `value`, `trend`, `trend-value` (with `data-direction` and `data-meaning`), `trend-icon`, `trend-comparison`.
+- The list `statCardTones` and the types `StatCardProps`, `StatCardTone` and `StatCardTrend` are exported. It has no `"use client"`.

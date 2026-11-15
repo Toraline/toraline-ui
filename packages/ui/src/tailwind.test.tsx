@@ -35,9 +35,11 @@ import {
   EmptyState,
   Panel,
   Select,
+  StatCard,
   StatusBadge,
   Textarea,
   countBadgeVariants,
+  statCardTones,
   statusBadgeVariants,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
@@ -206,6 +208,17 @@ async function renderEveryComponent(): Promise<string[]> {
         The orders are shown here.
       </EmptyState>
       <EmptyState title="No client yet" icon={PlusIcon} />
+      {statCardTones.map((tone) => (
+        <StatCard
+          key={tone}
+          tone={tone}
+          label="Sales"
+          value="R$ 1.200"
+          icon={PlusIcon}
+          trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+        />
+      ))}
+      <StatCard label="Costs" value="R$ 300" trend={{ direction: "up", value: "5%", upIsGood: false }} />
     </ThemeProvider>,
   );
 
@@ -372,6 +385,9 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["p-4", "md:p-6"],
     // EmptyState: the padding of a wide screen wins.
     ["px-4", "md:px-8"],
+    // StatCard: the padding and the size of the number of a wide screen win.
+    ["p-4", "md:p-5"],
+    ["text-2xl/8", "md:text-3xl/10"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

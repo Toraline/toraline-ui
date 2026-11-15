@@ -55,6 +55,8 @@ The components get the shape of the same components of the app Intraweb: variant
 - CountBadge (phase 8): a small pill with a number, in the variants `warning` and `brand`. `label` says what the number means to a screen reader.
 - Panel (phase 8): the card that groups content, with an optional title, subtitle and actions.
 - EmptyState (phase 8): what a list or a page shows when it has nothing to show: an icon, a title, a text and one action.
+- StatCard (phase 8): a card with one number, its label, an icon and how the number changed, in the tones `default` and `tinted`.
+- `@toraline.tech/tokens` (phase 8): the tokens `--text-2xl` (the class `text-2xl`, 24 pixels) and `--text-3xl` (the class `text-3xl`, 32 pixels), the font sizes of the number of StatCard. `createTheme` accepts `textSizes["2xl"]` and `textSizes["3xl"]`. There are now 78 level 2 tokens. With the preset, the class `text-3xl` is 32 pixels; with Tailwind CSS alone it is 30 pixels. An app that uses `text-3xl` with the preset gets text 2 pixels larger.
 
 ## 0.1.0 (2026-11-15)
 

@@ -71,3 +71,6 @@ export type { PanelProps } from "./panel/index.js";
 
 export { EmptyState } from "./empty-state/index.js";
 export type { EmptyStateProps } from "./empty-state/index.js";
+
+export { StatCard, statCardTones } from "./stat-card/index.js";
+export type { StatCardProps, StatCardTone, StatCardTrend } from "./stat-card/index.js";
