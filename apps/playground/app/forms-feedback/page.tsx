@@ -6,9 +6,11 @@ import {
   DecimalInput,
   Field,
   Select,
+  StatusBadge,
   Textarea,
   controlSizes,
   parseDecimalInput,
+  statusBadgeVariants,
 } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 
@@ -158,6 +160,19 @@ export default function FormsFeedbackPage() {
           <label htmlFor="task-flowers" className="text-sm text-body">
             Buy the flowers
           </label>
+        </Row>
+      </Section>
+
+      <Section title="StatusBadge">
+        <Row label="Variants">
+          {statusBadgeVariants.map((variant) => (
+            <StatusBadge key={variant} variant={variant} label={variant} />
+          ))}
+        </Row>
+        <Row label="With a dot">
+          {statusBadgeVariants.map((variant) => (
+            <StatusBadge key={variant} variant={variant} label={variant} dot />
+          ))}
         </Row>
       </Section>
     </main>

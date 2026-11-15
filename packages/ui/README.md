@@ -671,3 +671,24 @@ import { Checkbox, CheckboxControl } from "@toraline.tech/ui";
 - A checkbox has no look for "not valid" and no state "partly checked" (indeterminate): Intraweb has neither.
 - A box with `changed` has the attribute `data-changed="true"`.
 - The types `CheckboxProps` and `CheckboxControlProps` are exported. Neither has `"use client"`.
+
+### `StatusBadge`
+
+A badge that shows the state of a thing: a short text on a pill in the color of its meaning.
+
+```tsx
+import { StatusBadge } from "@toraline.tech/ui";
+
+<StatusBadge label="Paid" variant="success" dot />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements, required | The text of the badge |
+| `variant` | `"neutral"` (default), `"success"`, `"warning"`, `"error"`, `"info"` | The look. `neutral`: a state with no meaning of good or bad. `success`: done or good. `warning`: needs attention. `error`: failed or bad. `info`: a fact |
+| `dot` | `true`, `false` (default) | `true` shows a dot of 6 pixels in the stronger color of the variant, before the text |
+
+- The text is 12 pixels in the weight 500 of the heading font, and stays on one line.
+- The text must say the state by itself. The color and the dot are decoration; a screen reader skips the dot.
+- Main native element: the `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The dot has `data-slot="dot"`.
+- The list `statusBadgeVariants` and the types `StatusBadgeProps` and `StatusBadgeVariant` are exported. It has no `"use client"`.

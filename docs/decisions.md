@@ -49,6 +49,14 @@ Format of one entry:
 - Contrast: the border of a box that is not checked is `--border-strong` on `--bg-surface`, 1.47 (light) and 1.82 (dark), below the 3 that WCAG 1.4.11 asks for the edge of a control. The pair is already in the "known" test of `packages/tokens/src/tokens.test.ts` and in the entry of TOR-1133, for the switch of Toggle. The token was not changed.
 - Alternatives: a `data-changed:` class with the two conditions written out (`checked:data-changed:border-brand`, `hover:data-changed:border-hover`); a new Tailwind class `ring-warning` in the preset of the tokens.
 
+### StatusBadge (TOR-1150)
+- Decision: `StatusBadge` has the props (`label`, `variant`, `dot`), the 5 variants and the class lists of Intraweb's `components/ui/status-badge.tsx`. The text is the prop `label`, as in Intraweb, not `children`, so a screen of Intraweb needs no change. `label` accepts text or elements.
+- Decision: the list `statusBadgeVariants` starts with `neutral`, the default, as the convention of the lists asks.
+- Decision: the text is `font-heading text-xs/4 font-medium`, the computed values of Intraweb's text style `label-sm` (entry of TOR-1143: a text style class has its sizes in `rem`).
+- Decision (the neutral dot): `bg-current text-muted`. Intraweb writes `bg-slate-400`, a level 1 color, which rule 3 of "Styles" does not allow. `--text-muted` is `--color-slate-400` in the light theme, so the light theme is equal. In the dark theme the dot is `#61646c` (Intraweb: `#98a2b3` in both themes). The dot is decoration.
+- Decision: the component also accepts `className`, the other props of `<span>` and `ref` (Intraweb's accepts none), as every component of the library.
+- Alternatives: `children` for the text; a new token for the grey of the neutral dot.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

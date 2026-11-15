@@ -191,3 +191,28 @@ test("packages/tokens/README.md documents every level 2 token", () => {
     expect(readme).toContain(`\`--${name}\``);
   }
 });
+
+/*
+ * Phase 8 (TOR-1124): the pairs of the form controls and the feedback
+ * components. The pairs of each later component are added at the end of these lists.
+ */
+
+test.each([lightTheme, darkTheme])(
+  "phase 8, in the $name theme: the text of a badge, a card and a progress bar can be read on its background (contrast of 4.5 or more)",
+  (theme) => {
+    const pairs: [ThemeTokenName, ThemeTokenName][] = [
+      // StatusBadge: the text of each variant on its own background.
+      ["text-secondary", "bg-muted"],
+      ["text-success", "bg-success"],
+      ["text-warning", "bg-warning"],
+      ["text-error", "bg-error"],
+      ["text-info", "bg-info"],
+    ];
+    for (const [foreground, background] of pairs) {
+      expect(
+        contrastRatio(theme, foreground, background),
+        `${foreground} on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  },
+);

@@ -59,3 +59,6 @@ export type { DecimalInputProps } from "./decimal-input/index.js";
 
 export { Checkbox, CheckboxControl } from "./checkbox/index.js";
 export type { CheckboxControlProps, CheckboxProps } from "./checkbox/index.js";
+
+export { StatusBadge, statusBadgeVariants } from "./status-badge/index.js";
+export type { StatusBadgeProps, StatusBadgeVariant } from "./status-badge/index.js";

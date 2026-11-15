@@ -27,7 +27,15 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 8: forms and feedback.
-import { Checkbox, CheckboxControl, DecimalInput, Select, Textarea } from "./index";
+import {
+  Checkbox,
+  CheckboxControl,
+  DecimalInput,
+  Select,
+  StatusBadge,
+  Textarea,
+  statusBadgeVariants,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -181,6 +189,9 @@ async function renderEveryComponent(): Promise<string[]> {
       <Checkbox label="Send the invoice by e-mail" />
       <CheckboxControl aria-label="Paid" />
       <CheckboxControl aria-label="Paid, changed" changed />
+      {statusBadgeVariants.map((variant) => (
+        <StatusBadge key={variant} variant={variant} label="State" dot />
+      ))}
     </ThemeProvider>,
   );
 
