@@ -19,6 +19,7 @@
   --color-primary-hover: var(--purple-100);
   --color-primary-foreground: var(--grey-900);
   --color-danger: var(--red-300);
+  --color-danger-hover: var(--red-200);
   --color-danger-foreground: var(--grey-900);
   --color-success: var(--green-400);
   --color-success-foreground: var(--grey-900);
@@ -28,6 +29,12 @@
   --font-body: var(--font-stack-sans);
   --font-heading: var(--font-stack-sans);
   --font-mono: var(--font-stack-mono);
+
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+
+  --spacing: var(--space-1);
 
   --radius: var(--radius-size-md);
   --shadow: var(--shadow-size-md);

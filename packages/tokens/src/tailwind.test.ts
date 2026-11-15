@@ -61,6 +61,10 @@ describe("css/tailwind.css, the Tailwind preset", () => {
       "font-mono",
       "rounded",
       "shadow",
+      "text-sm",
+      "text-base",
+      "text-lg",
+      "p-4",
     ]);
 
     for (const colorName of colorNames) {
@@ -74,6 +78,11 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     expect(css).toContain(".font-mono { font-family: var(--font-mono); }");
     expect(css).toContain(".rounded { border-radius: var(--radius); }");
     expect(css).toContain("--tw-shadow: var(--shadow);");
+    for (const sizeName of ["sm", "base", "lg"]) {
+      expect(css).toContain(`.text-${sizeName} { font-size: var(--text-${sizeName});`);
+    }
+    expect(css).toContain(".p-4 { padding: calc(var(--spacing) * 4); }");
+    expect(css).toContain("--spacing: var(--space-1);");
   });
 
   test("the built CSS has both themes, so data-theme changes what the classes show", async () => {

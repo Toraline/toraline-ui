@@ -1,6 +1,9 @@
 /*
  * The styles of the components of @toraline/ui.
  *
+ * Each component has one file in this folder, and this file imports them all.
+ * An app imports only this file: @import "@toraline/ui/styles.css".
+ *
  * Every rule is inside the cascade layer "components". A cascade layer is a
  * named group of CSS rules with a fixed priority. Tailwind CSS puts its
  * classes in the layer "utilities", which has a higher priority, so a class
@@ -10,32 +13,9 @@
  * The first line gives the layers the same order Tailwind CSS gives them, so
  * the order is the same when this file loads before Tailwind CSS.
  *
- * The rules use only level 2 tokens of @toraline/tokens.
+ * The rules use only level 2 tokens of @toraline/tokens. A test
+ * (src/styles.test.ts) checks the rules of this folder.
  */
 @layer theme, base, components, utilities;
 
-@layer components {
-  .tui-theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    padding: 0.5em 1em;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius);
-    background-color: var(--color-surface-raised);
-    color: var(--color-text);
-    font-family: var(--font-body);
-    font-size: inherit;
-    line-height: 1.5;
-    cursor: pointer;
-  }
-
-  .tui-theme-toggle:hover {
-    background-color: var(--color-surface-muted);
-  }
-
-  .tui-theme-toggle:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
-  }
-}
+@import "./theme-toggle.css";

@@ -1,6 +1,14 @@
 # @toraline/ui
 
-The styled React components of the Toraline component library. Today it has the parts that control the theme: a provider, a hook and a toggle button. The other components (buttons, inputs and the rest) arrive in phase 3.
+The styled React components of the Toraline component library.
+
+| What | Import from | State |
+|---|---|---|
+| The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. None is built yet |
+| The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
+
+The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
 
 A theme is a set of colors, fonts and corner sizes. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline/tokens`](../tokens/README.md).
 
@@ -90,3 +98,74 @@ A button. Each press shows the next theme of `themes`. After the last theme it g
 ## Styling on top
 
 The styles of the library are in the cascade layer `components`. A cascade layer is a named group of CSS rules with a fixed priority. A Tailwind CSS class (layer `utilities`) and the CSS of an app that is in no layer both win over the library's styles. Example: `<ThemeToggle className="rounded-full" />`.
+
+Every component accepts `className`. The classes go on the outermost element of the component. A component with more than one element gives each inner element a class named `tui-<component>__<part>`, for example `tui-input__field`. An app can use these class names in its own CSS.
+
+## Rules every component follows
+
+These rules were decided in TOR-1009. The reasons are in [`docs/decisions.md`](../../docs/decisions.md). The folder [`src/template/`](src/template/README.md) is a small component that follows all of them: copy it to start a new component.
+
+### Files
+
+| File | Content |
+|---|---|
+| `src/<name>/<Name>.tsx` | The component |
+| `src/<name>/<Name>.test.tsx` | Its tests |
+| `src/<name>/index.ts` | What the folder exports |
+| `css/<name>.css` | Its styles. `css/styles.css` imports the file |
+| `src/index.ts` | Exports the component and its types from `@toraline/ui` |
+
+### Variants, sizes and states
+
+A variant is one of the looks of a component, for example `primary` or `danger`.
+
+1. The variants are one list in the component's file, and the type comes from the list: `export const buttonVariants = ["primary", "secondary"] as const`. Sizes work the same way (`buttonSizes`). The lists are exported, so a test or a catalog can show every value.
+2. The component writes the variant and the size on its element as the attributes `data-variant` and `data-size`. The CSS selects them: `.tui-button[data-variant="primary"]`.
+3. A state (disabled, loading, error, selected, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The CSS selects the same attribute, for example `.tui-input__field[aria-invalid="true"]`. The look and what a screen reader says cannot differ, because both come from one attribute.
+
+### Props
+
+1. The props type is the props of the native HTML element plus the component's own props: `ComponentProps<"button"> & { variant?: ButtonVariant }`. Each own prop has a short comment.
+2. A prop has the name HTML or React already uses when one exists: `disabled`, `checked`, `href`, `onChange`.
+3. `className` is joined with the helper `classNames("tui-<name>", className)` from `src/shared/class-names.ts`, and goes on the outermost element.
+4. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
+5. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
+6. A file starts with `"use client"` only when the component uses React state, an effect, or an event handler of its own. `"use client"` tells Next.js that the file runs in the browser. A component without it can also render in a Server Component.
+
+### Behaviour and accessibility
+
+1. A component uses the native HTML element that already has the behaviour: `<button>`, `<input>`, `<label>`, `<a>`, `<nav>`. The browser then gives the keyboard and the screen reader support.
+2. Behaviour that HTML does not have (arrow keys between tabs, a menu) is written by hand in the component, following the pattern of the WAI-ARIA Authoring Practices Guide (https://www.w3.org/WAI/ARIA/apg/patterns/). The package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles, for example Base UI, Radix or React Aria.
+3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
+4. Every element that can get focus shows the focus ring: `outline: 2px solid var(--color-focus-ring); outline-offset: 2px;` under `:focus-visible`.
+5. An icon that is only decoration has `aria-hidden="true"`. An icon is drawn with `currentColor`, so it has the color of the text.
+6. A movement or a transition is inside `@media (prefers-reduced-motion: no-preference)`, so a person who asked the device for less motion gets none.
+
+### Styles
+
+1. Every rule is inside `@layer components`, and every class name starts with `tui-`.
+2. A CSS variable in a component's styles is always a level 2 token of `@toraline/tokens`. A component never uses a level 1 token and never defines a variable of its own.
+3. A color is always a color token. `currentColor` and `transparent` are allowed.
+4. A font size is `--text-sm`, `--text-base` or `--text-lg`. A font is `--font-body`, `--font-heading` or `--font-mono`.
+5. A padding, a margin and a gap are a multiple of the spacing unit: `calc(var(--spacing) * 4)`.
+6. These are written as plain values, because they do not change with the theme: the width of a border or an outline in `px`, a line height, a font weight, a size in `em` or `%` (a size in `em` follows the font size of the component), a duration, and a `z-index`. A length in `rem` is never used.
+7. Text on its background has a contrast of 4.5 or more in both themes. Each pair of text token and background token that a component uses is in the contrast test of `packages/tokens/src/tokens.test.ts`.
+
+The test `src/styles.test.ts` checks rules 1 to 5 on every CSS file, and that a Tailwind class wins over the library's styles.
+
+### What every component's test covers
+
+The tests use Vitest, Testing Library and `@testing-library/user-event`, which presses keys the way a person does.
+
+1. It renders, with the right role and accessible name. The accessible name is the text a screen reader says for the element.
+2. Each variant and each size, from the exported lists.
+3. Each state, read from the attribute a screen reader reads.
+4. `className` from the app is on the outermost element, after the library's class.
+5. Another native attribute reaches the main native element, and `ref` points to it.
+6. The keyboard: every key the component answers to.
+7. A component with no `"use client"` renders on the server (`renderToString`).
+
+### After the code
+
+1. The component is on the page of `apps/playground`, with every variant and state.
+2. This file has the component's props and one short example.

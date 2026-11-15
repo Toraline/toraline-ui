@@ -4,5 +4,5 @@
 @import "@toraline/tokens/css/tailwind.css";
 /* The themes of this app and the classes of the colors it added, built from theme.config.ts. */
 @import "./theme.generated.css";
-/* The styles of the library's components (today: the theme toggle). */
+/* The styles of the library's components. */
 @import "@toraline/ui/styles.css";

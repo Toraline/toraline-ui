@@ -21,7 +21,7 @@
     },
     "./theme": {
       "types": "./dist/theme/index.d.ts",
-      "import": "./dist/theme.js"
+      "import": "./dist/theme/index.js"
     },
     "./styles.css": "./css/styles.css"
   },

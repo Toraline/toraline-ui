@@ -53,7 +53,7 @@ primitives["purple-500"]; // "#5e00a1"
 
 ## Build a theme for an app: `createTheme`
 
-`createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts and change the radius. A value the app does not give comes from the default theme.
+`createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts, the text sizes, the spacing unit and the radius. A value the app does not give comes from the default theme.
 
 ```ts
 import { createTheme } from "@toraline/tokens";
@@ -68,7 +68,7 @@ const css = createTheme({
 });
 ```
 
-`css` is this text. The 18 lines that are not shown have the values of the light theme:
+`css` is this text. The 23 lines that are not shown have the values of the light theme:
 
 ```css
 [data-theme="ocean"] {
@@ -94,6 +94,8 @@ The input, type `ThemeInput`:
 | `isDefault` | No | `true`: the theme also applies when `<html>` has no `data-theme` |
 | `colors` | No | The key is a color name without `color-`. A key the library has (`primary`, `text-muted`, ...) changes that color. Any other key (`brand`) adds the token `--color-<key>`. The value is any CSS color |
 | `fonts` | No | `body`, `heading`, `mono`. The value is any CSS `font-family` value |
+| `textSizes` | No | `sm`, `base`, `lg`. The value is any CSS length. Changes `--text-sm`, `--text-base`, `--text-lg` |
+| `spacing` | No | Any CSS length. Changes `--spacing`, the unit of every padding and gap of a component |
 | `radius` | No | Any CSS length |
 
 To change the light or the dark theme of the library, use its name: `createTheme({ name: "dark", base: "dark", colors: { primary: "#88ccff" } })`. The block comes later in the page than the library's block, so its values win.
@@ -167,6 +169,8 @@ Each class reads the CSS variable when the page is shown. Changing `data-theme` 
 |---|---|
 | Each `--color-<name>` | Every Tailwind color class with `<name>`: `bg-<name>`, `text-<name>`, `border-<name>`, `outline-<name>`, `ring-<name>`, `fill-<name>` and the others. Examples: `bg-primary`, `text-surface`, `text-text-muted`, `border-border`, `outline-focus-ring` |
 | `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page |
+| `--text-sm`, `--text-base`, `--text-lg` | `text-sm`, `text-base`, `text-lg`. Tailwind already has these classes, with the same sizes. With the preset they read the token |
+| `--spacing` | It is the unit of every Tailwind spacing class: `p-4` is `calc(var(--spacing) * 4)`. Tailwind already uses this variable, with the same value |
 | `--radius` | `rounded`, and the classes for one side or one corner, for example `rounded-t` |
 | `--shadow` | `shadow` |
 
@@ -230,7 +234,7 @@ const html = `<head><script>${createThemeScript()}</script></head>`;
 
 ## Level 2 tokens: the full list
 
-Every theme gives a value to each of these 21 tokens.
+Every theme gives a value to each of these 26 tokens.
 
 | Token | What it is for | Light | Dark |
 |---|---|---|---|
@@ -245,6 +249,7 @@ Every theme gives a value to each of these 21 tokens.
 | `--color-primary-hover` | Main action while the pointer is over it | `--purple-700` | `--purple-100` |
 | `--color-primary-foreground` | Text and icons on top of `--color-primary` | `--white` | `--grey-900` |
 | `--color-danger` | Error, or an action that deletes | `--red-600` | `--red-300` |
+| `--color-danger-hover` | An action that deletes, while the pointer is over it | `--red-700` | `--red-200` |
 | `--color-danger-foreground` | Text and icons on top of `--color-danger` | `--white` | `--grey-900` |
 | `--color-success` | Success | `--green-700` | `--green-400` |
 | `--color-success-foreground` | Text and icons on top of `--color-success` | `--white` | `--grey-900` |
@@ -253,12 +258,16 @@ Every theme gives a value to each of these 21 tokens.
 | `--font-body` | Font of normal text | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-heading` | Font of headings | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-mono` | Font of code | `--font-stack-mono` | `--font-stack-mono` |
+| `--text-sm` | Font size of small text: a small button, a label, an error message | `--font-size-sm` | `--font-size-sm` |
+| `--text-base` | Font size of normal text in a component | `--font-size-md` | `--font-size-md` |
+| `--text-lg` | Font size of large text: a large button | `--font-size-lg` | `--font-size-lg` |
+| `--spacing` | The spacing unit. A component writes every padding and gap as a multiple of it: `calc(var(--spacing) * 4)` | `--space-1` | `--space-1` |
 | `--radius` | How round the corners of a component are | `--radius-size-md` | `--radius-size-md` |
 | `--shadow` | Shadow of a raised part | `--shadow-size-sm` | `--shadow-size-md` |
 
 Each theme also sets the CSS property `color-scheme` (`light` or `dark`). It tells the browser which look to give to its own parts, for example scroll bars.
 
-A test checks the contrast of the text colors on their backgrounds in both themes. Contrast is how different two colors are, from 1 (the same) to 21 (black on white). The test requires 4.5 or more for text and 3 or more for the focus ring and the strong border.
+A test checks the contrast of the text colors on their backgrounds in both themes. Contrast is how different two colors are, from 1 (the same) to 21 (black on white). The test requires 4.5 or more for text and 3 or more for the parts that are not text: the focus ring, the strong border, and the colors that fill or outline a control.
 
 ## Level 1 tokens
 
@@ -266,7 +275,7 @@ A test checks the contrast of the text colors on their backgrounds in both theme
 |---|---|
 | Purple | `--purple-50`, `--purple-100`, `--purple-200`, `--purple-300`, `--purple-400`, `--purple-500`, `--purple-600`, `--purple-700` |
 | Grey | `--grey-100` (white) to `--grey-900` (darkest), in steps of 100 |
-| Red | `--red-300`, `--red-500`, `--red-600` |
+| Red | `--red-200`, `--red-300`, `--red-500`, `--red-600`, `--red-700` |
 | Green | `--green-300`, `--green-400`, `--green-500`, `--green-700` |
 | Black and white | `--black`, `--white` |
 | Spacing | `--space-1`, `--space-2`, `--space-3`, `--space-4`, `--space-6`, `--space-8`, `--space-12`, `--space-16`. The number is a multiple of `0.25rem` |
@@ -275,7 +284,7 @@ A test checks the contrast of the text colors on their backgrounds in both theme
 | Radius sizes | `--radius-size-none`, `--radius-size-sm`, `--radius-size-md`, `--radius-size-lg`, `--radius-size-full` |
 | Shadow sizes | `--shadow-size-sm`, `--shadow-size-md`, `--shadow-size-lg` |
 
-Spacing and font sizes exist only at level 1 today. No level 2 token uses them yet.
+The level 2 tokens `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 4 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
 
 ### Where the colors come from
 
@@ -295,7 +304,7 @@ The colors of the old library (`legacy/src/lib/config/theme.ts`) are the startin
 | `green100` (`#7EC36D`) | `--green-400` |
 | `greenSlider` (`#68A15F`) | `--green-500` |
 
-These 5 colors are new: `--purple-50`, `--purple-400`, `--red-300`, `--red-600`, `--green-700`. The old colors `purpleSlider`, `greyTransparent` and `blackTransparent` have no token.
+These 7 colors are new: `--purple-50`, `--purple-400`, `--red-200`, `--red-300`, `--red-600`, `--red-700`, `--green-700`. The old colors `purpleSlider`, `greyTransparent` and `blackTransparent` have no token.
 
 ## Rule for changes
 

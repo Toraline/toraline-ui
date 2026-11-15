@@ -47,6 +47,19 @@ describe("createTheme", () => {
     expect(readCssVariables(css)).toEqual({ ...darkTheme.tokens, radius: "0" });
   });
 
+  test("a changed text size and a changed spacing unit", () => {
+    const css = createTheme({ name: "compact", textSizes: { base: "0.9375rem" }, spacing: "0.2rem" });
+    expect(readCssVariables(css)).toEqual({
+      ...lightTheme.tokens,
+      "text-base": "0.9375rem",
+      spacing: "0.2rem",
+    });
+    expect(() =>
+      createTheme({ name: "compact", textSizes: { huge: "3rem" } as { base: string } }),
+    ).toThrow(/not a text size/);
+    expect(() => createTheme({ name: "compact", spacing: "1px; }" })).toThrow(/the spacing/);
+  });
+
   test("with isDefault, the theme also applies to a page with no data-theme", () => {
     const css = createTheme({ name: "light", isDefault: true });
     expect(css.startsWith(':root,\n[data-theme="light"] {\n')).toBe(true);
