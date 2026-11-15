@@ -1,0 +1,26 @@
+/* The styles of ThemeToggle, the button that changes the theme. */
+@layer components {
+  .tui-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius);
+    background-color: var(--color-surface-raised);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .tui-theme-toggle:hover {
+    background-color: var(--color-surface-muted);
+  }
+
+  .tui-theme-toggle:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}

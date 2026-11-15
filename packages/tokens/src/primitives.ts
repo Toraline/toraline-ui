@@ -25,9 +25,11 @@ export const primitives = {
   "grey-800": "#27303e",
   "grey-900": "#0f1928",
 
+  "red-200": "#f8a3a3",
   "red-300": "#f47878",
   "red-500": "#f04848",
   "red-600": "#d92d2d",
+  "red-700": "#b42020",
 
   "green-300": "#84d235",
   "green-400": "#7ec36d",

@@ -87,6 +87,11 @@ test.each([lightTheme, darkTheme])(
       ["color-primary-foreground", "color-primary-hover"],
       ["color-danger", "color-surface"],
       ["color-danger-foreground", "color-danger"],
+      ["color-danger-foreground", "color-danger-hover"],
+      // Pairs the components of @toraline/ui use (TOR-997).
+      ["color-primary", "color-surface-raised"],
+      ["color-primary", "color-surface-muted"],
+      ["color-text-muted", "color-surface-raised"],
       ["color-success", "color-surface"],
       ["color-success-foreground", "color-success"],
     ];
@@ -104,6 +109,10 @@ test.each([lightTheme, darkTheme])(
   (theme) => {
     expect(contrastRatio(theme, "color-focus-ring", "color-surface")).toBeGreaterThanOrEqual(3);
     expect(contrastRatio(theme, "color-border-strong", "color-surface")).toBeGreaterThanOrEqual(3);
+    // The track of a switch that is on, and the border of a field with an error.
+    expect(contrastRatio(theme, "color-success", "color-surface")).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(theme, "color-danger", "color-surface")).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(theme, "color-primary", "color-surface")).toBeGreaterThanOrEqual(3);
   },
 );
 

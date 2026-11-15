@@ -34,6 +34,17 @@ export type ThemeInput = {
     heading?: string;
     mono?: string;
   };
+  /** Font sizes of the components. The value is any CSS length, for example "0.9375rem". */
+  textSizes?: {
+    sm?: string;
+    base?: string;
+    lg?: string;
+  };
+  /**
+   * The spacing unit. Every padding and gap of a component is a multiple of it.
+   * Any CSS length. A smaller value makes every component more compact.
+   */
+  spacing?: string;
   /** How round the corners are. Any CSS length, for example "0.25rem". */
   radius?: string;
 };
@@ -98,6 +109,21 @@ export function createTheme(input: ThemeInput): string {
     }
     assertValue(value, `the font "${fontName}"`);
     tokens[`font-${fontName}`] = value;
+  }
+
+  for (const [sizeName, value] of Object.entries(input.textSizes ?? {})) {
+    if (!["sm", "base", "lg"].includes(sizeName)) {
+      throw new Error(
+        `createTheme: "${sizeName}" is not a text size of the library. The text sizes are "sm", "base" and "lg".`,
+      );
+    }
+    assertValue(value, `the text size "${sizeName}"`);
+    tokens[`text-${sizeName}`] = value;
+  }
+
+  if (input.spacing !== undefined) {
+    assertValue(input.spacing, "the spacing");
+    tokens.spacing = input.spacing;
   }
 
   if (input.radius !== undefined) {
