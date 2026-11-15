@@ -25,9 +25,9 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be a test version, `0.1.0`, and the command of step 2 is written for it.
+The packages are on npm since 2026-11-15, version `0.1.0`.
 
-To use the library before the release, build the two package files in this repository and install them in the app:
+To try a change of the library that is not released yet, build the two package files in this repository and install them in the app:
 
 ```bash
 make pack     # in this repository; writes 2 files into .pack/tarballs/

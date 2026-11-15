@@ -4,7 +4,7 @@ The design tokens and the themes of the Toraline component library. A design tok
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline.tech/tokens` is not on the npm registry. The first version will be `0.1.0`.
+The package is on npm since 2026-11-15. The first version is `0.1.0`.
 
 After the first release:
 

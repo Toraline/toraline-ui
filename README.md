@@ -6,7 +6,7 @@ The default look is the look of the app Intraweb, an app of Toraline: the same c
 
 **To use the library in an app, read the [guide](docs/guide.md):** install it, build the theme of the app, and style on top of a component.
 
-**The new packages are not published yet.** `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be `0.1.0`. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
+**The packages are on npm.** `@toraline.tech/ui` and `@toraline.tech/tokens`, version `0.1.0`, published on 2026-11-15. Versions that start with `0` are a pre-release: tested in Toraline's own apps, and props and tokens may still change. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 **This is the branch `main`**, the new library (version 2). Until 2026-11-15 it was named `v2`. The old library is unchanged in [`legacy/`](legacy/), and on the branch `old-package`, which was named `main` until that day. Its package is `@toraline/toraline-ui`.
 
@@ -22,7 +22,7 @@ The default look is the look of the app Intraweb, an app of Toraline: the same c
 | `docs/guide.md` | The guide for a person who uses the library in an app: install, build a theme, style on top. The catalog shows the same file as its first page | Written in phase 4 |
 | `docs/releasing.md` | The steps to publish a version of the two packages to npm, and how to undo a wrong release | Written in phase 5. Nothing is published yet |
 | `CHANGELOG.md` | What changed in each version of the two packages | |
-| `.github/workflows/release.yml` | The workflow that publishes the two packages. It runs only when a person starts it by hand | Has never run |
+| `.github/workflows/release.yml` | The workflow that publishes the two packages. It runs only when a person starts it by hand | Published `0.1.0` on 2026-11-15 |
 | `docs/decisions.md` | Technical decisions, newest first | |
 | `AGENTS.md`, `agent/` | How AI agents work in this repository | |
 

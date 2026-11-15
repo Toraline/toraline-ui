@@ -64,7 +64,7 @@ The examples use `0.1.1` as the new version.
    - `@toraline.tech/tokens`: <the same for the tokens>.
    ```
 
-   Write what changes for an app, not the names of commits. Put a change that breaks an app first, with what the app must change. For the first release, replace `(not published yet)` in the section `0.1.0` with the date.
+   Write what changes for an app, not the names of commits. Put a change that breaks an app first, with what the app must change. The heading of the section has the date of the release.
 
 5. **Check, then look inside the tarballs.**
 
@@ -104,6 +104,7 @@ The examples use `0.1.1` as the new version.
    npm view @toraline.tech/tokens dist-tags
    ```
 
+   - npm needs a few minutes after a publish. On 2026-11-15 it took about 5 minutes. Until then these commands answer `404 Not Found`. The workflow waits up to 10 minutes for the same reason.
    - The first two commands print the version.
    - `dist-tags` shows `latest: '0.1.1'`. For a version with a dash it shows `next`.
 
@@ -178,13 +179,11 @@ Found on 2026-11-15, not changed: npm has `@toraline/toraline-ui` 1.1.5, publish
 - The packages build into tarballs that a new Next.js 16.4.6 app installs and renders (checked on 2026-11-15, see `docs/decisions.md`).
 - `make pack`, `make version`, the guard on `npm publish`, the workflow file, `CHANGELOG.md` with the section `0.1.0`.
 
+- Version `0.1.0` of both packages is on npm, published by the workflow "Release" on 2026-11-15.
+
 **Not done**
-- Nothing is published. The names `@toraline.tech/ui` and `@toraline.tech/tokens` are still free on npm.
-- The workflow "Release" has never run.
 - The packages have no license.
+- Trusted Publishing is not set up. The workflow still uses the secret `NPM_PUBLISH_TOKEN`.
 
 **What you must do**
-1. Choose a license, or decide to publish with none.
-2. Do the [One-time setup](#one-time-setup).
-3. Merge the branch of TOR-999 into `main`.
-4. Do steps 7 to 10 of [Steps of a release](#steps-of-a-release) for `0.1.0`.
+1. Choose a license, or decide to keep publishing with none.

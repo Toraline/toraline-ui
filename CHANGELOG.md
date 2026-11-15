@@ -4,7 +4,7 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
-## 0.1.0 (not published yet)
+## 0.1.0 (2026-11-15)
 
 The first version of the new library. Inside Toraline it is called "V2". It is a pre-release: tested in Toraline's own apps, not used for real yet. Version `1.0.0` comes after the full rebrand. It replaces `@toraline/toraline-ui`, and nothing of the old package works unchanged with it.
 
