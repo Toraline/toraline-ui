@@ -113,11 +113,15 @@ jobs:
         if: inputs.publish
         run: |
           for name in @toraline.tech/tokens @toraline.tech/ui; do
-            for attempt in 1 2 3 4 5 6; do
+            # After a publish, npm answers "Your package is being processed and may take
+            # a few minutes to become available". On 2026-11-15 it took about 5 minutes.
+            # So ask again every 15 seconds, for up to 10 minutes.
+            for attempt in $(seq 1 40); do
               if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
                 break
               fi
-              sleep 10
+              echo "${name}@${VERSION} is not on npm yet (try ${attempt} of 40). Waiting 15 seconds."
+              sleep 15
             done
             echo "${name}@${VERSION} on npm:"
             npm view "${name}@${VERSION}" version

@@ -18,7 +18,7 @@ A theme is a set of colors, fonts, corner sizes and shadows. The page selects a 
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline.tech/ui` is not on the npm registry. The first version will be `0.1.0`.
+The package is on npm since 2026-11-15. The first version is `0.1.0`.
 
 After the first release:
 

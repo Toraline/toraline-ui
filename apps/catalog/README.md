@@ -122,4 +122,4 @@ The same steps were compared with `apps/playground`: the imports of `app/globals
 
 Before phase 6, the guide page of the static catalog was opened in a browser on port 6117: the links of its first table go to the 3 guides, the code samples are colored, and the two live examples render. In the first example the button is `rgb(11, 92, 173)` and the heading font is `Georgia, serif`. In the second, the button and the field with a class of the app have the radius `9999px`, and the button without it has `8px`. The browser console had no error. The 2 live examples are stories, so `make catalog-test` checks them in both themes. After phase 6 the 94 story tests passed.
 
-Not checked: `npm install @toraline.tech/ui @toraline.tech/tokens` was not run. It fails until the packages are published. The apps installed the 2 package files of `make pack`.
+Not checked: `npm install @toraline.tech/ui @toraline.tech/tokens` was not run. When this check was made the packages were not on npm yet (they are since 2026-11-15). The apps installed the 2 package files of `make pack`.
