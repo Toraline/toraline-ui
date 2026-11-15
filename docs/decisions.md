@@ -13,7 +13,7 @@ Format of one entry:
 ```
 
 ## 2026-11-15 - The themes cozy, old and glass stay in Intraweb, as app themes (TOR-1137)
-- Proposal: the library has the themes `light` and `dark` only. Intraweb's 3 other themes, `cozy`, `old` and `glass`, stay in Intraweb. Intraweb builds them with the theme function `createTheme` of `@toraline.tech/tokens`, the same way any app builds its own themes.
+- Decision: the library has the themes `light` and `dark` only. Intraweb's 3 other themes, `cozy`, `old` and `glass`, stay in Intraweb. Intraweb builds them with the theme function `createTheme` of `@toraline.tech/tokens`, the same way any app builds its own themes.
 - Why: the 3 themes are the taste of one app (a cream and pink theme, a theme that looks like an old game, a glass theme), not the look of Toraline. A theme in the library is a promise to every app: each new component must be checked in it, and each story test runs once for each theme. `glass` also needs CSS rules that are not tokens (below), which the library would have to ship and keep.
 - Checked with a test: `packages/tokens/src/intraweb-app-themes.test.ts`. Copies of Intraweb's `cozy.css`, `old.css` and `glass.css` are in `packages/tokens/src/intraweb-fixtures/` (commit `f8ad4c2` of `prontera-e-juno`, copied on 2026-11-15). The test reads each copy, gives its values to `createTheme`, and compares every token of the result with the copy. It then builds an app with the 5 themes through Tailwind 4.3.5 and checks the built CSS.
 - What the theme function expresses, for all 3 themes:
@@ -38,7 +38,7 @@ Format of one entry:
 - What Intraweb must do when it installs the library, for these 3 themes (not done; it is the work of a later phase): write the 3 inputs in its `theme.config.ts` from its 3 CSS files; remove the shadow rules of `cozy`, `old` and `glass` (the shadows become token values); keep the 4 rules of `glass` and the Tailwind colors of old screens in its own CSS; keep `THEME_DEFINITIONS` and the colors a person chooses (`customColorVars`), which are logic of the app and already use the token names.
 - No playground theme and no story were added for the 3 themes. A story would run in the accessibility tests in both themes of the catalog, and `glass` needs its 4 rules to look right. The playground has its own third theme, `paper`, which tests a theme of an app in a real page (entry of TOR-1135).
 - Not verified: the 3 themes in a browser, built with the theme function. The test compares token values and built CSS, and does not look at pixels. The contrast of the 3 themes was not checked; Intraweb's files state their own contrast numbers in their first comments.
-- Decided by: agent, to be confirmed by Juliana.
+- Decided by: Juliana, 2026-11-15: the 3 themes stay in Intraweb as app themes. The idea of the library offering more themes of its own is kept in the plan as ticket TOR-1206; nothing of it is built.
 
 ## 2026-11-15 - The theme function, the preset and the components use only the new names (TOR-1136)
 - State: no file outside this file and `legacy/` has an old token name or an old token class. The script `scripts/find-old-token-names.mjs` reads every file that git tracks and prints the lines that have one. On 2026-11-15 it printed `0 lines`. It is not part of `make check`.
