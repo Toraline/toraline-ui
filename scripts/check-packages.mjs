@@ -63,7 +63,7 @@ for (const { folder, manifest } of manifests) {
     fail(`${folder}/package.json must run "check-packages.mjs --publish" in the script "prepublishOnly". It is the guard against a publish by accident.`);
   }
   for (const [name, range] of Object.entries(manifest.dependencies ?? {})) {
-    if (name.startsWith("@toraline/") && range !== version) {
+    if (name.startsWith("@toraline.tech/") && range !== version) {
       fail(`${folder}/package.json depends on ${name} "${range}". It must be exactly "${version}". Run: make version VERSION=<version>`);
     }
   }

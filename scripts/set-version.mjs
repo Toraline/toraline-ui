@@ -19,7 +19,7 @@ for (const folder of ["packages/tokens", "packages/ui"]) {
   const manifest = JSON.parse(readFileSync(path, "utf8"));
   manifest.version = version;
   for (const name of Object.keys(manifest.dependencies ?? {})) {
-    if (name.startsWith("@toraline/")) {
+    if (name.startsWith("@toraline.tech/")) {
       manifest.dependencies[name] = version;
     }
   }
