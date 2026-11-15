@@ -83,3 +83,6 @@ export type {
 
 export { DeleteOverlay } from "./delete-overlay/index.js";
 export type { DeleteOverlayProps } from "./delete-overlay/index.js";
+
+export { ActionMenu, actionMenuTriggers } from "./action-menu/index.js";
+export type { ActionMenuItem, ActionMenuProps, ActionMenuTrigger } from "./action-menu/index.js";

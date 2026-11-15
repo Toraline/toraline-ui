@@ -790,3 +790,45 @@ The dialog that asks before something is deleted. It is a [`Modal`](#modal) in t
 - `className`, every other prop and `ref` go to the dialog, as in Modal. The parts have `data-slot`: `content`, `question`, `consequence`, `error`, `buttons`.
 - It is a Client Component, and renders nothing on the server.
 
+### `ActionMenu`
+
+```tsx
+"use client";
+import { Pencil, Trash2 } from "lucide-react";
+import { ActionMenu } from "@toraline.tech/ui";
+
+<ActionMenu
+  aria-label="Actions of Ana"
+  items={[
+    { key: "edit", label: "Edit", icon: Pencil, onSelect: editClient },
+    { key: "delete", label: "Delete", icon: Trash2, onSelect: askToDelete, disabled: hasOrders, hint: "Ana has open orders." },
+  ]}
+/>
+
+<ActionMenu aria-label="Actions of the list" trigger="button" items={items}>
+  Actions
+</ActionMenu>
+```
+
+A button that opens a menu of actions, for example the actions of one row of a table.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `items` | A list of `{ key, label, onSelect, icon, disabled, hint }`. Required | The actions. `key` is different for each action. `icon` is an icon component, shown before the text. `disabled: true` shows an action that cannot be chosen, and `hint` says why |
+| `aria-label` | Text. Required | The name of the button and of the menu for a screen reader, for example `"Actions of Ana"` |
+| `trigger` | `"icon"` (default), `"button"` | The button that opens the menu. `icon`: a small button with 3 dots. `button`: a small secondary button with a text and an arrow |
+| `children` | Text or elements | The text of the button, for the trigger `button`. Start `aria-label` with this text, so a person who controls the device with the voice can say what they see |
+| `disabled` | The HTML attribute | Disables the button |
+
+- The menu opens under the button, with the right edges lined up. It opens above when there is no room below, and keeps 8 pixels to the left and right edges of the window. It follows the button when the page scrolls. It is rendered in `<body>` (a portal), so a table or a Drawer that scrolls does not cut it.
+- Keyboard, on the button: Enter, Space and Down arrow open the menu with the focus on the first action. Up arrow opens it with the focus on the last action.
+- Keyboard, in the menu: the Up and Down arrows move between actions, and go around. Home goes to the first action, End to the last. A letter goes to the next action that starts with it. Enter and Space choose the action, close the menu and give the focus back to the button. Escape closes the menu and gives the focus back. Tab closes the menu and moves the focus to the element after the button.
+- A press outside the menu closes it.
+- An action with `disabled: true` has `aria-disabled="true"` and half of its opacity. It can get the focus with the arrow keys, so a screen reader says it and its `hint`. Choosing it does nothing.
+- Inside a Modal or a Drawer: Escape closes only the menu, and a click on an action is not a click "behind" the overlay.
+- Screen reader: the button has `aria-haspopup="menu"` and `aria-expanded`. The menu has the role `menu` and the name of `aria-label`, and each action the role `menuitem`.
+- With no action in `items`, the component renders nothing.
+- Main native element: the `<button>` that opens the menu. `className`, every other prop and `ref` go to it. The parts have `data-slot`: `trigger`, `arrow`, `menu`, `item`.
+- The menu is the same code as the menu of SplitButton (`src/shared/menu/Menu.tsx`): the same look and the same keys.
+- The list `actionMenuTriggers` and the types `ActionMenuProps`, `ActionMenuItem` and `ActionMenuTrigger` are exported.
+- It is a Client Component. The actions are functions and the icons are components, so the file of the app that gives `items` is a Client Component too.

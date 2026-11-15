@@ -12,6 +12,24 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - ActionMenu, and the menu that it shares with SplitButton (TOR-1161)
+- Decision: the menu is one file, `packages/ui/src/shared/menu/Menu.tsx`: the element with `role="menu"`, its actions, their look, the focus when it opens, and the keys. SplitButton and ActionMenu render it. Each keeps what differs: the button that opens the menu, whether it is open, and where the menu is placed (SplitButton: inside its own element with CSS, as before; ActionMenu: in `<body>`, with `useAnchoredPanel`).
+- SplitButton after the move: its test file is unchanged and passes. One behaviour changed: Escape in the menu stops there (it did reach a listener of the page). Without this, Escape in the menu of a SplitButton inside a Modal would close the Modal too. The class `whitespace-nowrap` moved from each action to the menu; the computed style of an action is the same.
+- Decision: `ActionMenu` has the props of Intraweb's `ActionMenu` (`components/ui/action-menu.tsx`) with 2 renames: `label` is `aria-label` (rule 2 of the props, as in TabNav), and the fixed text "Ações" of the trigger `button` is `children`.
+- The keys of the shared menu are the ones SplitButton had. For ActionMenu they are more than Intraweb has: a letter that goes to an action, the Up and Down arrows on the button, and a first or last action that gets the focus.
+- Accessibility problems of Intraweb's ActionMenu, fixed here:
+  1. Tab in the menu closes it and leaves the focus on no element, because the menu is removed from `<body>` while it has the focus. The next Tab starts at the top of the page. Here the focus goes back to the button first, so Tab moves to the element after the button.
+  2. A click on an action leaves the focus on no element. A Modal that the action opens then has no element to give the focus back to. Here the focus goes back to the button before the action runs.
+  3. A disabled action is skipped by the arrow keys, so a person who uses a screen reader never hears it or its `hint`. Here it has `aria-disabled="true"`, can get the focus, and cannot be chosen, as the menu pattern of the WAI-ARIA Authoring Practices Guide says.
+  4. The actions are in the Tab order. Here they have `tabindex="-1"`: the arrows move between them.
+  5. A click on an action of a menu inside a Drawer with unsaved changes counts as a click behind the Drawer, and asks to discard the changes (read in the code, not run in Intraweb). The menu is in `<body>`, outside the panel. Here the menu has the attribute `data-overlay-panel`.
+- Decision: the keyboard focus ring of an action stays (Intraweb shows only the background), as decided for SplitButton in TOR-1145.
+- Decision: with no action, ActionMenu renders nothing. Intraweb renders a button that opens an empty box.
+- Decision: the 3 dots and the arrow are inline `<svg>` elements with the shapes of Lucide's `ellipsis` and `chevron-down`.
+- States of the list "States to check": rest and closed (story "Closed"); open (story "Open"); hover and keyboard focus of an action: a quiet background, and the ring for the keyboard (story "Keyboard"); pressed: does not apply; disabled (stories "Disabled", "Disabled Action"); read-only, loading, error, selected: do not apply; empty: renders nothing (test); long content (story "Long Content"); near the edge of the window (story "Near The Edge"); right-to-left: considered, not supported, the menu lines up with the right edge of the button; both themes: every story test; reduced motion: the menu has no animation.
+- Alternatives: moving SplitButton's menu to `<body>` too, rejected because the ticket asks for no change of its behaviour; 2 menus that share only their classes; `disabled` on an action, as in Intraweb.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DiscardConfirmation and DeleteOverlay: every text is a prop (TOR-1160)
 - Decision: the 2 confirmation dialogs have no text of their own and no default text. The 4 texts of `DiscardConfirmation` (`title`, `description`, `discardLabel`, `keepEditingLabel`) and the texts of `DeleteOverlay` (`title`, `children`, `cancelLabel`, `deleteLabel`, `closeLabel`) are required props; the types refuse a dialog without them. Intraweb has them fixed in Portuguese.
 - Decision: Modal and Drawer ask before unsaved changes are lost only when the app gives the prop `discardConfirmation`, an object with the 4 texts. Without it they close at once. In Intraweb every Modal and Drawer asks.

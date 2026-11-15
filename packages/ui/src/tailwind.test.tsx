@@ -27,7 +27,16 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 9: overlays
-import { CloseButton, DeleteOverlay, DiscardConfirmation, Drawer, Modal, modalSizes } from "./index";
+import {
+  ActionMenu,
+  CloseButton,
+  DeleteOverlay,
+  DiscardConfirmation,
+  Drawer,
+  Modal,
+  actionMenuTriggers,
+  modalSizes,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -92,6 +101,29 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
 }
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** The floating panels of phase 9: each one opens with a press on its button. */
+const floatingButtonNames = actionMenuTriggers.map((trigger) => `Actions, ${trigger}`);
+
+function FloatingExamples() {
+  return (
+    <>
+      {actionMenuTriggers.map((trigger) => (
+        <ActionMenu
+          key={trigger}
+          trigger={trigger}
+          aria-label={`Actions, ${trigger}`}
+          items={[
+            { key: "edit", label: "Edit", icon: PlusIcon, onSelect: () => undefined },
+            { key: "delete", label: "Delete", onSelect: () => undefined, disabled: true, hint: "In use" },
+          ]}
+        >
+          Actions
+        </ActionMenu>
+      ))}
+    </>
+  );
+}
 
 /** The overlays of phase 9, open. An overlay is rendered in <body>, outside the element that holds the other components. */
 function OverlayExamples() {
@@ -232,6 +264,12 @@ async function renderEveryComponent(): Promise<string[]> {
   // An open menu is on the page only while it is open.
   for (const menuPlacement of splitButtonMenuPlacements) {
     await user.click(screen.getByRole("button", { name: `More options, ${menuPlacement}` }));
+    collect();
+  }
+  // Phase 9: the floating panels, each one open.
+  render(<FloatingExamples />);
+  for (const buttonName of floatingButtonNames) {
+    await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
   // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
@@ -383,6 +421,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["w-full", "md:max-w-lg"],
     // Phase 9, DiscardConfirmation: the buttons are in a row on a wide screen.
     ["flex-col-reverse", "sm:flex-row"],
+    // Phase 9, the menu of SplitButton and ActionMenu: the pointer over an action that cannot be chosen changes nothing.
+    ["hover:bg-subtle", "aria-disabled:hover:bg-transparent"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

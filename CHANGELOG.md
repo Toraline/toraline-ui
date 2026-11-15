@@ -54,6 +54,8 @@ The components get the shape of the same components of the app Intraweb: variant
 - Drawer: a panel on the right side of the screen with a footer that stays at the bottom. It leaves the page next to it usable. It has the same 3 focus rules as Modal. While it is open, `<body>` has the attribute `data-drawer-open`.
 - DiscardConfirmation: the question before something a person typed is lost. Modal and Drawer show it by themselves when they get the prop `discardConfirmation` with its 4 texts.
 - DeleteOverlay: the dialog that asks before something is deleted, with the states `pending`, `error` and `blocked`. Every text of the 2 confirmation dialogs is a prop of the app.
+- ActionMenu: a button (3 dots, or a text with an arrow) that opens a menu of actions next to it. The menu and the menu of SplitButton are the same code.
+- SplitButton: Escape in its menu no longer reaches a Modal or a Drawer that the SplitButton is in, so the key closes only the menu. Nothing else changed.
 
 ## 0.1.0 (2026-11-15)
 
