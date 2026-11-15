@@ -6,12 +6,12 @@
  */
 export const packageName = "@toraline/tokens";
 
-export { primitives } from "./primitives";
-export type { PrimitiveName } from "./primitives";
-export { darkTheme, lightTheme, themeTokenNames } from "./themes";
-export type { ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes";
-export { createTheme, getAddedColorNames } from "./create-theme";
-export type { ThemeColorName, ThemeInput } from "./create-theme";
+export { primitives } from "./primitives.js";
+export type { PrimitiveName } from "./primitives.js";
+export { darkTheme, lightTheme, themeTokenNames } from "./themes.js";
+export type { ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes.js";
+export { createTheme, getAddedColorNames } from "./create-theme.js";
+export type { ThemeColorName, ThemeInput } from "./create-theme.js";
 export {
   DEFAULT_THEMES,
   THEME_ATTRIBUTE,
@@ -21,6 +21,6 @@ export {
   readThemeCookie,
   resolveTheme,
   serializeThemeCookie,
-} from "./theme-storage";
-export type { ThemeScriptOptions } from "./theme-storage";
-export { createTailwindTheme } from "./tailwind";
+} from "./theme-storage.js";
+export type { ThemeScriptOptions } from "./theme-storage.js";
+export { createTailwindTheme } from "./tailwind.js";

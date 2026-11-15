@@ -1,5 +1,5 @@
 import type { ComponentProps, ElementType, ReactNode } from "react";
-import { classNames } from "../shared/class-names";
+import { classNames } from "../shared/class-names.js";
 
 /** One step of the path. */
 export type Crumb = {

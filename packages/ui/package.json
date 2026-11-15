@@ -1,8 +1,25 @@
 {
   "name": "@toraline/ui",
-  "version": "2.0.0-alpha.0",
-  "private": true,
+  "version": "2.0.0-beta.0",
   "description": "Styled React components of the Toraline component library.",
+  "keywords": [
+    "toraline",
+    "react",
+    "components",
+    "ui",
+    "design-system",
+    "nextjs",
+    "tailwindcss"
+  ],
+  "homepage": "https://github.com/Toraline/toraline-ui/tree/v2/packages/ui#readme",
+  "bugs": {
+    "url": "https://github.com/Toraline/toraline-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toraline/toraline-ui.git",
+    "directory": "packages/ui"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -17,24 +34,30 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./theme": {
       "types": "./dist/theme/index.d.ts",
-      "import": "./dist/theme/index.js"
+      "default": "./dist/theme/index.js"
     },
-    "./styles.css": "./css/styles.css"
+    "./styles.css": "./css/styles.css",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit --emitDeclarationOnly false"
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit --emitDeclarationOnly false",
+    "prepack": "npm run build",
+    "prepublishOnly": "node ../../scripts/check-packages.mjs --publish"
   },
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@toraline/tokens": "*"
+    "@toraline/tokens": "2.0.0-beta.0"
   },
   "devDependencies": {
     "@types/react": "19.3.0",

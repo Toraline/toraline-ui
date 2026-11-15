@@ -1,5 +1,5 @@
-import { darkTheme, lightTheme, themeTokenNames } from "./themes";
-import type { ThemeTokenName } from "./themes";
+import { darkTheme, lightTheme, themeTokenNames } from "./themes.js";
+import type { ThemeTokenName } from "./themes.js";
 
 type ColorTokenName = Extract<ThemeTokenName, `color-${string}`>;
 

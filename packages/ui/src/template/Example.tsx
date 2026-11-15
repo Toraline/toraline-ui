@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { classNames } from "../shared/class-names";
+import { classNames } from "../shared/class-names.js";
 
 /** The looks of the component. The first one is the default. */
 export const exampleVariants = ["neutral", "primary"] as const;

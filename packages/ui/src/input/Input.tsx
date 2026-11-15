@@ -1,6 +1,6 @@
 import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { classNames } from "../shared/class-names";
+import { classNames } from "../shared/class-names.js";
 
 export type InputProps = ComponentProps<"input"> & {
   /**

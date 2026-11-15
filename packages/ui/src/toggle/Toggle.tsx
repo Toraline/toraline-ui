@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { classNames } from "../shared/class-names";
+import { classNames } from "../shared/class-names.js";
 
 export type ToggleProps = Omit<ComponentProps<"input">, "type"> & {
   /**

@@ -1,4 +1,4 @@
-export { Button } from "./Button";
-export type { ButtonProps } from "./Button";
-export { buttonSizes, buttonVariants } from "./button-options";
-export type { ButtonSize, ButtonVariant } from "./button-options";
+export { Button } from "./Button.js";
+export type { ButtonProps } from "./Button.js";
+export { buttonSizes, buttonVariants } from "./button-options.js";
+export type { ButtonSize, ButtonVariant } from "./button-options.js";

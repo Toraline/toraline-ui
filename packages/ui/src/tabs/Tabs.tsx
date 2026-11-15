@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react";
 import type { ComponentProps, KeyboardEvent, ReactNode } from "react";
-import { classNames } from "../shared/class-names";
+import { classNames } from "../shared/class-names.js";
 
 /** One tab: the button a person presses, and the content it shows. */
 export type TabItem = {

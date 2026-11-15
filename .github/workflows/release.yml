@@ -1,0 +1,125 @@
+# Publishes @toraline/tokens and @toraline/ui (version 2) to the public npm registry.
+#
+# It runs ONLY when a person starts it by hand: GitHub > Actions > "Release version 2" >
+# "Run workflow", with the branch v2. It never runs on a push, on a tag or on a GitHub release.
+# The steps for a person are in docs/releasing.md.
+#
+# The old package @toraline/toraline-ui is not released here. Its workflow is npm-publish.yml.
+#
+# What the owner sets up once, in the repository settings on GitHub:
+#   Settings > Secrets and variables > Actions > New repository secret
+#   Name: NPM_PUBLISH_TOKEN
+#   Value: an npm access token that may publish the packages of the scope @toraline.
+# Without that secret a real publish stops at its first step, with a message that names the secret.
+name: Release version 2
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to publish. It must be the version in packages/ui/package.json, for example 2.0.0-beta.0"
+        required: true
+        type: string
+      publish:
+        description: "Publish for real. When this is off, the run only tests: it sends nothing to npm."
+        required: true
+        type: boolean
+        default: false
+
+# Two runs never publish at the same time.
+concurrency:
+  group: release-version-2
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # Lets npm sign where the package was built (npm calls this "provenance").
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Stop when the branch is not v2
+        if: github.ref != 'refs/heads/v2'
+        run: |
+          echo "::error::Version 2 is released only from the branch v2. This run uses ${GITHUB_REF}. Start the workflow again and choose the branch v2."
+          exit 1
+
+      - name: Stop when the npm token is missing
+        if: inputs.publish
+        env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        run: |
+          if [ -z "${NPM_PUBLISH_TOKEN}" ]; then
+            echo "::error::The repository secret NPM_PUBLISH_TOKEN is missing or empty. Add it in Settings > Secrets and variables > Actions. See docs/releasing.md."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+
+      - name: Stop when the version is not the version of the packages
+        run: |
+          package_version="$(node -p "require('./packages/ui/package.json').version")"
+          if [ "${VERSION}" != "${package_version}" ]; then
+            echo "::error::You asked for version ${VERSION}, and the packages on v2 have version ${package_version}. Change the version first (docs/releasing.md), or start again with ${package_version}."
+            exit 1
+          fi
+
+      - run: npm ci --no-audit --no-fund
+
+      # The story tests of the catalog run in a real browser. This step downloads it.
+      - run: npx playwright install --with-deps --only-shell chromium
+
+      - run: make check
+
+      # Builds the two packages again and prints the files of each one in the log.
+      - run: make pack
+
+      - name: Publish, or test the publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          # scripts/check-packages.mjs blocks "npm publish" unless this is the version of the packages.
+          TORALINE_RELEASE: ${{ inputs.version }}
+          PUBLISH: ${{ inputs.publish }}
+        run: |
+          # A version with a dash (2.0.0-beta.0) is a pre-release: it gets the npm tag "next".
+          # A version with no dash (2.0.0) is a full release: it gets the npm tag "latest".
+          case "${VERSION}" in
+            *-*) tag=next ;;
+            *) tag=latest ;;
+          esac
+          # @toraline/tokens goes first, because @toraline/ui depends on it.
+          for name in @toraline/tokens @toraline/ui; do
+            if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
+              echo "${name}@${VERSION} is already on npm. Skipped."
+              continue
+            fi
+            if [ "${PUBLISH}" = "true" ]; then
+              npm publish --workspace "${name}" --tag "${tag}" --access public --provenance
+            else
+              npm publish --workspace "${name}" --tag "${tag}" --access public --dry-run
+            fi
+          done
+
+      - name: Check the result on npm
+        if: inputs.publish
+        run: |
+          for name in @toraline/tokens @toraline/ui; do
+            for attempt in 1 2 3 4 5 6; do
+              if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
+                break
+              fi
+              sleep 10
+            done
+            echo "${name}@${VERSION} on npm:"
+            npm view "${name}@${VERSION}" version
+            npm view "${name}" dist-tags
+          done

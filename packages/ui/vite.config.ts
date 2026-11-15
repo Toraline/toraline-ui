@@ -10,7 +10,7 @@ export default defineConfig({
       },
       formats: ["es"],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ["react", "react-dom", "react/jsx-runtime", "@toraline/tokens"],
       // The build warns that a "use client" line may be lost when files are joined.
       // Files are not joined here (preserveModules), so the line is kept.
