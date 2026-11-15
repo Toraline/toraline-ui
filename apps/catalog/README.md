@@ -53,9 +53,9 @@ What the check does not cover: axe-core finds only the problems a program can fi
 | File | What it is |
 |---|---|
 | `.storybook/main.ts` | Which files are stories, which addons are on, and how Vite builds the catalog. An addon is a plugin of Storybook |
-| `.storybook/preview.tsx` | What every story gets: the CSS of the tokens and of the components, the control **Theme**, the decorator that applies the theme, and the rule that an accessibility problem fails the test. A decorator is a function that wraps every story |
+| `.storybook/preview.tsx` | What every story gets: the CSS of the catalog (which loads Tailwind CSS 4 and the tokens), the control **Theme**, the decorator that applies the theme, and the rule that an accessibility problem fails the test. A decorator is a function that wraps every story |
 | `.storybook/themes.ts` | The list of themes of the control. It is `DEFAULT_THEMES` of `@toraline.tech/tokens` |
-| `.storybook/preview.css` | The CSS of the catalog itself: the page behind a story gets the colors of the current theme |
+| `.storybook/preview.css` | The CSS of the catalog itself. It imports Tailwind CSS 4 and the Tailwind preset of `@toraline.tech/tokens`, and tells Tailwind to read the source of the components (`packages/ui/src`), so Tailwind builds the classes they use. It also gives the page behind a story the colors of the current theme |
 | `stories/*.stories.tsx` | The stories of one component |
 | `stories/Tokens.mdx`, `stories/Tokens.stories.tsx`, `stories/tokens/` | The tokens page, its stories, and the tables they draw |
 | `stories/Guide.mdx`, `stories/Guide.stories.tsx`, `stories/guide/` | The guide page, its live examples as stories, and the components and CSS of the examples |
@@ -112,7 +112,16 @@ Checked on 2026-11-15. The guide is `docs/guide.md`. Its code samples were run i
 | Next.js 16.4.6 with Tailwind CSS 4.3.5, after guides 1, 2 and 3 | `npm run build`, `next start -p 6118`, `curl` with and without the cookie, the page in a browser | The server answers `<html lang="en" data-theme="light" ...>` with no cookie and `data-theme="dark"` with `Cookie: toraline-theme=dark`. The button is `rgb(11, 92, 173)` in the light theme. The heading font is `Fraunces, "Fraunces Fallback", Georgia, serif`. The added color is `rgb(179, 71, 0)` (light) and `rgb(255, 179, 122)` (dark). A press on the theme button saves the cookie `toraline-theme=dark`. The button with `className="rounded-full"` has a fully round corner |
 | Vite 8.3.8 with React 19.3.1 and no Tailwind CSS (the section "Without Next.js") | `npm run build`, the built files served on port 6118, the page in a browser | `dist/index.html` has the script of `createThemeScript` in `<head>`. A press on the theme button changes `data-theme` to `dark` and the page background to `rgb(15, 25, 40)`. After a reload the page opens in the dark theme, and the button is `rgb(140, 200, 255)`. The button with `className="round"` has the radius `9999px` |
 
-Two steps of the guide come from errors found in these apps: `"type": "module"` in `package.json` (without it Node prints a warning for the script), and `allowImportingTsExtensions` in `tsconfig.json` (without it `next build` fails with the error TS5097).
+The 3 rows above were checked when the components were styled with CSS files. The components changed to Tailwind classes in TOR-1205, and Tailwind CSS 4 became required. The guide was checked again on 2026-11-15, in 2 new apps made in a folder outside the repository and deleted after the check. The apps installed the 2 package files that `make pack` writes.
+
+| App | What was run | Result |
+|---|---|---|
+| Next.js 16.4.6 made by `create-next-app` (Tailwind CSS 4.3.3, React 19.3.0), with the 3 CSS lines of guide 1, one Server Component page and one Client Component page | `npm run build`, `next start -p 3992`, the 2 pages in a browser (Chromium, with no window) | The built CSS file has the classes of the components, for example `.bg-primary` and `.aria-invalid\:enabled\:border-danger`. On both pages the button "Save" has the background `rgb(94, 0, 161)`, the text `rgb(255, 255, 255)`, the padding `8px 16px` and the radius `8px`. On the Client Component page a press changes the text of the button, and the button with `className="rounded-full bg-red-500 hover:bg-red-600"` has no class `rounded`, `bg-primary` or `hover:bg-primary-hover`, a red background, and a darker red with the pointer over it. The browser console had no error |
+| Vite 8.3.8 made by `npm create vite@latest` (React 19.3.1, Tailwind CSS 4.3.5 with `@tailwindcss/vite` 4.3.5), with the steps of the section "Without Next.js" | `npm run build`, `vite preview`, the page in a browser (Chromium, with no window) | `dist/index.html` has the script of `createThemeScript`. The button "Save" is `rgb(11, 92, 173)`. The button with `className="bg-brand text-brand-foreground hover:bg-primary-hover"` is `rgb(179, 71, 0)`, and `rgb(8, 74, 140)` with the pointer over it. The build printed no warning about `"use client"`. The browser console had no error |
+
+Not checked in these 2 apps: steps 7 to 10 of guide 2 in the Next.js app (the font and the theme cookie; the playground has them), and the theme button of the Vite app.
+
+Two steps of the guide come from errors found in the first 3 apps: `"type": "module"` in `package.json` (without it Node prints a warning for the script), and `allowImportingTsExtensions` in `tsconfig.json` (without it `next build` fails with the error TS5097).
 
 The same steps were compared with `apps/playground`: the imports of `app/globals.css`, `theme.config.ts`, `scripts/write-theme-css.ts`, the scripts of `package.json` and `app/layout.tsx` are the same, except for the color values and for the font, which the playground loads with `next/font/local`.
 

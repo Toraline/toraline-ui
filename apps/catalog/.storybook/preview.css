@@ -5,6 +5,17 @@
  * theme, the way an app does on its <body>.
  */
 
+/*
+ * Tailwind CSS 4, the Tailwind preset of the library, and the place where
+ * Tailwind finds the classes of the components. The catalog reads the source
+ * of the components, so it names the source folder. An app names the built
+ * files, with the line: @import "@toraline.tech/ui/tailwind.css";
+ * "source(..)" makes Tailwind look for classes in the folder of the catalog.
+ */
+@import "tailwindcss" source("..");
+@import "@toraline.tech/tokens/css/tailwind.css";
+@source "../../../packages/ui/src";
+
 /* The page of one story. */
 body {
   background-color: var(--color-surface);

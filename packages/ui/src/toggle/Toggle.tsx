@@ -1,6 +1,41 @@
 import type { ComponentProps, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 
+/*
+ * The classes of the switch. The track is the long rounded part. The thumb is
+ * the circle that moves inside it. Off: the thumb is on the left. On: the
+ * thumb is on the right and shows a check mark.
+ *
+ * Every state is selected by the state of the checkbox, which a screen reader
+ * reads. "peer-checked:" styles the element after the checkbox. The thumb and
+ * the check mark are inside that element, so they use "group-has-checked/toggle:",
+ * which looks for a checked checkbox inside the outermost element.
+ * Disabled, off or on: quiet colors. The place of the thumb still shows the state.
+ */
+
+const rootClass =
+  "group/toggle relative inline-flex cursor-pointer items-center gap-2 font-body text-base/normal text-text has-disabled:cursor-not-allowed has-disabled:text-text-muted";
+
+/** The checkbox is not shown, but it stays on the page: it gets the focus and the keys. */
+const inputClass = "peer absolute m-0 size-px opacity-0";
+
+const trackClass = classNames(
+  "box-border inline-flex h-[1.5em] w-[2.75em] flex-none items-center rounded-[1em] border-[0.125em] border-border-strong bg-surface p-[0.125em]",
+  "peer-checked:border-success peer-checked:bg-success",
+  "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring",
+  "peer-disabled:border-border peer-disabled:bg-surface-muted",
+  "motion-safe:transition-[background-color,border-color] motion-safe:ease-[ease]",
+);
+
+const thumbClass = classNames(
+  "inline-flex size-[1em] items-center justify-center rounded-[50%] bg-border-strong text-success",
+  "group-has-checked/toggle:translate-x-[1.25em] group-has-checked/toggle:bg-success-foreground",
+  "group-has-disabled/toggle:bg-text-muted group-has-disabled/toggle:text-surface-muted",
+  "motion-safe:transition-[translate,background-color] motion-safe:ease-[ease]",
+);
+
+const checkClass = "size-[0.75em] opacity-0 group-has-checked/toggle:opacity-100";
+
 export type ToggleProps = Omit<ComponentProps<"input">, "type"> & {
   /**
    * The visible name of the switch, shown next to it. It says what the switch
@@ -25,11 +60,17 @@ export function Toggle({ label, className, ...inputProps }: ToggleProps) {
   const hasLabel = label !== undefined && label !== null && label !== false && label !== "";
 
   return (
-    <label className={classNames("tui-toggle", className)}>
-      <input {...inputProps} type="checkbox" role="switch" className="tui-toggle__input" />
-      <span className="tui-toggle__track" aria-hidden="true">
-        <span className="tui-toggle__thumb">
-          <svg className="tui-toggle__check" viewBox="0 0 16 16" fill="none">
+    <label className={classNames(rootClass, className)}>
+      <input
+        {...inputProps}
+        type="checkbox"
+        role="switch"
+        className={inputClass}
+        data-slot="input"
+      />
+      <span className={trackClass} data-slot="track" aria-hidden="true">
+        <span className={thumbClass} data-slot="thumb">
+          <svg className={checkClass} data-slot="check" viewBox="0 0 16 16" fill="none">
             <path
               d="M3.5 8.5 6.5 11.5 12.5 4.5"
               stroke="currentColor"
@@ -40,7 +81,7 @@ export function Toggle({ label, className, ...inputProps }: ToggleProps) {
           </svg>
         </span>
       </span>
-      {hasLabel ? <span className="tui-toggle__label">{label}</span> : null}
+      {hasLabel ? <span data-slot="label">{label}</span> : null}
     </label>
   );
 }

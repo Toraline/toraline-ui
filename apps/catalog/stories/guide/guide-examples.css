@@ -1,6 +1,7 @@
 /*
  * The CSS of the live examples of the guide. It stands for the CSS file of an
- * app: its rules are in no cascade layer, so they win over the library's styles.
+ * app: its rules are in no cascade layer, so they win over the Tailwind classes
+ * of the library, which are in the cascade layer "utilities".
  */
 .guide-example {
   display: grid;
@@ -20,7 +21,7 @@
   font-size: var(--text-lg);
 }
 
-/* Guide 3, step 4: a style that uses the color the app added. */
+/* Guide 3, step 5: a style that uses the color the app added. */
 .guide-brand-note {
   margin: 0;
   padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
@@ -29,12 +30,12 @@
   color: var(--color-brand-foreground);
 }
 
-/* Guide 3, step 2: a class of the app on a component. */
+/* Guide 3, step 3: a class of the app's own CSS on a component. */
 .guide-round {
   border-radius: 9999px;
 }
 
-/* Guide 3, step 3: an inner part of a component. */
-.guide-search .tui-input__field {
+/* Guide 3, step 4: an inner part of a component. */
+.guide-search [data-slot="field"] {
   border-radius: 9999px;
 }

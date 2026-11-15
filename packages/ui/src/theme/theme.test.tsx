@@ -159,7 +159,8 @@ describe("ThemeToggle", () => {
     toggle.focus();
     expect(document.activeElement).toBe(toggle);
     expect(toggle.tabIndex).toBe(0);
-    expect(toggle.className).toBe("tui-theme-toggle my-class");
+    expect(toggle.className.split(" ").at(-1)).toBe("my-class");
+    expect(toggle.className.split(" ")).toContain("bg-surface-raised");
     expect(toggle.textContent).toBe("Change theme");
   });
 });

@@ -155,9 +155,11 @@ describe("Tabs", () => {
     expect(selectedTabName()).toBe("All");
   });
 
-  test("puts the app's className on the outermost element, after the library's class", () => {
+  test("puts the app's className on the outermost element, after the library's classes", () => {
     const { container } = render(<Tabs tabs={tabs} className="mt-4" />);
-    expect(container.firstElementChild?.className).toBe("tui-tabs mt-4");
+    const classes = container.firstElementChild?.className.split(" ") ?? [];
+    expect(classes.at(-1)).toBe("mt-4");
+    expect(classes).toContain("font-body");
   });
 
   test("passes other attributes to the outermost <div>, and ref points to it", () => {

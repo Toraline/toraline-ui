@@ -3,6 +3,58 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, FocusEvent, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
+import { focusRingClass } from "../shared/focus-ring.js";
+
+/*
+ * The classes of SplitButton: the main button, the button that opens the menu
+ * (the trigger), and the menu with its actions (the items).
+ *
+ * "group-data-[placement=top]/split-button:" selects by the attribute
+ * data-placement of the outermost element. "group-aria-expanded/trigger:"
+ * selects by aria-expanded of the trigger, the attribute a screen reader reads.
+ */
+
+const rootClass = "group/split-button relative inline-flex gap-1 font-body";
+
+/** What the main button and the trigger share. */
+const buttonClass = classNames(
+  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-body text-base/normal font-bold text-primary-foreground",
+  "hover:bg-primary-hover",
+  "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface disabled:text-text-muted",
+  "motion-safe:transition-[background-color] motion-safe:ease-[ease]",
+  focusRingClass,
+);
+
+const mainClass = classNames(buttonClass, "rounded-l rounded-r-none px-4 py-2");
+
+const triggerClass = classNames(
+  buttonClass,
+  "group/trigger rounded-l-none rounded-r px-3 py-2 enabled:aria-expanded:bg-primary-hover",
+);
+
+/** The arrow points to where the menu opens, and turns over while the menu is open. */
+const arrowClass = classNames(
+  "size-[0.875em]",
+  "group-data-[placement=top]/split-button:rotate-180",
+  "group-data-[placement=bottom]/split-button:group-aria-expanded/trigger:rotate-180",
+  "group-data-[placement=top]/split-button:group-aria-expanded/trigger:rotate-none",
+  "motion-safe:transition-[rotate] motion-safe:ease-[ease]",
+);
+
+/** The menu sits above the page and does not move the content around it. */
+const menuClass = classNames(
+  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded border border-border bg-surface-raised p-1 shadow",
+  "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
+);
+
+/** One action. The action under the pointer and the action that has the keyboard focus have the primary color. */
+const itemClass = classNames(
+  "flex cursor-pointer items-center gap-3 rounded border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-primary",
+  "hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+  focusRingClass,
+);
+
+const itemIconClass = "inline-flex size-[1em] flex-none";
 import type { SplitButtonMenuPlacement } from "./split-button-options.js";
 
 /** One action of the menu. */
@@ -165,7 +217,7 @@ export function SplitButton({
   return (
     <div
       ref={rootElement}
-      className={classNames("tui-split-button", className)}
+      className={classNames(rootClass, className)}
       data-placement={menuPlacement}
       onBlur={handleBlur}
     >
@@ -173,7 +225,8 @@ export function SplitButton({
         {...buttonProps}
         type={type}
         disabled={disabled}
-        className="tui-split-button__main"
+        className={mainClass}
+        data-slot="main"
       >
         {children}
       </button>
@@ -182,7 +235,8 @@ export function SplitButton({
         type="button"
         id={triggerId}
         disabled={disabled}
-        className="tui-split-button__trigger"
+        className={triggerClass}
+        data-slot="trigger"
         aria-label={menuLabel}
         aria-haspopup="menu"
         aria-expanded={isOpen}
@@ -191,7 +245,8 @@ export function SplitButton({
         onKeyDown={handleTriggerKeyDown}
       >
         <svg
-          className="tui-split-button__arrow"
+          className={arrowClass}
+          data-slot="arrow"
           viewBox="0 0 20 13"
           fill="currentColor"
           aria-hidden="true"
@@ -203,7 +258,8 @@ export function SplitButton({
         <div
           role="menu"
           id={menuId}
-          className="tui-split-button__menu"
+          className={menuClass}
+          data-slot="menu"
           aria-labelledby={triggerId}
           onKeyDown={handleMenuKeyDown}
         >
@@ -216,11 +272,12 @@ export function SplitButton({
               type="button"
               role="menuitem"
               tabIndex={-1}
-              className="tui-split-button__item"
+              className={itemClass}
+              data-slot="item"
               onClick={() => handleSelect(item)}
             >
               {item.icon === undefined ? null : (
-                <span className="tui-split-button__item-icon" aria-hidden="true">
+                <span className={itemIconClass} data-slot="item-icon" aria-hidden="true">
                   {item.icon}
                 </span>
               )}

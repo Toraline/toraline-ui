@@ -14,7 +14,7 @@ describe("Toggle", () => {
     const toggle = screen.getByRole("switch", { name: "Send e-mails", checked: false });
     expect(toggle.tagName).toBe("INPUT");
     expect(toggle.getAttribute("type")).toBe("checkbox");
-    expect(toggle.className).toBe("tui-toggle__input");
+    expect(toggle.getAttribute("data-slot")).toBe("input");
   });
 
   test("defaultChecked: it starts on, and a screen reader is told it is on", () => {
@@ -85,11 +85,13 @@ describe("Toggle", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  test("puts the app's className on the outermost element, after the library's class", () => {
+  test("puts the app's className on the outermost element, after the library's classes", () => {
     const { container } = render(<Toggle label="Send e-mails" className="mt-4" />);
     const root = container.firstElementChild as HTMLElement;
     expect(root.tagName).toBe("LABEL");
-    expect(root.className).toBe("tui-toggle mt-4");
+    const classes = root.className.split(" ");
+    expect(classes.at(-1)).toBe("mt-4");
+    expect(classes).toContain("inline-flex");
   });
 
   test("passes other attributes to the <input>, and ref points to it", () => {
@@ -105,12 +107,12 @@ describe("Toggle", () => {
   test("a switch with no label takes its name from aria-label", () => {
     const { container } = render(<Toggle aria-label="Dark mode" />);
     expect(screen.getByRole("switch", { name: "Dark mode" })).toBeTruthy();
-    expect(container.querySelector(".tui-toggle__label")).toBeNull();
+    expect(container.querySelector('[data-slot="label"]')).toBeNull();
   });
 
   test("the drawing of the switch is hidden from a screen reader", () => {
     const { container } = render(<Toggle label="Send e-mails" />);
-    expect(container.querySelector(".tui-toggle__track")?.getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector('[data-slot="track"]')?.getAttribute("aria-hidden")).toBe("true");
   });
 
   test("renders on the server", () => {

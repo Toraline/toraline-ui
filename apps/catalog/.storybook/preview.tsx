@@ -5,11 +5,8 @@ import { useGlobals } from "storybook/preview-api";
 import { THEME_ATTRIBUTE, resolveTheme } from "@toraline.tech/tokens";
 import { ThemeProvider, useTheme } from "@toraline.tech/ui/theme";
 
-// The tokens and the two themes of the library.
-import "@toraline.tech/tokens/css";
-// The styles of the library's components.
-import "@toraline.tech/ui/styles.css";
-// The CSS of the catalog itself.
+// Tailwind CSS 4 with the preset of the library (the tokens, the two themes,
+// and the classes of the components), and the CSS of the catalog itself.
 import "./preview.css";
 
 import { catalogThemes, defaultCatalogTheme } from "./themes";

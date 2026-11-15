@@ -37,7 +37,7 @@ catalog-browser: ## Download the browser that runs the story tests (does nothing
 catalog-test: catalog-browser ## Run only the story tests: every story in each theme, with the accessibility check
 	@npx vitest run --project 'stories-*'
 
-packages-check: ## Check the two published packages: same version, files of "exports", "use client", no extra file
+packages-check: ## Check the two published packages: same version, files of "exports", the Tailwind entry, "use client", no extra file
 	@node scripts/check-packages.mjs
 
 pack: ## Build the two published packages, write their tarballs into .pack/ and list the files of each

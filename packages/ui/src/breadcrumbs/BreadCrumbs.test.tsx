@@ -40,18 +40,18 @@ describe("BreadCrumbs", () => {
     const current = screen.getByText("Fernando Dias");
     expect(current.tagName).toBe("SPAN");
     expect(current.getAttribute("aria-current")).toBe("page");
-    expect(current.className).toBe("tui-breadcrumbs__current");
+    expect(current.getAttribute("data-slot")).toBe("current");
     expect(screen.queryByRole("link", { name: "Fernando Dias" })).toBeNull();
   });
 
   test("the separators are hidden from a screen reader, and there is none after the current page", () => {
     const { container } = render(<BreadCrumbs crumbs={crumbs} />);
-    const separators = [...container.querySelectorAll(".tui-breadcrumbs__separator")];
+    const separators = [...container.querySelectorAll('[data-slot="separator"]')];
     expect(separators).toHaveLength(2);
     expect(separators.every((separator) => separator.getAttribute("aria-hidden") === "true")).toBe(
       true,
     );
-    expect(container.querySelector("li:last-child .tui-breadcrumbs__separator")).toBeNull();
+    expect(container.querySelector('li:last-child [data-slot="separator"]')).toBeNull();
   });
 
   test("with one step, that step is the current page", () => {
@@ -86,12 +86,17 @@ describe("BreadCrumbs", () => {
     const link = screen.getByRole("link", { name: "Clients" });
     expect(link.getAttribute("href")).toBe("/app/clients");
     expect(link.hasAttribute("data-app-link")).toBe(true);
-    expect(link.className).toBe("tui-breadcrumbs__link");
+    // The app's link component receives the classes of the library's link.
+    expect(link.getAttribute("data-slot")).toBe("link");
+    expect(link.className.split(" ")).toContain("hover:underline");
   });
 
-  test("puts the app's className on the <nav>, after the library's class", () => {
-    render(<BreadCrumbs crumbs={crumbs} className="mt-4" />);
-    expect(screen.getByRole("navigation").className).toBe("tui-breadcrumbs mt-4");
+  test("puts the app's className on the <nav>, after the library's classes", () => {
+    render(<BreadCrumbs crumbs={crumbs} className="mt-4 font-heading" />);
+    const classes = screen.getByRole("navigation").className.split(" ");
+    expect(classes.slice(-2)).toEqual(["mt-4", "font-heading"]);
+    // The app's "font-heading" replaces the library's "font-body".
+    expect(classes).not.toContain("font-body");
   });
 
   test("passes other attributes to the <nav>, the app can change its name, and ref points to it", () => {
@@ -104,7 +109,7 @@ describe("BreadCrumbs", () => {
 
   test("renders on the server", () => {
     const html = renderToString(<BreadCrumbs crumbs={crumbs} />);
-    expect(html).toContain('<nav aria-label="Breadcrumb" class="tui-breadcrumbs">');
+    expect(html).toMatch(/<nav aria-label="Breadcrumb" class="[^"]+">/);
     expect(html).toContain('aria-current="page"');
   });
 });

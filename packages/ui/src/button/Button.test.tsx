@@ -30,9 +30,35 @@ describe("Button", () => {
     expect(screen.getByRole("button").getAttribute("data-size")).toBe(size);
   });
 
-  test("adds the app's className after the library's class", () => {
+  test("adds the app's className after the library's classes", () => {
     render(<Button className="mt-4 rounded-full">Save</Button>);
-    expect(screen.getByRole("button").className).toBe("tui-button mt-4 rounded-full");
+    const classes = screen.getByRole("button").className.split(" ");
+    expect(classes.slice(-2)).toEqual(["mt-4", "rounded-full"]);
+    // The app's "rounded-full" replaces the library's "rounded". The other classes of the library stay.
+    expect(classes).not.toContain("rounded");
+    expect(classes).toContain("bg-primary");
+  });
+
+  test("a color class of the app replaces the color class of the variant", () => {
+    render(
+      <Button variant="danger" className="bg-success hover:bg-primary-hover">
+        Save
+      </Button>,
+    );
+    const classes = screen.getByRole("button").className.split(" ");
+    expect(classes).toContain("bg-success");
+    expect(classes).toContain("hover:bg-primary-hover");
+    expect(classes).not.toContain("bg-danger");
+    expect(classes).not.toContain("hover:bg-danger-hover");
+    // The class of a state has another variant, so it stays.
+    expect(classes).toContain("disabled:bg-surface");
+  });
+
+  test("a loading button has no class for the pointer over it, so its colors stay", () => {
+    render(<Button loading>Save</Button>);
+    const classes = screen.getByRole("button").className.split(" ");
+    expect(classes).toContain("bg-primary");
+    expect(classes).not.toContain("hover:bg-primary-hover");
   });
 
   test("passes other attributes to the <button>, and ref points to it", () => {
@@ -95,7 +121,7 @@ describe("Button", () => {
     expect(button.getAttribute("aria-disabled")).toBe("true");
     expect(button.disabled).toBe(false);
 
-    const spinner = button.querySelector(".tui-button__spinner");
+    const spinner = button.querySelector('[data-slot="spinner"]');
     expect(spinner?.getAttribute("aria-hidden")).toBe("true");
 
     await user.tab();

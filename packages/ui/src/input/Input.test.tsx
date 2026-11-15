@@ -14,7 +14,7 @@ describe("Input", () => {
     const field = screen.getByRole("textbox", { name: "Title" });
     expect(field.tagName).toBe("INPUT");
     expect(field.getAttribute("name")).toBe("title");
-    expect(field.className).toBe("tui-input__field");
+    expect(field.getAttribute("data-slot")).toBe("field");
 
     const label = screen.getByText("Title");
     expect(label.tagName).toBe("LABEL");
@@ -43,7 +43,7 @@ describe("Input", () => {
     const field = screen.getByRole("textbox");
     expect(field.hasAttribute("aria-invalid")).toBe(false);
     expect(field.hasAttribute("aria-describedby")).toBe(false);
-    expect(container.querySelector(".tui-input__error")).toBeNull();
+    expect(container.querySelector('[data-slot="error"]')).toBeNull();
   });
 
   test("error: the field is marked as not valid, and the message is its description", () => {
@@ -52,7 +52,7 @@ describe("Input", () => {
     expect(field.getAttribute("aria-invalid")).toBe("true");
 
     const message = screen.getByText("The title is required.");
-    expect(message.className).toBe("tui-input__error");
+    expect(message.getAttribute("data-slot")).toBe("error");
     expect(field.getAttribute("aria-describedby")).toBe(message.id);
     expect(screen.getByRole("textbox", { description: "The title is required." })).toBe(field);
     expect(message.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
@@ -97,9 +97,20 @@ describe("Input", () => {
     expect(document.activeElement).toBe(screen.getByRole("textbox"));
   });
 
-  test("puts the app's className on the outermost element, after the library's class", () => {
-    const { container } = render(<Input label="Title" className="w-64" />);
-    expect(container.firstElementChild?.className).toBe("tui-input w-64");
+  test("puts the app's className on the outermost element, after the library's classes", () => {
+    const { container } = render(<Input label="Title" className="w-64 gap-4" />);
+    const classes = container.firstElementChild?.className.split(" ") ?? [];
+    expect(classes.slice(-2)).toEqual(["w-64", "gap-4"]);
+    // The app's "gap-4" replaces the library's "gap-1". The other classes of the library stay.
+    expect(classes).not.toContain("gap-1");
+    expect(classes).toContain("flex");
+  });
+
+  test("joins the app's aria-describedby with the id of the error message", () => {
+    render(<Input label="Title" id="title" aria-describedby="title-hint" error="Required." />);
+    expect(screen.getByRole("textbox").getAttribute("aria-describedby")).toBe(
+      "title-hint title-error",
+    );
   });
 
   test("passes other attributes to the <input>, and ref points to it", () => {
@@ -122,7 +133,7 @@ describe("Input", () => {
 
   test("renders on the server, with the label linked to the field", () => {
     const html = renderToString(<Input label="Title" id="title" error="Required." />);
-    expect(html).toContain('<label class="tui-input__label" for="title">Title</label>');
+    expect(html).toMatch(/<label class="[^"]+" data-slot="label" for="title">Title<\/label>/);
     expect(html).toContain('aria-invalid="true"');
     expect(html).toContain('aria-describedby="title-error"');
   });

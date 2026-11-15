@@ -9,6 +9,21 @@ export type ExampleVariant = (typeof exampleVariants)[number];
 export const exampleSizes = ["sm", "md"] as const;
 export type ExampleSize = (typeof exampleSizes)[number];
 
+/** The classes every Example has. */
+const baseClass = "inline-flex items-center rounded border font-body";
+
+/** The padding and the font size of each size. "/normal" is the line height. */
+const sizeClass: Record<ExampleSize, string> = {
+  sm: "px-2 py-0 text-sm/normal",
+  md: "px-3 py-1 text-base/normal",
+};
+
+/** The colors of each variant. Every color is a token class. */
+const variantClass: Record<ExampleVariant, string> = {
+  neutral: "border-border bg-surface-muted text-text",
+  primary: "border-primary bg-primary text-primary-foreground",
+};
+
 export type ExampleProps = ComponentProps<"span"> & {
   /** The look. When missing: "neutral". */
   variant?: ExampleVariant;
@@ -21,7 +36,8 @@ export type ExampleProps = ComponentProps<"span"> & {
  * rename "Example", and follow the steps in README.md of this folder.
  *
  * - Every other prop goes to the <span>, and "ref" points to it.
- * - "className" is added after the library's class, and its styles win.
+ * - "className" is added after the library's classes. A class of the app
+ *   replaces the class of the library that sets the same CSS property.
  */
 export function Example({
   variant = "neutral",
@@ -32,7 +48,7 @@ export function Example({
   return (
     <span
       {...spanProps}
-      className={classNames("tui-example", className)}
+      className={classNames(baseClass, sizeClass[size], variantClass[variant], className)}
       data-variant={variant}
       data-size={size}
     />

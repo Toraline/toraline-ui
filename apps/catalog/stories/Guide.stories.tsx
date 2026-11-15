@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const ThemeOfTheApp: Story = {};
 
-/** The result of guide 3. The second button and the field have round corners, from classes of the app. */
+/** The result of guide 3. The second and the third button and the field have round corners, from classes of the app. */
 export const StyleOnTop: Story = {
   render: () => <StyledOnTop />,
 };

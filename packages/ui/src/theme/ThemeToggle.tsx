@@ -1,7 +1,15 @@
 "use client";
 
 import type { ButtonHTMLAttributes, MouseEvent } from "react";
+import { classNames } from "../shared/class-names.js";
+import { focusRingClass } from "../shared/focus-ring.js";
 import { useTheme } from "./ThemeProvider.js";
+
+const themeToggleClass = classNames(
+  "inline-flex cursor-pointer items-center gap-2 rounded border border-border-strong bg-surface-raised px-4 py-2 font-body text-base/normal text-text",
+  "hover:bg-surface-muted",
+  focusRingClass,
+);
 
 export type ThemeToggleProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
   /**
@@ -46,7 +54,7 @@ export function ThemeToggle({
       aria-label={formatLabel(theme, nextTheme)}
       {...buttonProps}
       type="button"
-      className={className ? `tui-theme-toggle ${className}` : "tui-theme-toggle"}
+      className={classNames(themeToggleClass, className)}
       onClick={handleClick}
     >
       {children ?? `Theme: ${theme}`}

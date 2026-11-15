@@ -15,9 +15,10 @@ Do guide 1 first. Guides 2 and 3 both need it.
 - **Token**: a named value of the design, for example a color or a font. It is stored as a CSS variable, for example `--color-primary`.
 - **Theme**: one set of values for the tokens. The library has the themes `light` and `dark`.
 - **`data-theme`**: the attribute on `<html>` that selects the theme, for example `<html data-theme="dark">`.
-- **Tailwind CSS**: a tool that gives one CSS class for each style, for example `p-4` for a padding. The library works with Tailwind CSS 4 and without it.
+- **Tailwind CSS**: a tool that gives one CSS class for each style, for example `p-4` for a padding. The components of the library are styled with Tailwind CSS 4 classes, so the app must use Tailwind CSS 4.
 - **Cookie**: a small named value that the browser keeps and sends to the server with every request.
-- **Cascade layer**: a named group of CSS rules with a fixed priority.
+- **Cascade layer**: a named group of CSS rules with a fixed priority. Tailwind CSS puts its classes in the cascade layer `utilities`.
+- **Tailwind variant**: the part of a Tailwind class before the `:`, which says when the class applies. Example: `hover:bg-primary-hover` applies while the pointer is over the element.
 
 ## Guide 1: install the library in an app
 
@@ -34,7 +35,7 @@ npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/ta
 
 Replace `<path>` with the folder of this repository. Guide 1 and steps 1 to 10 of guide 2 were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6.
 
-What you need: Node 24 and React 19.
+What you need: Node 24, React 19 and Tailwind CSS 4.
 
 1. Create a Next.js app. Skip this step when you already have one.
 
@@ -60,19 +61,14 @@ What you need: Node 24 and React 19.
    ```css
    @import "tailwindcss";
    @import "@toraline.tech/tokens/css/tailwind.css";
-   @import "@toraline.tech/ui/styles.css";
+   @import "@toraline.tech/ui/tailwind.css";
    ```
 
-   The second line loads the tokens and the two themes, and makes each token a Tailwind class, for example `bg-surface`. The third line loads the styles of the components.
+   The second line loads the tokens and the two themes, and makes each token a Tailwind class, for example `bg-surface`. The third line tells Tailwind to read the files of `@toraline.tech/ui`, so it builds the CSS of the classes that the components use.
+
+   All 3 lines are needed. Without the third line the Button has no style: Tailwind builds the CSS of a class only when it finds the class in a file it reads, and it does not read the folder `node_modules` by itself.
 
    The rest of the file that `create-next-app` wrote must go: it sets its own colors on `<body>`, and they would win over the colors of the theme.
-
-   An app with no Tailwind CSS writes these 2 lines:
-
-   ```css
-   @import "@toraline.tech/tokens/css";
-   @import "@toraline.tech/ui/styles.css";
-   ```
 
 4. Replace the content of `app/page.tsx`:
 
@@ -203,7 +199,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    @import "tailwindcss";
    @import "@toraline.tech/tokens/css/tailwind.css";
    @import "./theme.generated.css";
-   @import "@toraline.tech/ui/styles.css";
+   @import "@toraline.tech/ui/tailwind.css";
    ```
 
 7. Create the file `app/fonts.ts`. It loads the heading font with `next/font` and puts it in the CSS variable `--font-fraunces`, the variable that `theme.config.ts` names.
@@ -288,22 +284,28 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
 ### Without Next.js
 
-The theme function and the components do not need Next.js. These steps are for an app made with Vite and React (`npm create vite@latest my-app -- --template react-ts`). They replace steps 2 and 6 to 9.
+The theme function and the components do not need Next.js. They need Tailwind CSS 4. These steps are for an app made with Vite and React (`npm create vite@latest my-app -- --template react-ts`). They replace steps 2 and 6 to 9.
 
-1. In `theme.config.ts`, the heading font is a font the app loads by itself, or fonts every device has:
+1. Install Tailwind CSS 4 and its plugin for Vite:
+
+   ```bash
+   npm install tailwindcss @tailwindcss/vite
+   ```
+
+2. In `theme.config.ts`, the heading font is a font the app loads by itself, or fonts every device has:
 
    ```ts
    const headingFont = "Georgia, serif";
    ```
 
-2. `scripts/write-theme-css.ts` writes the file into `src/`. An app with no Tailwind CSS does not need `createTailwindTheme`:
+3. `scripts/write-theme-css.ts` writes the file into `src/`:
 
    ```ts
    import { writeFileSync } from "node:fs";
-   import { createTheme } from "@toraline.tech/tokens";
+   import { createTailwindTheme, createTheme } from "@toraline.tech/tokens";
    import { themeInputs } from "../theme.config.ts";
 
-   const css = themeInputs.map(createTheme).join("\n");
+   const css = [createTailwindTheme(themeInputs), ...themeInputs.map(createTheme)].join("\n");
 
    writeFileSync(new URL("../src/theme.generated.css", import.meta.url), css);
    console.log(`Wrote src/theme.generated.css with ${themeInputs.length} themes.`);
@@ -311,31 +313,33 @@ The theme function and the components do not need Next.js. These steps are for a
 
    The scripts of `package.json` are `"theme"`, `"predev"` and `"prebuild"`, as in step 3 above.
 
-3. The CSS file of the app (`src/index.css`) imports the tokens, the generated file and the styles of the components. With no Tailwind CSS there is no class like `bg-surface`, so the app sets the page colors with the tokens:
+4. Replace the content of the CSS file of the app (`src/index.css`). The 4 imports are the same as in a Next.js app. The rule under them gives the page the colors of the theme:
 
    ```css
-   @import "@toraline.tech/tokens/css";
+   @import "tailwindcss";
+   @import "@toraline.tech/tokens/css/tailwind.css";
    @import "./theme.generated.css";
-   @import "@toraline.tech/ui/styles.css";
+   @import "@toraline.tech/ui/tailwind.css";
 
    body {
      background-color: var(--color-surface);
      color: var(--color-text);
-     font-family: var(--font-body);
    }
    ```
 
-4. There is no server to read the cookie. A small script in `<head>` reads it before the browser paints the page. `createThemeScript` returns that script as text. Add it in `vite.config.ts`:
+5. There is no server to read the cookie. A small script in `<head>` reads it before the browser paints the page. `createThemeScript` returns that script as text. Add it, and the plugin of Tailwind, in `vite.config.ts`:
 
    ```ts
    import { defineConfig } from "vite";
    import react from "@vitejs/plugin-react";
+   import tailwindcss from "@tailwindcss/vite";
    import { createThemeScript } from "@toraline.tech/tokens";
    import { themes } from "./theme.config.ts";
 
    export default defineConfig({
      plugins: [
        react(),
+       tailwindcss(),
        {
          name: "theme-script",
          // Puts the script in <head>. The browser runs it before it paints the page.
@@ -347,7 +351,7 @@ The theme function and the components do not need Next.js. These steps are for a
    });
    ```
 
-5. In `src/main.tsx`, put the provider around the app, with no `initialTheme`. The provider takes the theme that the script wrote on `<html>`.
+6. In `src/main.tsx`, put the provider around the app, with no `initialTheme`. The provider takes the theme that the script wrote on `<html>`.
 
    ```tsx
    import { StrictMode } from "react";
@@ -367,21 +371,29 @@ The theme function and the components do not need Next.js. These steps are for a
    );
    ```
 
-`npm run build` of a Vite app prints one warning for each component: `The semantics of the module level directive "use client" ... may not be preserved`. The line `"use client"` is for Next.js. A Vite app does not need it, so the warning changes nothing.
+`npm run build` of a Vite app can print one warning for each component: `The semantics of the module level directive "use client" ... may not be preserved`. The line `"use client"` is for Next.js. A Vite app does not need it, so the warning changes nothing.
 
 ## Guide 3: style on top of a component
 
-**Result:** one Button has fully round corners, and one field too. Nothing in the library changes.
+**Result:** one Button has fully round corners and the color the app added, and one field has round corners too. Nothing in the library changes.
 
 Every component accepts `className`. The classes go on the outermost element of the component.
 
-1. **With Tailwind CSS:** give the component a Tailwind class.
+1. **With a Tailwind class:** give the component the class. It replaces the class of the library that sets the same CSS property. Here `rounded-full` replaces the library's `rounded`, and the other styles of the Button stay.
 
    ```tsx
    <Button className="rounded-full">Save</Button>
    ```
 
-2. **With your own CSS:** write a class in the CSS file of the app, and give it to the component.
+2. **A color:** a token class and a standard Tailwind class both work. A color the app added in guide 2 is a token class too.
+
+   ```tsx
+   <Button className="bg-brand text-brand-foreground hover:bg-primary-hover">Save</Button>
+   ```
+
+   A class replaces only a class with the same Tailwind variant. `bg-brand` replaces the library's `bg-primary`. It does not replace `hover:bg-primary-hover` or `disabled:bg-surface`. So give one class for each state you want to change: `hover:` for the pointer over the element, `disabled:` for a disabled element, `focus-visible:` for the keyboard focus. A state you give no class for keeps the look of the library.
+
+3. **With your own CSS:** write a class in the CSS file of the app, in no cascade layer, and give it to the component.
 
    ```css
    .round {
@@ -393,10 +405,10 @@ Every component accepts `className`. The classes go on the outermost element of 
    <Button className="round">Save</Button>
    ```
 
-3. **An inner part of a component:** a component with more than one element gives each inner element a class named `tui-<component>__<part>`. Use it after your own class. This rule makes the field of one Input round:
+4. **An inner part of a component:** a component with more than one element gives each inner element the attribute `data-slot`, with the name of the part. Use it after your own class. This rule makes the field of one Input round:
 
    ```css
-   .search .tui-input__field {
+   .search [data-slot="field"] {
      border-radius: 9999px;
    }
    ```
@@ -405,7 +417,7 @@ Every component accepts `className`. The classes go on the outermost element of 
    <Input className="search" label="Search" name="search" />
    ```
 
-4. **With the colors of the theme:** use the tokens in your own CSS, so the style follows the theme. A color the app added in guide 2 is a token too.
+5. **With the colors of the theme in your own CSS:** use the tokens, so the style follows the theme.
 
    ```css
    .brand-note {
@@ -414,9 +426,16 @@ Every component accepts `className`. The classes go on the outermost element of 
    }
    ```
 
-Why your class wins: the styles of the library are in the cascade layer `components`. A Tailwind class is in the layer `utilities`, which has a higher priority. CSS of the app that is in no layer has a higher priority than every layer. So you never need `!important`.
+Why your class wins:
 
-The classes of the inner parts of each component are listed in `packages/ui/README.md`.
+- **A Tailwind class.** Every component joins its own classes and your `className` with the library `tailwind-merge`. When two Tailwind classes set the same CSS property, with the same Tailwind variant, only the last one stays. Yours is last.
+- **Your own CSS.** The Tailwind classes of the library are in the cascade layer `utilities`. CSS of the app that is in no layer has a higher priority than every layer.
+
+So you never need `!important`.
+
+Limit: a class of your own CSS that is inside `@layer components` or `@layer base` does not win, because those layers have a lower priority than `utilities`. Write the class in no layer.
+
+The `data-slot` names of the inner parts of each component are listed in `packages/ui/README.md`.
 
 ## Where to look next
 
