@@ -1,6 +1,6 @@
-# Publishes @toraline.tech/tokens and @toraline.tech/ui (version 2) to the public npm registry.
+# Publishes @toraline.tech/tokens and @toraline.tech/ui to the public npm registry.
 #
-# It runs ONLY when a person starts it by hand: GitHub > Actions > "Release version 2" >
+# It runs ONLY when a person starts it by hand: GitHub > Actions > "Release" >
 # "Run workflow", with the branch main. It never runs on a push, on a tag or on a GitHub release.
 # The steps for a person are in docs/releasing.md.
 #
@@ -11,13 +11,13 @@
 #   Name: NPM_PUBLISH_TOKEN
 #   Value: an npm access token that may publish the packages of the scope @toraline.tech.
 # Without that secret a real publish stops at its first step, with a message that names the secret.
-name: Release version 2
+name: Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "The version to publish. It must be the version in packages/ui/package.json, for example 2.0.0-beta.0"
+        description: "The version to publish. It must be the version in packages/ui/package.json, for example 0.1.0"
         required: true
         type: string
       publish:
@@ -90,8 +90,8 @@ jobs:
           TORALINE_RELEASE: ${{ inputs.version }}
           PUBLISH: ${{ inputs.publish }}
         run: |
-          # A version with a dash (2.0.0-beta.0) is a pre-release: it gets the npm tag "next".
-          # A version with no dash (2.0.0) is a full release: it gets the npm tag "latest".
+          # A version with a dash (0.2.0-beta.0) is a pre-release: it gets the npm tag "next".
+          # A version with no dash (0.1.0) gets the npm tag "latest".
           case "${VERSION}" in
             *-*) tag=next ;;
             *) tag=latest ;;

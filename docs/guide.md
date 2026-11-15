@@ -23,13 +23,13 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be a test version, `2.0.0-beta.0`, and the command of step 2 is written for it.
+**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be a test version, `0.1.0`, and the command of step 2 is written for it.
 
 To use the library before the release, build the two package files in this repository and install them in the app:
 
 ```bash
 make pack     # in this repository; writes 2 files into .pack/tarballs/
-npm install <path>/.pack/tarballs/toraline-tokens-2.0.0-beta.0.tgz <path>/.pack/tarballs/toraline-ui-2.0.0-beta.0.tgz     # in the app, in place of step 2
+npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.1.0.tgz     # in the app, in place of step 2
 ```
 
 Replace `<path>` with the folder of this repository. Guide 1 and steps 1 to 10 of guide 2 were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6.
@@ -48,12 +48,12 @@ What you need: Node 24 and React 19.
 2. Install the two packages.
 
    ```bash
-   npm install @toraline.tech/ui@next @toraline.tech/tokens@next
+   npm install @toraline.tech/ui @toraline.tech/tokens
    ```
 
    `@toraline.tech/ui` has the components. `@toraline.tech/tokens` has the tokens, the themes and the function that builds a theme. Install both, always in the same version.
 
-   `@next` selects the newest test version. After the full release `2.0.0`, the command is `npm install @toraline.tech/ui @toraline.tech/tokens`.
+   The library is at version `0.x`: it is tested in Toraline's own apps, and props and tokens may still change between versions.
 
 3. Open `app/globals.css`. Delete everything in it, and write these 3 lines:
 

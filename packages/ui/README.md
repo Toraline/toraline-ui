@@ -14,16 +14,16 @@ A theme is a set of colors, fonts and corner sizes. The page selects a theme wit
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline.tech/ui` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+**The package is not published yet.** Today (2026-11-15) `@toraline.tech/ui` is not on the npm registry. The first version will be `0.1.0`.
 
 After the first release:
 
 ```bash
-npm install @toraline.tech/ui@next @toraline.tech/tokens@next
+npm install @toraline.tech/ui @toraline.tech/tokens
 ```
 
 - Install both packages, in the same version. `@toraline.tech/ui` needs exactly its own version of `@toraline.tech/tokens`.
-- `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
+- The library is at version `0.x`: props and tokens may still change between versions.
 - The app needs React 19 (`react` and `react-dom`). Tailwind CSS 4 is optional.
 - The package has ES modules only (files read with `import`), with type files for TypeScript.
 

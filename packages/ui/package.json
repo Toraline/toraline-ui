@@ -1,6 +1,6 @@
 {
   "name": "@toraline.tech/ui",
-  "version": "2.0.0-beta.0",
+  "version": "0.1.0",
   "description": "Styled React components of the Toraline component library.",
   "keywords": [
     "toraline",
@@ -57,7 +57,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@toraline.tech/tokens": "2.0.0-beta.0"
+    "@toraline.tech/tokens": "0.1.0"
   },
   "devDependencies": {
     "@types/react": "19.3.0",
