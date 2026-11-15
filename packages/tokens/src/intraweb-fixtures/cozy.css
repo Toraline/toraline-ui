@@ -1,0 +1,101 @@
+/*
+ * A copy of the theme file "cozy" of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/themes/cozy.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+/*
+ * Tema Aconchegante: creme e rosa Prontera, cantos mais suaves e sombras quentes.
+ * Contraste AA com o fundo dos cards (#fffaf5): texto terciário 5,3:1, botão primário 5,1:1.
+ */
+[data-theme="cozy"] {
+  color-scheme: light;
+
+  --bg-page: #f6ede3;
+  --bg-surface: #fffaf5;
+  --bg-subtle: #fbf3ea;
+  --bg-muted: #f3e7da;
+  --bg-inverse: #9a5f50;
+  --bg-inverse-hover: #82493b;
+  --bg-selected: #f8ebe6;
+  --bg-danger-subtle: var(--color-red-50);
+  --bg-error: var(--color-red-50);
+  --bg-success: var(--color-green-50);
+  --bg-warning: var(--color-orange-50);
+  --bg-overlay: rgb(59 42 34 / 0.45);
+  --bg-primary: #9a5f50;
+  --bg-primary-hover: #82493b;
+  --bg-primary-subtle: #f8ebe6;
+  --bg-primary-muted: #f1d9d1;
+  --bg-accent-subtle: #edf2f5;
+  --bg-highlight: #fff1dc;
+  --bg-info: #f8ebe6;
+  --bg-tooltip: #3b2a22;
+
+  --text-primary: #3b2a22;
+  --text-strong: #4a362c;
+  --text-body: #5e4636;
+  --text-secondary: #6f5646;
+  --text-tertiary: #7d6353;
+  --text-muted: #a89282;
+  --text-inverse: #ffffff;
+  --text-danger: var(--color-red-700);
+  --text-error: var(--color-red-700);
+  --text-success: var(--color-green-700);
+  --text-warning: var(--color-orange-700);
+  --text-caution: var(--color-orange-700);
+  --text-brand: #8a5244;
+  --text-info: #8a5244;
+  --text-accent: #42637c;
+
+  --border-default: #eadccf;
+  --border-strong: #dccbbb;
+  --border-subtle: #f3e9de;
+  --border-hover: #c9b4a2;
+  --border-focus: #9a5f50;
+  --border-inverse: #9a5f50;
+  --border-brand: #9a5f50;
+  --border-danger: var(--color-red-200);
+  --border-error: var(--color-red-200);
+  --border-invalid: var(--color-red-600);
+  --border-changed: var(--color-orange-400);
+  --border-success: var(--color-green-200);
+  --border-info: #e7cfc6;
+  --border-warning: var(--color-orange-200);
+
+  --icon-default: #8a7060;
+  --icon-strong: #5e4636;
+  --icon-brand: #8a5244;
+
+  --data-1: #9a5f50;
+  --data-2: #d7ada1;
+  --data-3: #42637c;
+  --data-success: var(--color-green-500);
+  --data-warning: var(--color-orange-400);
+  --data-danger: var(--color-red-600);
+  --data-track: #eadccf;
+
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+}
+
+/* O Tailwind embute o valor das sombras na classe; aqui só troca a cor para o marrom quente. */
+[data-theme="cozy"] .shadow-sm {
+  --tw-shadow: 0 1px 2px rgb(94 70 54 / 0.06);
+}
+[data-theme="cozy"] .shadow-card {
+  --tw-shadow: 0 1px 2px rgb(94 70 54 / 0.05), 0 6px 20px rgb(94 70 54 / 0.07);
+}
+[data-theme="cozy"] .shadow-lg {
+  --tw-shadow: 0 4px 6px -2px rgb(94 70 54 / 0.05), 0 12px 20px -4px rgb(94 70 54 / 0.12);
+}
+[data-theme="cozy"] .shadow-xl {
+  --tw-shadow: 0 8px 8px -4px rgb(94 70 54 / 0.05), 0 20px 28px -4px rgb(94 70 54 / 0.12);
+}
+[data-theme="cozy"] .shadow-2xl {
+  --tw-shadow: 0 24px 48px -12px rgb(94 70 54 / 0.25);
+}

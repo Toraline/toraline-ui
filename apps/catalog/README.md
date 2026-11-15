@@ -87,7 +87,7 @@ Checked on 2026-11-15 with Storybook 10.6.7, Vitest 5.1.0, Playwright 1.65.1 (Ch
 
 ```bash
 make catalog-test    # 94 tests passed: 47 stories in the project stories-light, 47 in stories-dark
-make check           # 396 tests passed: 302 unit tests and the 94 story tests. About 25 seconds
+make check           # 408 tests passed: 314 unit tests and the 94 story tests. About 25 seconds
 ```
 
 | Check | Result |

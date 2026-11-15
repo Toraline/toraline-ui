@@ -1,0 +1,119 @@
+/*
+ * A copy of the theme file "old" of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/themes/old.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+/*
+ * Tema Old: painéis de pedra escura, bordas de bronze e dourado, cantos quase retos e relevo
+ * chanfrado nas sombras. Títulos em Pixelify Sans (licença OFL); sem imagens do jogo.
+ * Contraste AA com o fundo dos cards (#2a2520): texto terciário 5,2:1, dourado 8,4:1.
+ */
+[data-theme="old"] {
+  color-scheme: dark;
+
+  --bg-page: #17130f;
+  --bg-surface: #2a2520;
+  --bg-subtle: #332d27;
+  --bg-muted: #3b342d;
+  --bg-inverse: #c9a24a;
+  --bg-inverse-hover: #dbb75e;
+  --bg-selected: #3a3222;
+  --bg-danger-subtle: #3a1b16;
+  --bg-error: #3a1b16;
+  --bg-success: #1c2e19;
+  --bg-warning: #35290f;
+  --bg-overlay: rgb(0 0 0 / 0.65);
+  --bg-primary: #c9a24a;
+  --bg-primary-hover: #dbb75e;
+  --bg-primary-subtle: #3a3222;
+  --bg-primary-muted: #4a3f28;
+  --bg-accent-subtle: #22321e;
+  --bg-highlight: #3a3020;
+  --bg-info: #3a3222;
+  --bg-tooltip: #f0e6cf;
+
+  --text-primary: #f0e6cf;
+  --text-strong: #e6d9bb;
+  --text-body: #d2c4a5;
+  --text-secondary: #b8aa8a;
+  --text-tertiary: #a69a7c;
+  --text-muted: #6e634f;
+  --text-inverse: #17130f;
+  --text-danger: #f07b6c;
+  --text-error: #f07b6c;
+  --text-success: #8fcf7a;
+  --text-warning: #f2c14e;
+  --text-caution: #f2c14e;
+  --text-brand: #e0bd66;
+  --text-info: #e0bd66;
+  --text-accent: #8fcf7a;
+
+  --border-default: #5a4a35;
+  --border-strong: #7a6340;
+  --border-subtle: #3b342d;
+  --border-hover: #9b7f4f;
+  --border-focus: #e0bd66;
+  --border-inverse: #c9a24a;
+  --border-brand: #c9a24a;
+  --border-danger: #7a2a1e;
+  --border-error: #7a2a1e;
+  --border-invalid: #f07b6c;
+  --border-changed: #f2c14e;
+  --border-success: #3d6b33;
+  --border-info: #6b5733;
+  --border-warning: #8a5a12;
+
+  --icon-default: #a69a7c;
+  --icon-strong: #d2c4a5;
+  --icon-brand: #e0bd66;
+
+  --data-1: #c9a24a;
+  --data-2: #7a6340;
+  --data-3: #6fae5a;
+  --data-success: #6fae5a;
+  --data-warning: #f2c14e;
+  --data-danger: #d9533f;
+  --data-track: #3b342d;
+
+  --radius-md: 0.125rem;
+  --radius-lg: 0.1875rem;
+  --radius-xl: 0.25rem;
+  --radius-2xl: 0.375rem;
+
+  /* Telas antigas (paletas cruas): o escuro do dark.css vale aqui, só os neutros ficam quentes. */
+  --color-white: #2a2520;
+  --color-zinc-50: #332d27;
+  --color-zinc-100: #3b342d;
+  --color-zinc-200: #5a4a35;
+  --color-zinc-300: #7a6340;
+  --color-zinc-400: #6e634f;
+  --color-zinc-500: #a69a7c;
+  --color-zinc-600: #b8aa8a;
+  --color-zinc-700: #d2c4a5;
+  --color-zinc-800: #e6d9bb;
+  --color-zinc-900: #f0e6cf;
+}
+
+:root[data-theme="old"] {
+  --font-display: var(--font-pixelify);
+}
+
+/* Relevo de pedra: luz em cima à esquerda, sombra embaixo à direita. */
+[data-theme="old"] .shadow-sm {
+  --tw-shadow: inset 1px 1px 0 rgb(255 240 200 / 0.06), 0 1px 2px rgb(0 0 0 / 0.5);
+}
+[data-theme="old"] .shadow-card {
+  --tw-shadow:
+    inset 1px 1px 0 rgb(255 240 200 / 0.08), inset -1px -1px 0 rgb(0 0 0 / 0.45),
+    0 0 0 1px #4a3d2b, 0 2px 6px rgb(0 0 0 / 0.5);
+}
+[data-theme="old"] .shadow-lg,
+[data-theme="old"] .shadow-xl {
+  --tw-shadow: inset 1px 1px 0 rgb(255 240 200 / 0.08), 0 0 0 1px #7a6340, 0 12px 20px rgb(0 0 0 / 0.6);
+}
+[data-theme="old"] .shadow-2xl {
+  --tw-shadow: inset 1px 1px 0 rgb(255 240 200 / 0.08), 0 0 0 1px #9b7f4f, 0 24px 48px rgb(0 0 0 / 0.7);
+}

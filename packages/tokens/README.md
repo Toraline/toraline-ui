@@ -145,6 +145,12 @@ To change the light or the dark theme of the library, use its name: `createTheme
 
 `createTheme` throws an error when a name has other characters, or when a value has one of `;`, `{`, `}`, `<`, `>`, `\` or `/*`. This stops a value from closing the CSS block.
 
+### A theme of an app can change every token
+
+The app Intraweb has 3 themes of its own next to `light` and `dark`: `cozy` (cream and pink, softer corners, warm shadows), `old` (dark, almost square corners, its own heading font) and `glass` (translucent cards). They stay in Intraweb: the library has only `light` and `dark`. The test `src/intraweb-app-themes.test.ts` builds the 3 with `createTheme`, from copies of Intraweb's files: every color, the radius sizes, the shadows and the heading font. A transparent color (`rgb(255 255 255 / 0.68)`) is a value like any other.
+
+What `createTheme` cannot express is a CSS rule: it gives values to tokens. The theme `glass` has 4 such rules (a gradient behind the page, a blur behind each card, a less transparent background for a menu or a dialog, and a fallback for a browser with no blur). An app keeps such rules in its own CSS file, next to the output of `createTheme`. The same test checks that they work together.
+
 `getAddedColorNames(input)` returns the colors of an input that the library does not have. For the example above: `["bg-promo"]`.
 
 ## Fonts

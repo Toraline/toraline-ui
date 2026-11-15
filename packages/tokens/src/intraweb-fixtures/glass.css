@@ -1,0 +1,73 @@
+/*
+ * A copy of the theme file "glass" of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/themes/glass.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+/*
+ * Tema Vidro: fundo em degradê azul e rosa Prontera, com menu, barras e cards de vidro fosco
+ * (translúcidos com desfoque). Herda os demais tokens do Claro (`:root`).
+ * Contraste AA medido sobre o vidro no ponto mais escuro do degradê (vidro ≈ #ecf2f8): texto
+ * terciário 5,4:1, marca 5,6:1, status 5,7:1 ou mais, botão primário 6,3:1. Por isso o terciário e
+ * os textos de sucesso e alerta são mais escuros que no Claro.
+ */
+[data-theme="glass"] {
+  color-scheme: light;
+
+  --bg-page: #e8eef5;
+  --bg-surface: rgb(255 255 255 / 0.68);
+  --bg-subtle: rgb(255 255 255 / 0.45);
+  --bg-muted: rgb(226 232 240 / 0.6);
+  --bg-selected: rgb(222 233 242 / 0.75);
+  --bg-primary-subtle: rgb(222 233 242 / 0.8);
+  --bg-primary-muted: rgb(200 218 232 / 0.85);
+  --bg-overlay: rgb(16 24 40 / 0.35);
+
+  --text-tertiary: #55627a;
+  --text-success: #166534;
+  --text-warning: #9a3412;
+  --text-caution: #9a3412;
+
+  --border-default: rgb(100 116 139 / 0.22);
+  --border-subtle: rgb(100 116 139 / 0.14);
+  --border-strong: rgb(100 116 139 / 0.4);
+
+  --data-track: rgb(203 213 225 / 0.7);
+
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+}
+
+[data-theme="glass"] body {
+  background:
+    radial-gradient(60rem 40rem at 0% 0%, rgb(178 205 226 / 0.7), transparent 60%),
+    radial-gradient(50rem 36rem at 100% 10%, rgb(240 200 190 / 0.6), transparent 60%),
+    radial-gradient(56rem 40rem at 50% 100%, rgb(205 196 236 / 0.5), transparent 60%),
+    var(--bg-page);
+  background-attachment: fixed;
+}
+
+/* Campos ficam sem desfoque: o filtro cria uma camada própria que cobre ícones posicionados sobre eles. */
+[data-theme="glass"] .bg-surface:not(input, select, textarea) {
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+
+/* Menus, popovers e modais flutuam sobre o conteúdo: vidro mais opaco para o texto não brigar com o que está atrás. */
+[data-theme="glass"] .bg-surface:is(.shadow-lg, .shadow-xl, .shadow-2xl, [role="menu"], [role="dialog"]) {
+  background-color: rgb(255 255 255 / 0.86);
+}
+
+[data-theme="glass"] .shadow-card {
+  --tw-shadow: 0 1px 1px rgb(255 255 255 / 0.6) inset, 0 8px 24px rgb(30 50 80 / 0.08);
+}
+[data-theme="glass"] .shadow-lg {
+  --tw-shadow: 0 12px 32px -6px rgb(30 50 80 / 0.18);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme="glass"] {
+    --bg-surface: rgb(255 255 255 / 0.92);
+  }
+}
