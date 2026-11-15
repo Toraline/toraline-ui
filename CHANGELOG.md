@@ -47,6 +47,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - TabNav: tabs where each tab is a link to a route, in two looks: `primary` (a line under the current tab) and `secondary` (the segmented control). The app gives the current path (`currentPath`) and its link component (`linkComponent`). The current tab has `aria-current="page"`.
 - Tabs: `content` of a tab is optional. An app that shows the content itself gives no content and reads the selected tab from `value`. The type of `value` is the ids of the tabs when they are written as fixed texts.
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
+- DataTable, with the parts `Tr`, `Th`, `Td`, `ActionsTh` and `DataTableMessage`: a real `<table>` inside a card, with the look of Intraweb's DataTable. The table needs a name (`caption`, `aria-label` or `aria-labelledby`). `Th` and `Td` have `align`; `Tr` has `selected` (the row of the open record, `aria-current="true"`) and `hoverable`; `ActionsTh` is the header of the column of the buttons of each row; `DataTableMessage` is the row of an empty or a loading table. A table wider than its box scrolls sideways and can then be scrolled with the keyboard. `stackOnMobile` shows each row as a block on a screen less than 768 pixels wide (phase 10, TOR-1126).
 
 ## 0.1.0 (2026-11-15)
 

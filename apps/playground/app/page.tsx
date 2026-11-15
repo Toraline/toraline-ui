@@ -24,6 +24,11 @@ export default function Page() {
           TabNav: tabs that are links to routes
         </a>
       </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/data">
+          The data components: DataTable, DataGrid, ListItem, DetailPanel
+        </a>
+      </p>
 
       <section className="mt-6 rounded-xl border border-default bg-surface p-4 shadow-card">
         <h2 className="font-heading text-xl font-bold">A card</h2>

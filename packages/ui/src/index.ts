@@ -46,3 +46,23 @@ export type {
   SplitButtonMenuPlacement,
   SplitButtonProps,
 } from "./split-button/index.js";
+
+// Phase 10: data
+export {
+  ActionsTh,
+  DataTable,
+  DataTableMessage,
+  Td,
+  Th,
+  Tr,
+  tableCellAlignments,
+} from "./data-table/index.js";
+export type {
+  ActionsThProps,
+  DataTableMessageProps,
+  DataTableProps,
+  TableCellAlignment,
+  TdProps,
+  ThProps,
+  TrProps,
+} from "./data-table/index.js";

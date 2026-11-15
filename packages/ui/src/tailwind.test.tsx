@@ -26,6 +26,8 @@ import {
   splitButtonMenuPlacements,
   tabNavVariants,
 } from "./index";
+// Phase 10: data
+import { ActionsTh, DataTable, DataTableMessage, Td, Th, Tr, tableCellAlignments } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -166,6 +168,32 @@ async function renderEveryComponent(): Promise<string[]> {
           </Example>
         )),
       )}
+      {/* Phase 10: data */}
+      {[false, true].map((stackOnMobile) => (
+        <DataTable key={String(stackOnMobile)} caption="Orders" stackOnMobile={stackOnMobile}>
+          <thead>
+            <tr>
+              {tableCellAlignments.map((align) => (
+                <Th key={align} align={align}>
+                  Client
+                </Th>
+              ))}
+              <ActionsTh />
+            </tr>
+          </thead>
+          <tbody>
+            <Tr hoverable selected>
+              {tableCellAlignments.map((align) => (
+                <Td key={align} align={align} data-label="Client">
+                  Fernando Dias
+                </Td>
+              ))}
+              <Td />
+            </Tr>
+            <DataTableMessage colSpan={4}>No orders yet.</DataTableMessage>
+          </tbody>
+        </DataTable>
+      ))}
     </ThemeProvider>,
   );
 
@@ -271,8 +299,9 @@ describe("the classes of the components use only tokens", () => {
     // A breakpoint of Tailwind ("lg:") is a media query with a width in rem. It
     // is Tailwind's own value for the width of the screen, not a length of a
     // component, so the width of a media query is left out of this check.
+    // "max-md:" (phase 10, a table shown as blocks) is the same breakpoint, as "width < 48rem".
     const withoutBreakpoints = utilitiesLayer(cssOfClasses).replace(
-      /@media \(width >= \d+(\.\d+)?rem\)/g,
+      /@media \(width (>=|<) \d+(\.\d+)?rem\)/g,
       "@media (breakpoint)",
     );
     expect(withoutBreakpoints).toContain("@media (breakpoint)");
@@ -319,6 +348,12 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
     ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
+    // Phase 10: data
+    // Tr: the row of the open record wins over the row under the pointer.
+    ["hover:bg-subtle", "aria-[current=true]:bg-selected"],
+    // DataTable with stackOnMobile: the classes of a narrow screen win over the classes of a cell.
+    ["border-b", "max-md:[&_td]:[border:0]"],
+    ["py-2.5", "max-md:[&_td]:py-1.5"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

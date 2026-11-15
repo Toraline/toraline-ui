@@ -108,6 +108,13 @@ test.each([lightTheme, darkTheme])(
       // A placeholder, and the text of a disabled button or field.
       ["text-tertiary", "bg-surface"],
       ["text-tertiary", "bg-subtle"],
+      // Phase 10: data. The selected row of a table and the selected item of a list.
+      ["text-primary", "bg-subtle"],
+      ["text-primary", "bg-selected"],
+      ["text-body", "bg-selected"],
+      ["text-tertiary", "bg-selected"],
+      ["text-secondary", "bg-selected"],
+      ["text-secondary", "bg-subtle"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
@@ -141,6 +148,11 @@ test.each([lightTheme, darkTheme])(
       ["icon-strong", "bg-subtle"],
       ["icon-brand", "bg-primary-subtle"],
       ["icon-brand", "bg-primary-muted"],
+      // Phase 10: data. The line on the left of the selected row and of the selected item.
+      ["border-brand", "bg-selected"],
+      ["bg-primary", "bg-selected"],
+      ["icon-default", "bg-subtle"],
+      ["icon-default", "bg-selected"],
     ];
     for (const [foreground, background] of pairs) {
       expect(

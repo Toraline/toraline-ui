@@ -546,3 +546,59 @@ The tests use Vitest, Testing Library and `@testing-library/user-event`, which p
 
 1. The component is on the page of `apps/playground`, with every variant and state.
 2. This file has the component's props and one short example.
+
+## The data components (phase 10)
+
+They come from `@toraline.tech/ui`, as the components above, and follow the same rules. The route `/data` of [`apps/playground`](../../apps/playground/README.md) shows them.
+
+### `DataTable`, `Tr`, `Th`, `Td`, `ActionsTh`, `DataTableMessage`
+
+A table of data inside a card. It is a real `<table>`: the app writes `<thead>`, `<tbody>` and `<tfoot>` itself, with the parts of the library inside.
+
+```tsx
+import { Pencil } from "lucide-react";
+import { ActionsTh, DataTable, DataTableMessage, IconButton, Td, Th, Tr } from "@toraline.tech/ui";
+
+<DataTable caption="Orders">
+  <thead>
+    <tr>
+      <Th>Client</Th>
+      <Th align="right">Total</Th>
+      <ActionsTh />
+    </tr>
+  </thead>
+  <tbody>
+    {orders.length === 0 ? <DataTableMessage colSpan={3}>No orders yet.</DataTableMessage> : null}
+    {orders.map((order) => (
+      <Tr key={order.id} hoverable selected={order.id === openOrderId}>
+        <Td>{order.client}</Td>
+        <Td align="right">{order.total}</Td>
+        <Td className="w-12" align="right">
+          <IconButton icon={Pencil} size="sm" aria-label={`Edit the order of ${order.client}`} />
+        </Td>
+      </Tr>
+    ))}
+  </tbody>
+</DataTable>
+```
+
+| Part | Prop | Values | Meaning |
+|---|---|---|---|
+| `DataTable` | `caption` | Text or elements | The name of the table. A screen reader says it; it is not shown. The table needs `caption`, `aria-label` or `aria-labelledby`: TypeScript refuses a table with none of them |
+| `DataTable` | `stackOnMobile` | `true`, `false` (default) | `true`: on a screen less than 768 pixels wide, each row is a block, and each cell is one line with the name of its column on the left. Each `Td` then needs the attribute `data-label` with the name of its column. A cell with no `data-label` (the cell of the buttons) is a line of its own |
+| `Tr` | `selected` | `true`, `false` (default) | The row of the record that is open, for example in a panel next to the table. The row gets `aria-current="true"`, the background `bg-selected` and a line in the brand color on its left |
+| `Tr` | `hoverable` | `true`, `false` (default) | The row has a quiet background while the pointer is over it |
+| `Th` | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. When missing: the left |
+| `Th` | `scope` | `"col"` (default), `"row"`, `"colgroup"`, `"rowgroup"` | The HTML attribute: what the header cell names |
+| `Td` | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers: it also gives every digit the same width (`tabular-nums`), so the numbers of a column line up |
+| `ActionsTh` | `label` | Text. Default `"Actions"` | The name of the column of the buttons of each row. Only a screen reader says it |
+| `DataTableMessage` | `colSpan` | A number. Required | The number of columns of the table. The part is one row with one message as wide as the table: a table with no rows, or a table whose rows are loading |
+
+- The classes are the ones of the DataTable of the app Intraweb (`components/ui/data-table.tsx`). The look was compared with Intraweb's in both themes.
+- Main native element: the `<table>`. Every other prop and `ref` go to it. `className` goes to the box around the table (`data-slot="box"`), which is the card.
+- Each part (`Tr`, `Th`, `Td`) gives `className`, every other prop and `ref` to its own element. A plain `<tr>` works too. `DataTableMessage` gives them to its `<td>`.
+- A table wider than its box scrolls sideways. While it is wider, the box can get the keyboard focus (`tabindex="0"`), so the arrow keys scroll it, and it has `role="group"` and the name of the table. A table that fits adds no stop for the Tab key.
+- A table whose rows are loading: give `aria-busy="true"` to `DataTable` and the text in a `DataTableMessage`.
+- A footer row is a `<tfoot>` with classes of the app, for example `<tr className="bg-subtle font-medium">` and `<Td className="border-t border-default text-strong">`.
+- The list `tableCellAlignments` and the types `DataTableProps`, `TrProps`, `ThProps`, `TdProps`, `ActionsThProps`, `DataTableMessageProps` and `TableCellAlignment` are exported.
+- They have no `"use client"`: they also render in a Server Component. Only the box around the table runs in the browser, to measure its width.
