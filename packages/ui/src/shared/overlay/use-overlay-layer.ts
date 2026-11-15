@@ -29,7 +29,18 @@ export function isTopmostOverlay(token: symbol): boolean {
   return openOverlays.at(-1) === token;
 }
 
+/** The token of one overlay: what the list of open overlays holds for it. It stays the same while the overlay is on the page. */
+export function useOverlayToken(): symbol {
+  const tokenRef = useRef<symbol | null>(null);
+  if (tokenRef.current === null) {
+    tokenRef.current = Symbol("overlay");
+  }
+  return tokenRef.current;
+}
+
 export type OverlayLayerOptions = {
+  /** The token of the overlay, from useOverlayToken. */
+  token: symbol;
   /** The panel of the overlay: the element with the role "dialog". */
   panelRef: RefObject<HTMLElement | null>;
   /** Called when a person presses Escape while this overlay is the newest open one. */
@@ -49,16 +60,8 @@ export type OverlayLayerOptions = {
  *    or to the panel. When it closes, the focus goes back to where it was.
  * 3. Escape reaches only the newest overlay.
  * 4. Tab and Shift+Tab stay inside the panel: after the last element comes the first.
- *
- * It returns the token of the overlay, for isTopmostOverlay.
  */
-export function useOverlayLayer({ panelRef, onEscape, containFocus }: OverlayLayerOptions): symbol {
-  const tokenRef = useRef<symbol | null>(null);
-  if (tokenRef.current === null) {
-    tokenRef.current = Symbol("overlay");
-  }
-  const token = tokenRef.current;
-
+export function useOverlayLayer({ token, panelRef, onEscape, containFocus }: OverlayLayerOptions): void {
   useEffect(() => {
     openOverlays.push(token);
     return () => {
@@ -134,6 +137,4 @@ export function useOverlayLayer({ panelRef, onEscape, containFocus }: OverlayLay
     document.addEventListener("focusin", handleFocusIn);
     return () => document.removeEventListener("focusin", handleFocusIn);
   }, [token, panelRef, containFocus]);
-
-  return token;
 }

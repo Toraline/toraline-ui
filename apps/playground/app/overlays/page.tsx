@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CloseButton } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
+import { ConfirmationExamples } from "./ConfirmationExamples";
 import { DrawerExamples } from "./DrawerExamples";
 import { ModalExamples } from "./ModalExamples";
 
@@ -52,6 +53,10 @@ export default function OverlaysPage() {
           The page stays usable while the panel is open: press the button of the page.
         </p>
         <DrawerExamples />
+      </Section>
+
+      <Section title="DiscardConfirmation and DeleteOverlay">
+        <ConfirmationExamples />
       </Section>
     </main>
   );

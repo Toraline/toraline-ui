@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 9: overlays
-import { CloseButton, Drawer, Modal, modalSizes } from "./index";
+import { CloseButton, DeleteOverlay, DiscardConfirmation, Drawer, Modal, modalSizes } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -114,6 +114,26 @@ function OverlayExamples() {
           The content
         </Drawer>
       ))}
+      <DeleteOverlay
+        title="Delete"
+        cancelLabel="Cancel"
+        deleteLabel="Delete"
+        closeLabel="Close"
+        consequence="Its prices are deleted too."
+        error="It could not be deleted."
+        onDelete={() => undefined}
+        onClose={() => undefined}
+      >
+        Delete the product?
+      </DeleteOverlay>
+      <DiscardConfirmation
+        title="Discard the changes?"
+        description="What you typed is lost."
+        discardLabel="Discard"
+        keepEditingLabel="Keep editing"
+        onDiscard={() => undefined}
+        onKeepEditing={() => undefined}
+      />
     </>
   );
 }
@@ -361,6 +381,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // Phase 9, Drawer: the same, for the footer and the width.
     ["px-4", "md:px-6"],
     ["w-full", "md:max-w-lg"],
+    // Phase 9, DiscardConfirmation: the buttons are in a row on a wide screen.
+    ["flex-col-reverse", "sm:flex-row"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

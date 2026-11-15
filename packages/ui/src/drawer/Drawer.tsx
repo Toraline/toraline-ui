@@ -3,13 +3,20 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { DiscardConfirmation } from "../discard-confirmation/DiscardConfirmation.js";
+import type { DiscardConfirmationTexts } from "../discard-confirmation/DiscardConfirmation.js";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
 import { mergeRefs } from "../shared/merge-refs.js";
 import { tabbableElements } from "../shared/overlay/focusable.js";
 import { OverlayHeader } from "../shared/overlay/OverlayHeader.js";
 import { useIsClient } from "../shared/overlay/use-is-client.js";
-import { OVERLAY_PANEL_ATTRIBUTE, useOverlayLayer } from "../shared/overlay/use-overlay-layer.js";
+import {
+  OVERLAY_PANEL_ATTRIBUTE,
+  useOverlayLayer,
+  useOverlayToken,
+} from "../shared/overlay/use-overlay-layer.js";
+import { useUnsavedChanges } from "../shared/overlay/use-unsaved-changes.js";
 
 /*
  * The classes of Drawer are the ones of the Drawer of the app Intraweb
@@ -58,6 +65,12 @@ export type DrawerProps = Omit<ComponentProps<"div">, "title"> & {
   wide?: boolean;
   /** The name of the button that closes the panel, for a screen reader. When missing: "Close". */
   closeLabel?: string;
+  /**
+   * The 4 texts of the question "discard the changes?". When the app gives
+   * them, the panel asks before it closes with something typed and not saved,
+   * and before a click on the page next to it is done. When missing: no question.
+   */
+  discardConfirmation?: DiscardConfirmationTexts;
 };
 
 /**
@@ -73,6 +86,10 @@ export type DrawerProps = Omit<ComponentProps<"div">, "title"> & {
  * - Escape closes the panel. With several overlays open, only the newest.
  * - When it closes, the focus goes back to the element that had it before.
  * - The page next to the panel can still be clicked: the panel has no dark layer.
+ * - With "discardConfirmation": a person who typed in a field inside the
+ *   panel and did not send the form is asked before the panel closes, and
+ *   before a click on the page next to it is done. After "discard", that click
+ *   is done again. A field with the attribute data-overlay-ignore-dirty does not count.
  * - While it is open, <body> has the attribute data-drawer-open ("narrow" or
  *   "wide"), so the CSS of the app can make room for the panel.
  * - "className", every other prop and "ref" go to the panel, the element with role="dialog".
@@ -89,6 +106,7 @@ function DrawerPanel({
   footer,
   wide = false,
   closeLabel = "Close",
+  discardConfirmation,
   className,
   children,
   ref,
@@ -99,7 +117,14 @@ function DrawerPanel({
   const bodyRef = useRef<HTMLDivElement>(null);
   const [isBodyInTabOrder, setIsBodyInTabOrder] = useState(false);
 
-  useOverlayLayer({ panelRef, onEscape: onClose, containFocus: false });
+  const token = useOverlayToken();
+  const { requestClose, isAsking, discard, keepEditing } = useUnsavedChanges({
+    enabled: discardConfirmation !== undefined,
+    panelRef,
+    token,
+    onClose,
+  });
+  useOverlayLayer({ token, panelRef, onEscape: requestClose, containFocus: false });
 
   // Content with nothing to stop at (only text) is put in the Tab order itself,
   // so a person who uses the keyboard can scroll it with the arrow keys.
@@ -119,27 +144,43 @@ function DrawerPanel({
   }, [wide]);
 
   return createPortal(
-    <div
-      aria-labelledby={titleId}
-      {...panelProps}
-      ref={mergeRefs(panelRef, ref)}
-      {...{ [OVERLAY_PANEL_ATTRIBUTE]: "" }}
-      role="dialog"
-      aria-modal="false"
-      tabIndex={-1}
-      className={classNames(panelClass, wide ? wideClass : narrowClass, className)}
-      data-wide={wide}
-    >
-      <OverlayHeader id={titleId} title={title} actions={actions} closeLabel={closeLabel} onClose={onClose} />
-      <div ref={bodyRef} className={bodyClass} data-slot="body" tabIndex={isBodyInTabOrder ? 0 : undefined}>
-        {children}
-      </div>
-      {footer === undefined || footer === null || footer === false ? null : (
-        <div className={footerClass} data-slot="footer">
-          {footer}
+    <>
+      <div
+        aria-labelledby={titleId}
+        {...panelProps}
+        ref={mergeRefs(panelRef, ref)}
+        {...{ [OVERLAY_PANEL_ATTRIBUTE]: "" }}
+        role="dialog"
+        aria-modal="false"
+        tabIndex={-1}
+        className={classNames(panelClass, wide ? wideClass : narrowClass, className)}
+        data-wide={wide}
+      >
+        <OverlayHeader
+          id={titleId}
+          title={title}
+          actions={actions}
+          closeLabel={closeLabel}
+          onClose={requestClose}
+        />
+        <div
+          ref={bodyRef}
+          className={bodyClass}
+          data-slot="body"
+          tabIndex={isBodyInTabOrder ? 0 : undefined}
+        >
+          {children}
         </div>
-      )}
-    </div>,
+        {footer === undefined || footer === null || footer === false ? null : (
+          <div className={footerClass} data-slot="footer">
+            {footer}
+          </div>
+        )}
+      </div>
+      {isAsking && discardConfirmation !== undefined ? (
+        <DiscardConfirmation {...discardConfirmation} onDiscard={discard} onKeepEditing={keepEditing} />
+      ) : null}
+    </>,
     document.body,
   );
 }

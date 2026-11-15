@@ -52,6 +52,8 @@ The components get the shape of the same components of the app Intraweb: variant
 - CloseButton: the button with a cross that closes a dialog or a side panel. Its name for a screen reader is `"Close"` unless the app gives `aria-label`.
 - Modal: a dialog above the page, in the sizes `md`, `lg`, `xl` and `full`. The focus goes into it, Tab stays inside, Escape closes only the newest overlay, and the focus goes back to the element that opened it.
 - Drawer: a panel on the right side of the screen with a footer that stays at the bottom. It leaves the page next to it usable. It has the same 3 focus rules as Modal. While it is open, `<body>` has the attribute `data-drawer-open`.
+- DiscardConfirmation: the question before something a person typed is lost. Modal and Drawer show it by themselves when they get the prop `discardConfirmation` with its 4 texts.
+- DeleteOverlay: the dialog that asks before something is deleted, with the states `pending`, `error` and `blocked`. Every text of the 2 confirmation dialogs is a prop of the app.
 
 ## 0.1.0 (2026-11-15)
 

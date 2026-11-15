@@ -647,6 +647,7 @@ A dialog above the page, for a task that needs the whole attention. The app rend
 | `actions` | Elements | Buttons or links next to the title, before the button that closes |
 | `size` | `"md"`, `"lg"` (default), `"xl"`, `"full"` | The widest the dialog gets: 512, 672, 896 and 1152 pixels |
 | `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+| `discardConfirmation` | `{ title, description, discardLabel, keepEditingLabel }` | The 4 texts of the question before unsaved changes are lost. When missing: the dialog never asks. See [`DiscardConfirmation`](#discardconfirmation) |
 
 - Focus: when the dialog opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the dialog itself. When it closes, the focus goes back to the element that had it before, for example the button that opened it.
 - Keyboard: Tab and Shift+Tab stay inside the dialog; after the last element comes the first. Escape closes the dialog. With several overlays open, Escape closes only the newest one.
@@ -690,6 +691,7 @@ A panel on the right side of the screen that leaves the page next to it visible 
 | `actions` | Elements | Buttons or links next to the title, before the button that closes |
 | `wide` | `true`, `false` (default) | `true`: the panel is 896 pixels wide at most, for a form with a table. `false`: 512 pixels |
 | `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+| `discardConfirmation` | `{ title, description, discardLabel, keepEditingLabel }` | The 4 texts of the question before unsaved changes are lost. When missing: the panel never asks. See [`DiscardConfirmation`](#discardconfirmation) |
 
 - Focus: when the panel opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the panel itself. When it closes, the focus goes back to the element that had it before.
 - Keyboard: Tab and Shift+Tab stay inside the panel while the focus is in it; after the last element (in the footer) comes the first. Escape closes the panel. With several overlays open, Escape closes only the newest one.
@@ -701,3 +703,90 @@ A panel on the right side of the screen that leaves the page next to it visible 
 - Main element: the `<div role="dialog">`, which is also the outermost element. `className`, every other prop and `ref` go to it. The parts have `data-slot`: `header`, `title`, `actions`, `body`, `footer`.
 - The panel is rendered in `<body>` (a portal), so it renders nothing on the server.
 - It is a Client Component. `onClose` is a function, so the file of the app that renders a Drawer is a Client Component too.
+
+### `DiscardConfirmation`
+
+```tsx
+const discardTexts = {
+  title: "Discard the changes?",
+  description: "You typed something that is not saved yet. If you leave now, these changes are lost.",
+  discardLabel: "Discard",
+  keepEditingLabel: "Keep editing",
+};
+
+// Modal and Drawer show the question by themselves:
+<Drawer title="Order 12" discardConfirmation={discardTexts} onClose={close}>
+  <form>...</form>
+</Drawer>
+
+// An app shows it itself for another case:
+{isAsking ? <DiscardConfirmation {...discardTexts} onDiscard={leave} onKeepEditing={stay} /> : null}
+```
+
+The question a person gets before something they typed is lost. The library has no text of its own: the 4 texts are required props.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The question. It is the name of the dialog for a screen reader |
+| `description` | Text or elements. Required | What happens. A screen reader says it after the title |
+| `discardLabel` | Text or elements. Required | The text of the button that loses the changes |
+| `keepEditingLabel` | Text or elements. Required | The text of the button that goes back to the form |
+| `onDiscard` | A function. Required | Called when the person chooses to lose the changes |
+| `onKeepEditing` | A function. Required | Called when the person chooses to go on editing, with the button or with Escape |
+
+- Focus: the focus goes to the button that keeps editing, the safe choice. When the question closes, the focus goes back to the element that had it before.
+- Keyboard: Tab and Shift+Tab stay inside the question. Escape means "keep editing".
+- Pointer: a click on the dark layer does nothing. The person must choose.
+- Screen reader: `role="alertdialog"`, `aria-modal="true"`, `aria-labelledby` (the title) and `aria-describedby` (the description).
+- `className`, every other prop and `ref` go to the `<div role="alertdialog">`. The parts have `data-slot`: `backdrop`, `title`, `description`, `buttons`.
+- In a Modal or a Drawer with `discardConfirmation`:
+  - A person who typed in a field inside it (an `input` or `change` event) and did not send the form (a `submit` event) is asked before it closes: the button with the cross, Escape, or the dark layer of the Modal.
+  - A click on the page next to a Drawer is stopped and asks first. After "discard", the same click is done again.
+  - The browser asks before the page is left or loaded again.
+  - A field with the attribute `data-overlay-ignore-dirty`, or inside an element with it, does not count as a change, for example a search field.
+- The type `DiscardConfirmationTexts` is the 4 texts, for a file of the app that holds them once.
+- It is a Client Component, and renders nothing on the server.
+
+### `DeleteOverlay`
+
+```tsx
+{isOpen ? (
+  <DeleteOverlay
+    title="Delete"
+    cancelLabel="Cancel"
+    deleteLabel="Delete"
+    pendingLabel="Deleting…"
+    closeLabel="Close"
+    consequence="Its prices are deleted too."
+    pending={isDeleting}
+    error={deleteError}
+    onDelete={deleteProduct}
+    onClose={close}
+  >
+    Delete the product "Brownie"? This cannot be undone.
+  </DeleteOverlay>
+) : null}
+```
+
+The dialog that asks before something is deleted. It is a [`Modal`](#modal) in the size `md`. The library has no text of its own, and it does not delete: the app does, and gives `pending`, `error` and `blocked`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the dialog |
+| `children` | Text or elements. Required | The question, with the name of what is deleted |
+| `cancelLabel` | Text or elements. Required | The text of the button that goes back |
+| `deleteLabel` | Text or elements. Required | The text of the button that deletes |
+| `closeLabel` | Text. Required | The name of the button with the cross, and the text of the button of the `blocked` view |
+| `onDelete` | A function. Required | Called when the person presses the button that deletes |
+| `onClose` | A function. Required | Called when the person cancels: the button, the cross, Escape or the dark layer |
+| `consequence` | Text or elements | What else is deleted with it, in a quiet color |
+| `pending` | `true`, `false` (default) | `true` while the delete runs: the button that deletes is in the state `loading` of Button |
+| `pendingLabel` | Text or elements | The text of the button that deletes while `pending` is `true`. When missing: `deleteLabel` |
+| `error` | Text or elements | The message when the delete failed. It has `role="alert"` |
+| `blocked` | Elements | Give it when the record cannot be deleted: the explanation. It replaces the question and the 2 buttons, and one button with the text of `closeLabel` closes the dialog |
+| `blockedTitle` | Text or elements | The title while `blocked` is given. When missing: `title` |
+
+- Focus and keyboard: the rules of Modal. The focus goes to the button that cancels, the safe choice.
+- `className`, every other prop and `ref` go to the dialog, as in Modal. The parts have `data-slot`: `content`, `question`, `consequence`, `error`, `buttons`.
+- It is a Client Component, and renders nothing on the server.
+

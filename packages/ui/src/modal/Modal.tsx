@@ -3,11 +3,18 @@
 import { useEffect, useId, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { DiscardConfirmation } from "../discard-confirmation/DiscardConfirmation.js";
+import type { DiscardConfirmationTexts } from "../discard-confirmation/DiscardConfirmation.js";
 import { classNames } from "../shared/class-names.js";
 import { mergeRefs } from "../shared/merge-refs.js";
 import { OverlayHeader } from "../shared/overlay/OverlayHeader.js";
 import { useIsClient } from "../shared/overlay/use-is-client.js";
-import { OVERLAY_PANEL_ATTRIBUTE, useOverlayLayer } from "../shared/overlay/use-overlay-layer.js";
+import {
+  OVERLAY_PANEL_ATTRIBUTE,
+  useOverlayLayer,
+  useOverlayToken,
+} from "../shared/overlay/use-overlay-layer.js";
+import { useUnsavedChanges } from "../shared/overlay/use-unsaved-changes.js";
 import type { ModalSize } from "./modal-options.js";
 
 /*
@@ -53,6 +60,12 @@ export type ModalProps = Omit<ComponentProps<"div">, "title"> & {
   size?: ModalSize;
   /** The name of the button that closes the dialog, for a screen reader. When missing: "Close". */
   closeLabel?: string;
+  /**
+   * The 4 texts of the question "discard the changes?". When the app gives
+   * them, the dialog asks before it closes with something typed and not saved.
+   * When missing: the dialog closes with no question.
+   */
+  discardConfirmation?: DiscardConfirmationTexts;
 };
 
 /**
@@ -68,6 +81,9 @@ export type ModalProps = Omit<ComponentProps<"div">, "title"> & {
  * - Escape closes the dialog. With several overlays open, only the newest.
  * - When it closes, the focus goes back to the element that had it before.
  * - A click on the dark layer closes it. The page behind does not scroll.
+ * - With "discardConfirmation": a person who typed in a field inside the
+ *   dialog and did not send the form is asked before the dialog closes. A field
+ *   with the attribute data-overlay-ignore-dirty does not count.
  * - "className", every other prop and "ref" go to the dialog, the element with role="dialog".
  */
 export function Modal(props: ModalProps) {
@@ -81,6 +97,7 @@ function ModalDialog({
   actions,
   size = "lg",
   closeLabel = "Close",
+  discardConfirmation,
   className,
   children,
   ref,
@@ -91,7 +108,14 @@ function ModalDialog({
   /** The click closes only when the press started on the dark layer: selecting text and letting go outside does not close. */
   const pressedBackdrop = useRef(false);
 
-  useOverlayLayer({ panelRef, onEscape: onClose, containFocus: true });
+  const token = useOverlayToken();
+  const { requestClose, isAsking, discard, keepEditing } = useUnsavedChanges({
+    enabled: discardConfirmation !== undefined,
+    panelRef,
+    token,
+    onClose,
+  });
+  useOverlayLayer({ token, panelRef, onEscape: requestClose, containFocus: true });
 
   // The page behind does not scroll while the dialog is open.
   useEffect(() => {
@@ -106,12 +130,14 @@ function ModalDialog({
     <div
       className={backdropClass}
       data-slot="backdrop"
+      // The dark layer is part of the overlay: a click on it is handled here, not as a click behind a panel.
+      {...{ [OVERLAY_PANEL_ATTRIBUTE]: "" }}
       onMouseDown={(event) => {
         pressedBackdrop.current = event.target === event.currentTarget;
       }}
       onClick={(event) => {
         if (pressedBackdrop.current && event.target === event.currentTarget) {
-          onClose();
+          requestClose();
         }
         pressedBackdrop.current = false;
       }}
@@ -128,11 +154,20 @@ function ModalDialog({
         data-size={size}
       >
         <div aria-hidden="true" className={handleClass} data-slot="handle" />
-        <OverlayHeader id={titleId} title={title} actions={actions} closeLabel={closeLabel} onClose={onClose} />
+        <OverlayHeader
+          id={titleId}
+          title={title}
+          actions={actions}
+          closeLabel={closeLabel}
+          onClose={requestClose}
+        />
         <div className={bodyClass} data-slot="body">
           {children}
         </div>
       </div>
+      {isAsking && discardConfirmation !== undefined ? (
+        <DiscardConfirmation {...discardConfirmation} onDiscard={discard} onKeepEditing={keepEditing} />
+      ) : null}
     </div>,
     document.body,
   );

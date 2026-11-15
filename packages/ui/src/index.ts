@@ -74,3 +74,12 @@ export type { ModalProps, ModalSize } from "./modal/index.js";
 
 export { Drawer } from "./drawer/index.js";
 export type { DrawerProps } from "./drawer/index.js";
+
+export { DiscardConfirmation } from "./discard-confirmation/index.js";
+export type {
+  DiscardConfirmationProps,
+  DiscardConfirmationTexts,
+} from "./discard-confirmation/index.js";
+
+export { DeleteOverlay } from "./delete-overlay/index.js";
+export type { DeleteOverlayProps } from "./delete-overlay/index.js";
