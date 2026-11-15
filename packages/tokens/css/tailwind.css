@@ -1,7 +1,7 @@
 /*
  * The Tailwind CSS 4 preset of the Toraline tokens.
  *
- * Import this file after "tailwindcss". It does 5 things:
+ * Import this file after "tailwindcss". It does 6 things:
  * 1. It loads the level 1 tokens, the light theme and the dark theme.
  * 2. It makes every level 1 color a Tailwind color, for example bg-brand-700.
  * 3. It makes every level 2 token a Tailwind class. Examples:
@@ -13,10 +13,12 @@
  *    --font-heading    -> font-heading
  *    --text-sm         -> text-sm (the font size)
  *    --spacing         -> the unit of p-4, gap-2 and every other spacing class
- *    --radius          -> rounded
- *    --shadow          -> shadow
- * 4. It makes --font-body the font of the page.
- * 5. It makes the Tailwind variant "dark:" follow data-theme="dark".
+ *    --radius-md       -> rounded-md
+ *    --shadow-card     -> shadow-card
+ * 4. It adds the text styles: one class that sets the font, the size and the
+ *    weight of a text together, for example heading-page and label.
+ * 5. It makes --font-body the font of the page.
+ * 6. It makes the Tailwind variant "dark:" follow data-theme="dark".
  *
  * The class names are the class names of the app Intraweb, so a component
  * copied from Intraweb needs no change in its classes.
@@ -168,7 +170,7 @@
  * theme. They are used only when no theme file is loaded.
  *
  * This block must stay equal to "lightTheme" in src/themes.ts, without the
- * colors and the shadow. A test compares the two.
+ * colors and the shadows. A test compares the two.
  */
 @theme {
   --font-body: var(--font-stack-sans);
@@ -181,7 +183,10 @@
 
   --spacing: var(--space-1);
 
-  --radius: var(--radius-size-md);
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
 
   /* Tailwind uses these two for the page and for <code>, <kbd>, <pre> and <samp>. */
   --default-font-family: var(--font-body);
@@ -189,12 +194,92 @@
 }
 
 /*
- * The shadow is different. Tailwind copies the value of a shadow into the class
- * "shadow" when it builds the CSS. With "inline", the value it copies is
- * "var(--shadow)", so the class still follows the theme.
+ * The shadows are different. Tailwind copies the value of a shadow into the
+ * class when it builds the CSS. With "inline", the value it copies is
+ * "var(--shadow-card)", so the class still follows the theme.
  */
 @theme inline {
-  --shadow: var(--shadow);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-card: var(--shadow-card);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
+/*
+ * The text styles. A text style sets the font, the size, the line height and
+ * the weight of a text together: <h1 class="heading-page">. They are the text
+ * style utilities of Intraweb's globals.css, with the same names and values.
+ * The sizes are in rem, so the text follows the font size of the page.
+ *
+ * These blocks must stay equal to "textStyles" in src/text-styles.ts.
+ * A test compares the two.
+ */
+@utility heading-page {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+@utility heading-section {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+}
+
+@utility heading-card {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+@utility display-number {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility display-number-sm {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+@utility label-lg {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+@utility label-sm {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+@utility caption-overline {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

@@ -9,7 +9,7 @@ const listClass = "m-0 flex list-none flex-wrap items-baseline gap-2 p-0";
 const itemClass = "inline-flex items-baseline gap-2";
 
 const linkClass = classNames(
-  "rounded text-secondary no-underline hover:text-brand hover:underline",
+  "rounded-md text-secondary no-underline hover:text-brand hover:underline",
   focusRingClass,
 );
 

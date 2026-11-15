@@ -7,7 +7,8 @@ import { createTheme } from "./create-theme";
 import { createTailwindTheme } from "./tailwind";
 import { primitives } from "./primitives";
 import { getTailwindColorMapping } from "./tailwind-variables";
-import { colorTokenNames, lightTheme } from "./themes";
+import { textStyleNames, textStyles } from "./text-styles";
+import { colorTokenNames, lightTheme, themeTokenNames } from "./themes";
 
 const presetPath = fileURLToPath(new URL("../css/tailwind.css", import.meta.url));
 
@@ -76,12 +77,17 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     const colorNames: readonly string[] = colorTokenNames;
     const otherLightTokens = Object.fromEntries(
       Object.entries(lightTheme.tokens)
-        .filter(([tokenName]) => !colorNames.includes(tokenName) && tokenName !== "shadow")
+        .filter(([tokenName]) => !colorNames.includes(tokenName) && !tokenName.startsWith("shadow-"))
         .map(([tokenName, value]) => [`--${tokenName}`, value]),
     );
     expect(tokens).toEqual(otherLightTokens);
-    expect(lightTheme.tokens.shadow).toBe("var(--shadow-size-sm)");
-    expect(readPreset()).toContain("@theme inline {\n  --shadow: var(--shadow);\n}");
+    // The shadows are in a block "@theme inline": each class reads the token itself.
+    const shadowBlock = [...readPreset().matchAll(/@theme inline \{([\s\S]*?)\}/g)][1]?.[1] ?? "";
+    const shadowNames = themeTokenNames.filter((tokenName) => tokenName.startsWith("shadow-"));
+    expect(shadowNames).toEqual(["shadow-sm", "shadow-card", "shadow-lg", "shadow-xl", "shadow-2xl"]);
+    expect(readVariables(shadowBlock)).toEqual(
+      Object.fromEntries(shadowNames.map((shadowName) => [`--${shadowName}`, `var(--${shadowName})`])),
+    );
     expect(defaultFont).toBe("var(--font-body)");
     expect(defaultMonoFont).toBe("var(--font-mono)");
   });
@@ -131,8 +137,16 @@ describe("css/tailwind.css, the Tailwind preset", () => {
       "font-body",
       "font-heading",
       "font-mono",
-      "rounded",
-      "shadow",
+      "rounded-md",
+      "rounded-lg",
+      "rounded-xl",
+      "rounded-2xl",
+      "rounded-t-md",
+      "shadow-sm",
+      "shadow-card",
+      "shadow-lg",
+      "shadow-xl",
+      "shadow-2xl",
       "text-sm",
       "text-base",
       "text-lg",
@@ -142,13 +156,64 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     expect(css).toContain(".font-body { font-family: var(--font-body); }");
     expect(css).toContain(".font-heading { font-family: var(--font-heading); }");
     expect(css).toContain(".font-mono { font-family: var(--font-mono); }");
-    expect(css).toContain(".rounded { border-radius: var(--radius); }");
-    expect(css).toContain("--tw-shadow: var(--shadow);");
+    for (const sizeName of ["md", "lg", "xl", "2xl"]) {
+      expect(css).toContain(`.rounded-${sizeName} { border-radius: var(--radius-${sizeName}); }`);
+    }
+    expect(css).toContain(
+      ".rounded-t-md { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }",
+    );
+    for (const shadowName of ["sm", "card", "lg", "xl", "2xl"]) {
+      expect(css).toMatch(
+        new RegExp(`\\.shadow-${shadowName} \\{ --tw-shadow: var\\(--shadow-${shadowName}\\); box-shadow:`),
+      );
+    }
     for (const sizeName of ["sm", "base", "lg"]) {
       expect(css).toContain(`.text-${sizeName} { font-size: var(--text-${sizeName});`);
     }
     expect(css).toContain(".p-4 { padding: calc(var(--spacing) * 4); }");
     expect(css).toContain("--spacing: var(--space-1);");
+  });
+
+  test("the radius sizes and the shadows of Tailwind that are not tokens stay as Tailwind defines them", async () => {
+    const css = await buildCss(["rounded-full", "rounded-sm", "shadow-md"]);
+    expect(css).toContain(".rounded-full { border-radius: calc(infinity * 1px); }");
+    expect(css).toContain(".rounded-sm { border-radius: var(--radius-sm); }");
+    expect(css).toContain(".shadow-md { --tw-shadow: 0 4px 6px -1px");
+  });
+
+  test("a shadow class follows the theme: a theme that changes the token changes the class", async () => {
+    const appCss = createTheme({ name: "warm", shadows: { card: "0 6px 20px rgb(94 70 54 / 0.07)" } });
+    const css = await buildCss(["shadow-card"], appCss);
+    expect(css).toContain(".shadow-card { --tw-shadow: var(--shadow-card);");
+    expect(css).toMatch(/\[data-theme="?warm"?\] \{[^}]*--shadow-card: 0 6px 20px rgb\(94 70 54 \/ 0\.07\);/);
+  });
+
+  test("its text styles have exactly the declarations of text-styles.ts", () => {
+    const utilities = [...readPreset().matchAll(/@utility ([a-z-]+) \{([\s\S]*?)\}/g)];
+    const presetStyles = Object.fromEntries(
+      utilities.map((match) => [
+        match[1],
+        Object.fromEntries(
+          [...(match[2] as string).matchAll(/([a-z-]+):\s*([^;]+);/g)].map((declaration) => [
+            declaration[1],
+            (declaration[2] as string).trim(),
+          ]),
+        ),
+      ]),
+    );
+    expect(presetStyles).toEqual(textStyles);
+    expect(Object.keys(presetStyles)).toEqual(textStyleNames);
+  });
+
+  test("every text style is a Tailwind class", async () => {
+    const css = await buildCss([...textStyleNames]);
+    for (const [name, declarations] of Object.entries(textStyles)) {
+      const body = Object.entries(declarations)
+        .map(([property, value]) => `${property}: ${value};`)
+        .join(" ");
+      expect(css).toContain(`.${name} { ${body} }`);
+    }
+    expect(css).toContain(".heading-page { font-family: var(--font-heading); font-size: 1.5rem; line-height: 2rem; font-weight: 600; }");
   });
 
   test("the built CSS has both themes, so data-theme changes what the classes show", async () => {

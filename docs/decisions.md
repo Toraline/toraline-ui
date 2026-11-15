@@ -12,6 +12,22 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Radius sizes, shadows and text styles of Intraweb (TOR-1134)
+- Decision: the level 2 tokens `--radius` and `--shadow` are replaced by the 4 radius sizes and the 5 shadows of Intraweb, with the same names and values: `--radius-md` (`0.5rem`), `--radius-lg` (`0.75rem`), `--radius-xl` (`1rem`), `--radius-2xl` (`1.25rem`), and `--shadow-sm`, `--shadow-card`, `--shadow-lg`, `--shadow-xl`, `--shadow-2xl`. The Tailwind classes are `rounded-md` to `rounded-2xl` and `shadow-sm` to `shadow-2xl`. There are now 75 level 2 tokens. The level 1 tokens `--radius-size-*` and `--shadow-size-*` are removed: nothing points to them.
+- Old name → new name: `--radius` and the class `rounded` → `--radius-md` and `rounded-md`. `--shadow` and the class `shadow` → the shadow of the part: `--shadow-lg` and `shadow-lg` for a menu, `--shadow-card` and `shadow-card` for a card.
+- Decision: they are level 2 tokens, with a value in each theme. The light and the dark theme have the same values.
+- Why: in Intraweb they are in the `@theme` block, and the themes cozy, old and glass change them. A level 2 token is what a theme of an app can change through the theme function.
+- Decision: the preset declares the shadows in a block `@theme inline` (`--shadow-card: var(--shadow-card)`), so the class reads the token and follows the theme. This is the mechanism the library already had for `--shadow` (entry of TOR-1008).
+- Difference from Intraweb: Intraweb declares the shadows in a plain `@theme` block. Tailwind then copies the value into the class, and Intraweb's themes change a shadow with a CSS rule for each class (`[data-theme="cozy"] .shadow-card { --tw-shadow: ... }`). The class names are the same. With the library a theme changes a shadow by changing the token. Known limit of `inline`: the Tailwind classes that give a shadow another color (`shadow-red-500`) have no effect on these 5 shadows.
+- Decision: `createTheme` accepts `radius` as one value or as an object, and a new field `shadows`. One value changes `--radius-md`, the corner of a button and a field, which is what `radius` changed before. An object changes each size it names (`md`, `lg`, `xl`, `2xl`). `shadows` has `sm`, `card`, `lg`, `xl`, `2xl`.
+- Decision: the 9 text styles of Intraweb are classes of the preset, written with `@utility`, with the same names and declarations: `heading-page`, `heading-section`, `heading-card`, `display-number`, `display-number-sm`, `label`, `label-lg`, `label-sm`, `caption-overline`. The same values are the TypeScript object `textStyles`. They are not level 2 tokens: no theme of Intraweb changes them, and their font is the token `--font-heading`.
+- Decision: the sizes of the text styles stay in `rem`, as in Intraweb. No component of the library uses a text style in this phase, so the rule "no length in `rem` in the classes of a component" (test `packages/ui/src/tailwind.test.tsx`) still holds.
+- Not copied: Intraweb's utility `select-chevron`. It is the arrow of a select field, not a text style, and the library has no select.
+- The tokens page of the catalog shows the 4 radius sizes, the 5 shadows and a table of the 9 text styles.
+- Decision: the classes of the components move in this commit: `rounded` → `rounded-md`, and the menu of SplitButton gets `rounded-lg` and `shadow-lg`, the classes of Intraweb's menu of actions.
+- Alternatives: keeping `--radius` and `--shadow` next to the new tokens; a plain `@theme` block for the shadows, as in Intraweb; text styles as level 2 tokens, one for each property.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The light and the dark theme have the values of Intraweb (TOR-1133)
 - Decision: every level 2 color token of the themes `light` and `dark` has the value of Intraweb's `styles/themes/light.css` and `styles/themes/dark.css`, written the same way: the light theme points to level 1 colors (`var(--color-slate-100)`), the dark theme has raw values (`#0c111d`).
 - Decision: copies of the two files are in `packages/tokens/src/intraweb-fixtures/light.css` and `dark.css`. The first comment of each copy names the source file, the commit of the repository `prontera-e-juno` (`f8ad4c2`) and the date of the copy (2026-11-15). The test `packages/tokens/src/intraweb.test.ts` compares the 59 color tokens of each theme with its copy: the names, the values and the order.

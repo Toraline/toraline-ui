@@ -49,9 +49,27 @@ export type ThemeInput = {
    * Any CSS length. A smaller value makes every component more compact.
    */
   spacing?: string;
-  /** How round the corners are. Any CSS length, for example "0.25rem". */
-  radius?: string;
+  /**
+   * How round the corners are. Any CSS length, for example "0.25rem".
+   * One value changes --radius-md, the corner of a button and a field.
+   * An object changes each size it names: "md" (button, field), "lg" (menu,
+   * popover), "xl" (card, table, dialog) and "2xl" (drawer).
+   */
+  radius?: string | Partial<Record<ThemeRadiusName, string>>;
+  /**
+   * The shadows. The value is any CSS box-shadow value. The sizes are "sm",
+   * "card" (card, table), "lg" (menu, popover), "xl" and "2xl" (dialog, drawer).
+   */
+  shadows?: Partial<Record<ThemeShadowName, string>>;
 };
+
+/** The radius sizes of the library. "md" is the level 2 token --radius-md. */
+export const themeRadiusNames = ["md", "lg", "xl", "2xl"] as const;
+export type ThemeRadiusName = (typeof themeRadiusNames)[number];
+
+/** The shadows of the library. "card" is the level 2 token --shadow-card. */
+export const themeShadowNames = ["sm", "card", "lg", "xl", "2xl"] as const;
+export type ThemeShadowName = (typeof themeShadowNames)[number];
 
 const defaultThemes = { light: lightTheme, dark: darkTheme };
 
@@ -165,9 +183,26 @@ export function createTheme(input: ThemeInput): string {
     tokens.spacing = input.spacing;
   }
 
-  if (input.radius !== undefined) {
-    assertValue(input.radius, "the radius");
-    tokens.radius = input.radius;
+  // One value is the radius of a button and a field: --radius-md.
+  const radius = typeof input.radius === "string" ? { md: input.radius } : (input.radius ?? {});
+  for (const [radiusName, value] of Object.entries(radius)) {
+    if (!(themeRadiusNames as readonly string[]).includes(radiusName)) {
+      throw new Error(
+        `createTheme: "${radiusName}" is not a radius size of the library. The radius sizes are "md", "lg", "xl" and "2xl".`,
+      );
+    }
+    assertValue(value, `the radius "${radiusName}"`);
+    tokens[`radius-${radiusName}`] = value;
+  }
+
+  for (const [shadowName, value] of Object.entries(input.shadows ?? {})) {
+    if (!(themeShadowNames as readonly string[]).includes(shadowName)) {
+      throw new Error(
+        `createTheme: "${shadowName}" is not a shadow of the library. The shadows are "sm", "card", "lg", "xl" and "2xl".`,
+      );
+    }
+    assertValue(value, `the shadow "${shadowName}"`);
+    tokens[`shadow-${shadowName}`] = value;
   }
 
   const themeSelector = `[data-theme="${input.name}"]`;

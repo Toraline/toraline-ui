@@ -8,7 +8,7 @@
   justify-items: start;
   gap: calc(var(--spacing) * 4);
   padding: calc(var(--spacing) * 6);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   background-color: var(--bg-page);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -25,7 +25,7 @@
 .guide-promo-note {
   margin: 0;
   padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   background-color: var(--bg-promo);
   color: var(--text-on-promo);
 }

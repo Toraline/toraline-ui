@@ -24,3 +24,5 @@ export {
 } from "./theme-storage.js";
 export type { ThemeScriptOptions } from "./theme-storage.js";
 export { createTailwindTheme } from "./tailwind.js";
+export { textStyleNames, textStyles } from "./text-styles.js";
+export type { TextStyleName } from "./text-styles.js";

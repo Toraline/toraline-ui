@@ -25,11 +25,11 @@ const buttonClass = classNames(
   focusRingClass,
 );
 
-const mainClass = classNames(buttonClass, "rounded-l rounded-r-none px-4 py-2");
+const mainClass = classNames(buttonClass, "rounded-l-md rounded-r-none px-4 py-2");
 
 const triggerClass = classNames(
   buttonClass,
-  "group/trigger rounded-l-none rounded-r px-3 py-2 enabled:aria-expanded:bg-primary-hover",
+  "group/trigger rounded-l-none rounded-r-md px-3 py-2 enabled:aria-expanded:bg-primary-hover",
 );
 
 /** The arrow points to where the menu opens, and turns over while the menu is open. */
@@ -46,13 +46,13 @@ const arrowClass = classNames(
  * Its colors, and the colors of an action, are the ones of the menu of actions of the app Intraweb.
  */
 const menuClass = classNames(
-  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded border border-subtle bg-surface p-1 shadow",
+  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded-lg border border-subtle bg-surface p-1 shadow-lg",
   "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
 );
 
 /** One action. The action under the pointer and the action that has the keyboard focus have a quiet background. */
 const itemClass = classNames(
-  "flex cursor-pointer items-center gap-3 rounded border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-body",
+  "flex cursor-pointer items-center gap-3 rounded-md border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-body",
   "hover:bg-subtle focus:bg-subtle",
   focusRingClass,
 );

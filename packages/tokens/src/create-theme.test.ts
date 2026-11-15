@@ -43,7 +43,7 @@ describe("createTheme", () => {
   test('with base "dark", the values the app does not give come from the dark theme', () => {
     const css = createTheme({ name: "night", base: "dark", radius: "0" });
     expect(css).toContain("  color-scheme: dark;\n");
-    expect(readCssVariables(css)).toEqual({ ...darkTheme.tokens, radius: "0" });
+    expect(readCssVariables(css)).toEqual({ ...darkTheme.tokens, "radius-md": "0" });
   });
 
   test("a changed text size and a changed spacing unit", () => {
@@ -57,6 +57,44 @@ describe("createTheme", () => {
       createTheme({ name: "compact", textSizes: { huge: "3rem" } as { base: string } }),
     ).toThrow(/not a text size/);
     expect(() => createTheme({ name: "compact", spacing: "1px; }" })).toThrow(/the spacing/);
+  });
+
+  test("one radius value changes --radius-md, and an object changes each size it names", () => {
+    expect(readCssVariables(createTheme({ name: "square", radius: "0.125rem" }))).toEqual({
+      ...lightTheme.tokens,
+      "radius-md": "0.125rem",
+    });
+    expect(
+      readCssVariables(
+        createTheme({ name: "soft", radius: { md: "0.625rem", lg: "1rem", xl: "1.25rem", "2xl": "1.5rem" } }),
+      ),
+    ).toEqual({
+      ...lightTheme.tokens,
+      "radius-md": "0.625rem",
+      "radius-lg": "1rem",
+      "radius-xl": "1.25rem",
+      "radius-2xl": "1.5rem",
+    });
+    expect(() => createTheme({ name: "soft", radius: { full: "9999px" } as { md: string } })).toThrow(
+      /not a radius size/,
+    );
+    expect(() => createTheme({ name: "soft", radius: { lg: "1rem; }" } })).toThrow(/the radius "lg"/);
+  });
+
+  test("changed shadows", () => {
+    const css = createTheme({
+      name: "warm",
+      shadows: { sm: "0 1px 2px rgb(94 70 54 / 0.06)", card: "0 1px 2px rgb(94 70 54 / 0.05), 0 6px 20px rgb(94 70 54 / 0.07)" },
+    });
+    expect(readCssVariables(css)).toEqual({
+      ...lightTheme.tokens,
+      "shadow-sm": "0 1px 2px rgb(94 70 54 / 0.06)",
+      "shadow-card": "0 1px 2px rgb(94 70 54 / 0.05), 0 6px 20px rgb(94 70 54 / 0.07)",
+    });
+    expect(() => createTheme({ name: "warm", shadows: { md: "none" } as { sm: string } })).toThrow(
+      /not a shadow/,
+    );
+    expect(() => createTheme({ name: "warm", shadows: { sm: "none; }" } })).toThrow(/the shadow "sm"/);
   });
 
   test("with isDefault, the theme also applies to a page with no data-theme", () => {

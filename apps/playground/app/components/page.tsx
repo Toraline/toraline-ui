@@ -19,7 +19,7 @@ import { SplitButtonExamples } from "./SplitButtonExamples";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="mt-8 rounded border border-default bg-surface p-4">
+    <section className="mt-8 rounded-xl border border-default bg-surface p-4">
       <h2 className="font-heading text-xl font-bold">{title}</h2>
       {children}
     </section>

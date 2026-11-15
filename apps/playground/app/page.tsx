@@ -20,7 +20,7 @@ export default function Page() {
         </a>
       </p>
 
-      <section className="mt-6 rounded border border-default bg-surface p-4 shadow">
+      <section className="mt-6 rounded-xl border border-default bg-surface p-4 shadow-card">
         <h2 className="font-heading text-xl font-bold">A card</h2>
         <p className="mt-2">Its colors, border, radius and shadow come from level 2 tokens.</p>
         <p className="mt-2">
@@ -34,11 +34,11 @@ export default function Page() {
       </section>
 
       <ul className="mt-6 flex flex-wrap gap-3">
-        <li className="rounded bg-primary px-3 py-1 text-inverse">bg-primary</li>
-        <li className="rounded bg-error px-3 py-1 text-error">bg-error</li>
-        <li className="rounded bg-success px-3 py-1 text-success">bg-success</li>
-        <li className="rounded bg-surface px-3 py-1">bg-surface</li>
-        <li data-testid="promo" className="rounded bg-promo px-3 py-1 text-on-promo">
+        <li className="rounded-md bg-primary px-3 py-1 text-inverse">bg-primary</li>
+        <li className="rounded-md bg-error px-3 py-1 text-error">bg-error</li>
+        <li className="rounded-md bg-success px-3 py-1 text-success">bg-success</li>
+        <li className="rounded-md bg-surface px-3 py-1">bg-surface</li>
+        <li data-testid="promo" className="rounded-md bg-promo px-3 py-1 text-on-promo">
           bg-promo, a color this app added
         </li>
       </ul>

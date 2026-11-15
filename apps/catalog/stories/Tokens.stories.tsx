@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { OtherThemeTokenTable, PrimitiveTables, ThemeTokenTable } from "./tokens/TokenTables";
+import {
+  OtherThemeTokenTable,
+  PrimitiveTables,
+  TextStyleTable,
+  ThemeTokenTable,
+} from "./tokens/TokenTables";
 
 /**
  * The stories of the tokens page. Each story is one table. The page
@@ -44,11 +49,17 @@ export const TextSizes: Story = { args: { group: "textSizes" } };
 /** The spacing unit. The bars are 1, 2, 4 and 8 units wide. */
 export const Spacing: Story = { args: { group: "spacing" } };
 
-/** The radius token: how round the corners of a component are. */
+/** The 4 radius sizes: how round a corner is, from a button to a drawer. */
 export const Radius: Story = { args: { group: "radius" } };
 
-/** The shadow token: the shadow of a raised part. */
-export const Shadow: Story = { args: { group: "shadow" } };
+/** The 5 shadows, from the smallest to the shadow of a dialog. */
+export const Shadows: Story = { args: { group: "shadows" } };
+
+/** The text styles: one class that sets the font, the size, the line height and the weight of a text. */
+export const TextStyles: Story = {
+  args: { group: "backgrounds" },
+  render: () => <TextStyleTable />,
+};
 
 /** The level 2 tokens that are in none of the groups above. Today there is none. */
 export const OtherTokens: Story = {

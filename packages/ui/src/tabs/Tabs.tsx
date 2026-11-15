@@ -15,7 +15,7 @@ const listClass = "flex flex-wrap border-b-2 border-b-default";
  * The colors are the ones of the tabs of the app Intraweb.
  */
 const tabClass = classNames(
-  "m-0 -mb-[2px] cursor-pointer rounded-t rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-body text-base/normal font-bold text-secondary",
+  "m-0 -mb-[2px] cursor-pointer rounded-t-md rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-body text-base/normal font-bold text-secondary",
   "hover:text-primary",
   "aria-selected:border-b-brand aria-selected:text-brand",
   "motion-safe:transition-[border-color,color] motion-safe:ease-[ease]",

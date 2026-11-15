@@ -10,7 +10,7 @@ export const exampleSizes = ["sm", "md"] as const;
 export type ExampleSize = (typeof exampleSizes)[number];
 
 /** The classes every Example has. */
-const baseClass = "inline-flex items-center rounded border font-body";
+const baseClass = "inline-flex items-center rounded-md border font-body";
 
 /** The padding and the font size of each size. "/normal" is the line height. */
 const sizeClass: Record<ExampleSize, string> = {

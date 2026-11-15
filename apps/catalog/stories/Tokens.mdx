@@ -69,11 +69,21 @@ The default fonts are the fonts of the device. An app sets its own fonts with th
 
 ## Radius
 
+There are 4 radius sizes. With the Tailwind preset they are the classes `rounded-md` (a button, a field), `rounded-lg` (a menu, a popover), `rounded-xl` (a card, a table, a dialog) and `rounded-2xl` (a drawer).
+
 <Canvas of={TokenStories.Radius} sourceState="none" />
 
-## Shadow
+## Shadows
 
-<Canvas of={TokenStories.Shadow} sourceState="none" />
+There are 5 shadows. With the Tailwind preset they are the classes `shadow-sm`, `shadow-card` (a card, a table), `shadow-lg` (a menu, a popover), `shadow-xl` and `shadow-2xl` (a dialog, a drawer). The two themes of the library have the same shadows. A theme of an app can change them.
+
+<Canvas of={TokenStories.Shadows} sourceState="none" />
+
+## Text styles
+
+A text style is one class of the Tailwind preset that sets the font, the size, the line height and the weight of a text together. Example: `<h1 className="heading-page">`. The sizes are in `rem`, a length that follows the font size of the page (`1rem` is 16 pixels when the person did not change it). A text style is the same in every theme; its font is the token `--font-heading`.
+
+<Canvas of={TokenStories.TextStyles} sourceState="none" />
 
 ## Other tokens
 

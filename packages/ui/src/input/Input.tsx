@@ -23,7 +23,7 @@ export type InputProps = ComponentProps<"input"> & {
  * The colors of each part are the ones of the text field of the app Intraweb.
  */
 const fieldClass = classNames(
-  "w-full rounded border border-default bg-surface p-3 font-body text-base/normal text-primary",
+  "w-full rounded-md border border-default bg-surface p-3 font-body text-base/normal text-primary",
   "placeholder:text-tertiary placeholder:opacity-100",
   "hover:border-hover focus-visible:border-focus",
   "aria-invalid:enabled:border-invalid",

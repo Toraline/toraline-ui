@@ -11,6 +11,11 @@
  * The first part of a name says where the color is used:
  * "bg-" a background, "text-" a text, "border-" a border, "icon-" an icon,
  * "data-" a chart or a progress bar.
+ *
+ * The 4 radius sizes and the 5 shadows also have the names and the values of
+ * Intraweb (the "@theme" block of its globals.css). They are level 2 tokens,
+ * so a theme of an app can change them. The two themes of the library have
+ * the same values.
  */
 
 /** The names of the level 2 color tokens. */
@@ -94,8 +99,17 @@ export const themeTokenNames = [
   "text-base",
   "text-lg",
   "spacing",
-  "radius",
-  "shadow",
+  // How round a corner is, from the corner of a button to the corner of a drawer.
+  "radius-md",
+  "radius-lg",
+  "radius-xl",
+  "radius-2xl",
+  // Shadows, from the smallest to the shadow of a dialog.
+  "shadow-sm",
+  "shadow-card",
+  "shadow-lg",
+  "shadow-xl",
+  "shadow-2xl",
 ] as const;
 
 /** The name of a level 2 token, without the two dashes. Example: "bg-primary". */
@@ -190,8 +204,15 @@ export const lightTheme: ThemeDefinition = {
     "text-base": "var(--font-size-md)",
     "text-lg": "var(--font-size-lg)",
     spacing: "var(--space-1)",
-    radius: "var(--radius-size-md)",
-    shadow: "var(--shadow-size-sm)",
+    "radius-md": "0.5rem",
+    "radius-lg": "0.75rem",
+    "radius-xl": "1rem",
+    "radius-2xl": "1.25rem",
+    "shadow-sm": "0 1px 2px rgb(16 24 40 / 0.05)",
+    "shadow-card": "0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04)",
+    "shadow-lg": "0 4px 6px -2px rgb(16 24 40 / 0.03), 0 12px 16px -4px rgb(16 24 40 / 0.08)",
+    "shadow-xl": "0 8px 8px -4px rgb(16 24 40 / 0.03), 0 20px 24px -4px rgb(16 24 40 / 0.08)",
+    "shadow-2xl": "0 24px 48px -12px rgb(16 24 40 / 0.18)",
   },
 };
 
@@ -270,7 +291,14 @@ export const darkTheme: ThemeDefinition = {
     "text-base": "var(--font-size-md)",
     "text-lg": "var(--font-size-lg)",
     spacing: "var(--space-1)",
-    radius: "var(--radius-size-md)",
-    shadow: "var(--shadow-size-md)",
+    "radius-md": "0.5rem",
+    "radius-lg": "0.75rem",
+    "radius-xl": "1rem",
+    "radius-2xl": "1.25rem",
+    "shadow-sm": "0 1px 2px rgb(16 24 40 / 0.05)",
+    "shadow-card": "0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04)",
+    "shadow-lg": "0 4px 6px -2px rgb(16 24 40 / 0.03), 0 12px 16px -4px rgb(16 24 40 / 0.08)",
+    "shadow-xl": "0 8px 8px -4px rgb(16 24 40 / 0.03), 0 20px 24px -4px rgb(16 24 40 / 0.08)",
+    "shadow-2xl": "0 24px 48px -12px rgb(16 24 40 / 0.18)",
   },
 };

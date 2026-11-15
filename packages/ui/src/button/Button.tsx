@@ -12,7 +12,7 @@ import type { ButtonSize, ButtonVariant } from "./button-options.js";
  * The colors of each part are the ones of the Button of the app Intraweb.
  */
 const baseClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded border border-transparent font-body font-semibold",
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent font-body font-semibold",
   "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "enabled:aria-busy:cursor-progress",
   "motion-safe:transition-[background-color,border-color] motion-safe:ease-[ease]",

@@ -56,7 +56,8 @@ A **theme** is one block of level 2 values. The page selects a theme with the at
      background: var(--bg-surface);
      color: var(--text-primary);
      border: 1px solid var(--border-default);
-     border-radius: var(--radius);
+     border-radius: var(--radius-xl);
+     box-shadow: var(--shadow-card);
      font-family: var(--font-body);
    }
    ```
@@ -75,7 +76,7 @@ colorTokenNames; // the names of the level 2 color tokens only
 
 ## Build a theme for an app: `createTheme`
 
-`createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts, the text sizes, the spacing unit and the radius. A value the app does not give comes from the default theme.
+`createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts, the text sizes, the spacing unit, the radius sizes and the shadows. A value the app does not give comes from the default theme.
 
 ```ts
 import { createTheme } from "@toraline.tech/tokens";
@@ -118,7 +119,8 @@ The input, type `ThemeInput`:
 | `fonts` | No | `body`, `heading`, `mono`. The value is any CSS `font-family` value |
 | `textSizes` | No | `sm`, `base`, `lg`. The value is any CSS length. Changes `--text-sm`, `--text-base`, `--text-lg` |
 | `spacing` | No | Any CSS length. Changes `--spacing`, the unit of every padding and gap of a component |
-| `radius` | No | Any CSS length |
+| `radius` | No | Any CSS length, or an object. One value changes `--radius-md`, the corner of a button and a field. An object changes each size it names: `{ md: "0.625rem", lg: "1rem", xl: "1.25rem", "2xl": "1.5rem" }` |
+| `shadows` | No | An object with `sm`, `card`, `lg`, `xl`, `2xl`. The value is any CSS `box-shadow` value |
 
 The keys of `colors`:
 
@@ -201,7 +203,7 @@ The fonts after the variable (`Georgia, serif`) are used while the font file loa
 An app that uses `@toraline.tech/ui` must import the preset: the components are styled with the classes it makes. Such an app adds a third line, `@import "@toraline.tech/ui/tailwind.css";`, described in [`packages/ui/README.md`](../ui/README.md).
 
 ```html
-<div class="rounded border border-default bg-surface p-4 text-primary shadow">
+<div class="rounded-xl border border-default bg-surface p-4 text-primary shadow-card">
   <h2 class="font-heading text-brand">Title</h2>
 </div>
 ```
@@ -221,12 +223,34 @@ Each class reads the CSS variable when the page is shown. Changing `data-theme` 
 | `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page |
 | `--text-sm`, `--text-base`, `--text-lg` | `text-sm`, `text-base`, `text-lg`. Tailwind already has these classes, with the same sizes. With the preset they read the token |
 | `--spacing` | It is the unit of every Tailwind spacing class: `p-4` is `calc(var(--spacing) * 4)`. Tailwind already uses this variable, with the same value |
-| `--radius` | `rounded`, and the classes for one side or one corner, for example `rounded-t` |
-| `--shadow` | `shadow` |
+| `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl` | `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, and the classes for one side or one corner, for example `rounded-t-md` |
+| `--shadow-sm`, `--shadow-card`, `--shadow-lg`, `--shadow-xl`, `--shadow-2xl` | `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl`, `shadow-2xl` |
 
 The class names are the class names of the app Intraweb. A token is a class of its group only: `bg-primary` is the background of the main action and `text-primary` is the main text color. They are two tokens, and there is no class `text-page` or `bg-strong`. How it works: the preset has one line for each color token in a block `@theme inline`, for example `--background-color-primary: var(--bg-primary);`. Tailwind CSS 4 makes the class `bg-<name>` from a variable named `--background-color-<name>`, `text-<name>` from `--text-color-<name>`, and `border-<name>` from `--border-color-<name>`. These 3 names are not in the table "Theme variable namespaces" of the documentation of Tailwind (read on 2026-11-15). They are in the code of Tailwind 4.3.5, Intraweb uses them, and a test of this package builds every class with Tailwind.
 
-The preset also makes the Tailwind variant `dark:` follow `data-theme="dark"`. Example: `dark:hidden` hides an element in the dark theme. The other Tailwind classes, for example `p-4`, `bg-red-500` and `rounded-lg`, stay as Tailwind defines them.
+The preset also makes the Tailwind variant `dark:` follow `data-theme="dark"`. Example: `dark:hidden` hides an element in the dark theme. The other Tailwind classes, for example `p-4`, `bg-red-500`, `rounded-full` and `shadow-md`, stay as Tailwind defines them.
+
+### Text styles
+
+A text style is one class that sets the font, the size, the line height and the weight of a text together. The 9 text styles are the text style utilities of Intraweb, with the same names and values:
+
+| Class | Used for | Font size | Line height | Font weight |
+|---|---|---|---|---|
+| `heading-page` | The title of a page | `1.5rem` | `2rem` | 600 |
+| `heading-section` | The title of a section, a dialog or a drawer | `1.125rem` | `1.75rem` | 500 |
+| `heading-card` | The title of a card | `1rem` | `1.5rem` | 500 |
+| `display-number` | A large number, for example a total. The digits all have the same width | `2rem` | `2.5rem` | 600 |
+| `display-number-sm` | A large number, one size smaller | `1.5rem` | `2rem` | 600 |
+| `label` | The name of a field, the text of a tab or a badge | `0.875rem` | `1.25rem` | 500 |
+| `label-lg` | A larger label | `1rem` | `1.5rem` | 500 |
+| `label-sm` | A smaller label | `0.75rem` | `1rem` | 500 |
+| `caption-overline` | A small text in capital letters above a title, with wider letter spacing | `0.75rem` | `1rem` | 500 |
+
+Every text style has the font `--font-heading`. The same values are in TypeScript: `textStyles` and `textStyleNames`.
+
+```html
+<h1 class="heading-page text-primary">Clients</h1>
+```
 
 ### A color the app added
 
@@ -288,7 +312,7 @@ const html = `<head><script>${createThemeScript()}</script></head>`;
 
 The color tokens have the names of the design system of the app Intraweb. The first part of a name is the group, and says where the color is used: `--bg-*` a background, `--text-*` a text, `--border-*` a border, `--icon-*` an icon, `--data-*` a chart or a progress bar. With the Tailwind preset, a token is a class of its group only: `--bg-primary` is the class `bg-primary`, and there is no class `text-page`.
 
-Every theme gives a value to each of these 68 tokens.
+Every theme gives a value to each of these 75 tokens.
 
 | Token | Tailwind class | What it is for | Light | Dark |
 |---|---|---|---|---|
@@ -358,8 +382,15 @@ Every theme gives a value to each of these 68 tokens.
 | `--text-base` | `text-base` | Font size of normal text in a component | `--font-size-md` | `--font-size-md` |
 | `--text-lg` | `text-lg` | Font size of large text: a large button | `--font-size-lg` | `--font-size-lg` |
 | `--spacing` | `p-4`, `gap-2`, ... | The spacing unit. Every padding and gap of a component is a multiple of it: the Tailwind class `px-4` is `calc(var(--spacing) * 4)` | `--space-1` | `--space-1` |
-| `--radius` | `rounded` | How round the corners of a component are | `--radius-size-md` | `--radius-size-md` |
-| `--shadow` | `shadow` | Shadow of a raised part | `--shadow-size-sm` | `--shadow-size-md` |
+| `--radius-md` | `rounded-md` | Corner of a button and a field | `0.5rem` | `0.5rem` |
+| `--radius-lg` | `rounded-lg` | Corner of a menu and a popover | `0.75rem` | `0.75rem` |
+| `--radius-xl` | `rounded-xl` | Corner of a card, a table and a dialog | `1rem` | `1rem` |
+| `--radius-2xl` | `rounded-2xl` | Corner of a drawer | `1.25rem` | `1.25rem` |
+| `--shadow-sm` | `shadow-sm` | Small shadow: the selected item of a group of tabs | `0 1px 2px rgb(16 24 40 / 0.05)` | `0 1px 2px rgb(16 24 40 / 0.05)` |
+| `--shadow-card` | `shadow-card` | Shadow of a card and a table | `0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04)` | `0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04)` |
+| `--shadow-lg` | `shadow-lg` | Shadow of a menu and a popover | `0 4px 6px -2px rgb(16 24 40 / 0.03), 0 12px 16px -4px rgb(16 24 40 / 0.08)` | `0 4px 6px -2px rgb(16 24 40 / 0.03), 0 12px 16px -4px rgb(16 24 40 / 0.08)` |
+| `--shadow-xl` | `shadow-xl` | Larger shadow | `0 8px 8px -4px rgb(16 24 40 / 0.03), 0 20px 24px -4px rgb(16 24 40 / 0.08)` | `0 8px 8px -4px rgb(16 24 40 / 0.03), 0 20px 24px -4px rgb(16 24 40 / 0.08)` |
+| `--shadow-2xl` | `shadow-2xl` | Shadow of a dialog and a drawer | `0 24px 48px -12px rgb(16 24 40 / 0.18)` | `0 24px 48px -12px rgb(16 24 40 / 0.18)` |
 
 Each theme also sets the CSS property `color-scheme` (`light` or `dark`). It tells the browser which look to give to its own parts, for example scroll bars.
 
@@ -393,8 +424,6 @@ The limit of 3 for a border comes from the accessibility rule for the parts of a
 | Spacing | `--space-1`, `--space-2`, `--space-3`, `--space-4`, `--space-6`, `--space-8`, `--space-12`, `--space-16`. The number is a multiple of `0.25rem` |
 | Font sizes | `--font-size-xs`, `--font-size-sm`, `--font-size-md`, `--font-size-lg`, `--font-size-xl`, `--font-size-2xl`, `--font-size-3xl` |
 | Font stacks | `--font-stack-sans`, `--font-stack-mono`. A font stack is a list of fonts; the browser uses the first one the device has |
-| Radius sizes | `--radius-size-none`, `--radius-size-sm`, `--radius-size-md`, `--radius-size-lg`, `--radius-size-full` |
-| Shadow sizes | `--shadow-size-sm`, `--shadow-size-md`, `--shadow-size-lg` |
 
 The level 2 tokens `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 4 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
 

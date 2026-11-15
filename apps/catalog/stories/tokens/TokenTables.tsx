@@ -1,6 +1,14 @@
 import type { CSSProperties, ReactNode } from "react";
-import { colorTokenNames, darkTheme, lightTheme, primitives, themeTokenNames } from "@toraline.tech/tokens";
-import type { ThemeTokenName } from "@toraline.tech/tokens";
+import {
+  colorTokenNames,
+  darkTheme,
+  lightTheme,
+  primitives,
+  textStyleNames,
+  textStyles,
+  themeTokenNames,
+} from "@toraline.tech/tokens";
+import type { TextStyleName, ThemeTokenName } from "@toraline.tech/tokens";
 import "./token-tables.css";
 
 /**
@@ -133,12 +141,12 @@ const themeTokenGroups = {
   radius: {
     caption: "Radius",
     sampleKind: "radius",
-    includes: (tokenName) => tokenName === "radius",
+    includes: (tokenName) => tokenName.startsWith("radius-"),
   },
-  shadow: {
-    caption: "Shadow",
+  shadows: {
+    caption: "Shadows",
     sampleKind: "shadow",
-    includes: (tokenName) => tokenName === "shadow",
+    includes: (tokenName) => tokenName.startsWith("shadow-"),
   },
 } satisfies Record<string, ThemeTokenGroup>;
 
@@ -223,6 +231,86 @@ export function OtherThemeTokenTable() {
   );
 }
 
+/**
+ * The Tailwind class of each text style. The class has the name of the style.
+ * The names are written here in full because Tailwind CSS builds the CSS of a
+ * class only when it finds the name in a file of the catalog. The type makes
+ * the build fail when the library adds a text style that is not in this list.
+ */
+const textStyleClasses: Record<TextStyleName, string> = {
+  "heading-page": "heading-page",
+  "heading-section": "heading-section",
+  "heading-card": "heading-card",
+  "display-number": "display-number",
+  "display-number-sm": "display-number-sm",
+  label: "label",
+  "label-lg": "label-lg",
+  "label-sm": "label-sm",
+  "caption-overline": "caption-overline",
+};
+
+/** What each text style is for. */
+const textStyleUses: Record<TextStyleName, string> = {
+  "heading-page": "The title of a page",
+  "heading-section": "The title of a section, a dialog or a drawer",
+  "heading-card": "The title of a card",
+  "display-number": "A large number, for example a total",
+  "display-number-sm": "A large number, one size smaller",
+  label: "The name of a field, the text of a tab or a badge",
+  "label-lg": "A larger label",
+  "label-sm": "A smaller label",
+  "caption-overline": "A small text in capital letters above a title",
+};
+
+/** The CSS properties that have their own column in the table of the text styles. */
+const textStyleColumns = ["font-size", "line-height", "font-weight"];
+
+/** The table of the text styles: the class, a sample, what it is for and its values. */
+export function TextStyleTable() {
+  return (
+    <ScrollableTable caption="Text styles">
+      <thead>
+        <tr>
+          <th scope="col">Class</th>
+          <th scope="col">Sample</th>
+          <th scope="col">Used for</th>
+          <th scope="col">Font size</th>
+          <th scope="col">Line height</th>
+          <th scope="col">Font weight</th>
+          <th scope="col">Other</th>
+        </tr>
+      </thead>
+      <tbody>
+        {textStyleNames.map((name) => {
+          const declarations: Record<string, string> = textStyles[name];
+          const otherDeclarations = Object.entries(declarations).filter(
+            ([property]) => property !== "font-family" && !textStyleColumns.includes(property),
+          );
+          return (
+            <tr key={name}>
+              <th scope="row">
+                <code>{name}</code>
+              </th>
+              <td>
+                <span className={textStyleClasses[name]}>
+                  {name.startsWith("display-number") ? "1,234.56" : "Toraline"}
+                </span>
+              </td>
+              <td>{textStyleUses[name]}</td>
+              {textStyleColumns.map((property) => (
+                <td key={property}>{declarations[property]}</td>
+              ))}
+              <td>
+                {otherDeclarations.map(([property, value]) => `${property}: ${value}`).join("; ")}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </ScrollableTable>
+  );
+}
+
 /** One group of level 1 tokens. */
 type PrimitiveGroup = {
   caption: string;
@@ -246,16 +334,6 @@ const primitiveGroups: PrimitiveGroup[] = [
     caption: "Level 1 spacing",
     sampleKind: "space",
     includes: (tokenName) => tokenName.startsWith("space-"),
-  },
-  {
-    caption: "Level 1 radius sizes",
-    sampleKind: "radius",
-    includes: (tokenName) => tokenName.startsWith("radius-size-"),
-  },
-  {
-    caption: "Level 1 shadow sizes",
-    sampleKind: "shadow",
-    includes: (tokenName) => tokenName.startsWith("shadow-size-"),
   },
 ];
 

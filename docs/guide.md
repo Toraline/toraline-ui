@@ -265,7 +265,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
      return (
        <main className="p-8">
          <h1 className="font-heading text-3xl text-brand">My app</h1>
-         <p className="mt-4 inline-block rounded bg-promo px-3 py-1 text-on-promo">
+         <p className="mt-4 inline-block rounded-md bg-promo px-3 py-1 text-on-promo">
            The color the app added
          </p>
          <div className="mt-4 flex gap-4">
@@ -382,7 +382,7 @@ The theme function and the components do not need Next.js. They need Tailwind CS
 
 Every component accepts `className`. The classes go on the outermost element of the component.
 
-1. **With a Tailwind class:** give the component the class. It replaces the class of the library that sets the same CSS property. Here `rounded-full` replaces the library's `rounded`, and the other styles of the Button stay.
+1. **With a Tailwind class:** give the component the class. It replaces the class of the library that sets the same CSS property. Here `rounded-full` replaces the library's `rounded-md`, and the other styles of the Button stay.
 
    ```tsx
    <Button className="rounded-full">Save</Button>

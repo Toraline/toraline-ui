@@ -199,8 +199,9 @@ describe("the classes of the components use only tokens", () => {
     expect(variableNames).toContain("font-body");
     expect(variableNames).toContain("text-base");
     expect(variableNames).toContain("spacing");
-    expect(variableNames).toContain("radius");
-    expect(variableNames).toContain("shadow");
+    expect(variableNames).toContain("radius-md");
+    expect(variableNames).toContain("radius-lg");
+    expect(variableNames).toContain("shadow-lg");
     for (const variableName of new Set(variableNames)) {
       expect(tokenNames, `--${variableName}`).toContain(variableName);
     }

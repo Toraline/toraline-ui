@@ -83,16 +83,6 @@ export const primitives = {
     'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   "font-stack-mono":
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-
-  "radius-size-none": "0",
-  "radius-size-sm": "0.25rem",
-  "radius-size-md": "0.5rem",
-  "radius-size-lg": "1rem",
-  "radius-size-full": "9999px",
-
-  "shadow-size-sm": "0 1px 2px rgb(15 25 40 / 0.12)",
-  "shadow-size-md": "0 4px 12px rgb(15 25 40 / 0.16)",
-  "shadow-size-lg": "0 12px 32px rgb(15 25 40 / 0.2)",
 } as const;
 
 /** The name of a level 1 token, without the two dashes. Example: "color-brand-700". */

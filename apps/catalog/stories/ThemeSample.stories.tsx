@@ -6,9 +6,9 @@ const cardStyle: CSSProperties = {
   maxWidth: "32rem",
   padding: "calc(var(--spacing) * 4)",
   border: "1px solid var(--border-default)",
-  borderRadius: "var(--radius)",
+  borderRadius: "var(--radius-xl)",
   backgroundColor: "var(--bg-surface)",
-  boxShadow: "var(--shadow)",
+  boxShadow: "var(--shadow-card)",
   color: "var(--text-primary)",
   fontFamily: "var(--font-body)",
 };

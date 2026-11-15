@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { primitives } from "./primitives";
 import { getTailwindColorMapping } from "./tailwind-variables";
+import { textStyles } from "./text-styles";
 import { colorTokenNames, darkTheme, lightTheme } from "./themes";
 import type { ThemeDefinition } from "./themes";
 
@@ -138,5 +139,64 @@ describe("the light theme and the dark theme", () => {
       expect(resolve(libraryValue, primitives), name).toBe(resolve(value, intrawebScales));
       expect(resolve(libraryValue, primitives), name).toMatch(/^(#[0-9a-f]{6}|rgb\(.+\))$/);
     }
+  });
+});
+
+describe("the radius sizes and the shadows", () => {
+  const intrawebTheme = readCssVariables(readFixture("globals-theme.css"));
+
+  test.each([lightTheme, darkTheme])(
+    "the 4 radius sizes of the $name theme have the names and the values of Intraweb",
+    (theme) => {
+      const intrawebRadius = pickByName(intrawebTheme, (name) => name.startsWith("radius-"));
+      expect(Object.keys(intrawebRadius)).toEqual(["radius-md", "radius-lg", "radius-xl", "radius-2xl"]);
+      expect(pickByName(theme.tokens, (name) => name.startsWith("radius-"))).toEqual(intrawebRadius);
+    },
+  );
+
+  test.each([lightTheme, darkTheme])(
+    "the 5 shadows of the $name theme have the names and the values of Intraweb",
+    (theme) => {
+      const intrawebShadows = pickByName(intrawebTheme, (name) => name.startsWith("shadow-"));
+      expect(Object.keys(intrawebShadows)).toEqual([
+        "shadow-sm",
+        "shadow-card",
+        "shadow-lg",
+        "shadow-xl",
+        "shadow-2xl",
+      ]);
+      expect(pickByName(theme.tokens, (name) => name.startsWith("shadow-"))).toEqual(intrawebShadows);
+    },
+  );
+});
+
+describe("the text styles", () => {
+  test("the 9 text styles have the names and the declarations of Intraweb's text style utilities", () => {
+    const utilities = [
+      ...withoutComments(readFixture("globals-utilities.css")).matchAll(/@utility ([a-z-]+) \{([\s\S]*?)\}/g),
+    ];
+    const intrawebStyles = Object.fromEntries(
+      utilities.map((match) => [
+        match[1],
+        Object.fromEntries(
+          [...(match[2] as string).matchAll(/([a-z-]+):\s*([^;]+);/g)].map((declaration) => [
+            declaration[1],
+            (declaration[2] as string).trim(),
+          ]),
+        ),
+      ]),
+    );
+    expect(Object.keys(intrawebStyles)).toEqual([
+      "heading-page",
+      "heading-section",
+      "heading-card",
+      "display-number",
+      "display-number-sm",
+      "label",
+      "label-lg",
+      "label-sm",
+      "caption-overline",
+    ]);
+    expect(textStyles).toEqual(intrawebStyles);
   });
 });
