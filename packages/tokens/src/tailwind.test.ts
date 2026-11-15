@@ -135,6 +135,7 @@ describe("css/tailwind.css, the Tailwind preset", () => {
   test("the other level 2 tokens are Tailwind classes that read the CSS variable", async () => {
     const css = await buildCss([
       "font-body",
+      "font-sans",
       "font-heading",
       "font-mono",
       "rounded-md",
@@ -154,6 +155,8 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     ]);
 
     expect(css).toContain(".font-body { font-family: var(--font-body); }");
+    // "font-sans" is the class of Intraweb for the font of normal text.
+    expect(css).toContain(".font-sans { font-family: var(--font-body); }");
     expect(css).toContain(".font-heading { font-family: var(--font-heading); }");
     expect(css).toContain(".font-mono { font-family: var(--font-mono); }");
     for (const sizeName of ["md", "lg", "xl", "2xl"]) {
@@ -246,9 +249,15 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     expect(css).not.toMatch(/--color-red-600: oklch/);
   });
 
-  test("the font of the page is --font-body", async () => {
-    const css = await buildCss(["font-body"]);
+  test("the font of the page is --font-body, which is Inter, and --font-heading is Poppins", async () => {
+    const css = await buildCss(["font-body", "font-heading"]);
     expect(css).toContain("--default-font-family: var(--font-body);");
+    expect(css).toContain("--font-body: var(--font-stack-sans);");
+    expect(css).toContain("--font-heading: var(--font-stack-display);");
+    expect(css).toContain('--font-stack-sans: var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif;');
+    expect(css).toContain(
+      '--font-stack-display: var(--font-poppins, "Poppins"), ui-sans-serif, system-ui, sans-serif;',
+    );
   });
 
   test('the variant "dark:" follows data-theme="dark"', async () => {

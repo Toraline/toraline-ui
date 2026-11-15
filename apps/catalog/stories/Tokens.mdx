@@ -53,7 +53,9 @@ With the Tailwind preset each token is a class of its group only. `--bg-primary`
 
 ## Fonts
 
-The default fonts are the fonts of the device. An app sets its own fonts with the function `createTheme`. The page **Guide** shows how.
+The default fonts are Inter for normal text and Poppins for headings and buttons, the fonts of Intraweb. The library names the two fonts and downloads no font file: the app loads them. When the app loads no font, the browser uses a font of the device. The page **Guide** shows how an app loads the two fonts, and how it sets other fonts with the function `createTheme`.
+
+This catalog loads Inter and Poppins from font files, so the samples below show them.
 
 <Canvas of={TokenStories.Fonts} sourceState="none" />
 

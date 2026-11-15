@@ -16,7 +16,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 | Ticket | What to look at |
 |---|---|
 | TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
-| TOR-1007 | The headings use the font Fraunces. The rest of the text uses the default font of the library |
+| TOR-1007, TOR-1135 | In the themes `light` and `dark` the headings use the font Poppins and the rest of the text uses the font Inter: the default fonts of the library. In the theme `paper`, a theme of this app, the headings use the font Fraunces, which the app set through the theme function |
 | TOR-997 | The page `/components` shows every component of `@toraline.tech/ui` with every variant and state. The theme button on that page changes the theme |
 | TOR-1008 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-brand` is a color this app added. Changing the theme changes all of them |
 
@@ -27,8 +27,8 @@ npm run dev -w @toraline/playground         # development server on http://local
 | `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline.tech/tokens` |
 | `scripts/write-theme-css.ts` | Runs `createTailwindTheme` and `createTheme` on the inputs and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
 | `postcss.config.mjs` | Tells Next.js to run Tailwind CSS 4 |
-| `app/fonts.ts` | Loads the font Fraunces with `next/font/local` into the CSS variable `--font-fraunces` |
-| `app/fonts/` | The font file and its license (SIL Open Font License 1.1) |
+| `app/fonts.ts` | Loads 3 fonts with `next/font/local`: Inter into the CSS variable `--font-inter`, Poppins (weights 400, 500 and 600) into `--font-poppins`, and Fraunces into `--font-fraunces`. The library reads the first two variables. `theme.config.ts` gives the third to the theme function |
+| `app/fonts/` | The 5 font files and the 3 licenses (SIL Open Font License 1.1). The files are committed, so `make check` builds this app with no network. The catalog (`apps/catalog/.storybook/preview.css`) uses the Inter and Poppins files too |
 | `app/layout.tsx` | Reads the theme cookie on the server and writes `data-theme` on `<html>` |
 | `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file, and `@toraline.tech/ui/tailwind.css`, the line that makes Tailwind build the classes of the components. It has no other CSS |
 | `app/page.tsx` | The test page. It has no CSS of its own: only classes |
@@ -59,17 +59,19 @@ Results:
 
 The same server was then opened in a browser. With the keyboard: Tab moved the focus to the button, Enter changed `data-theme` to `dark`, the page background changed from `rgb(255, 255, 255)` to `rgb(15, 25, 40)`, and the cookie `toraline-theme=dark` was saved. After a reload the page had `data-theme="dark"` and the dark background. The browser console had no error.
 
-## How the heading font was checked
+## How the fonts were checked
 
-`theme.config.ts` gives `fonts: { heading: "var(--font-fraunces), Georgia, serif" }` to the theme function, in both themes. Checked on the built app on 2026-11-15, in a browser, with `getComputedStyle`:
+The library names its default fonts and downloads none. `app/fonts.ts` loads Inter and Poppins from font files and puts them in the CSS variables `--font-inter` and `--font-poppins`, which the font tokens of the library read. `theme.config.ts` gives `fonts: { heading: "var(--font-fraunces), Georgia, serif" }` to the theme function in the theme `paper` only.
 
-| Element | Its font (`font-family`) |
-|---|---|
-| `<h1>` | `fraunces, "fraunces Fallback", Georgia, serif` |
-| `<body>` | `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` (the default of the library) |
-| `<code>` | `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace` (the default of the library) |
+Checked on the built app on 2026-11-15 (Next.js 16.4.6), in a browser with no window (Chromium, through Playwright), with `getComputedStyle`. The theme was chosen with the cookie `toraline-theme`:
 
-The browser reported the font `fraunces` as loaded (`document.fonts`).
+| Element | Its font (`font-family`) in the theme `light` | In the theme `paper` |
+|---|---|---|
+| `<body>` | `inter, "inter Fallback", ui-sans-serif, system-ui, sans-serif` | The same |
+| `<h1>` and `<h2>` | `poppins, "poppins Fallback", ui-sans-serif, system-ui, sans-serif` | `fraunces, "fraunces Fallback", Georgia, serif` |
+| `<code>` | `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace` | The same |
+
+The browser reported these fonts as loaded (`document.fonts`): in the theme `light`, `inter` and `poppins` (weight 600, the weight of the headings); in the theme `paper`, `inter` and `fraunces`. The browser console had no error.
 
 ## How the token classes were checked
 

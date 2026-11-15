@@ -81,7 +81,7 @@
   --data-track: var(--color-slate-200);
 
   --font-body: var(--font-stack-sans);
-  --font-heading: var(--font-stack-sans);
+  --font-heading: var(--font-stack-display);
   --font-mono: var(--font-stack-mono);
 
   --text-sm: var(--font-size-sm);

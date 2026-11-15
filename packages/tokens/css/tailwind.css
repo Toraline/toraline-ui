@@ -10,6 +10,7 @@
  *    --border-default  -> border-default
  *    --icon-default    -> text-icon
  *    --data-1          -> bg-data-1, text-data-1, fill-data-1 and the others
+ *    --font-body       -> font-body and font-sans
  *    --font-heading    -> font-heading
  *    --text-sm         -> text-sm (the font size)
  *    --spacing         -> the unit of p-4, gap-2 and every other spacing class
@@ -174,7 +175,7 @@
  */
 @theme {
   --font-body: var(--font-stack-sans);
-  --font-heading: var(--font-stack-sans);
+  --font-heading: var(--font-stack-display);
   --font-mono: var(--font-stack-mono);
 
   --text-sm: var(--font-size-sm);
@@ -204,6 +205,15 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+}
+
+/*
+ * "font-sans" is the class Intraweb uses for the font of normal text. It reads
+ * the same token as "font-body". So a component copied from Intraweb, with
+ * "font-sans" or "font-heading", needs no change.
+ */
+@theme inline {
+  --font-sans: var(--font-body);
 }
 
 /*

@@ -10,8 +10,8 @@ export default function Page() {
     <main className="mx-auto max-w-2xl p-8">
       <h1 className="font-heading text-3xl font-bold text-brand">toraline-ui playground</h1>
       <p className="mt-4">
-        This page tests the themes. Press the button to change the theme. Reload the page: it
-        opens in the theme you chose.
+        This page tests the themes. Press the button to change the theme: light, dark, then
+        paper, a theme of this app. Reload the page: it opens in the theme you chose.
       </p>
       <ThemeToggle className="mt-4" />
       <p className="mt-4">
@@ -24,9 +24,11 @@ export default function Page() {
         <h2 className="font-heading text-xl font-bold">A card</h2>
         <p className="mt-2">Its colors, border, radius and shadow come from level 2 tokens.</p>
         <p className="mt-2">
-          The headings use the font Fraunces. This app loads it with{" "}
-          <code className="font-mono">next/font</code> and sets it as{" "}
-          <code className="font-mono">--font-heading</code> through the theme function.
+          The headings use the font Poppins and the text uses the font Inter: the default fonts
+          of the library. This app loads them with <code className="font-mono">next/font</code>.
+          In the theme <code className="font-mono">paper</code> the headings use the font
+          Fraunces, which this app sets as <code className="font-mono">--font-heading</code>{" "}
+          through the theme function.
         </p>
         <p className="mt-2 text-tertiary">
           This text uses the class <code className="font-mono">text-tertiary</code>.

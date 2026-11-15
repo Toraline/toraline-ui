@@ -151,15 +151,63 @@ To change the light or the dark theme of the library, use its name: `createTheme
 
 Three level 2 tokens decide every font of the library:
 
-| Token | Used for | Default |
-|---|---|---|
-| `--font-body` | Normal text | `--font-stack-sans`: the font of the device's operating system |
-| `--font-heading` | Headings | `--font-stack-sans` |
-| `--font-mono` | Code | `--font-stack-mono`: the fixed-width font of the device |
+| Token | Used for | Default | Tailwind class |
+|---|---|---|---|
+| `--font-body` | Normal text | `--font-stack-sans`: Inter | `font-body`, and `font-sans`, the name Intraweb uses |
+| `--font-heading` | Headings, buttons and the text styles | `--font-stack-display`: Poppins, in the weights 400, 500 and 600 | `font-heading` |
+| `--font-mono` | Code | `--font-stack-mono`: the fixed-width font of the device | `font-mono` |
 
-The defaults need no setup: they load no font file. No file of the library names a font outside `css/primitives.css` and `src/primitives.ts`. A test (`packages/ui/src/fonts.test.ts`) checks this.
+Inter and Poppins are the fonts of the app Intraweb. **The library downloads no font and ships no font file.** It only names the fonts. The app loads them. The values of the two level 1 tokens are:
 
-An app sets its own fonts through `createTheme`. The app loads the font itself, and gives the theme function a CSS `font-family` value. Example with `next/font` in a Next.js app:
+```css
+--font-stack-sans: var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif;
+--font-stack-display: var(--font-poppins, "Poppins"), ui-sans-serif, system-ui, sans-serif;
+```
+
+How to read `var(--font-inter, "Inter")`: the font in the CSS variable `--font-inter` when the app defines that variable on `<html>`, and the font with the family name `Inter` when it does not. So there are two ways to load the fonts:
+
+1. **A Next.js app, with `next/font`.** `next/font` is the part of Next.js that downloads a font when the app is built and serves it with the app. Give the fonts the variables `--font-inter` and `--font-poppins`, and put the two classes on `<html>`:
+
+   ```ts
+   // app/fonts.ts
+   import { Inter, Poppins } from "next/font/google";
+
+   export const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+
+   export const poppins = Poppins({
+     subsets: ["latin"],
+     weight: ["400", "500", "600"],
+     variable: "--font-poppins",
+     display: "swap",
+   });
+   ```
+
+   ```tsx
+   // app/layout.tsx
+   <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+   ```
+
+   The classes must be on `<html>`, not on `<body>`: the tokens are defined on `<html>` and read the variables there.
+
+2. **Any other app, the plain way.** Load font files whose family names are `Inter` and `Poppins`, in any way: the npm packages `@fontsource/inter` and `@fontsource/poppins`, a `<link>` to a font service, or your own `@font-face` rules. Example with the npm packages, in the first file of the app:
+
+   ```ts
+   import "@fontsource/inter/400.css";
+   import "@fontsource/inter/500.css";
+   import "@fontsource/inter/600.css";
+   import "@fontsource/inter/700.css";
+   import "@fontsource/poppins/400.css";
+   import "@fontsource/poppins/500.css";
+   import "@fontsource/poppins/600.css";
+   ```
+
+An app that loads no font still works: the browser uses a font of the device (`ui-sans-serif, system-ui, sans-serif`).
+
+No file of the library names a font outside `css/primitives.css` and `src/primitives.ts`, and no file of the library loads one. A test (`packages/ui/src/fonts.test.ts`) checks this.
+
+### Set other fonts
+
+An app sets its own fonts through `createTheme`, with a CSS `font-family` value in `fonts.body`, `fonts.heading` or `fonts.mono`. A font the app does not give stays the default. Example with `next/font` in a Next.js app:
 
 1. Load the font and give it a CSS variable name (`app/fonts.ts`):
 
@@ -179,17 +227,16 @@ An app sets its own fonts through `createTheme`. The app loads the font itself, 
    <html lang="en" data-theme={theme} className={fraunces.variable}>
    ```
 
-3. Give the variable to the theme function, in every theme of the app:
+3. Give the variable to the theme function, in every theme that has the font:
 
    ```ts
    createTheme({
-     name: "light",
-     isDefault: true,
+     name: "paper",
      fonts: { heading: "var(--font-fraunces), Georgia, serif" },
    });
    ```
 
-The fonts after the variable (`Georgia, serif`) are used while the font file loads. `next/font/google` works the same way: it also has the option `variable`. The working example is [`apps/playground`](../../apps/playground/README.md).
+The fonts after the variable (`Georgia, serif`) are used while the font file loads. `next/font/google` works the same way: it also has the option `variable`. The working example is [`apps/playground`](../../apps/playground/README.md): its themes `light` and `dark` have Inter and Poppins, loaded from font files with `next/font/local`, and its theme `paper` has Fraunces for the headings.
 
 ## Tailwind CSS 4
 
@@ -220,7 +267,7 @@ Each class reads the CSS variable when the page is shown. Changing `data-theme` 
 | `--icon-default`, `--icon-strong`, `--icon-brand` | `text-icon`, `text-icon-strong`, `text-icon-brand`: an icon takes the text color |
 | Each `--data-<name>` | Every Tailwind color class with `data-<name>`: `bg-data-1`, `text-data-1`, `fill-data-1`, `stroke-data-1` and the others |
 | Each level 1 color `--color-<scale>-<step>` | Every Tailwind color class: `bg-brand-700`, `text-slate-500`, `border-red-600` and the others |
-| `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page |
+| `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page, and the class `font-sans`, the name Intraweb uses for it |
 | `--text-sm`, `--text-base`, `--text-lg` | `text-sm`, `text-base`, `text-lg`. Tailwind already has these classes, with the same sizes. With the preset they read the token |
 | `--spacing` | It is the unit of every Tailwind spacing class: `p-4` is `calc(var(--spacing) * 4)`. Tailwind already uses this variable, with the same value |
 | `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl` | `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, and the classes for one side or one corner, for example `rounded-t-md` |
@@ -375,8 +422,8 @@ Every theme gives a value to each of these 75 tokens.
 | `--data-warning` | `bg-data-warning`, `text-data-warning`, ... | Value that asks for attention in a chart or a progress bar | `--color-orange-400` | `#fdb022` |
 | `--data-danger` | `bg-data-danger`, `text-data-danger`, ... | Bad value in a chart or a progress bar | `--color-red-600` | `#f97066` |
 | `--data-track` | `bg-data-track`, `text-data-track`, ... | The empty part of a progress bar | `--color-slate-200` | `#333741` |
-| `--font-body` | `font-body` | Font of normal text | `--font-stack-sans` | `--font-stack-sans` |
-| `--font-heading` | `font-heading` | Font of headings and buttons | `--font-stack-sans` | `--font-stack-sans` |
+| `--font-body` | `font-body`, `font-sans` | Font of normal text | `--font-stack-sans` | `--font-stack-sans` |
+| `--font-heading` | `font-heading` | Font of headings and buttons | `--font-stack-display` | `--font-stack-display` |
 | `--font-mono` | `font-mono` | Font of code | `--font-stack-mono` | `--font-stack-mono` |
 | `--text-sm` | `text-sm` | Font size of small text: a small button, a label, an error message | `--font-size-sm` | `--font-size-sm` |
 | `--text-base` | `text-base` | Font size of normal text in a component | `--font-size-md` | `--font-size-md` |
@@ -423,7 +470,7 @@ The limit of 3 for a border comes from the accessibility rule for the parts of a
 | Red (error and danger) | `--color-red-50`, `--color-red-200`, `--color-red-600`, `--color-red-700` |
 | Spacing | `--space-1`, `--space-2`, `--space-3`, `--space-4`, `--space-6`, `--space-8`, `--space-12`, `--space-16`. The number is a multiple of `0.25rem` |
 | Font sizes | `--font-size-xs`, `--font-size-sm`, `--font-size-md`, `--font-size-lg`, `--font-size-xl`, `--font-size-2xl`, `--font-size-3xl` |
-| Font stacks | `--font-stack-sans`, `--font-stack-mono`. A font stack is a list of fonts; the browser uses the first one the device has |
+| Font stacks | `--font-stack-sans` (Inter), `--font-stack-display` (Poppins), `--font-stack-mono`. A font stack is a list of fonts; the browser uses the first one it has |
 
 The level 2 tokens `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 4 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
 

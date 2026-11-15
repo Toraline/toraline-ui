@@ -198,7 +198,7 @@ export const lightTheme: ThemeDefinition = {
     "data-track": "var(--color-slate-200)",
 
     "font-body": "var(--font-stack-sans)",
-    "font-heading": "var(--font-stack-sans)",
+    "font-heading": "var(--font-stack-display)",
     "font-mono": "var(--font-stack-mono)",
     "text-sm": "var(--font-size-sm)",
     "text-base": "var(--font-size-md)",
@@ -285,7 +285,7 @@ export const darkTheme: ThemeDefinition = {
     "data-track": "#333741",
 
     "font-body": "var(--font-stack-sans)",
-    "font-heading": "var(--font-stack-sans)",
+    "font-heading": "var(--font-stack-display)",
     "font-mono": "var(--font-stack-mono)",
     "text-sm": "var(--font-size-sm)",
     "text-base": "var(--font-size-md)",

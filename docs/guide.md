@@ -1,10 +1,10 @@
 # Guide: use the library in an app
 
-After the 3 guides of this page, a new Next.js app shows a Button of the library in the app's own theme, with a button that changes between a light theme and a dark theme.
+After the 3 guides of this page, a new Next.js app shows a Button of the library, first in the default look of the library and then in the app's own theme, with a button that changes between a light theme and a dark theme.
 
 | Guide | Result |
 |---|---|
-| [1. Install the library in an app](#guide-1-install-the-library-in-an-app) | A page of the app shows a styled Button |
+| [1. Install the library in an app](#guide-1-install-the-library-in-an-app) | A page of the app shows a styled Button, in the default look of the library |
 | [2. Build the theme of the app](#guide-2-build-the-theme-of-the-app) | The app has its own colors and fonts, and a button that changes the theme |
 | [3. Style on top of a component](#guide-3-style-on-top-of-a-component) | One Button looks different, with no change in the library |
 
@@ -34,7 +34,7 @@ make pack     # in this repository; writes 2 files into .pack/tarballs/
 npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.1.0.tgz     # in the app, in place of step 2
 ```
 
-Replace `<path>` with the folder of this repository. Guide 1 and steps 1 to 10 of guide 2 were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6.
+Replace `<path>` with the folder of this repository.
 
 What you need: Node 24, React 19 and Tailwind CSS 4.
 
@@ -71,7 +71,48 @@ What you need: Node 24, React 19 and Tailwind CSS 4.
 
    The rest of the file that `create-next-app` wrote must go: it sets its own colors on `<body>`, and they would win over the colors of the theme.
 
-4. Replace the content of `app/page.tsx`:
+4. Create the file `app/fonts.ts`. It loads the two default fonts of the library: Inter for normal text, and Poppins for headings and buttons. The library names these fonts and does not download them, so the app loads them. `next/font` is the part of Next.js that downloads a font when the app is built and serves it with the app.
+
+   ```ts
+   import { Inter, Poppins } from "next/font/google";
+
+   export const inter = Inter({
+     subsets: ["latin"],
+     variable: "--font-inter",
+     display: "swap",
+   });
+
+   export const poppins = Poppins({
+     subsets: ["latin"],
+     weight: ["400", "500", "600"],
+     variable: "--font-poppins",
+     display: "swap",
+   });
+   ```
+
+   The two names `--font-inter` and `--font-poppins` must be exactly these: they are the CSS variables that the font tokens of the library read. Poppins needs the 3 weights `400`, `500` and `600`.
+
+5. Replace the content of `app/layout.tsx`. It puts the two fonts on `<html>`, and gives the page the background and the text color of the theme.
+
+   ```tsx
+   import type { ReactNode } from "react";
+   import { inter, poppins } from "./fonts";
+   import "./globals.css";
+
+   export default function RootLayout({ children }: { children: ReactNode }) {
+     return (
+       <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+         <body className="bg-page text-primary">{children}</body>
+       </html>
+     );
+   }
+   ```
+
+   `inter.variable` is a class that defines the CSS variable `--font-inter`. The two classes must be on `<html>`, not on `<body>`: the tokens are defined on `<html>` and read the variables there.
+
+   An app that skips steps 4 and 5 still works. The text then has a font of the device, because the font tokens end with `ui-sans-serif, system-ui, sans-serif`.
+
+6. Replace the content of `app/page.tsx`:
 
    ```tsx
    import { Button } from "@toraline.tech/ui";
@@ -85,13 +126,13 @@ What you need: Node 24, React 19 and Tailwind CSS 4.
    }
    ```
 
-5. Start the app and open http://localhost:3000.
+7. Start the app and open http://localhost:3000.
 
    ```bash
    npm run dev
    ```
 
-   The page shows a blue-grey button (`#42637c`) with the white text "Save".
+   The page shows a blue-grey button (`#42637c`) with the white text "Save", on a light grey page. The text of the button has the font Poppins.
 
 ## Guide 2: build the theme of the app
 
@@ -104,7 +145,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    ```ts
    import type { ThemeInput } from "@toraline.tech/tokens";
 
-   // The heading font: the font that app/fonts.ts loads, then fonts every device has.
+   // The heading font of this app: a font that app/fonts.ts loads (step 7), then fonts every device has.
    const headingFont = "var(--font-fraunces), Georgia, serif";
 
    export const themeInputs: ThemeInput[] = [
@@ -143,7 +184,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
    - **Change a color.** A key that is the name of a color token of the library, for example `bg-primary`, changes that token. The key is the token name without the two dashes. `--bg-primary` is the background of the main action, and `--text-brand` is the text in the brand color. Each use of a color has its own token, so an app that changes its main color changes each token that has it. The full list is in `packages/tokens/README.md`.
    - **Add a color.** A key the library does not have adds a token. The first part of the key says where the color is used, as in the library: `bg-` a background, `text-` a text, `border-` a border, `icon-` an icon. `bg-promo` adds the token `--bg-promo` and the Tailwind class `bg-promo`. `text-on-promo` adds `--text-on-promo` and the class `text-on-promo`.
-   - **Change the fonts.** `fonts` accepts `body`, `heading` and `mono`. The value is any CSS `font-family` value.
+   - **Change the fonts.** `fonts` accepts `body`, `heading` and `mono`. The value is any CSS `font-family` value. A font you do not give stays the default of the library: Inter for `body`, Poppins for `heading`. Here the headings and the buttons get the font Fraunces, and the normal text stays Inter.
    - `base` names the theme of the library that gives every value you do not give.
    - `isDefault: true` makes the theme apply also when `<html>` has no `data-theme`.
 
@@ -205,18 +246,25 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    @import "@toraline.tech/ui/tailwind.css";
    ```
 
-7. Create the file `app/fonts.ts`. It loads the heading font with `next/font` and puts it in the CSS variable `--font-fraunces`, the variable that `theme.config.ts` names.
+7. Open `app/fonts.ts`, the file of guide 1. Add the heading font of the app. `next/font` puts it in the CSS variable `--font-fraunces`, the variable that `theme.config.ts` names.
 
    ```ts
-   import { Fraunces } from "next/font/google";
+   import { Fraunces, Inter } from "next/font/google";
+
+   export const inter = Inter({
+     subsets: ["latin"],
+     variable: "--font-inter",
+     display: "swap",
+   });
 
    export const fraunces = Fraunces({
      subsets: ["latin"],
      variable: "--font-fraunces",
+     display: "swap",
    });
    ```
 
-   Any font of `next/font/google` or of `next/font/local` works the same way: give it a `variable`, and use that variable in `theme.config.ts`.
+   Poppins is no longer in the file: this app replaced it as the heading font, so nothing uses it. Any font of `next/font/google` or of `next/font/local` works the same way: give it a `variable`, and use that variable in `theme.config.ts`.
 
 8. Replace the content of `app/layout.tsx`. The layout reads the saved theme from the cookie on the server, writes it on `<html>`, and puts the provider around the app. The provider is the component that holds the current theme.
 
@@ -226,7 +274,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    import { THEME_COOKIE_NAME, resolveTheme } from "@toraline.tech/tokens";
    import { ThemeProvider } from "@toraline.tech/ui/theme";
    import { themes } from "../theme.config";
-   import { fraunces } from "./fonts";
+   import { fraunces, inter } from "./fonts";
    import "./globals.css";
 
    export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -234,7 +282,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
      const theme = resolveTheme(cookieStore.get(THEME_COOKIE_NAME)?.value, themes);
 
      return (
-       <html lang="en" data-theme={theme} className={fraunces.variable}>
+       <html lang="en" data-theme={theme} className={`${inter.variable} ${fraunces.variable}`}>
          <body className="bg-page text-primary">
            <ThemeProvider themes={themes} initialTheme={theme}>
              {children}
@@ -280,14 +328,15 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 10. Stop the app with Ctrl+C, start it again with `npm run dev`, and open http://localhost:3000.
 
     - The button "Save" is blue (`#0b5cad`), not blue-grey.
-    - The heading uses the font Fraunces and the blue color.
+    - The heading and the text of the button use the font Fraunces. The heading is blue.
+    - The other text uses the font Inter.
     - The note has the orange color the app added.
     - Press the button `Theme: light`. The page becomes dark, and the button "Save" becomes light blue (`#8cc8ff`).
     - Reload the page. It opens in the dark theme.
 
 ### Without Next.js
 
-The theme function and the components do not need Next.js. They need Tailwind CSS 4. These steps are for an app made with Vite and React (`npm create vite@latest my-app -- --template react-ts`). They replace steps 2 and 6 to 9.
+The theme function and the components do not need Next.js. They need Tailwind CSS 4. These steps are for an app made with Vite and React (`npm create vite@latest my-app -- --template react-ts`). They replace steps 4 and 5 of guide 1, and steps 2 and 6 to 9 of guide 2.
 
 1. Install Tailwind CSS 4 and its plugin for Vite:
 
@@ -295,13 +344,35 @@ The theme function and the components do not need Next.js. They need Tailwind CS
    npm install tailwindcss @tailwindcss/vite
    ```
 
-2. In `theme.config.ts`, the heading font is a font the app loads by itself, or fonts every device has:
+2. Load the default fonts of the library, Inter and Poppins. With no `next/font`, the plain way is a font file whose family name is the name the token has: `Inter` and `Poppins`. The npm packages of Fontsource have such files. Install them:
+
+   ```bash
+   npm install @fontsource/inter @fontsource/poppins
+   ```
+
+   Then import one CSS file for each weight, at the top of `src/main.tsx`:
+
+   ```ts
+   import "@fontsource/inter/400.css";
+   import "@fontsource/inter/500.css";
+   import "@fontsource/inter/600.css";
+   import "@fontsource/inter/700.css";
+   import "@fontsource/poppins/400.css";
+   import "@fontsource/poppins/500.css";
+   import "@fontsource/poppins/600.css";
+   ```
+
+   Any other way to load a font works too (a `<link>` to a font service, your own `@font-face` rule), when the family names are `Inter` and `Poppins`. The catalog of this repository uses `@font-face` rules: `apps/catalog/.storybook/preview.css`.
+
+3. In `theme.config.ts`, the heading font is a font the app loads by itself, or fonts every device has:
 
    ```ts
    const headingFont = "Georgia, serif";
    ```
 
-3. `scripts/write-theme-css.ts` writes the file into `src/`:
+   With this value the app does not use Poppins, so the 3 Poppins imports of step 2 can go. To keep Poppins for the headings, remove the two lines `fonts: { heading: headingFont },` from `theme.config.ts` and keep the imports.
+
+4. `scripts/write-theme-css.ts` writes the file into `src/`:
 
    ```ts
    import { writeFileSync } from "node:fs";
@@ -314,9 +385,9 @@ The theme function and the components do not need Next.js. They need Tailwind CS
    console.log(`Wrote src/theme.generated.css with ${themeInputs.length} themes.`);
    ```
 
-   The scripts of `package.json` are `"theme"`, `"predev"` and `"prebuild"`, as in step 3 above.
+   The scripts of `package.json` are `"theme"`, `"predev"` and `"prebuild"`, as in step 3 of guide 2.
 
-4. Replace the content of the CSS file of the app (`src/index.css`). The 4 imports are the same as in a Next.js app. The rule under them gives the page the colors of the theme:
+5. Replace the content of the CSS file of the app (`src/index.css`). The 4 imports are the same as in a Next.js app. The rule under them gives the page the colors of the theme:
 
    ```css
    @import "tailwindcss";
@@ -330,7 +401,7 @@ The theme function and the components do not need Next.js. They need Tailwind CS
    }
    ```
 
-5. There is no server to read the cookie. A small script in `<head>` reads it before the browser paints the page. `createThemeScript` returns that script as text. Add it, and the plugin of Tailwind, in `vite.config.ts`:
+6. There is no server to read the cookie. A small script in `<head>` reads it before the browser paints the page. `createThemeScript` returns that script as text. Add it, and the plugin of Tailwind, in `vite.config.ts`:
 
    ```ts
    import { defineConfig } from "vite";
@@ -354,9 +425,16 @@ The theme function and the components do not need Next.js. They need Tailwind CS
    });
    ```
 
-6. In `src/main.tsx`, put the provider around the app, with no `initialTheme`. The provider takes the theme that the script wrote on `<html>`.
+7. In `src/main.tsx`, put the provider around the app, with no `initialTheme`. The provider takes the theme that the script wrote on `<html>`.
 
    ```tsx
+   import "@fontsource/inter/400.css";
+   import "@fontsource/inter/500.css";
+   import "@fontsource/inter/600.css";
+   import "@fontsource/inter/700.css";
+   import "@fontsource/poppins/400.css";
+   import "@fontsource/poppins/500.css";
+   import "@fontsource/poppins/600.css";
    import { StrictMode } from "react";
    import { createRoot } from "react-dom/client";
    import { Button } from "@toraline.tech/ui";

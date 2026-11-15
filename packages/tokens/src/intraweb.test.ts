@@ -200,3 +200,27 @@ describe("the text styles", () => {
     expect(textStyles).toEqual(intrawebStyles);
   });
 });
+
+describe("the fonts", () => {
+  const intrawebInlineBlock =
+    /@theme inline \{([\s\S]*?)\}/.exec(withoutComments(readFixture("globals-utilities.css")))?.[1] ?? "";
+  const intrawebFonts = readCssVariables(intrawebInlineBlock);
+
+  test("Intraweb's two font classes are font-sans (normal text) and font-heading (headings and buttons)", () => {
+    expect(intrawebFonts["font-sans"]).toBe("var(--font-body), ui-sans-serif, system-ui, sans-serif");
+    expect(intrawebFonts["font-heading"]).toBe("var(--font-display), ui-sans-serif, system-ui, sans-serif");
+  });
+
+  test("the default fonts are Inter and Poppins, with the fallback fonts of Intraweb", () => {
+    // Intraweb gets the two fonts from next/font, in the variables --font-inter and --font-poppins.
+    // The library reads the same two variables, and names the font when the variable is missing.
+    expect(primitives["font-stack-sans"]).toBe('var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif');
+    expect(primitives["font-stack-display"]).toBe(
+      'var(--font-poppins, "Poppins"), ui-sans-serif, system-ui, sans-serif',
+    );
+    for (const theme of [lightTheme, darkTheme]) {
+      expect(theme.tokens["font-body"]).toBe("var(--font-stack-sans)");
+      expect(theme.tokens["font-heading"]).toBe("var(--font-stack-display)");
+    }
+  });
+});
