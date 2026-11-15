@@ -20,8 +20,20 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/** The color tokens, with the value of each one in each theme. */
-export const Colors: Story = { args: { group: "colors" } };
+/** The background colors, with the value of each one in each theme. */
+export const Backgrounds: Story = { args: { group: "backgrounds" } };
+
+/** The text colors. */
+export const TextColors: Story = { args: { group: "textColors" } };
+
+/** The border colors. */
+export const Borders: Story = { args: { group: "borders" } };
+
+/** The icon colors. */
+export const Icons: Story = { args: { group: "icons" } };
+
+/** The colors of charts and progress bars. */
+export const DataColors: Story = { args: { group: "dataColors" } };
 
 /** The font tokens. The values are the same in both themes. */
 export const Fonts: Story = { args: { group: "fonts" } };
@@ -40,12 +52,12 @@ export const Shadow: Story = { args: { group: "shadow" } };
 
 /** The level 2 tokens that are in none of the groups above. Today there is none. */
 export const OtherTokens: Story = {
-  args: { group: "colors" },
+  args: { group: "backgrounds" },
   render: () => <OtherThemeTokenTable />,
 };
 
 /** The level 1 tokens: the raw values. They do not change with the theme. */
 export const Level1: Story = {
-  args: { group: "colors" },
+  args: { group: "backgrounds" },
   render: () => <PrimitiveTables />,
 };

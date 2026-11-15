@@ -10,11 +10,11 @@ export type ClassNameValue = string | false | null | undefined;
  * classNames(buttonClass, className). When two classes set the same CSS
  * property, the later one stays and the earlier one is removed. So a class of
  * the app replaces the class of the library for the same property:
- * classNames("bg-primary px-4", "bg-danger") is "px-4 bg-danger".
+ * classNames("bg-primary px-4", "bg-surface") is "px-4 bg-surface".
  *
  * Two classes are compared only when they have the same Tailwind variants.
- * "hover:bg-danger-hover" replaces "hover:bg-primary-hover", and does not
- * replace "bg-primary" or "disabled:bg-surface".
+ * "hover:bg-subtle" replaces "hover:bg-primary-hover", and does not
+ * replace "bg-primary" or "disabled:bg-subtle".
  *
  * The comparison is done by the library "tailwind-merge". It knows the token
  * classes of @toraline.tech/tokens with no configuration: it reads any name

@@ -19,14 +19,15 @@ export type InputProps = ComponentProps<"input"> & {
 /**
  * The classes of the field. The states are selected by the attribute a screen
  * reader reads: "aria-invalid:" for an error, "disabled:" for a disabled field.
- * With an error the border has the danger color, also while the field has the focus.
+ * With an error the border has the color of an invalid field, also while the field has the focus.
+ * The colors of each part are the ones of the text field of the app Intraweb.
  */
 const fieldClass = classNames(
-  "w-full rounded border border-border-strong bg-surface p-3 font-body text-base/normal text-text",
-  "placeholder:text-text-muted placeholder:opacity-100",
-  "hover:border-text focus-visible:border-primary",
-  "aria-invalid:enabled:border-danger",
-  "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted",
+  "w-full rounded border border-default bg-surface p-3 font-body text-base/normal text-primary",
+  "placeholder:text-tertiary placeholder:opacity-100",
+  "hover:border-hover focus-visible:border-focus",
+  "aria-invalid:enabled:border-invalid",
+  "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "motion-safe:transition-[border-color] motion-safe:ease-[ease]",
   focusRingClass,
 );
@@ -77,7 +78,7 @@ export function Input({
     <div className={classNames("flex flex-col gap-1 font-body", className)}>
       {hasLabel ? (
         <label
-          className="text-sm/normal font-medium text-text"
+          className="text-sm/normal font-medium text-strong"
           data-slot="label"
           htmlFor={fieldId}
         >

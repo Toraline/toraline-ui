@@ -167,7 +167,7 @@ describe("Tailwind builds the CSS of every class of the components", () => {
   test("the test found the classes of the components", () => {
     expect(classNames.length).toBeGreaterThan(100);
     expect(classNames).toContain("bg-primary");
-    expect(classNames).toContain("focus-visible:outline-focus-ring");
+    expect(classNames).toContain("focus-visible:outline-focus");
   });
 
   test("every class has a rule in the CSS that Tailwind builds from the source files", () => {
@@ -188,10 +188,14 @@ describe("the classes of the components use only tokens", () => {
       // ("--tw-*", "--font-weight-*", "--leading-*", "--default-transition-*").
       .filter(
         (variableName) =>
-          /^(color|font|text|spacing|radius|shadow)(-|$)/.test(variableName) &&
+          /^(bg|text|border|icon|data|color|font|spacing|radius|shadow)(-|$)/.test(variableName) &&
           !variableName.startsWith("font-weight-"),
       );
-    expect(variableNames).toContain("color-primary");
+    expect(variableNames).toContain("bg-primary");
+    expect(variableNames).toContain("text-primary");
+    expect(variableNames).toContain("border-default");
+    expect(variableNames).toContain("border-focus");
+    expect(variableNames).toContain("icon-default");
     expect(variableNames).toContain("font-body");
     expect(variableNames).toContain("text-base");
     expect(variableNames).toContain("spacing");
@@ -218,26 +222,34 @@ describe("the class of the state that must win comes later in the built CSS", ()
   // property and can match one element at the same time.
   test.each([
     // Button, and the two buttons of SplitButton: disabled wins over the pointer over it.
-    ["hover:bg-primary-hover", "disabled:bg-surface"],
-    ["hover:bg-surface-muted", "disabled:bg-surface"],
-    ["hover:bg-danger-hover", "disabled:bg-surface"],
+    ["hover:bg-primary-hover", "disabled:bg-subtle"],
+    ["hover:bg-subtle", "disabled:bg-subtle"],
+    ["hover:bg-danger-subtle", "disabled:bg-subtle"],
+    ["hover:border-hover", "disabled:border-default"],
+    ["border-danger", "disabled:border-default"],
+    ["text-danger", "disabled:text-tertiary"],
     ["bg-primary", "hover:bg-primary-hover"],
+    ["bg-surface", "hover:bg-subtle"],
     // Input: the focus wins over the pointer, and disabled wins over both.
-    ["border-border-strong", "hover:border-text"],
-    ["hover:border-text", "focus-visible:border-primary"],
-    ["focus-visible:border-primary", "disabled:border-border"],
+    ["border-default", "hover:border-hover"],
+    ["hover:border-hover", "focus-visible:border-focus"],
+    ["focus-visible:border-focus", "disabled:border-default"],
+    ["text-primary", "disabled:text-tertiary"],
     // Toggle: on wins over off, and disabled wins over on.
-    ["bg-surface", "peer-checked:bg-success"],
-    ["peer-checked:bg-success", "peer-disabled:bg-surface-muted"],
-    ["peer-checked:border-success", "peer-disabled:border-border"],
-    ["bg-border-strong", "group-has-checked/toggle:bg-success-foreground"],
-    ["group-has-checked/toggle:bg-success-foreground", "group-has-disabled/toggle:bg-text-muted"],
-    ["text-text", "has-disabled:text-text-muted"],
+    ["bg-surface", "peer-checked:bg-primary"],
+    ["border-strong", "peer-checked:border-brand"],
+    ["peer-checked:bg-primary", "peer-disabled:bg-subtle"],
+    ["peer-checked:border-brand", "peer-disabled:border-default"],
+    ["bg-current", "group-has-checked/toggle:bg-surface"],
+    ["group-has-checked/toggle:bg-surface", "group-has-disabled/toggle:bg-current"],
+    ["text-icon", "group-has-disabled/toggle:text-muted"],
+    ["text-brand", "group-has-disabled/toggle:text-inverse"],
+    ["text-body", "has-disabled:text-tertiary"],
     // Tabs: the selected tab wins over the pointer over it.
-    ["hover:text-text", "aria-selected:text-text"],
-    ["border-b-transparent", "aria-selected:border-b-primary"],
+    ["hover:text-primary", "aria-selected:text-brand"],
+    ["border-b-transparent", "aria-selected:border-b-brand"],
     // SplitButton: the keyboard focus ring wins over the plain focus.
-    ["focus:bg-primary", "focus-visible:outline-2"],
+    ["focus:bg-subtle", "focus-visible:outline-2"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
@@ -247,7 +259,7 @@ describe("the class of the state that must win comes later in the built CSS", ()
 
   test("the error border of Input applies only to a field that is not disabled", () => {
     expect(cssFromSource).toContain(
-      `${selectorOf("aria-invalid:enabled:border-danger")}[aria-invalid="true"]:enabled`,
+      `${selectorOf("aria-invalid:enabled:border-invalid")}[aria-invalid="true"]:enabled`,
     );
   });
 

@@ -41,17 +41,20 @@ describe("Button", () => {
 
   test("a color class of the app replaces the color class of the variant", () => {
     render(
-      <Button variant="danger" className="bg-success hover:bg-primary-hover">
+      <Button variant="danger" className="bg-highlight hover:bg-primary-hover">
         Save
       </Button>,
     );
     const classes = screen.getByRole("button").className.split(" ");
-    expect(classes).toContain("bg-success");
+    expect(classes).toContain("bg-highlight");
     expect(classes).toContain("hover:bg-primary-hover");
-    expect(classes).not.toContain("bg-danger");
-    expect(classes).not.toContain("hover:bg-danger-hover");
+    expect(classes).not.toContain("bg-surface");
+    expect(classes).not.toContain("hover:bg-danger-subtle");
+    // A class of the app for another CSS property does not remove the border color or the text color.
+    expect(classes).toContain("border-danger");
+    expect(classes).toContain("text-danger");
     // The class of a state has another variant, so it stays.
-    expect(classes).toContain("disabled:bg-surface");
+    expect(classes).toContain("disabled:bg-subtle");
   });
 
   test("a loading button has no class for the pointer over it, so its colors stay", () => {

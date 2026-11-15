@@ -1,0 +1,145 @@
+/*
+ * A copy of the "@theme inline" block (which Tailwind class each token becomes) and the text style utilities of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/globals.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+@theme inline {
+  --background-color-page: var(--bg-page);
+  --background-color-surface: var(--bg-surface);
+  --background-color-subtle: var(--bg-subtle);
+  --background-color-muted: var(--bg-muted);
+  --background-color-inverse: var(--bg-inverse);
+  --background-color-inverse-hover: var(--bg-inverse-hover);
+  --background-color-selected: var(--bg-selected);
+  --background-color-danger-subtle: var(--bg-danger-subtle);
+  --background-color-error: var(--bg-error);
+  --background-color-success: var(--bg-success);
+  --background-color-warning: var(--bg-warning);
+  --background-color-overlay: var(--bg-overlay);
+  --background-color-primary: var(--bg-primary);
+  --background-color-primary-hover: var(--bg-primary-hover);
+  --background-color-primary-subtle: var(--bg-primary-subtle);
+  --background-color-primary-muted: var(--bg-primary-muted);
+  --background-color-accent-subtle: var(--bg-accent-subtle);
+  --background-color-highlight: var(--bg-highlight);
+  --background-color-info: var(--bg-info);
+  --background-color-tooltip: var(--bg-tooltip);
+
+  --text-color-primary: var(--text-primary);
+  --text-color-strong: var(--text-strong);
+  --text-color-body: var(--text-body);
+  --text-color-secondary: var(--text-secondary);
+  --text-color-tertiary: var(--text-tertiary);
+  --text-color-muted: var(--text-muted);
+  --text-color-inverse: var(--text-inverse);
+  --text-color-danger: var(--text-danger);
+  --text-color-error: var(--text-error);
+  --text-color-success: var(--text-success);
+  --text-color-warning: var(--text-warning);
+  --text-color-caution: var(--text-caution);
+  --text-color-brand: var(--text-brand);
+  --text-color-info: var(--text-info);
+  --text-color-accent: var(--text-accent);
+  --text-color-icon: var(--icon-default);
+  --text-color-icon-strong: var(--icon-strong);
+  --text-color-icon-brand: var(--icon-brand);
+
+  --border-color-default: var(--border-default);
+  --border-color-strong: var(--border-strong);
+  --border-color-subtle: var(--border-subtle);
+  --border-color-hover: var(--border-hover);
+  --border-color-focus: var(--border-focus);
+  --border-color-inverse: var(--border-inverse);
+  --border-color-brand: var(--border-brand);
+  --border-color-danger: var(--border-danger);
+  --border-color-error: var(--border-error);
+  --border-color-invalid: var(--border-invalid);
+  --border-color-changed: var(--border-changed);
+  --border-color-success: var(--border-success);
+  --border-color-info: var(--border-info);
+  --border-color-warning: var(--border-warning);
+
+  --outline-color-focus: var(--border-focus);
+  --ring-color-info: var(--border-info);
+
+  --color-data-1: var(--data-1);
+  --color-data-2: var(--data-2);
+  --color-data-3: var(--data-3);
+  --color-data-success: var(--data-success);
+  --color-data-warning: var(--data-warning);
+  --color-data-danger: var(--data-danger);
+  --color-data-track: var(--data-track);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility heading-page {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+@utility heading-section {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+}
+
+@utility heading-card {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+@utility display-number {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility display-number-sm {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+@utility label-lg {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+@utility label-sm {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+@utility caption-overline {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

@@ -18,9 +18,9 @@ const rootClass = "group/split-button relative inline-flex gap-1 font-body";
 
 /** What the main button and the trigger share. */
 const buttonClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-body text-base/normal font-bold text-primary-foreground",
+  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-body text-base/normal font-bold text-inverse",
   "hover:bg-primary-hover",
-  "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface disabled:text-text-muted",
+  "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "motion-safe:transition-[background-color] motion-safe:ease-[ease]",
   focusRingClass,
 );
@@ -41,16 +41,19 @@ const arrowClass = classNames(
   "motion-safe:transition-[rotate] motion-safe:ease-[ease]",
 );
 
-/** The menu sits above the page and does not move the content around it. */
+/**
+ * The menu sits above the page and does not move the content around it.
+ * Its colors, and the colors of an action, are the ones of the menu of actions of the app Intraweb.
+ */
 const menuClass = classNames(
-  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded border border-border bg-surface-raised p-1 shadow",
+  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded border border-subtle bg-surface p-1 shadow",
   "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
 );
 
-/** One action. The action under the pointer and the action that has the keyboard focus have the primary color. */
+/** One action. The action under the pointer and the action that has the keyboard focus have a quiet background. */
 const itemClass = classNames(
-  "flex cursor-pointer items-center gap-3 rounded border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-primary",
-  "hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+  "flex cursor-pointer items-center gap-3 rounded border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-body",
+  "hover:bg-subtle focus:bg-subtle",
   focusRingClass,
 );
 

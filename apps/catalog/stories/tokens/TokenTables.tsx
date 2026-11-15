@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { darkTheme, lightTheme, primitives, themeTokenNames } from "@toraline.tech/tokens";
+import { colorTokenNames, darkTheme, lightTheme, primitives, themeTokenNames } from "@toraline.tech/tokens";
 import type { ThemeTokenName } from "@toraline.tech/tokens";
 import "./token-tables.css";
 
@@ -8,8 +8,8 @@ import "./token-tables.css";
  * @toraline.tech/tokens, so a token that the library adds or changes appears here
  * with no change in this file.
  *
- * A level 1 token is a raw value, for example --purple-500.
- * A level 2 token is a meaning, for example --color-primary. Each theme gives it a value.
+ * A level 1 token is a raw value, for example --color-brand-700.
+ * A level 2 token is a meaning, for example --bg-primary. Each theme gives it a value.
  */
 
 /** The themes of the library, in the order of the columns. */
@@ -24,7 +24,7 @@ const spacingSteps = [1, 2, 4, 8];
 /** The kinds of sample a table can draw next to a value. */
 type SampleKind = "color" | "font" | "text-size" | "space" | "radius" | "shadow" | "none";
 
-/** Draws the sample of one CSS value. "cssValue" is any CSS value, for example "var(--color-primary)". */
+/** Draws the sample of one CSS value. "cssValue" is any CSS value, for example "var(--bg-primary)". */
 function Sample({ kind, cssValue }: { kind: SampleKind; cssValue: string }) {
   const samples: Record<SampleKind, ReactNode> = {
     color: <span className="catalog-token-sample__color" style={{ backgroundColor: cssValue }} />,
@@ -53,7 +53,7 @@ function Sample({ kind, cssValue }: { kind: SampleKind; cssValue: string }) {
 /**
  * Splits the value of a level 2 token in two parts: the level 1 token it
  * points to, and the raw value of that token.
- * Example: "var(--purple-500)" gives "--purple-500" and "#5e00a1".
+ * Example: "var(--color-brand-700)" gives "--color-brand-700" and "#42637c".
  * A value that points to no level 1 token gives only the raw value.
  */
 function describeValue(value: string): { reference?: string; raw: string } {
@@ -82,11 +82,38 @@ type ThemeTokenGroup = {
   includes: (tokenName: string) => boolean;
 };
 
+/** true for a level 2 color token. "text-primary" is a color; "text-sm" is a font size. */
+const isColorToken = (tokenName: string) => (colorTokenNames as readonly string[]).includes(tokenName);
+
+/** true for a color token of one group. The group is the first part of the name, for example "bg-". */
+const isColorOfGroup = (prefix: string) => (tokenName: string) =>
+  isColorToken(tokenName) && tokenName.startsWith(prefix);
+
 const themeTokenGroups = {
-  colors: {
-    caption: "Colors",
+  backgrounds: {
+    caption: "Background colors",
     sampleKind: "color",
-    includes: (tokenName) => tokenName.startsWith("color-"),
+    includes: isColorOfGroup("bg-"),
+  },
+  textColors: {
+    caption: "Text colors",
+    sampleKind: "color",
+    includes: isColorOfGroup("text-"),
+  },
+  borders: {
+    caption: "Border colors",
+    sampleKind: "color",
+    includes: isColorOfGroup("border-"),
+  },
+  icons: {
+    caption: "Icon colors",
+    sampleKind: "color",
+    includes: isColorOfGroup("icon-"),
+  },
+  dataColors: {
+    caption: "Colors of charts and progress bars",
+    sampleKind: "color",
+    includes: isColorOfGroup("data-"),
   },
   fonts: {
     caption: "Fonts",
@@ -96,7 +123,7 @@ const themeTokenGroups = {
   textSizes: {
     caption: "Text sizes",
     sampleKind: "text-size",
-    includes: (tokenName) => tokenName.startsWith("text-"),
+    includes: (tokenName) => tokenName.startsWith("text-") && !isColorToken(tokenName),
   },
   spacing: {
     caption: "Spacing",

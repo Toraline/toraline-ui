@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { primitives } from "./primitives";
+import { getTailwindColorMapping } from "./tailwind-variables";
 
 /**
  * The default look of this library is the look of the app Intraweb.
@@ -54,5 +55,23 @@ describe("level 1 colors", () => {
         .map((name) => name.split("-")[1]),
     );
     expect([...scaleNames]).toEqual(["slate", "brand", "pink", "cream", "green", "orange", "red"]);
+  });
+});
+
+describe("the Tailwind classes of the color tokens", () => {
+  test("each color token becomes the same Tailwind class as in Intraweb", () => {
+    const intrawebInlineBlock = /@theme inline \{([\s\S]*?)\}/.exec(
+      withoutComments(readFixture("globals-utilities.css")),
+    )?.[1];
+    const intrawebMapping = readCssVariables(intrawebInlineBlock ?? "");
+    // Intraweb's two font lines are compared in the test of the fonts.
+    const { "font-sans": fontSans, "font-heading": fontHeading, ...intrawebColorMapping } = intrawebMapping;
+    expect(fontSans).toBeDefined();
+    expect(fontHeading).toBeDefined();
+
+    const libraryMapping = Object.fromEntries(
+      Object.entries(getTailwindColorMapping()).map(([name, value]) => [name.slice(2), value]),
+    );
+    expect(libraryMapping).toEqual(intrawebColorMapping);
   });
 });

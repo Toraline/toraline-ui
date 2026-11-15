@@ -12,6 +12,59 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Level 2 color tokens: the names of Intraweb, and one Tailwind class for each group (TOR-1131)
+- Decision: the level 2 color tokens of `@toraline.tech/tokens` have the names of the design system of the app Intraweb. There are 59, in 5 groups: 20 `--bg-*` (a background), 15 `--text-*` (a text), 14 `--border-*` (a border), 3 `--icon-*` (an icon) and 7 `--data-*` (a chart or a progress bar). The list is taken from Intraweb's files `styles/themes/light.css` and `styles/themes/dark.css`. No level 2 token named `--color-*` is left in `packages/tokens`.
+- Why: phase 6 (TOR-1122). A component copied from Intraweb then needs no change, and Intraweb can install the library with its own token names.
+- The table old name → new name. An old token had one name for every use. In Intraweb each use has its own token, so one old token can have more than one new token:
+
+| Old token | New token | Note |
+|---|---|---|
+| `--color-surface` | `--bg-page` (the page) and `--bg-surface` (a field) | |
+| `--color-surface-raised` | `--bg-surface` | A card, a menu, a secondary button |
+| `--color-surface-muted` | `--bg-subtle` (a part under the pointer, a disabled part) and `--bg-muted` | |
+| `--color-text` | `--text-primary` | Also `--text-strong` (a label) and `--text-body` (normal text) |
+| `--color-text-muted` | `--text-tertiary` (a hint, a placeholder, a disabled part) and `--text-secondary` (a tab or a link that is not selected) | Not `--text-muted`: in Intraweb that token is for decoration and its contrast is below 4.5 |
+| `--color-border` | `--border-default` | Also `--border-subtle` (a menu) |
+| `--color-border-strong` | `--border-strong` | The border of a field is now `--border-default`, as in Intraweb |
+| `--color-primary` | `--bg-primary` (a background), `--text-brand` (a text), `--border-brand` (a border), `--icon-brand` (an icon) | |
+| `--color-primary-hover` | `--bg-primary-hover` | |
+| `--color-primary-foreground` | `--text-inverse` | |
+| `--color-danger` | `--text-danger` (a text), `--border-danger` (the border of a danger button), `--border-invalid` (the border of a field with an error) | Intraweb has no strong red background. Its danger button is red text on `--bg-surface` |
+| `--color-danger-hover` | `--bg-danger-subtle` | The background of a danger button under the pointer |
+| `--color-danger-foreground` | None | No part has text on a strong red background any more |
+| `--color-success` | `--text-success` (a text), `--bg-success` (a quiet background), `--border-success`, `--data-success` | The switch that is on now has `--bg-primary`, as the checkbox of Intraweb |
+| `--color-success-foreground` | None | The thumb of a switch that is on has `--bg-surface` |
+| `--color-focus-ring` | `--border-focus` | Class `outline-focus` |
+| `--color-overlay` | `--bg-overlay` | |
+| A color an app added, `--color-<name>` | `--bg-<name>`, `--text-<name>`, `--border-<name>`, `--icon-<name>`, `--data-<name>`, or still `--color-<name>` | See the keys of `colors` below |
+
+- The old Tailwind class → the new Tailwind class: `bg-surface` (the page) → `bg-page`; `bg-surface-raised` → `bg-surface`; `bg-surface-muted` → `bg-subtle` or `bg-muted`; `text-text` → `text-primary`; `text-text-muted` → `text-tertiary` or `text-secondary`; `border-border` → `border-default`; `border-border-strong` → `border-strong`; `text-primary` (the brand color as text) → `text-brand`; `border-primary` → `border-brand`; `text-primary-foreground` → `text-inverse`; `text-danger` and `border-danger` keep their names; `bg-danger` → none; `outline-focus-ring` → `outline-focus`. Two class names stay and change their meaning: `text-primary` was the brand color and is now the main text color; `bg-surface` was the page and is now a card or a field.
+- The 9 level 2 tokens that are not colors keep their names in this entry: `--font-body`, `--font-heading`, `--font-mono`, `--text-sm`, `--text-base`, `--text-lg`, `--spacing`, `--radius`, `--shadow`. The entries of TOR-1134 and TOR-1135 change the radius, the shadow and the fonts.
+- Decision: `--text-sm`, `--text-base` and `--text-lg` (font sizes) and `--text-primary` (a color) both start with `--text-`. The list `colorTokenNames` of the package says which tokens are colors.
+- Why: these are the names of Intraweb and of Tailwind, and Tailwind itself has `text-sm` and `text-red-500`. A color token of an app cannot take the name of a font size: `createTheme` refuses `text-xs` to `text-9xl`.
+- Decision: the Tailwind preset makes each color token a class of its group only, with the same `@theme inline` block as Intraweb's `globals.css`: `--background-color-<name>: var(--bg-<name>)` gives `bg-<name>`, `--text-color-<name>: var(--text-<name>)` gives `text-<name>`, `--border-color-<name>: var(--border-<name>)` gives `border-<name>`, `--text-color-icon...: var(--icon-...)` gives `text-icon`, `text-icon-strong` and `text-icon-brand`, `--color-data-<name>: var(--data-<name>)` gives a class for every property, and 2 more lines give `outline-focus` and `ring-info`. A test compares the block of the preset with a copy of Intraweb's block (`src/intraweb-fixtures/globals-utilities.css`), and another test builds every class with Tailwind 4.3.5.
+- Why: the task of the phase asks for the same class names as Intraweb. With one class for each group, `bg-primary` (the brand color) and `text-primary` (the main text color) are two tokens with no clash.
+- Not in the documentation: the table "Theme variable namespaces" of the page "Theme variables" of Tailwind (read on 2026-11-15) lists `--color-*` and does not list `--background-color-*`, `--text-color-*`, `--border-color-*`, `--outline-color-*` or `--ring-color-*`. They are in the code of Tailwind 4.3.5 (`node_modules/tailwindcss/dist/lib.js` looks for `--background-color` before `--color`), and Intraweb uses them. The same page documents `@theme inline` for a theme variable that points to another variable.
+- Decision (the theme function): the shape of `createTheme` and `createTailwindTheme` does not change. A key of `colors` is now the full name of a token, without the two dashes:
+  - the name of a color token of the library (`bg-primary`) changes that token;
+  - another name that starts with `bg-`, `text-`, `border-`, `icon-` or `data-` (`bg-promo`) adds a token of that group, `--bg-promo`, with the class of that group;
+  - any other name (`promo`) adds `--color-promo`, a color for every CSS property, as before.
+- Decision: `createTheme` throws an error for a key with no group that is the end of a class of the library (`primary`, `surface`, `brand`, `danger`, `icon`, `focus`, `info` and the others).
+- Why: before this phase `primary` changed the main color. With the new names it would add `--color-primary`, and the classes `bg-primary` and `text-primary` would still read the tokens of the library, so the app would see no change and no error. The error names the token to write.
+- Decision: `createTailwindTheme` writes a color of one group as `@theme inline { --background-color-promo: var(--bg-promo, #b34700); }`. The value after the comma is the value of the first theme that has the color, as before.
+- Decision: the light and the dark theme get the values of Intraweb in the same commit as the names.
+- Why: 42 of the 59 names have no old token, and the old palette has no value for them (for example a very light red for `--bg-danger-subtle`). The preset, the theme function, the classes of the components, the catalog and the playground also move in this commit, because Tailwind cannot give the class `text-primary` its old meaning and its new meaning at once. The commit of TOR-1133 adds the comparison with Intraweb's files, and the commit of TOR-1136 moves what is left.
+- Decision: the colors of each component, following the component of Intraweb where there is one:
+  - Button `primary`: `bg-primary text-inverse`, `hover:bg-primary-hover`. `secondary`: `border-default bg-surface text-strong`, `hover:border-hover hover:bg-subtle`. `danger`: `border-danger bg-surface text-danger`, `hover:bg-danger-subtle`. These are the classes of Intraweb's `components/ui/button.tsx`.
+  - Button, disabled: `border-default bg-subtle text-tertiary` for every variant. Intraweb uses `opacity-50`. The library keeps its own rule (entry of TOR-1010): a disabled button must still have a contrast of 4.5.
+  - Input: field `border-default bg-surface text-primary`, placeholder `text-tertiary`, `hover:border-hover`, `focus-visible:border-focus`, error `border-invalid`, disabled `bg-subtle text-tertiary`, label `text-strong`, error message `text-danger`. These are the tokens of Intraweb's `components/ui/form-controls.tsx`. One difference stays: the field with the focus keeps the outline of the library (2 pixels, `outline-focus`); Intraweb draws a ring of 3 pixels in `ring-info` and no outline.
+  - Tabs: a tab `text-secondary`, `hover:text-primary`, selected `text-brand` with a line `border-b-brand`; the line of the row `border-b-default`. These are the tokens of Intraweb's `TabNav`. The tab under the pointer no longer gets a background.
+  - SplitButton: the two buttons as the primary Button. The menu `border-subtle bg-surface`, an action `text-body`, `hover:bg-subtle focus:bg-subtle`: the tokens of Intraweb's `ActionMenu`.
+  - Toggle, BreadCrumbs and ThemeToggle have no component in Intraweb. Toggle follows Intraweb's checkbox: off `border-strong bg-surface`, on `border-brand bg-primary`; the thumb is `text-icon` (off) and `bg-surface` (on). BreadCrumbs: a link `text-secondary`, `hover:text-brand`, the current page `text-primary`. ThemeToggle has the colors of the secondary Button.
+- Not done here: the sizes of the components (heights, paddings, font sizes) are not changed to the sizes of Intraweb. The task of the phase keeps variants, sizes and new components for phase 7.
+- Alternatives: keeping `--color-*` names and mapping them to Intraweb's class names only in the preset; one generic `--color-<name>` for every added color, with a class for every property, as before (the classes `text-brand` and `border-brand` of an added color `brand` would clash with the tokens of the library); a temporary layer of old names so that the components could move in a later commit.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Level 1 colors: the color scales of Intraweb (TOR-1132)
 - Decision: the level 1 colors of `@toraline.tech/tokens` are the 7 color scales of the design system of the app Intraweb: slate and brand (50 to 900), pink, cream, green, orange and red. 37 colors. Each has the name and the value of the `@theme` block of Intraweb's `globals.css`, for example `--color-brand-700: #42637c`.
 - Why: phase 6 (TOR-1122) makes the default look of the library the look of Intraweb, so that Intraweb can install the library and look the same.

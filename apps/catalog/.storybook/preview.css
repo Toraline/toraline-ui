@@ -18,14 +18,14 @@
 
 /* The page of one story. */
 body {
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-body);
 }
 
 /* The box around a story inside a documentation page. */
 .docs-story {
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-body);
 }

@@ -9,12 +9,13 @@ import type { ButtonSize, ButtonVariant } from "./button-options.js";
  * The classes every button has. A state is selected by the attribute a screen
  * reader reads: "disabled:" by the HTML attribute disabled, "aria-busy:" by aria-busy.
  * Disabled is the same quiet look for every variant.
+ * The colors of each part are the ones of the Button of the app Intraweb.
  */
 const baseClass = classNames(
   "inline-flex cursor-pointer items-center justify-center gap-2 rounded border border-transparent font-body font-semibold",
-  "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface disabled:text-text-muted",
+  "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "enabled:aria-busy:cursor-progress",
-  "motion-safe:transition-[background-color] motion-safe:ease-[ease]",
+  "motion-safe:transition-[background-color,border-color] motion-safe:ease-[ease]",
   focusRingClass,
 );
 
@@ -27,16 +28,16 @@ const sizeClass: Record<ButtonSize, string> = {
 
 /** The colors of each variant. */
 const variantClass: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-primary-foreground",
-  secondary: "border-primary bg-surface-raised text-primary",
-  danger: "bg-danger text-danger-foreground",
+  primary: "bg-primary text-inverse",
+  secondary: "border-default bg-surface text-strong",
+  danger: "border-danger bg-surface text-danger",
 };
 
-/** The background of each variant while the pointer is over the button. A loading button does not get it. */
+/** The colors of each variant while the pointer is over the button. A loading button does not get them. */
 const hoverClass: Record<ButtonVariant, string> = {
   primary: "hover:bg-primary-hover",
-  secondary: "hover:bg-surface-muted",
-  danger: "hover:bg-danger-hover",
+  secondary: "hover:border-hover hover:bg-subtle",
+  danger: "hover:bg-danger-subtle",
 };
 
 /** The spinner: a circle with one side that has no color. It turns only when the person did not ask for less motion. */

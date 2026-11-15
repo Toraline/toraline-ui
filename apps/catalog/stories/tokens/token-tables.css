@@ -7,14 +7,14 @@
 }
 
 .catalog-token-scroll:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
 .catalog-token-table {
   width: 100%;
   border-collapse: collapse;
-  color: var(--color-text);
+  color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   line-height: 1.5;
@@ -32,7 +32,7 @@
 .catalog-token-table th,
 .catalog-token-table td {
   padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border-default);
   vertical-align: middle;
 }
 
@@ -46,8 +46,8 @@
  * the theme of the page is.
  */
 .catalog-token-table__theme-cell {
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .catalog-token-table__value {
@@ -75,7 +75,7 @@
   display: inline-block;
   width: 3em;
   height: 3em;
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--border-strong);
 }
 
 .catalog-token-sample__color {
@@ -84,16 +84,16 @@
 
 .catalog-token-sample__radius {
   border-width: 2px;
-  background-color: var(--color-surface-muted);
+  background-color: var(--bg-muted);
 }
 
 .catalog-token-sample__shadow {
-  border-color: var(--color-border);
-  background-color: var(--color-surface-raised);
+  border-color: var(--border-default);
+  background-color: var(--bg-surface);
 }
 
 .catalog-token-sample__space {
   display: inline-block;
   height: 1.5em;
-  background-color: var(--color-primary);
+  background-color: var(--bg-primary);
 }

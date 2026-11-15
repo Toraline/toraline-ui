@@ -10,8 +10,9 @@ This page shows every design token of the library. The tables read the values fr
 ## Words this page uses
 
 - **Design token**: a named value of the design, for example a color or a font. It is stored as a CSS variable.
-- **Level 1 token**: a raw value. The name says what the value is. Example: `--purple-500` is `#5e00a1`.
-- **Level 2 token**: a meaning. The name says what the value is for. Example: `--color-primary` is the color of the main action. Components use only level 2 tokens.
+- **Level 1 token**: a raw value. The name says what the value is. Example: `--color-brand-700` is `#42637c`.
+- **Level 2 token**: a meaning. The name says what the value is for. Example: `--bg-primary` is the background of the main action. Components use only level 2 tokens.
+- **Intraweb**: an app of Toraline. The default colors of the library are the colors of its design system, with the same names.
 - **Theme**: one set of values for the level 2 tokens. The library has the themes `light` and `dark`.
 
 ## How to read a table
@@ -26,7 +27,29 @@ A cell always has the colors of its own theme. The control **Theme** in the tool
 
 ## Colors
 
-<Canvas of={TokenStories.Colors} sourceState="none" />
+The first part of the name of a color token is its group. It says where the color is used: `--bg-*` a background, `--text-*` a text, `--border-*` a border, `--icon-*` an icon, `--data-*` a chart or a progress bar.
+
+With the Tailwind preset each token is a class of its group only. `--bg-primary` is the class `bg-primary`, `--text-primary` is `text-primary`, `--border-default` is `border-default`, `--icon-default` is `text-icon`, and `--data-1` is `bg-data-1`, `text-data-1` and the classes of the other properties.
+
+### Background colors
+
+<Canvas of={TokenStories.Backgrounds} sourceState="none" />
+
+### Text colors
+
+<Canvas of={TokenStories.TextColors} sourceState="none" />
+
+### Border colors
+
+<Canvas of={TokenStories.Borders} sourceState="none" />
+
+### Icon colors
+
+<Canvas of={TokenStories.Icons} sourceState="none" />
+
+### Colors of charts and progress bars
+
+<Canvas of={TokenStories.DataColors} sourceState="none" />
 
 ## Fonts
 

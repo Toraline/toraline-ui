@@ -12,8 +12,9 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 ## Words this guide uses
 
-- **Token**: a named value of the design, for example a color or a font. It is stored as a CSS variable, for example `--color-primary`.
+- **Token**: a named value of the design, for example a color or a font. It is stored as a CSS variable, for example `--bg-primary`, the background of the main action.
 - **Theme**: one set of values for the tokens. The library has the themes `light` and `dark`.
+- **Intraweb**: an app of Toraline. The default look of the library is the look of Intraweb: the same colors, with the same token names and the same class names.
 - **`data-theme`**: the attribute on `<html>` that selects the theme, for example `<html data-theme="dark">`.
 - **Tailwind CSS**: a tool that gives one CSS class for each style, for example `p-4` for a padding. The components of the library are styled with Tailwind CSS 4 classes, so the app must use Tailwind CSS 4.
 - **Cookie**: a small named value that the browser keeps and sends to the server with every request.
@@ -90,7 +91,7 @@ What you need: Node 24, React 19 and Tailwind CSS 4.
    npm run dev
    ```
 
-   The page shows a purple button with the white text "Save".
+   The page shows a blue-grey button (`#42637c`) with the white text "Save".
 
 ## Guide 2: build the theme of the app
 
@@ -112,10 +113,11 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
        base: "light",
        isDefault: true,
        colors: {
-         primary: "#0b5cad", // changes --color-primary
-         "primary-hover": "#084a8c", // changes --color-primary-hover
-         brand: "#b34700", // adds --color-brand
-         "brand-foreground": "#ffffff", // adds --color-brand-foreground
+         "bg-primary": "#0b5cad", // changes --bg-primary
+         "bg-primary-hover": "#084a8c", // changes --bg-primary-hover
+         "text-brand": "#0b5cad", // changes --text-brand
+         "bg-promo": "#b34700", // adds --bg-promo
+         "text-on-promo": "#ffffff", // adds --text-on-promo
        },
        fonts: { heading: headingFont },
      },
@@ -123,10 +125,11 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
        name: "dark",
        base: "dark",
        colors: {
-         primary: "#8cc8ff",
-         "primary-hover": "#b9dcff",
-         brand: "#ffb37a",
-         "brand-foreground": "#0f1928",
+         "bg-primary": "#8cc8ff",
+         "bg-primary-hover": "#b9dcff",
+         "text-brand": "#8cc8ff",
+         "bg-promo": "#ffb37a",
+         "text-on-promo": "#0c111d",
        },
        fonts: { heading: headingFont },
      },
@@ -138,8 +141,8 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
    What each part does:
 
-   - **Change a color.** A key that the library has, for example `primary`, changes that color. The key is the token name without `--color-`.
-   - **Add a color.** Any other key, for example `brand`, adds a token: `--color-brand`.
+   - **Change a color.** A key that is the name of a color token of the library, for example `bg-primary`, changes that token. The key is the token name without the two dashes. `--bg-primary` is the background of the main action, and `--text-brand` is the text in the brand color. Each use of a color has its own token, so an app that changes its main color changes each token that has it. The full list is in `packages/tokens/README.md`.
+   - **Add a color.** A key the library does not have adds a token. The first part of the key says where the color is used, as in the library: `bg-` a background, `text-` a text, `border-` a border, `icon-` an icon. `bg-promo` adds the token `--bg-promo` and the Tailwind class `bg-promo`. `text-on-promo` adds `--text-on-promo` and the class `text-on-promo`.
    - **Change the fonts.** `fonts` accepts `body`, `heading` and `mono`. The value is any CSS `font-family` value.
    - `base` names the theme of the library that gives every value you do not give.
    - `isDefault: true` makes the theme apply also when `<html>` has no `data-theme`.
@@ -159,7 +162,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    console.log(`Wrote app/theme.generated.css with ${themeInputs.length} themes.`);
    ```
 
-   `createTheme` returns the CSS of one theme. `createTailwindTheme` returns the CSS that makes each added color a Tailwind class, for example `bg-brand`.
+   `createTheme` returns the CSS of one theme. `createTailwindTheme` returns the CSS that makes each added color a Tailwind class, for example `bg-promo`.
 
 3. Open `package.json`. Add the line `"type": "module"`, and add 3 scripts, so the CSS file is written before the app starts and before it is built:
 
@@ -232,7 +235,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
      return (
        <html lang="en" data-theme={theme} className={fraunces.variable}>
-         <body className="bg-surface text-text">
+         <body className="bg-page text-primary">
            <ThemeProvider themes={themes} initialTheme={theme}>
              {children}
            </ThemeProvider>
@@ -261,8 +264,8 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    export default function Page() {
      return (
        <main className="p-8">
-         <h1 className="font-heading text-3xl text-primary">My app</h1>
-         <p className="mt-4 inline-block rounded bg-brand px-3 py-1 text-brand-foreground">
+         <h1 className="font-heading text-3xl text-brand">My app</h1>
+         <p className="mt-4 inline-block rounded bg-promo px-3 py-1 text-on-promo">
            The color the app added
          </p>
          <div className="mt-4 flex gap-4">
@@ -276,7 +279,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
 10. Stop the app with Ctrl+C, start it again with `npm run dev`, and open http://localhost:3000.
 
-    - The button "Save" is blue (`#0b5cad`), not purple.
+    - The button "Save" is blue (`#0b5cad`), not blue-grey.
     - The heading uses the font Fraunces and the blue color.
     - The note has the orange color the app added.
     - Press the button `Theme: light`. The page becomes dark, and the button "Save" becomes light blue (`#8cc8ff`).
@@ -322,8 +325,8 @@ The theme function and the components do not need Next.js. They need Tailwind CS
    @import "@toraline.tech/ui/tailwind.css";
 
    body {
-     background-color: var(--color-surface);
-     color: var(--color-text);
+     background-color: var(--bg-page);
+     color: var(--text-primary);
    }
    ```
 
@@ -388,10 +391,10 @@ Every component accepts `className`. The classes go on the outermost element of 
 2. **A color:** a token class and a standard Tailwind class both work. A color the app added in guide 2 is a token class too.
 
    ```tsx
-   <Button className="bg-brand text-brand-foreground hover:bg-primary-hover">Save</Button>
+   <Button className="bg-promo text-on-promo hover:bg-primary-hover">Save</Button>
    ```
 
-   A class replaces only a class with the same Tailwind variant. `bg-brand` replaces the library's `bg-primary`. It does not replace `hover:bg-primary-hover` or `disabled:bg-surface`. So give one class for each state you want to change: `hover:` for the pointer over the element, `disabled:` for a disabled element, `focus-visible:` for the keyboard focus. A state you give no class for keeps the look of the library.
+   A class replaces only a class for the same CSS property, with the same Tailwind variant. `bg-promo` replaces the library's `bg-primary`, and `text-on-promo` replaces the library's `text-inverse`. They do not replace `hover:bg-primary-hover` or `disabled:bg-subtle`. So give one class for each state you want to change: `hover:` for the pointer over the element, `disabled:` for a disabled element, `focus-visible:` for the keyboard focus. A state you give no class for keeps the look of the library.
 
 3. **With your own CSS:** write a class in the CSS file of the app, in no cascade layer, and give it to the component.
 
@@ -420,9 +423,9 @@ Every component accepts `className`. The classes go on the outermost element of 
 5. **With the colors of the theme in your own CSS:** use the tokens, so the style follows the theme.
 
    ```css
-   .brand-note {
-     background-color: var(--color-brand);
-     color: var(--color-brand-foreground);
+   .promo-note {
+     background-color: var(--bg-promo);
+     color: var(--text-on-promo);
    }
    ```
 

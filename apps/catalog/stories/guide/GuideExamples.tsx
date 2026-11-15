@@ -19,10 +19,11 @@ const guideThemeInputs: Record<string, ThemeInput> = {
     name: "guide-light",
     base: "light",
     colors: {
-      primary: "#0b5cad",
-      "primary-hover": "#084a8c",
-      brand: "#b34700",
-      "brand-foreground": "#ffffff",
+      "bg-primary": "#0b5cad",
+      "bg-primary-hover": "#084a8c",
+      "text-brand": "#0b5cad",
+      "bg-promo": "#b34700",
+      "text-on-promo": "#ffffff",
     },
     fonts: { heading: "Georgia, serif" },
   },
@@ -30,10 +31,11 @@ const guideThemeInputs: Record<string, ThemeInput> = {
     name: "guide-dark",
     base: "dark",
     colors: {
-      primary: "#8cc8ff",
-      "primary-hover": "#b9dcff",
-      brand: "#ffb37a",
-      "brand-foreground": "#0f1928",
+      "bg-primary": "#8cc8ff",
+      "bg-primary-hover": "#b9dcff",
+      "text-brand": "#8cc8ff",
+      "bg-promo": "#ffb37a",
+      "text-on-promo": "#0c111d",
     },
     fonts: { heading: "Georgia, serif" },
   },
@@ -66,7 +68,7 @@ export function ThemedApp() {
   return (
     <GuideTheme>
       <h2 className="guide-example__heading">My app</h2>
-      <p className="guide-brand-note">The color the app added</p>
+      <p className="guide-promo-note">The color the app added</p>
       <Button>Save</Button>
       <ThemeToggle />
     </GuideTheme>

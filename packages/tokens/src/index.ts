@@ -8,8 +8,8 @@ export const packageName = "@toraline.tech/tokens";
 
 export { primitives } from "./primitives.js";
 export type { PrimitiveName } from "./primitives.js";
-export { darkTheme, lightTheme, themeTokenNames } from "./themes.js";
-export type { ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes.js";
+export { colorTokenNames, darkTheme, lightTheme, themeTokenNames } from "./themes.js";
+export type { ColorTokenName, ThemeDefinition, ThemeTokenName, ThemeTokens } from "./themes.js";
 export { createTheme, getAddedColorNames } from "./create-theme.js";
 export type { ThemeColorName, ThemeInput } from "./create-theme.js";
 export {
