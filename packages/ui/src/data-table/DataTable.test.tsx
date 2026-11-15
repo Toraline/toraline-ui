@@ -81,7 +81,8 @@ describe("DataTable", () => {
     const box = screen.getByRole("table").parentElement as HTMLElement;
     expect(box.getAttribute("data-slot")).toBe("box");
     expect(box.className.split(" ")).toEqual(
-      expect.arrayContaining(["overflow-x-auto", "rounded-xl", "bg-surface", "shadow-card"]),
+      // "relative" keeps the caption, which only a screen reader reads, inside the box.
+      expect.arrayContaining(["relative", "overflow-x-auto", "rounded-xl", "bg-surface", "shadow-card"]),
     );
     // A table that fits adds no stop for the Tab key.
     expect(box.hasAttribute("tabindex")).toBe(false);

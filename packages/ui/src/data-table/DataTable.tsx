@@ -2,7 +2,7 @@ import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
-import { DataTableScroll } from "./DataTableScroll.js";
+import { ScrollBox } from "../shared/ScrollBox.js";
 
 /*
  * The classes are the ones of the DataTable of the app Intraweb
@@ -18,8 +18,13 @@ import { DataTableScroll } from "./DataTableScroll.js";
 export const tableCellAlignments = ["left", "center", "right"] as const;
 export type TableCellAlignment = (typeof tableCellAlignments)[number];
 
-/** The box around the table: a card. It scrolls sideways when the table is wider than the box. */
-const boxClass = classNames("overflow-x-auto rounded-xl bg-surface shadow-card", focusRingClass);
+/**
+ * The box around the table: a card. It scrolls sideways when the table is wider
+ * than the box. "relative" keeps the parts that only a screen reader reads (the
+ * caption, the name of the actions column) inside the box: without it they are
+ * placed against the page, and a wide table makes the whole page scroll sideways.
+ */
+const boxClass = classNames("relative overflow-x-auto rounded-xl bg-surface shadow-card", focusRingClass);
 
 const tableClass = "w-full text-left font-body text-sm/5";
 
@@ -115,7 +120,7 @@ export function DataTable({
   const nameIsCaption = hasCaption && ariaLabel === undefined && ariaLabelledBy === undefined;
 
   return (
-    <DataTableScroll
+    <ScrollBox
       className={classNames(boxClass, className)}
       data-slot="box"
       aria-label={ariaLabel}
@@ -135,7 +140,7 @@ export function DataTable({
         ) : null}
         {children}
       </table>
-    </DataTableScroll>
+    </ScrollBox>
   );
 }
 

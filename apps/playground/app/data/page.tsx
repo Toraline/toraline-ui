@@ -5,6 +5,7 @@ import {
   ActionsTh,
   DataTable,
   DataTableMessage,
+  DetailPanel,
   IconButton,
   ListItem,
   Td,
@@ -40,7 +41,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-8">
       <h2 className="font-heading text-xl font-semibold">{title}</h2>
-      <div className="mt-3 grid gap-4">{children}</div>
+      <div className="mt-3 space-y-4">{children}</div>
     </section>
   );
 }
@@ -173,6 +174,19 @@ export default function DataPage() {
             <ListItem title="Vacation" meta="An item that cannot be pressed" value="80 h" />
           </li>
         </ul>
+      </Section>
+
+      <Section title="DetailPanel">
+        <DetailPanel
+          title="Vacation of Marina Lopes"
+          fields={[
+            { label: "Period", value: "01/11/2026 to 10/11/2026" },
+            { label: "Hours", value: "80 h" },
+            { label: "Manager", value: "Fernando Dias" },
+          ]}
+        >
+          <p className="text-sm/5 text-body">This panel is rendered by a Server Component, so it has no close button.</p>
+        </DetailPanel>
       </Section>
     </main>
   );

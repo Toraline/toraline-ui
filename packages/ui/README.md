@@ -740,3 +740,42 @@ import { ListItem } from "@toraline.tech/ui";
 - The inner parts have `data-slot`: `icon`, `text`, `title`, `meta`, `end`, `value`, `chevron`.
 - The type `ListItemProps` is exported.
 - It has no `"use client"`: it also renders in a Server Component. An item with `onClick` needs a Client Component around it, because a function cannot go from a Server Component to the browser.
+
+### `DetailPanel`
+
+The detail of the selected record, shown next to a list. It does not cover the page and does not keep the focus inside: the list can still be used.
+
+```tsx
+import { Button, DetailPanel } from "@toraline.tech/ui";
+
+<DetailPanel
+  title="Vacation of Marina Lopes"
+  status={<StatusBadge status="open" />}
+  onClose={closePanel}
+  fields={[
+    { label: "Period", value: "01/11/2026 to 10/11/2026" },
+    { label: "Hours", value: "80 h" },
+  ]}
+  footer={<Button onClick={approve}>Approve</Button>}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title, an `<h2>`. It is the name of the panel for a screen reader |
+| `status` | Elements | Shown under the title, usually a badge with the status of the record |
+| `onClose` | A function | Called on a press of the close button. Without it, the panel has no close button |
+| `closeLabel` | Text. Default `"Close"` | The name of the close button for a screen reader |
+| `fields` | A list of `{ label, value }` | The fields of the record, shown as a list of names and values. `label` is a text no other field of the panel has; `value` is text or elements |
+| `footer` | Elements | The actions of the record, shown at the bottom, on the right |
+| `children` | Elements | More content, shown after the fields |
+
+- The parts and the classes are the ones of the DetailPanel of the app Intraweb (`components/ui/detail-panel.tsx`). The look was compared with Intraweb's in both themes.
+- Width: as wide as its container, and 360 pixels from a screen 1280 pixels wide (`xl:w-90 xl:shrink-0`), so it sits next to a list in a row. Give `className` to change it.
+- Main native element: the `<aside>`. `className`, every other prop and `ref` go to it. The HTML attribute `title` is not accepted: `title` is the title of the panel.
+- Screen reader: the panel is a complementary region with the name of its title. The fields are a description list (`<dl>`).
+- Keyboard: Tab moves the focus to the close button and to the buttons of the footer. The content scrolls when the app limits the height of the panel (`className="max-h-96"`); while it scrolls, it can get the keyboard focus, so the arrow keys scroll it.
+- While the record loads, the app gives its own text as `children` and `aria-busy="true"`.
+- The inner parts have `data-slot`: `header`, `title`, `body`, `fields`, `footer`.
+- The types `DetailPanelProps` and `DetailField` are exported.
+- It has no `"use client"`: it also renders in a Server Component. A panel with `onClose` needs a Client Component around it, because a function cannot go from a Server Component to the browser.

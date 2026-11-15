@@ -79,3 +79,5 @@ export type {
 } from "./data-grid/index.js";
 export { ListItem } from "./list-item/index.js";
 export type { ListItemProps } from "./list-item/index.js";
+export { DetailPanel } from "./detail-panel/index.js";
+export type { DetailField, DetailPanelProps } from "./detail-panel/index.js";

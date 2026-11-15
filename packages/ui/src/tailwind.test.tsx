@@ -32,6 +32,7 @@ import {
   DataGrid,
   DataTable,
   DataTableMessage,
+  DetailPanel,
   ListItem,
   Td,
   Th,
@@ -272,6 +273,15 @@ async function renderEveryComponent(): Promise<string[]> {
       <ListItem title="Day off request" meta="12/10" value="8 h" status={<span>Open</span>} icon={PlusIcon} href="/requests/1" selected />
       <ListItem title="Ana" onClick={() => undefined} />
       <ListItem title="No action" />
+      <DetailPanel
+        title="Request #12"
+        status={<span>Open</span>}
+        onClose={() => undefined}
+        fields={[{ label: "Type", value: "Vacation" }]}
+        footer={<button type="button">Approve</button>}
+      >
+        A note of the manager.
+      </DetailPanel>
     </ThemeProvider>,
   );
 
@@ -440,6 +450,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["hover:bg-subtle", "data-checked:bg-selected"],
     ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
     ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
+    // DetailPanel: the width of a wide screen wins over the full width.
+    ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
