@@ -12,6 +12,21 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Shared positioning: `useAnchoredPanel` and `computeAnchoredPosition` (TOR-1157)
+- Decision: the code that places a floating panel is in `packages/ui/src/anchored-panel/`, in 2 files. `anchored-position.ts` computes the position from 3 rectangles (the anchor, the panel, the window) and has no React and no browser code. `use-anchored-panel.ts` is Intraweb's hook `useAnchoredPanel` (`components/ui/use-anchored-panel.ts`): open or closed, the 2 refs, the press outside, Escape, and placing again on scroll and resize.
+- Why 2 files: the rule "below, above, near the edge" is then tested with plain numbers. jsdom, the browser-like page of the unit tests, does not lay out a page. The hook is tested too, with a button and a panel whose sizes the test gives.
+- Kept from Intraweb: the gap of 4 pixels, the 8 pixels to the left and right edges of the window, `align` (`"left"`, `"right"`, default `"right"`), the returned names (`open`, `toggle`, `close`, `triggerRef`, `panelRef`, `panelStyle`, `placed`, `handleEscape`), and the CSS it writes (a panel above is measured from the bottom, a panel lined up to the right from the right).
+- Added, each for a ticket of this phase:
+  - `side` (`"bottom"`, `"top"`) and `align: "center"`; the pure function also has the sides `"right"` and `"left"`, for Tooltip.
+  - `strategy: "absolute"`, for Popover, whose panel stays inside the element around the button, as in Intraweb.
+  - `show`, and `side` in the result.
+  - The panel is placed again when it changes its size (`ResizeObserver`), for a panel whose content changes.
+- Changed from Intraweb: when the panel fits on neither side, it opens on the side with more room. Intraweb always opens it above.
+- Decision: `useAnchoredPanel` and `computeAnchoredPosition` are exported. Intraweb's column filter (`components/ui/data-grid/column-filter.tsx`) calls the hook itself.
+- Alternatives: Floating UI (`@floating-ui/react-dom` 2.1.9), which handles more cases and is a dependency; CSS anchor positioning, which Firefox does not have in every version in use.
+- Not verified: CSS anchor positioning support was not looked up; it is named from memory.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Overlays: written by hand, as in Intraweb, not with Base UI (TOR-1156)
 - Context: an overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip. Intraweb writes its overlays by hand (`components/ui/overlay.tsx`, `action-menu.tsx`, `popover.tsx`, `tooltip.tsx`, `use-anchored-panel.ts`, 830 lines with `delete-overlay.tsx`). The conventions (entry of TOR-1009) name Base UI (`@base-ui/react`) as the library for behaviour that is hard to write correctly.
 - Decision: the overlays of phase 9 (Modal, Drawer, DiscardConfirmation, DeleteOverlay, ActionMenu, Popover, Tooltip) are written by hand, from Intraweb's code. No dependency is added. The accessibility problems found in Intraweb's code are fixed in the library; each entry of this phase lists them.

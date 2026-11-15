@@ -46,3 +46,22 @@ export type {
   SplitButtonMenuPlacement,
   SplitButtonProps,
 } from "./split-button/index.js";
+
+// Phase 9: overlays
+export {
+  anchoredAligns,
+  anchoredSides,
+  computeAnchoredPosition,
+  useAnchoredPanel,
+} from "./anchored-panel/index.js";
+export type {
+  AnchoredAlign,
+  AnchoredBox,
+  AnchoredPanel,
+  AnchoredPosition,
+  AnchoredPositionOptions,
+  AnchoredSide,
+  AnchoredSize,
+  AnchoredStyle,
+  UseAnchoredPanelOptions,
+} from "./anchored-panel/index.js";

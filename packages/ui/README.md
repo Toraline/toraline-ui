@@ -546,3 +546,54 @@ The tests use Vitest, Testing Library and `@testing-library/user-event`, which p
 
 1. The component is on the page of `apps/playground`, with every variant and state.
 2. This file has the component's props and one short example.
+
+## The overlays
+
+An overlay is a part of the screen that opens above the page: a dialog, a side panel, a menu, a popover, a tooltip. They come from `@toraline.tech/ui`, as the other components, and were built in phase 9 (TOR-1125) from the overlays of the app Intraweb. They are written by hand, with no library of primitives: the reasons are in the entry of TOR-1156 of [`docs/decisions.md`](../../docs/decisions.md). An app sets up nothing for them. The page `/overlays` of [`apps/playground`](../../apps/playground/README.md) shows each one.
+
+### `useAnchoredPanel`
+
+A hook (a function a component calls) for a floating panel that belongs to a button: a menu, a popover, a filter. `ActionMenu` and `Popover` use it. An app uses it for a panel of its own.
+
+```tsx
+"use client";
+import { useAnchoredPanel } from "@toraline.tech/ui";
+
+export function ColumnFilter() {
+  const { open, toggle, triggerRef, panelRef, panelStyle, placed, handleEscape } = useAnchoredPanel({
+    align: "left",
+  });
+  return (
+    <>
+      <button ref={triggerRef} aria-expanded={open} onClick={toggle}>
+        Filter
+      </button>
+      {open ? (
+        <div
+          ref={panelRef}
+          style={panelStyle}
+          className={placed ? "fixed z-50" : "invisible fixed z-50"}
+          onKeyDown={handleEscape}
+        >
+          ...
+        </div>
+      ) : null}
+    </>
+  );
+}
+```
+
+| Option | Values | Meaning |
+|---|---|---|
+| `side` | `"bottom"` (default), `"top"` | The side of the button where the panel opens |
+| `align` | `"right"` (default), `"left"`, `"center"` | Which edges of the button and the panel line up |
+| `gap` | A number of pixels. When missing: 4 | The space between the button and the panel |
+| `strategy` | `"fixed"` (default), `"absolute"` | `fixed`: the panel has `position: fixed`, for a panel rendered in `<body>` with `createPortal`. `absolute`: the panel has `position: absolute` inside a positioned element |
+
+It returns `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (for the button), `panelRef` and `panelStyle` (for the panel), `placed` (`false` until the panel is measured: hide the panel with the class `invisible` until then), `side` (the side the panel is on) and `handleEscape` (for `onKeyDown` of the panel).
+
+- The panel opens on the side asked for. When it does not fit there, it opens on the other side, unless that side has less room.
+- The panel keeps 8 pixels to the left and right edges of the window.
+- The panel is placed again when the page scrolls, when the window changes its size and when the panel changes its size.
+- A press outside the panel and the button closes the panel. Escape closes it, gives the focus back to the button, and does not reach a Modal or a Drawer that is open under it.
+- The function `computeAnchoredPosition` computes the position from 3 rectangles, with no browser. It also has the sides `"right"` and `"left"`, which Tooltip uses.
