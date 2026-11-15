@@ -18,3 +18,6 @@ export type { ToggleProps } from "./toggle";
 
 export { Tabs } from "./tabs";
 export type { TabItem, TabsProps } from "./tabs";
+
+export { BreadCrumbs } from "./breadcrumbs";
+export type { BreadCrumbsProps, Crumb } from "./breadcrumbs";

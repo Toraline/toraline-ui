@@ -155,3 +155,12 @@ Off, the thumb has no `transform` and the check mark has an opacity of `0`. On, 
 | Content | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
 
 With the keyboard, starting with the focus on the tab "All": Right arrow selected "Orders". Left arrow 2 times selected "All" and then "Support", the last tab. The content changed to the content of "Support". The second example starts on "Premium", and its `className="mt-6"` gives it a top margin of `24px`.
+
+### BreadCrumbs (TOR-1014)
+
+| Part | Light theme | Dark theme |
+|---|---|---|
+| Link and separator | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
+| Current page | `rgb(15, 25, 40)`, font size `18px` | `rgb(243, 243, 244)`, font size `18px` |
+
+In the first example the links go to `/` and `/components`, and the element with `aria-current="page"` has the text "BreadCrumbs". The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's style gives `700`.

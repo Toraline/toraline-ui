@@ -1,5 +1,14 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
-import { Button, Input, Tabs, Toggle, buttonSizes, buttonVariants } from "@toraline/ui";
+import {
+  BreadCrumbs,
+  Button,
+  Input,
+  Tabs,
+  Toggle,
+  buttonSizes,
+  buttonVariants,
+} from "@toraline/ui";
 import { ThemeToggle } from "@toraline/ui/theme";
 
 /**
@@ -30,6 +39,12 @@ const orderTabs = [
   { id: "orders", label: "Orders", content: <p>The content of the tab "Orders".</p> },
   { id: "premium", label: "Premium", content: <p>The content of the tab "Premium".</p> },
   { id: "support", label: "Support", content: <p>The content of the tab "Support".</p> },
+];
+
+const crumbs = [
+  { label: "Playground", href: "/" },
+  { label: "Components", href: "/components" },
+  { label: "BreadCrumbs", href: "/components" },
 ];
 
 export default function ComponentsPage() {
@@ -125,6 +140,23 @@ export default function ComponentsPage() {
             defaultSelectedId="premium"
             aria-label="Orders by kind, second example"
             className="mt-6 w-full"
+          />
+        </Row>
+      </Section>
+
+      <Section title="BreadCrumbs">
+        <Row label="3 steps. The last one is the current page">
+          <BreadCrumbs crumbs={crumbs} />
+        </Row>
+        <Row label="1 step">
+          <BreadCrumbs crumbs={crumbs.slice(0, 1)} aria-label="Breadcrumb with 1 step" />
+        </Row>
+        <Row label="With the Link of next/link (linkComponent) and a class of the app (font-normal)">
+          <BreadCrumbs
+            crumbs={crumbs}
+            linkComponent={Link}
+            className="font-normal"
+            aria-label="Breadcrumb with next/link"
           />
         </Row>
       </Section>

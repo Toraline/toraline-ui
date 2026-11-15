@@ -18,6 +18,7 @@
  */
 @layer theme, base, components, utilities;
 
+@import "./breadcrumbs.css";
 @import "./button.css";
 @import "./input.css";
 @import "./tabs.css";

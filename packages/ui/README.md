@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle, Tabs |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle, Tabs, BreadCrumbs |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -195,6 +195,32 @@ import { Tabs } from "@toraline/ui";
 - Screen reader: the row has the role `tablist`, each tab the role `tab`, and the content the role `tabpanel`. The selected tab has `aria-selected="true"`, the others `"false"`. The content takes its name from the selected tab.
 - Only the content of the selected tab is on the page.
 - It is a Client Component, because it holds state.
+
+### `BreadCrumbs`
+
+Breadcrumbs are the path from the first page of the app to the current page, as a row of links.
+
+```tsx
+import { BreadCrumbs } from "@toraline/ui";
+
+<BreadCrumbs
+  crumbs={[
+    { label: "Clients", href: "/clients" },
+    { label: "Fernando Dias", href: "/clients/12" },
+  ]}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `crumbs` | A list of `{ label, href }` | The steps of the path, in order. The last step is the current page: it is shown as text, larger, and its `href` is not used. A step with no `href` is also text |
+| `linkComponent` | A component. When missing: `"a"` | The component that renders each link. It receives `href`, `className` and `children`. A Next.js app gives the `Link` of `next/link`, so a press does not load the whole page again |
+| `aria-label` | Text. When missing: `"Breadcrumb"` | The name of the region for a screen reader |
+
+- Main native element: the `<nav>`. `className`, every other prop and `ref` go to it. The inner classes are `tui-breadcrumbs__list`, `tui-breadcrumbs__item`, `tui-breadcrumbs__link`, `tui-breadcrumbs__text`, `tui-breadcrumbs__separator` and `tui-breadcrumbs__current`.
+- Keyboard: Tab goes through the links. The current page is not a link and does not get focus.
+- Screen reader: a navigation region with an ordered list. The current page has `aria-current="page"`. The `/` between steps has `aria-hidden="true"`, so it is not read.
+- It has no `"use client"`: it also renders in a Server Component.
 
 ## Styling on top
 
