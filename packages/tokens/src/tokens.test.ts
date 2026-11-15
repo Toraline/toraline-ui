@@ -75,25 +75,34 @@ test.each([lightTheme, darkTheme])(
 );
 
 test.each([lightTheme, darkTheme])(
-  "in the $name theme, text can be read on its background (contrast of 4.5 or more)",
+  "in the $name theme, the text of the components can be read on its background (contrast of 4.5 or more)",
   (theme) => {
+    // The pairs the components of @toraline.tech/ui use: [text, background].
     const pairs: [ThemeTokenName, ThemeTokenName][] = [
-      ["color-text", "color-surface"],
-      ["color-text", "color-surface-raised"],
-      ["color-text", "color-surface-muted"],
-      ["color-text-muted", "color-surface"],
-      ["color-primary", "color-surface"],
-      ["color-primary-foreground", "color-primary"],
-      ["color-primary-foreground", "color-primary-hover"],
-      ["color-danger", "color-surface"],
-      ["color-danger-foreground", "color-danger"],
-      ["color-danger-foreground", "color-danger-hover"],
-      // Pairs the components of @toraline.tech/ui use (TOR-997).
-      ["color-primary", "color-surface-raised"],
-      ["color-primary", "color-surface-muted"],
-      ["color-text-muted", "color-surface-raised"],
-      ["color-success", "color-surface"],
-      ["color-success-foreground", "color-success"],
+      // Text on the page and on a card.
+      ["text-primary", "bg-page"],
+      ["text-primary", "bg-surface"],
+      ["text-strong", "bg-page"],
+      ["text-strong", "bg-surface"],
+      ["text-strong", "bg-subtle"],
+      ["text-body", "bg-page"],
+      ["text-body", "bg-surface"],
+      ["text-body", "bg-subtle"],
+      ["text-secondary", "bg-page"],
+      ["text-secondary", "bg-surface"],
+      // The primary button, at rest and with the pointer over it.
+      ["text-inverse", "bg-primary"],
+      ["text-inverse", "bg-primary-hover"],
+      // The danger button and the error message of a field.
+      ["text-danger", "bg-page"],
+      ["text-danger", "bg-surface"],
+      ["text-danger", "bg-danger-subtle"],
+      // A link, and the selected tab.
+      ["text-brand", "bg-page"],
+      ["text-brand", "bg-surface"],
+      // A placeholder, and the text of a disabled button or field.
+      ["text-tertiary", "bg-surface"],
+      ["text-tertiary", "bg-subtle"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
@@ -105,14 +114,62 @@ test.each([lightTheme, darkTheme])(
 );
 
 test.each([lightTheme, darkTheme])(
-  "in the $name theme, the focus ring and the strong border can be seen (contrast of 3 or more)",
+  "in the $name theme, the focus outline and the colors that mark a state can be seen (contrast of 3 or more)",
   (theme) => {
-    expect(contrastRatio(theme, "color-focus-ring", "color-surface")).toBeGreaterThanOrEqual(3);
-    expect(contrastRatio(theme, "color-border-strong", "color-surface")).toBeGreaterThanOrEqual(3);
-    // The track of a switch that is on, and the border of a field with an error.
-    expect(contrastRatio(theme, "color-success", "color-surface")).toBeGreaterThanOrEqual(3);
-    expect(contrastRatio(theme, "color-danger", "color-surface")).toBeGreaterThanOrEqual(3);
-    expect(contrastRatio(theme, "color-primary", "color-surface")).toBeGreaterThanOrEqual(3);
+    const pairs: [ThemeTokenName, ThemeTokenName][] = [
+      // The outline of the element that has the keyboard focus.
+      ["border-focus", "bg-page"],
+      ["border-focus", "bg-surface"],
+      // The border of a field with an error.
+      ["border-invalid", "bg-surface"],
+      // The track of a switch that is on, and the line under the selected tab.
+      ["bg-primary", "bg-page"],
+      ["bg-primary", "bg-surface"],
+      ["border-brand", "bg-page"],
+      ["border-brand", "bg-surface"],
+      // The thumb of a switch that is off.
+      ["icon-default", "bg-surface"],
+    ];
+    for (const [foreground, background] of pairs) {
+      expect(
+        contrastRatio(theme, foreground, background),
+        `${foreground} on ${background}`,
+      ).toBeGreaterThanOrEqual(3);
+    }
+  },
+);
+
+/**
+ * The pairs of Intraweb's values that are below the limit. The values are not
+ * changed in the library: they are Intraweb's. This test is the record of them.
+ * It fails when a value changes, so the record cannot go out of date.
+ * The components of @toraline.tech/ui do not put text on these backgrounds.
+ * The list is also in docs/decisions.md (TOR-1133).
+ */
+test.each<[themeName: "light" | "dark", foreground: ThemeTokenName, background: ThemeTokenName, limit: number, contrast: number]>([
+  // Text. The limit is 4.5.
+  ["light", "text-tertiary", "bg-page", 4.5, 4.48],
+  ["light", "text-tertiary", "bg-muted", 4.5, 4.48],
+  ["dark", "text-tertiary", "bg-muted", 4.5, 4.27],
+  // Intraweb uses --text-muted for decoration only.
+  ["light", "text-muted", "bg-surface", 4.5, 2.58],
+  ["dark", "text-muted", "bg-surface", 4.5, 2.91],
+  // The border of a field, a button or a switch. The limit is 3.
+  ["light", "border-default", "bg-surface", 3, 1.24],
+  ["dark", "border-default", "bg-surface", 3, 1.45],
+  ["light", "border-strong", "bg-surface", 3, 1.47],
+  ["dark", "border-strong", "bg-surface", 3, 1.82],
+  ["light", "border-hover", "bg-surface", 3, 2.58],
+  ["dark", "border-hover", "bg-surface", 3, 2.91],
+  ["light", "border-danger", "bg-surface", 3, 1.42],
+  ["dark", "border-danger", "bg-surface", 3, 1.75],
+])(
+  "known, in the %s theme: %s on %s is below %s (contrast %s)",
+  (themeName, foreground, background, limit, contrast) => {
+    const theme = themeName === "light" ? lightTheme : darkTheme;
+    const ratio = contrastRatio(theme, foreground, background);
+    expect(ratio).toBeLessThan(limit);
+    expect(Number(ratio.toFixed(2))).toBe(contrast);
   },
 );
 

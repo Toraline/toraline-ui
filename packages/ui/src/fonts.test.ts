@@ -9,6 +9,9 @@ import { darkTheme, lightTheme, primitives } from "@toraline.tech/tokens";
  * The only place with font names is the level 1 file of the tokens package
  * (css/primitives.css and src/primitives.ts). Everything else uses
  * --font-body, --font-heading and --font-mono.
+ *
+ * Since TOR-1135 the default fonts are Inter (normal text) and Poppins
+ * (headings and buttons). The library names them and downloads no font file.
  */
 
 const packagesFolder = fileURLToPath(new URL("../../", import.meta.url));
@@ -21,10 +24,12 @@ const listFiles = (folder: string): string[] =>
 
 const isTestFile = (path: string) => /\.test\.tsx?$/.test(path);
 const isPrimitivesFile = (path: string) => /primitives\.(css|ts)$/.test(path);
+// The copies of Intraweb's CSS files, which the tests of the tokens compare with. They are not library code.
+const isFixtureFile = (path: string) => path.includes("intraweb-fixtures");
 
 const libraryFiles = ["tokens/css", "tokens/src", "ui/css", "ui/src"]
   .flatMap((folder) => listFiles(join(packagesFolder, folder)))
-  .filter((path) => !isTestFile(path) && !isPrimitivesFile(path));
+  .filter((path) => !isTestFile(path) && !isPrimitivesFile(path) && !isFixtureFile(path));
 
 const cssFiles = libraryFiles.filter((path) => path.endsWith(".css"));
 const codeFiles = libraryFiles.filter((path) => /\.tsx?$/.test(path));
@@ -49,7 +54,7 @@ test("every font-family in the library's CSS is a level 2 font token", () => {
 test("the level 2 font tokens of the default themes point to level 1 font stacks", () => {
   for (const theme of [lightTheme, darkTheme]) {
     for (const tokenName of ["font-body", "font-heading", "font-mono"] as const) {
-      expect(theme.tokens[tokenName]).toMatch(/^var\(--font-stack-(sans|mono)\)$/);
+      expect(theme.tokens[tokenName]).toMatch(/^var\(--font-stack-(sans|display|mono)\)$/);
     }
   }
 });
@@ -61,18 +66,44 @@ test("no library code sets a font by itself", () => {
   }
 });
 
+test("the default fonts are Inter for normal text and Poppins for headings, each with fonts of the device after it", () => {
+  expect(primitives["font-stack-sans"]).toMatch(/^var\(--font-inter, "Inter"\), .+, sans-serif$/);
+  expect(primitives["font-stack-display"]).toMatch(/^var\(--font-poppins, "Poppins"\), .+, sans-serif$/);
+  expect(primitives["font-stack-mono"]).toMatch(/, monospace$/);
+});
+
+test("the library ships no font file and has no code that downloads one", () => {
+  const everyFile = ["tokens/css", "tokens/src", "ui/css", "ui/src"].flatMap((folder) =>
+    listFiles(join(packagesFolder, folder)),
+  );
+  expect(everyFile.filter((path) => /\.(woff2?|ttf|otf|eot)$/.test(path))).toEqual([]);
+  for (const path of libraryFiles) {
+    const text = withoutComments(readFileSync(path, "utf8"));
+    expect(text, path).not.toMatch(/@font-face|next\/font|fonts\.googleapis|fonts\.gstatic/);
+  }
+});
+
 test("the font names of the level 1 font stacks are in no other library file", () => {
-  const genericNames = ["system-ui", "-apple-system", "ui-monospace", "sans-serif", "monospace"];
-  const fontNames = [primitives["font-stack-sans"], primitives["font-stack-mono"]]
+  // The names with a capital letter are fonts: "Inter", "Poppins", "Menlo".
+  // The others are words of CSS: "var(--font-inter", "ui-sans-serif", "system-ui", "monospace".
+  const fontNames = [
+    primitives["font-stack-sans"],
+    primitives["font-stack-display"],
+    primitives["font-stack-mono"],
+  ]
     .flatMap((stack) => stack.split(","))
-    .map((name) => name.trim().replaceAll('"', ""))
-    .filter((name) => !genericNames.includes(name));
-  expect(fontNames).toContain("Segoe UI");
+    .map((name) => name.trim().replace(/["()]/g, ""))
+    .filter((name) => /^[A-Z]/.test(name));
+  expect(fontNames).toContain("Inter");
+  expect(fontNames).toContain("Poppins");
+  expect(fontNames).toContain("Liberation Mono");
 
   for (const path of libraryFiles) {
     const text = withoutComments(readFileSync(path, "utf8"));
     for (const fontName of fontNames) {
-      expect(text.includes(fontName), `${fontName} in ${path}`).toBe(false);
+      // A whole word: "Inter" is not found inside "Interval".
+      const isNamed = new RegExp(`\\b${fontName}\\b`).test(text);
+      expect(isNamed, `${fontName} in ${path}`).toBe(false);
     }
   }
 });

@@ -8,26 +8,26 @@
   justify-items: start;
   gap: calc(var(--spacing) * 4);
   padding: calc(var(--spacing) * 6);
-  border-radius: var(--radius);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-body);
 }
 
 .guide-example__heading {
   margin: 0;
-  color: var(--color-primary);
+  color: var(--text-brand);
   font-family: var(--font-heading);
   font-size: var(--text-lg);
 }
 
 /* Guide 3, step 5: a style that uses the color the app added. */
-.guide-brand-note {
+.guide-promo-note {
   margin: 0;
   padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
-  border-radius: var(--radius);
-  background-color: var(--color-brand);
-  color: var(--color-brand-foreground);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-promo);
+  color: var(--text-on-promo);
 }
 
 /* Guide 3, step 3: a class of the app's own CSS on a component. */

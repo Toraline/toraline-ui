@@ -2,42 +2,65 @@
  * Level 1 tokens: raw values.
  *
  * A key is the name of the CSS variable without the two dashes.
- * Example: the key "purple-500" is the CSS variable --purple-500.
+ * Example: the key "color-brand-700" is the CSS variable --color-brand-700.
  * css/primitives.css must stay equal to this object. A test compares the two.
  */
 export const primitives = {
-  "purple-50": "#f6efff",
-  "purple-100": "#d0b1ff",
-  "purple-200": "#b593ea",
-  "purple-300": "#833cda",
-  "purple-400": "#6f1dc0",
-  "purple-500": "#5e00a1",
-  "purple-600": "#51009b",
-  "purple-700": "#3d0069",
+  /*
+   * The color scales of the Intraweb design system. The names and the values are
+   * the ones of the "@theme" block of Intraweb's globals.css, so each one is also
+   * a Tailwind CSS color: --color-brand-700 gives the class bg-brand-700.
+   */
+  // Slate: the neutral scale, for text, borders and backgrounds.
+  "color-slate-50": "#f7f8fa",
+  "color-slate-100": "#f1f3f6",
+  "color-slate-200": "#e4e7ec",
+  "color-slate-300": "#d0d5dd",
+  "color-slate-400": "#98a2b3",
+  "color-slate-500": "#667085",
+  "color-slate-600": "#475467",
+  "color-slate-700": "#344054",
+  "color-slate-800": "#1d2939",
+  "color-slate-900": "#101828",
 
-  "grey-100": "#ffffff",
-  "grey-200": "#f3f3f4",
-  "grey-300": "#e7e8e9",
-  "grey-400": "#cfd1d4",
-  "grey-500": "#9fa3a9",
-  "grey-600": "#6f757e",
-  "grey-700": "#3f4753",
-  "grey-800": "#27303e",
-  "grey-900": "#0f1928",
+  // Brand: the blue of the brand. --color-brand-700 is the color of the main action.
+  "color-brand-50": "#f2f6f9",
+  "color-brand-100": "#e3ecf2",
+  "color-brand-200": "#c8d8e4",
+  "color-brand-300": "#a9c2d4",
+  "color-brand-400": "#8eaec5",
+  "color-brand-500": "#6f93ae",
+  "color-brand-600": "#557a96",
+  "color-brand-700": "#42637c",
+  "color-brand-800": "#344f63",
+  "color-brand-900": "#263a49",
 
-  "red-200": "#f8a3a3",
-  "red-300": "#f47878",
-  "red-500": "#f04848",
-  "red-600": "#d92d2d",
-  "red-700": "#b42020",
+  // Pink: the accent color.
+  "color-pink-50": "#fbf4f2",
+  "color-pink-100": "#f5e6e1",
+  "color-pink-400": "#d7ada1",
+  "color-pink-700": "#9a5f50",
 
-  "green-300": "#84d235",
-  "green-400": "#7ec36d",
-  "green-500": "#68a15f",
-  "green-700": "#2f6f14",
+  // Cream: the highlight background.
+  "color-cream-100": "#fff5ec",
 
-  black: "#000000",
-  white: "#ffffff",
+  // Green: success.
+  "color-green-50": "#ecfdf3",
+  "color-green-200": "#abefc6",
+  "color-green-500": "#17b26a",
+  "color-green-700": "#067647",
+
+  // Orange: warning.
+  "color-orange-50": "#fffaeb",
+  "color-orange-200": "#fedf89",
+  "color-orange-400": "#fdb022",
+  "color-orange-700": "#b54708",
+
+  // Red: error and danger.
+  "color-red-50": "#fef3f2",
+  "color-red-200": "#fecdca",
+  "color-red-600": "#d92d20",
+  "color-red-700": "#b42318",
 
   "space-1": "0.25rem",
   "space-2": "0.5rem",
@@ -56,21 +79,21 @@ export const primitives = {
   "font-size-2xl": "1.5rem",
   "font-size-3xl": "2rem",
 
-  "font-stack-sans":
-    'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  /*
+   * Font stacks. A font stack is a list of fonts; the browser uses the first one it has.
+   * The library downloads no font: the app loads Inter and Poppins.
+   * "var(--font-inter, "Inter")" means: the font in the CSS variable --font-inter
+   * when the app defines that variable on <html> (next/font does), and the font
+   * named "Inter" when it does not. The fonts after it are the fonts of the device,
+   * used when the app loaded no font, or while the font file loads.
+   */
+  // Inter: the font of normal text.
+  "font-stack-sans": 'var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif',
+  // Poppins, in the weights 400, 500 and 600: the font of headings and buttons.
+  "font-stack-display": 'var(--font-poppins, "Poppins"), ui-sans-serif, system-ui, sans-serif',
   "font-stack-mono":
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-
-  "radius-size-none": "0",
-  "radius-size-sm": "0.25rem",
-  "radius-size-md": "0.5rem",
-  "radius-size-lg": "1rem",
-  "radius-size-full": "9999px",
-
-  "shadow-size-sm": "0 1px 2px rgb(15 25 40 / 0.12)",
-  "shadow-size-md": "0 4px 12px rgb(15 25 40 / 0.16)",
-  "shadow-size-lg": "0 12px 32px rgb(15 25 40 / 0.2)",
 } as const;
 
-/** The name of a level 1 token, without the two dashes. Example: "purple-500". */
+/** The name of a level 1 token, without the two dashes. Example: "color-brand-700". */
 export type PrimitiveName = keyof typeof primitives;

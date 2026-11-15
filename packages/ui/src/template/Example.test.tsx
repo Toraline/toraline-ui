@@ -30,9 +30,9 @@ describe("Example", () => {
     render(<Example className="mt-4 rounded-full">New</Example>);
     const classes = screen.getByText("New").className.split(" ");
     expect(classes.slice(-2)).toEqual(["mt-4", "rounded-full"]);
-    // The app's "rounded-full" replaces the library's "rounded". The other classes of the library stay.
-    expect(classes).not.toContain("rounded");
-    expect(classes).toContain("bg-surface-muted");
+    // The app's "rounded-full" replaces the library's "rounded-md". The other classes of the library stay.
+    expect(classes).not.toContain("rounded-md");
+    expect(classes).toContain("bg-muted");
   });
 
   test("passes other attributes to the element, and ref points to it", () => {

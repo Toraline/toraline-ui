@@ -2,9 +2,13 @@
  * The light theme: one block of level 2 tokens.
  *
  * A level 2 token is a CSS variable whose name says what the value is for.
- * Example: --color-primary. Components use only level 2 tokens.
+ * Example: --bg-primary is the background of the main action. Components use
+ * only level 2 tokens.
  * The light theme is also the default: it applies when the page has no
  * data-theme attribute.
+ *
+ * The color tokens have the names and the values of the theme "light" of the
+ * app Intraweb. A test compares them with a copy of Intraweb's file.
  *
  * This file must stay equal to "lightTheme" in src/themes.ts. A test compares the two.
  */
@@ -12,26 +16,72 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --color-surface: var(--grey-100);
-  --color-surface-raised: var(--grey-100);
-  --color-surface-muted: var(--grey-200);
-  --color-text: var(--grey-900);
-  --color-text-muted: var(--grey-600);
-  --color-border: var(--grey-400);
-  --color-border-strong: var(--grey-600);
-  --color-primary: var(--purple-500);
-  --color-primary-hover: var(--purple-700);
-  --color-primary-foreground: var(--white);
-  --color-danger: var(--red-600);
-  --color-danger-hover: var(--red-700);
-  --color-danger-foreground: var(--white);
-  --color-success: var(--green-700);
-  --color-success-foreground: var(--white);
-  --color-focus-ring: var(--purple-300);
-  --color-overlay: rgb(15 25 40 / 0.6);
+  --bg-page: var(--color-slate-100);
+  --bg-surface: #ffffff;
+  --bg-subtle: var(--color-slate-50);
+  --bg-muted: var(--color-slate-100);
+  --bg-inverse: var(--color-brand-700);
+  --bg-inverse-hover: var(--color-brand-800);
+  --bg-selected: var(--color-brand-50);
+  --bg-danger-subtle: var(--color-red-50);
+  --bg-error: var(--color-red-50);
+  --bg-success: var(--color-green-50);
+  --bg-warning: var(--color-orange-50);
+  --bg-overlay: rgb(16 24 40 / 0.5);
+  --bg-primary: var(--color-brand-700);
+  --bg-primary-hover: var(--color-brand-800);
+  --bg-primary-subtle: var(--color-brand-50);
+  --bg-primary-muted: var(--color-brand-100);
+  --bg-accent-subtle: var(--color-pink-50);
+  --bg-highlight: var(--color-cream-100);
+  --bg-info: var(--color-brand-50);
+  --bg-tooltip: var(--color-slate-900);
+
+  --text-primary: var(--color-slate-900);
+  --text-strong: var(--color-slate-800);
+  --text-body: var(--color-slate-700);
+  --text-secondary: var(--color-slate-600);
+  --text-tertiary: var(--color-slate-500);
+  --text-muted: var(--color-slate-400);
+  --text-inverse: #ffffff;
+  --text-danger: var(--color-red-700);
+  --text-error: var(--color-red-700);
+  --text-success: var(--color-green-700);
+  --text-warning: var(--color-orange-700);
+  --text-caution: var(--color-orange-700);
+  --text-brand: var(--color-brand-700);
+  --text-info: var(--color-brand-700);
+  --text-accent: var(--color-pink-700);
+
+  --border-default: var(--color-slate-200);
+  --border-strong: var(--color-slate-300);
+  --border-subtle: var(--color-slate-100);
+  --border-hover: var(--color-slate-400);
+  --border-focus: var(--color-brand-600);
+  --border-inverse: var(--color-brand-700);
+  --border-brand: var(--color-brand-700);
+  --border-danger: var(--color-red-200);
+  --border-error: var(--color-red-200);
+  --border-invalid: var(--color-red-600);
+  --border-changed: var(--color-orange-400);
+  --border-success: var(--color-green-200);
+  --border-info: var(--color-brand-200);
+  --border-warning: var(--color-orange-200);
+
+  --icon-default: var(--color-slate-500);
+  --icon-strong: var(--color-slate-700);
+  --icon-brand: var(--color-brand-700);
+
+  --data-1: var(--color-brand-600);
+  --data-2: var(--color-brand-300);
+  --data-3: var(--color-pink-400);
+  --data-success: var(--color-green-500);
+  --data-warning: var(--color-orange-400);
+  --data-danger: var(--color-red-600);
+  --data-track: var(--color-slate-200);
 
   --font-body: var(--font-stack-sans);
-  --font-heading: var(--font-stack-sans);
+  --font-heading: var(--font-stack-display);
   --font-mono: var(--font-stack-mono);
 
   --text-sm: var(--font-size-sm);
@@ -40,6 +90,14 @@
 
   --spacing: var(--space-1);
 
-  --radius: var(--radius-size-md);
-  --shadow: var(--shadow-size-sm);
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04);
+  --shadow-lg: 0 4px 6px -2px rgb(16 24 40 / 0.03), 0 12px 16px -4px rgb(16 24 40 / 0.08);
+  --shadow-xl: 0 8px 8px -4px rgb(16 24 40 / 0.03), 0 20px 24px -4px rgb(16 24 40 / 0.08);
+  --shadow-2xl: 0 24px 48px -12px rgb(16 24 40 / 0.18);
 }

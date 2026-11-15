@@ -6,23 +6,25 @@ import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
 
 /** The row of tabs, with a line under it. */
-const listClass = "flex flex-wrap border-b-2 border-b-border";
+const listClass = "flex flex-wrap border-b-2 border-b-default";
 
 /**
  * One tab. The selected tab is selected by aria-selected, the attribute a
- * screen reader reads: it has the main text color and a line in the primary
- * color under it. The negative margin puts that line on the line of the row.
+ * screen reader reads: it has the brand color, and a line in the brand color
+ * under it. The negative margin puts that line on the line of the row.
+ * The colors, the font of headings and the medium weight are the ones of the
+ * tabs of the app Intraweb.
  */
 const tabClass = classNames(
-  "m-0 -mb-[2px] cursor-pointer rounded-t rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-body text-base/normal font-bold text-text-muted",
-  "hover:bg-surface-muted hover:text-text",
-  "aria-selected:border-b-primary aria-selected:text-text",
-  "motion-safe:transition-[background-color,border-color,color] motion-safe:ease-[ease]",
+  "m-0 -mb-[2px] cursor-pointer rounded-t-md rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-heading text-base/normal font-medium text-secondary",
+  "hover:text-primary",
+  "aria-selected:border-b-brand aria-selected:text-brand",
+  "motion-safe:transition-[border-color,color] motion-safe:ease-[ease]",
   focusRingClass,
 );
 
 /** The content of the selected tab. */
-const panelClass = classNames("px-0 py-4 text-base/normal text-text", focusRingClass);
+const panelClass = classNames("px-0 py-4 text-base/normal text-primary", focusRingClass);
 
 /** One tab: the button a person presses, and the content it shows. */
 export type TabItem = {

@@ -8,38 +8,40 @@ import { ThemeToggle } from "@toraline.tech/ui/theme";
 export default function Page() {
   return (
     <main className="mx-auto max-w-2xl p-8">
-      <h1 className="font-heading text-3xl font-bold text-primary">toraline-ui playground</h1>
+      <h1 className="font-heading text-3xl font-bold text-brand">toraline-ui playground</h1>
       <p className="mt-4">
-        This page tests the themes. Press the button to change the theme. Reload the page: it
-        opens in the theme you chose.
+        This page tests the themes. Press the button to change the theme: light, dark, then
+        paper, a theme of this app. Reload the page: it opens in the theme you chose.
       </p>
       <ThemeToggle className="mt-4" />
       <p className="mt-4">
-        <a className="text-primary underline" href="/components">
+        <a className="text-brand underline" href="/components">
           The components of the library
         </a>
       </p>
 
-      <section className="mt-6 rounded border border-border bg-surface-raised p-4 shadow">
+      <section className="mt-6 rounded-xl border border-default bg-surface p-4 shadow-card">
         <h2 className="font-heading text-xl font-bold">A card</h2>
         <p className="mt-2">Its colors, border, radius and shadow come from level 2 tokens.</p>
         <p className="mt-2">
-          The headings use the font Fraunces. This app loads it with{" "}
-          <code className="font-mono">next/font</code> and sets it as{" "}
-          <code className="font-mono">--font-heading</code> through the theme function.
+          The headings use the font Poppins and the text uses the font Inter: the default fonts
+          of the library. This app loads them with <code className="font-mono">next/font</code>.
+          In the theme <code className="font-mono">paper</code> the headings use the font
+          Fraunces, which this app sets as <code className="font-mono">--font-heading</code>{" "}
+          through the theme function.
         </p>
-        <p className="mt-2 text-text-muted">
-          This text uses the class <code className="font-mono">text-text-muted</code>.
+        <p className="mt-2 text-tertiary">
+          This text uses the class <code className="font-mono">text-tertiary</code>.
         </p>
       </section>
 
       <ul className="mt-6 flex flex-wrap gap-3">
-        <li className="rounded bg-primary px-3 py-1 text-primary-foreground">bg-primary</li>
-        <li className="rounded bg-danger px-3 py-1 text-danger-foreground">bg-danger</li>
-        <li className="rounded bg-success px-3 py-1 text-success-foreground">bg-success</li>
-        <li className="rounded bg-surface-muted px-3 py-1">bg-surface-muted</li>
-        <li data-testid="brand" className="rounded bg-brand px-3 py-1 text-brand-foreground">
-          bg-brand, a color this app added
+        <li className="rounded-md bg-primary px-3 py-1 text-inverse">bg-primary</li>
+        <li className="rounded-md bg-error px-3 py-1 text-error">bg-error</li>
+        <li className="rounded-md bg-success px-3 py-1 text-success">bg-success</li>
+        <li className="rounded-md bg-surface px-3 py-1">bg-surface</li>
+        <li data-testid="promo" className="rounded-md bg-promo px-3 py-1 text-on-promo">
+          bg-promo, a color this app added
         </li>
       </ul>
     </main>

@@ -11,30 +11,37 @@ import { classNames } from "../shared/class-names.js";
  * the check mark are inside that element, so they use "group-has-checked/toggle:",
  * which looks for a checked checkbox inside the outermost element.
  * Disabled, off or on: quiet colors. The place of the thumb still shows the state.
+ *
+ * The app Intraweb has no switch. The colors are the ones of its checkbox:
+ * a strong border when off, the color of the main action when on.
+ * "bg-current" gives the thumb the color of its own text class ("text-icon",
+ * the color of an icon), because no background token has that grey.
  */
 
 const rootClass =
-  "group/toggle relative inline-flex cursor-pointer items-center gap-2 font-body text-base/normal text-text has-disabled:cursor-not-allowed has-disabled:text-text-muted";
+  "group/toggle relative inline-flex cursor-pointer items-center gap-2 font-body text-base/normal text-body has-disabled:cursor-not-allowed has-disabled:text-tertiary";
 
 /** The checkbox is not shown, but it stays on the page: it gets the focus and the keys. */
 const inputClass = "peer absolute m-0 size-px opacity-0";
 
 const trackClass = classNames(
-  "box-border inline-flex h-[1.5em] w-[2.75em] flex-none items-center rounded-[1em] border-[0.125em] border-border-strong bg-surface p-[0.125em]",
-  "peer-checked:border-success peer-checked:bg-success",
-  "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring",
-  "peer-disabled:border-border peer-disabled:bg-surface-muted",
+  "box-border inline-flex h-[1.5em] w-[2.75em] flex-none items-center rounded-[1em] border-[0.125em] border-strong bg-surface p-[0.125em]",
+  "peer-checked:border-brand peer-checked:bg-primary",
+  "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus",
+  "peer-disabled:border-default peer-disabled:bg-subtle",
   "motion-safe:transition-[background-color,border-color] motion-safe:ease-[ease]",
 );
 
 const thumbClass = classNames(
-  "inline-flex size-[1em] items-center justify-center rounded-[50%] bg-border-strong text-success",
-  "group-has-checked/toggle:translate-x-[1.25em] group-has-checked/toggle:bg-success-foreground",
-  "group-has-disabled/toggle:bg-text-muted group-has-disabled/toggle:text-surface-muted",
-  "motion-safe:transition-[translate,background-color] motion-safe:ease-[ease]",
+  "inline-flex size-[1em] items-center justify-center rounded-[50%] bg-current text-icon",
+  "group-has-checked/toggle:translate-x-[1.25em] group-has-checked/toggle:bg-surface",
+  "group-has-disabled/toggle:bg-current group-has-disabled/toggle:text-muted",
+  "motion-safe:transition-[translate,background-color,color] motion-safe:ease-[ease]",
 );
 
-const checkClass = "size-[0.75em] opacity-0 group-has-checked/toggle:opacity-100";
+/** The check mark: the brand color on the thumb of a switch that is on. */
+const checkClass =
+  "size-[0.75em] text-brand opacity-0 group-has-checked/toggle:opacity-100 group-has-disabled/toggle:text-inverse";
 
 export type ToggleProps = Omit<ComponentProps<"input">, "type"> & {
   /**

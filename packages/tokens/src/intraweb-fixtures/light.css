@@ -1,0 +1,94 @@
+/*
+ * A copy of the theme file "light" of the app Intraweb.
+ * Source: the repository prontera-e-juno, file apps/intraweb/src/styles/themes/light.css,
+ * commit f8ad4c2fa99c54f7d9435e9e250304c03e1765af, copied on 2026-11-15.
+ * The tests compare the tokens of this package with this file. When Intraweb changes a value,
+ * copy the file again and change the date. Do not edit the values by hand.
+ * The comments below this one are Intraweb's own, in Portuguese.
+ */
+/*
+ * Tema Claro (padrão). Também vale sem `data-theme` no <html>, e para temas ainda sem arquivo.
+ * Um tema só redefine estes tokens semânticos; ver docs/architecture/intraweb-design-system.md.
+ */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-page: var(--color-slate-100);
+  --bg-surface: #ffffff;
+  --bg-subtle: var(--color-slate-50);
+  --bg-muted: var(--color-slate-100);
+  --bg-inverse: var(--color-brand-700);
+  --bg-inverse-hover: var(--color-brand-800);
+  --bg-selected: var(--color-brand-50);
+  --bg-danger-subtle: var(--color-red-50);
+  --bg-error: var(--color-red-50);
+  --bg-success: var(--color-green-50);
+  --bg-warning: var(--color-orange-50);
+  --bg-overlay: rgb(16 24 40 / 0.5);
+  --bg-primary: var(--color-brand-700);
+  --bg-primary-hover: var(--color-brand-800);
+  --bg-primary-subtle: var(--color-brand-50);
+  --bg-primary-muted: var(--color-brand-100);
+  --bg-accent-subtle: var(--color-pink-50);
+  --bg-highlight: var(--color-cream-100);
+  --bg-info: var(--color-brand-50);
+  --bg-tooltip: var(--color-slate-900);
+
+  --text-primary: var(--color-slate-900);
+  --text-strong: var(--color-slate-800);
+  --text-body: var(--color-slate-700);
+  --text-secondary: var(--color-slate-600);
+  --text-tertiary: var(--color-slate-500);
+  --text-muted: var(--color-slate-400);
+  --text-inverse: #ffffff;
+  --text-danger: var(--color-red-700);
+  --text-error: var(--color-red-700);
+  --text-success: var(--color-green-700);
+  --text-warning: var(--color-orange-700);
+  --text-caution: var(--color-orange-700);
+  --text-brand: var(--color-brand-700);
+  --text-info: var(--color-brand-700);
+  --text-accent: var(--color-pink-700);
+
+  --border-default: var(--color-slate-200);
+  --border-strong: var(--color-slate-300);
+  --border-subtle: var(--color-slate-100);
+  --border-hover: var(--color-slate-400);
+  --border-focus: var(--color-brand-600);
+  --border-inverse: var(--color-brand-700);
+  --border-brand: var(--color-brand-700);
+  --border-danger: var(--color-red-200);
+  --border-error: var(--color-red-200);
+  --border-invalid: var(--color-red-600);
+  --border-changed: var(--color-orange-400);
+  --border-success: var(--color-green-200);
+  --border-info: var(--color-brand-200);
+  --border-warning: var(--color-orange-200);
+
+  --icon-default: var(--color-slate-500);
+  --icon-strong: var(--color-slate-700);
+  --icon-brand: var(--color-brand-700);
+
+  --data-1: var(--color-brand-600);
+  --data-2: var(--color-brand-300);
+  --data-3: var(--color-pink-400);
+  --data-success: var(--color-green-500);
+  --data-warning: var(--color-orange-400);
+  --data-danger: var(--color-red-600);
+  --data-track: var(--color-slate-200);
+}
+
+/*
+ * Trecho sempre claro dentro de outro tema (prévia do site do Juno): além das cores, volta a
+ * fonte dos títulos, os raios e as sombras que os outros temas trocam.
+ */
+[data-theme] [data-theme="light"] {
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+[data-theme] [data-theme="light"] .shadow-sm {
+  --tw-shadow: 0 1px 2px rgb(16 24 40 / 0.05);
+}

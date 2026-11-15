@@ -10,7 +10,7 @@ export const exampleSizes = ["sm", "md"] as const;
 export type ExampleSize = (typeof exampleSizes)[number];
 
 /** The classes every Example has. */
-const baseClass = "inline-flex items-center rounded border font-body";
+const baseClass = "inline-flex items-center rounded-md border font-body";
 
 /** The padding and the font size of each size. "/normal" is the line height. */
 const sizeClass: Record<ExampleSize, string> = {
@@ -20,8 +20,8 @@ const sizeClass: Record<ExampleSize, string> = {
 
 /** The colors of each variant. Every color is a token class. */
 const variantClass: Record<ExampleVariant, string> = {
-  neutral: "border-border bg-surface-muted text-text",
-  primary: "border-primary bg-primary text-primary-foreground",
+  neutral: "border-default bg-muted text-primary",
+  primary: "border-brand bg-primary text-inverse",
 };
 
 export type ExampleProps = ComponentProps<"span"> & {

@@ -2,19 +2,19 @@ import type { ComponentProps, ElementType, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
 
-const rootClass = "font-body text-base/normal font-bold text-text-muted";
+const rootClass = "font-body text-base/normal font-bold text-secondary";
 
 const listClass = "m-0 flex list-none flex-wrap items-baseline gap-2 p-0";
 
 const itemClass = "inline-flex items-baseline gap-2";
 
 const linkClass = classNames(
-  "rounded text-text-muted no-underline hover:text-primary hover:underline",
+  "rounded-md text-secondary no-underline hover:text-brand hover:underline",
   focusRingClass,
 );
 
 /** The current page: the main text color, and larger. */
-const currentClass = "text-lg/normal text-text";
+const currentClass = "text-lg/normal text-primary";
 
 /** One step of the path. */
 export type Crumb = {

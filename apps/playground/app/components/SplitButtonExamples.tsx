@@ -39,10 +39,10 @@ export function SplitButtonExamples() {
         <SplitButton
           items={items}
           menuLabel="More options, with a class of the app"
-          className="shadow"
-          onClick={() => setLastAction("Download all (shadow)")}
+          className="shadow-card"
+          onClick={() => setLastAction("Download all (shadow-card)")}
         >
-          With a class of the app (shadow)
+          With a class of the app (shadow-card)
         </SplitButton>
       </div>
     </>

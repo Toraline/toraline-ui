@@ -160,7 +160,7 @@ describe("ThemeToggle", () => {
     expect(document.activeElement).toBe(toggle);
     expect(toggle.tabIndex).toBe(0);
     expect(toggle.className.split(" ").at(-1)).toBe("my-class");
-    expect(toggle.className.split(" ")).toContain("bg-surface-raised");
+    expect(toggle.className.split(" ")).toContain("bg-surface");
     expect(toggle.textContent).toBe("Change theme");
   });
 });
