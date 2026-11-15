@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Checks the two packages that are published to npm: @toraline/tokens and @toraline/ui.
+// Checks the two packages that are published to npm: @toraline.tech/tokens and @toraline.tech/ui.
 //
 //   node scripts/check-packages.mjs            the checks of "make check" (run after a build)
 //   node scripts/check-packages.mjs --publish  the same checks, and the checks that guard "npm publish"
@@ -48,7 +48,7 @@ const manifests = packageFolders.map((folder) => ({
 }));
 const version = manifests[0].manifest.version;
 
-// 1. The packages have the same version, and @toraline/ui asks for exactly that version of @toraline/tokens.
+// 1. The packages have the same version, and @toraline.tech/ui asks for exactly that version of @toraline.tech/tokens.
 for (const { folder, manifest } of manifests) {
   if (manifest.version !== version) {
     fail(`${folder}/package.json has version ${manifest.version}. Every published package must have the same version (${version}). Run: make version VERSION=<version>`);

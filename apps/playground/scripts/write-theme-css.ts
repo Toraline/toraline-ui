@@ -7,7 +7,7 @@
  * 2. One [data-theme] block for each theme, with the value of every level 2 token.
  */
 import { writeFileSync } from "node:fs";
-import { createTailwindTheme, createTheme } from "@toraline/tokens";
+import { createTailwindTheme, createTheme } from "@toraline.tech/tokens";
 import { themeInputs } from "../theme.config.ts";
 
 const header =

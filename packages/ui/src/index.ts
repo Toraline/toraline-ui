@@ -1,11 +1,11 @@
 /**
- * @toraline/ui
+ * @toraline.tech/ui
  *
  * The styled components of the Toraline component library.
  * Each component has its own folder in src/ and is exported here.
- * The parts of the theme (provider, hook, toggle) are in "@toraline/ui/theme".
+ * The parts of the theme (provider, hook, toggle) are in "@toraline.tech/ui/theme".
  */
-export const packageName = "@toraline/ui";
+export const packageName = "@toraline.tech/ui";
 
 export { Button, buttonSizes, buttonVariants } from "./button/index.js";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./button/index.js";

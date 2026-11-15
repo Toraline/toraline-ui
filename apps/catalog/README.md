@@ -31,7 +31,7 @@ The control does what an app does: it writes the attribute `data-theme` on `<htm
 |---|---|---|
 | Guide | How to use the library | The guide: install the library, build the theme of an app, style on top of a component. Its text is the file `docs/guide.md` of the repository, which the root `README.md` also links to. Under the text are two live examples |
 | Guide | Live examples | The two examples of the guide as stories, so the accessibility check covers them |
-| Foundations | Tokens | One page with every token: colors, fonts, text sizes, spacing, radius and shadow, with the value in each theme, and the level 1 tokens. The tables read `@toraline/tokens`, so they always show the current values |
+| Foundations | Tokens | One page with every token: colors, fonts, text sizes, spacing, radius and shadow, with the value in each theme, and the level 1 tokens. The tables read `@toraline.tech/tokens`, so they always show the current values |
 | Foundations | Theme sample | A card that uses only level 2 tokens, with the button that changes the theme |
 | Components | Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton, ThemeToggle | For each component: a page **Docs** with the table of props, and one story for each state |
 
@@ -54,7 +54,7 @@ What the check does not cover: axe-core finds only the problems a program can fi
 |---|---|
 | `.storybook/main.ts` | Which files are stories, which addons are on, and how Vite builds the catalog. An addon is a plugin of Storybook |
 | `.storybook/preview.tsx` | What every story gets: the CSS of the tokens and of the components, the control **Theme**, the decorator that applies the theme, and the rule that an accessibility problem fails the test. A decorator is a function that wraps every story |
-| `.storybook/themes.ts` | The list of themes of the control. It is `DEFAULT_THEMES` of `@toraline/tokens` |
+| `.storybook/themes.ts` | The list of themes of the control. It is `DEFAULT_THEMES` of `@toraline.tech/tokens` |
 | `.storybook/preview.css` | The CSS of the catalog itself: the page behind a story gets the colors of the current theme |
 | `stories/*.stories.tsx` | The stories of one component |
 | `stories/Tokens.mdx`, `stories/Tokens.stories.tsx`, `stories/tokens/` | The tokens page, its stories, and the tables they draw |
@@ -118,4 +118,4 @@ The same steps were compared with `apps/playground`: the imports of `app/globals
 
 The guide page of the static catalog was opened in a browser on port 6117: the links of its first table go to the 3 guides, the code samples are colored, and the two live examples render. In the first example the button is `rgb(11, 92, 173)` and the heading font is `Georgia, serif`. In the second, the button and the field with a class of the app have the radius `9999px`, and the button without it has `8px`. The browser console had no error. The 2 live examples are stories, so `make catalog-test` checks them in both themes: 84 story tests passed.
 
-Not checked: `npx create-next-app@latest` and `npm install @toraline/ui @toraline/tokens` were not run. The first downloads a new app, and the second fails until the packages are published. The Vite app was made by hand without `@vitejs/plugin-react`, which the template of `npm create vite@latest` adds.
+Not checked: `npx create-next-app@latest` and `npm install @toraline.tech/ui @toraline.tech/tokens` were not run. The first downloads a new app, and the second fails until the packages are published. The Vite app was made by hand without `@vitejs/plugin-react`, which the template of `npm create vite@latest` adds.

@@ -1,6 +1,6 @@
 # toraline-ui: instructions for agents
 
-The component library of Toraline, as a monorepo: `packages/tokens` (design tokens and themes), `packages/ui` (styled React components, published as `@toraline/ui`) `apps/catalog` (Storybook) and `apps/playground` (a private Next.js app that is the test page for themes, fonts and the Tailwind preset). Version 2 is built on the branch `v2`; the old library is unchanged in `legacy/`.
+The component library of Toraline, as a monorepo: `packages/tokens` (design tokens and themes), `packages/ui` (styled React components, published as `@toraline.tech/ui`) `apps/catalog` (Storybook) and `apps/playground` (a private Next.js app that is the test page for themes, fonts and the Tailwind preset). Version 2 is built on the branch `v2`; the old library is unchanged in `legacy/`.
 
 ## Project profile
 

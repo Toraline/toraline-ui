@@ -23,7 +23,7 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline/ui` and `@toraline/tokens` are not on the npm registry. The first version will be a test version, `2.0.0-beta.0`, and the command of step 2 is written for it.
+**The packages are not published yet.** Today (2026-11-15) the command of step 2 fails, because the names `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be a test version, `2.0.0-beta.0`, and the command of step 2 is written for it.
 
 To use the library before the release, build the two package files in this repository and install them in the app:
 
@@ -48,19 +48,19 @@ What you need: Node 24 and React 19.
 2. Install the two packages.
 
    ```bash
-   npm install @toraline/ui@next @toraline/tokens@next
+   npm install @toraline.tech/ui@next @toraline.tech/tokens@next
    ```
 
-   `@toraline/ui` has the components. `@toraline/tokens` has the tokens, the themes and the function that builds a theme. Install both, always in the same version.
+   `@toraline.tech/ui` has the components. `@toraline.tech/tokens` has the tokens, the themes and the function that builds a theme. Install both, always in the same version.
 
-   `@next` selects the newest test version. After the full release `2.0.0`, the command is `npm install @toraline/ui @toraline/tokens`.
+   `@next` selects the newest test version. After the full release `2.0.0`, the command is `npm install @toraline.tech/ui @toraline.tech/tokens`.
 
 3. Open `app/globals.css`. Delete everything in it, and write these 3 lines:
 
    ```css
    @import "tailwindcss";
-   @import "@toraline/tokens/css/tailwind.css";
-   @import "@toraline/ui/styles.css";
+   @import "@toraline.tech/tokens/css/tailwind.css";
+   @import "@toraline.tech/ui/styles.css";
    ```
 
    The second line loads the tokens and the two themes, and makes each token a Tailwind class, for example `bg-surface`. The third line loads the styles of the components.
@@ -70,14 +70,14 @@ What you need: Node 24 and React 19.
    An app with no Tailwind CSS writes these 2 lines:
 
    ```css
-   @import "@toraline/tokens/css";
-   @import "@toraline/ui/styles.css";
+   @import "@toraline.tech/tokens/css";
+   @import "@toraline.tech/ui/styles.css";
    ```
 
 4. Replace the content of `app/page.tsx`:
 
    ```tsx
-   import { Button } from "@toraline/ui";
+   import { Button } from "@toraline.tech/ui";
 
    export default function Page() {
      return (
@@ -105,7 +105,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 1. Create the file `theme.config.ts` in the folder of the app. It holds the themes of the app.
 
    ```ts
-   import type { ThemeInput } from "@toraline/tokens";
+   import type { ThemeInput } from "@toraline.tech/tokens";
 
    // The heading font: the font that app/fonts.ts loads, then fonts every device has.
    const headingFont = "var(--font-fraunces), Georgia, serif";
@@ -154,7 +154,7 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
    ```ts
    import { writeFileSync } from "node:fs";
-   import { createTailwindTheme, createTheme } from "@toraline/tokens";
+   import { createTailwindTheme, createTheme } from "@toraline.tech/tokens";
    import { themeInputs } from "../theme.config.ts";
 
    const css = [createTailwindTheme(themeInputs), ...themeInputs.map(createTheme)].join("\n");
@@ -201,9 +201,9 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 
    ```css
    @import "tailwindcss";
-   @import "@toraline/tokens/css/tailwind.css";
+   @import "@toraline.tech/tokens/css/tailwind.css";
    @import "./theme.generated.css";
-   @import "@toraline/ui/styles.css";
+   @import "@toraline.tech/ui/styles.css";
    ```
 
 7. Create the file `app/fonts.ts`. It loads the heading font with `next/font` and puts it in the CSS variable `--font-fraunces`, the variable that `theme.config.ts` names.
@@ -224,8 +224,8 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
    ```tsx
    import { cookies } from "next/headers";
    import type { ReactNode } from "react";
-   import { THEME_COOKIE_NAME, resolveTheme } from "@toraline/tokens";
-   import { ThemeProvider } from "@toraline/ui/theme";
+   import { THEME_COOKIE_NAME, resolveTheme } from "@toraline.tech/tokens";
+   import { ThemeProvider } from "@toraline.tech/ui/theme";
    import { themes } from "../theme.config";
    import { fraunces } from "./fonts";
    import "./globals.css";
@@ -259,8 +259,8 @@ The steps are for a Next.js app. The section [Without Next.js](#without-nextjs) 
 9. Add the theme button to `app/page.tsx`:
 
    ```tsx
-   import { Button } from "@toraline/ui";
-   import { ThemeToggle } from "@toraline/ui/theme";
+   import { Button } from "@toraline.tech/ui";
+   import { ThemeToggle } from "@toraline.tech/ui/theme";
 
    export default function Page() {
      return (
@@ -300,7 +300,7 @@ The theme function and the components do not need Next.js. These steps are for a
 
    ```ts
    import { writeFileSync } from "node:fs";
-   import { createTheme } from "@toraline/tokens";
+   import { createTheme } from "@toraline.tech/tokens";
    import { themeInputs } from "../theme.config.ts";
 
    const css = themeInputs.map(createTheme).join("\n");
@@ -314,9 +314,9 @@ The theme function and the components do not need Next.js. These steps are for a
 3. The CSS file of the app (`src/index.css`) imports the tokens, the generated file and the styles of the components. With no Tailwind CSS there is no class like `bg-surface`, so the app sets the page colors with the tokens:
 
    ```css
-   @import "@toraline/tokens/css";
+   @import "@toraline.tech/tokens/css";
    @import "./theme.generated.css";
-   @import "@toraline/ui/styles.css";
+   @import "@toraline.tech/ui/styles.css";
 
    body {
      background-color: var(--color-surface);
@@ -330,7 +330,7 @@ The theme function and the components do not need Next.js. These steps are for a
    ```ts
    import { defineConfig } from "vite";
    import react from "@vitejs/plugin-react";
-   import { createThemeScript } from "@toraline/tokens";
+   import { createThemeScript } from "@toraline.tech/tokens";
    import { themes } from "./theme.config.ts";
 
    export default defineConfig({
@@ -352,8 +352,8 @@ The theme function and the components do not need Next.js. These steps are for a
    ```tsx
    import { StrictMode } from "react";
    import { createRoot } from "react-dom/client";
-   import { Button } from "@toraline/ui";
-   import { ThemeProvider, ThemeToggle } from "@toraline/ui/theme";
+   import { Button } from "@toraline.tech/ui";
+   import { ThemeProvider, ThemeToggle } from "@toraline.tech/ui/theme";
    import { themes } from "../theme.config";
    import "./index.css";
 

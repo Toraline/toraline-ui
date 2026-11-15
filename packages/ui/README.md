@@ -1,28 +1,28 @@
-# @toraline/ui
+# @toraline.tech/ui
 
 The styled React components of the Toraline component library.
 
 | What | Import from | State |
 |---|---|---|
-| The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton |
-| The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
+| The parts that control the theme: a provider, a hook and a toggle button | `@toraline.tech/ui/theme` | Built in phase 2 |
+| The components | `@toraline.tech/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton |
+| The styles of everything above | `@toraline.tech/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
 
-A theme is a set of colors, fonts and corner sizes. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline/tokens`](../tokens/README.md).
+A theme is a set of colors, fonts and corner sizes. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline.tech/tokens`](../tokens/README.md).
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline/ui` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+**The package is not published yet.** Today (2026-11-15) `@toraline.tech/ui` is not on the npm registry. The first version will be `2.0.0-beta.0`.
 
 After the first release:
 
 ```bash
-npm install @toraline/ui@next @toraline/tokens@next
+npm install @toraline.tech/ui@next @toraline.tech/tokens@next
 ```
 
-- Install both packages, in the same version. `@toraline/ui` needs exactly its own version of `@toraline/tokens`.
+- Install both packages, in the same version. `@toraline.tech/ui` needs exactly its own version of `@toraline.tech/tokens`.
 - `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
 - The app needs React 19 (`react` and `react-dom`). Tailwind CSS 4 is optional.
 - The package has ES modules only (files read with `import`), with type files for TypeScript.
@@ -35,19 +35,19 @@ Before the first release, an app can install the package files that `make pack` 
 
    ```css
    @import "tailwindcss";
-   @import "@toraline/tokens/css/tailwind.css";
-   @import "@toraline/ui/styles.css";
+   @import "@toraline.tech/tokens/css/tailwind.css";
+   @import "@toraline.tech/ui/styles.css";
    ```
 
-   An app with no Tailwind CSS imports `@toraline/tokens/css` in place of the first two lines.
+   An app with no Tailwind CSS imports `@toraline.tech/tokens/css` in place of the first two lines.
 
 2. In the root layout (`app/layout.tsx`), read the saved theme on the server, write it on `<html>`, and give it to the provider:
 
    ```tsx
    import { cookies } from "next/headers";
    import type { ReactNode } from "react";
-   import { THEME_COOKIE_NAME, resolveTheme } from "@toraline/tokens";
-   import { ThemeProvider } from "@toraline/ui/theme";
+   import { THEME_COOKIE_NAME, resolveTheme } from "@toraline.tech/tokens";
+   import { ThemeProvider } from "@toraline.tech/ui/theme";
    import "./globals.css";
 
    const themes = ["light", "dark"];
@@ -71,7 +71,7 @@ Before the first release, an app can install the package files that `make pack` 
 3. Put the toggle anywhere inside the provider:
 
    ```tsx
-   import { ThemeToggle } from "@toraline/ui/theme";
+   import { ThemeToggle } from "@toraline.tech/ui/theme";
 
    export default function Page() {
      return <ThemeToggle />;
@@ -80,11 +80,11 @@ Before the first release, an app can install the package files that `make pack` 
 
 The server writes `data-theme` in the HTML it sends, so the page never shows the wrong theme first. This working example is the app [`apps/playground`](../../apps/playground/README.md).
 
-Reading a cookie in the root layout makes Next.js render every page at request time (dynamic rendering). An app that needs pages built once (static rendering) does not read the cookie on the server. It puts the script of `createThemeScript` from `@toraline/tokens` inside `<head>`, and gives no `initialTheme` to the provider.
+Reading a cookie in the root layout makes Next.js render every page at request time (dynamic rendering). An app that needs pages built once (static rendering) does not read the cookie on the server. It puts the script of `createThemeScript` from `@toraline.tech/tokens` inside `<head>`, and gives no `initialTheme` to the provider.
 
 ## The parts
 
-All three come from `@toraline/ui/theme`. They are Client Components: they run in the browser.
+All three come from `@toraline.tech/ui/theme`. They are Client Components: they run in the browser.
 
 ### `ThemeProvider`
 
@@ -114,12 +114,12 @@ A button. Each press shows the next theme of `themes`. After the last theme it g
 
 ## The components
 
-All of them come from `@toraline/ui`. They need the CSS of step 1 above. The page `/components` of [`apps/playground`](../../apps/playground/README.md) shows each one with every variant and state.
+All of them come from `@toraline.tech/ui`. They need the CSS of step 1 above. The page `/components` of [`apps/playground`](../../apps/playground/README.md) shows each one with every variant and state.
 
 ### `Button`
 
 ```tsx
-import { Button } from "@toraline/ui";
+import { Button } from "@toraline.tech/ui";
 
 <Button variant="danger" size="sm" onClick={deleteOrder}>
   Delete
@@ -143,7 +143,7 @@ import { Button } from "@toraline/ui";
 ### `Input`
 
 ```tsx
-import { Input } from "@toraline/ui";
+import { Input } from "@toraline.tech/ui";
 
 <Input label="Title" name="title" error={titleError} />
 ```
@@ -165,7 +165,7 @@ import { Input } from "@toraline/ui";
 A switch: a control that is on or off. It is not `ThemeToggle`, the button that changes the theme.
 
 ```tsx
-import { Toggle } from "@toraline/ui";
+import { Toggle } from "@toraline.tech/ui";
 
 <Toggle label="Send e-mails" checked={sendEmails} onChange={(event) => setSendEmails(event.target.checked)} />
 ```
@@ -189,7 +189,7 @@ import { Toggle } from "@toraline/ui";
 A row of tabs, and under it the content of the selected tab.
 
 ```tsx
-import { Tabs } from "@toraline/ui";
+import { Tabs } from "@toraline.tech/ui";
 
 <Tabs
   aria-label="Orders by kind"
@@ -218,7 +218,7 @@ import { Tabs } from "@toraline/ui";
 Breadcrumbs are the path from the first page of the app to the current page, as a row of links.
 
 ```tsx
-import { BreadCrumbs } from "@toraline/ui";
+import { BreadCrumbs } from "@toraline.tech/ui";
 
 <BreadCrumbs
   crumbs={[
@@ -245,7 +245,7 @@ A main button for the main action, and next to it a small button that opens a me
 
 ```tsx
 "use client";
-import { SplitButton } from "@toraline/ui";
+import { SplitButton } from "@toraline.tech/ui";
 
 <SplitButton
   onClick={downloadAll}
@@ -296,7 +296,7 @@ These rules were decided in TOR-1009. The reasons are in [`docs/decisions.md`](.
 | `src/<name>/<Name>.test.tsx` | Its tests |
 | `src/<name>/index.ts` | What the folder exports |
 | `css/<name>.css` | Its styles. `css/styles.css` imports the file |
-| `src/index.ts` | Exports the component and its types from `@toraline/ui` |
+| `src/index.ts` | Exports the component and its types from `@toraline.tech/ui` |
 
 ### Variants, sizes and states
 
@@ -328,7 +328,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 ### Styles
 
 1. Every rule is inside `@layer components`, and every class name starts with `tui-`.
-2. A CSS variable in a component's styles is always a level 2 token of `@toraline/tokens`. A component never uses a level 1 token and never defines a variable of its own.
+2. A CSS variable in a component's styles is always a level 2 token of `@toraline.tech/tokens`. A component never uses a level 1 token and never defines a variable of its own.
 3. A color is always a color token. `currentColor` and `transparent` are allowed.
 4. A font size is `--text-sm`, `--text-base` or `--text-lg`. A font is `--font-body`, `--font-heading` or `--font-mono`.
 5. A padding, a margin and a gap are a multiple of the spacing unit: `calc(var(--spacing) * 4)`.

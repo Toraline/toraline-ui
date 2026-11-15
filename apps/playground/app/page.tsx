@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@toraline/ui/theme";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
 
 /**
  * The test page. Every color, font, radius and shadow class here is a token class:

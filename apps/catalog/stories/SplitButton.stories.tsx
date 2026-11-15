@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
-import { SplitButton, splitButtonMenuPlacements } from "@toraline/ui";
+import { SplitButton, splitButtonMenuPlacements } from "@toraline.tech/ui";
 import { optionList } from "./shared/option-list";
 import { Row } from "./shared/Row";
 

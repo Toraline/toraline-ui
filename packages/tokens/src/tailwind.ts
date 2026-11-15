@@ -13,7 +13,7 @@ import type { ThemeInput } from "./create-theme.js";
  * The result is an empty text when no theme adds a color.
  *
  * Put the result in a CSS file that Tailwind reads, after the import of
- * "@toraline/tokens/css/tailwind.css". Tailwind builds its classes from CSS files,
+ * "@toraline.tech/tokens/css/tailwind.css". Tailwind builds its classes from CSS files,
  * so a <style> element in the page is too late.
  */
 export function createTailwindTheme(themeInputs: readonly ThemeInput[]): string {

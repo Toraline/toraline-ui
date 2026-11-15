@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import tailwind from "@tailwindcss/postcss";
 import postcss from "postcss";
 import { describe, expect, test } from "vitest";
-import { themeTokenNames } from "@toraline/tokens";
+import { themeTokenNames } from "@toraline.tech/tokens";
 
 /**
  * The rules every CSS file of a component follows (TOR-1009):

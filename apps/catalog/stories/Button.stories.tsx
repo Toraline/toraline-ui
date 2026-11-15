@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { Button, buttonSizes, buttonVariants } from "@toraline/ui";
+import { Button, buttonSizes, buttonVariants } from "@toraline.tech/ui";
 import { optionList } from "./shared/option-list";
 import { Row } from "./shared/Row";
 

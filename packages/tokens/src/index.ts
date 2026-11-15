@@ -1,10 +1,10 @@
 /**
- * @toraline/tokens
+ * @toraline.tech/tokens
  *
  * The design tokens and the themes of the Toraline component library.
  * This package has no React code. The CSS files are in the folder css/.
  */
-export const packageName = "@toraline/tokens";
+export const packageName = "@toraline.tech/tokens";
 
 export { primitives } from "./primitives.js";
 export type { PrimitiveName } from "./primitives.js";

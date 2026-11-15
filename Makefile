@@ -42,7 +42,7 @@ packages-check: ## Check the two published packages: same version, files of "exp
 
 pack: ## Build the two published packages, write their tarballs into .pack/ and list the files of each
 	@rm -rf .pack/tarballs && mkdir -p .pack/tarballs
-	@npm pack --workspace @toraline/tokens --workspace @toraline/ui --pack-destination .pack/tarballs
+	@npm pack --workspace @toraline.tech/tokens --workspace @toraline.tech/ui --pack-destination .pack/tarballs
 	@ls -l .pack/tarballs
 
 version: ## Set the version of the two published packages (VERSION=2.0.0-beta.1)

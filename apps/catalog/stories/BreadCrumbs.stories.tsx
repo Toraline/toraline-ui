@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { BreadCrumbs } from "@toraline/ui";
+import { BreadCrumbs } from "@toraline.tech/ui";
 
 // The addresses start with "#", so a press on a link does not leave the story.
 const crumbs = [

@@ -8,12 +8,12 @@ import {
   Toggle,
   buttonSizes,
   buttonVariants,
-} from "@toraline/ui";
-import { ThemeToggle } from "@toraline/ui/theme";
+} from "@toraline.tech/ui";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
 import { SplitButtonExamples } from "./SplitButtonExamples";
 
 /**
- * The page of the components. It shows every component of @toraline/ui with
+ * The page of the components. It shows every component of @toraline.tech/ui with
  * every variant and state. Press the theme button to see them in the other theme.
  */
 

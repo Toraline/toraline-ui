@@ -1,4 +1,4 @@
-# Publishes @toraline/tokens and @toraline/ui (version 2) to the public npm registry.
+# Publishes @toraline.tech/tokens and @toraline.tech/ui (version 2) to the public npm registry.
 #
 # It runs ONLY when a person starts it by hand: GitHub > Actions > "Release version 2" >
 # "Run workflow", with the branch v2. It never runs on a push, on a tag or on a GitHub release.
@@ -9,7 +9,7 @@
 # What the owner sets up once, in the repository settings on GitHub:
 #   Settings > Secrets and variables > Actions > New repository secret
 #   Name: NPM_PUBLISH_TOKEN
-#   Value: an npm access token that may publish the packages of the scope @toraline.
+#   Value: an npm access token that may publish the packages of the scope @toraline.tech.
 # Without that secret a real publish stops at its first step, with a message that names the secret.
 name: Release version 2
 
@@ -96,8 +96,8 @@ jobs:
             *-*) tag=next ;;
             *) tag=latest ;;
           esac
-          # @toraline/tokens goes first, because @toraline/ui depends on it.
-          for name in @toraline/tokens @toraline/ui; do
+          # @toraline.tech/tokens goes first, because @toraline.tech/ui depends on it.
+          for name in @toraline.tech/tokens @toraline.tech/ui; do
             if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
               echo "${name}@${VERSION} is already on npm. Skipped."
               continue
@@ -112,7 +112,7 @@ jobs:
       - name: Check the result on npm
         if: inputs.publish
         run: |
-          for name in @toraline/tokens @toraline/ui; do
+          for name in @toraline.tech/tokens @toraline.tech/ui; do
             for attempt in 1 2 3 4 5 6; do
               if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
                 break

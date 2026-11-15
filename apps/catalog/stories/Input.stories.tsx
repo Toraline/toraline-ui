@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Input } from "@toraline/ui";
+import { Input } from "@toraline.tech/ui";
 
 /** A text field with a label and an error message. */
 const meta = {

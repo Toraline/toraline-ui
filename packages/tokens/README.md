@@ -1,19 +1,19 @@
-# @toraline/tokens
+# @toraline.tech/tokens
 
 The design tokens and the themes of the Toraline component library. A design token is a named value of the design, for example a color or a font, stored as a CSS variable. This package has no React code.
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline/tokens` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+**The package is not published yet.** Today (2026-11-15) `@toraline.tech/tokens` is not on the npm registry. The first version will be `2.0.0-beta.0`.
 
 After the first release:
 
 ```bash
-npm install @toraline/tokens@next
+npm install @toraline.tech/tokens@next
 ```
 
 - `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
-- An app that also uses `@toraline/ui` installs both packages in the same version.
+- An app that also uses `@toraline.tech/ui` installs both packages in the same version.
 - The package needs no React. Tailwind CSS 4 is optional.
 - The package has ES modules only (files read with `import`), with type files for TypeScript.
 
@@ -36,10 +36,10 @@ A **theme** is one block of level 2 values. The page selects a theme with the at
 1. Import the CSS once, in the global CSS file of the app:
 
    ```css
-   @import "@toraline/tokens/css";
+   @import "@toraline.tech/tokens/css";
    ```
 
-   This one line loads the level 1 tokens, the light theme and the dark theme. The three files can also be imported one by one: `@toraline/tokens/css/primitives.css`, `@toraline/tokens/css/themes/light.css`, `@toraline/tokens/css/themes/dark.css`.
+   This one line loads the level 1 tokens, the light theme and the dark theme. The three files can also be imported one by one: `@toraline.tech/tokens/css/primitives.css`, `@toraline.tech/tokens/css/themes/light.css`, `@toraline.tech/tokens/css/themes/dark.css`.
 
 2. Select the theme on the root element:
 
@@ -62,7 +62,7 @@ A **theme** is one block of level 2 values. The page selects a theme with the at
 The same values are available in TypeScript:
 
 ```ts
-import { lightTheme, darkTheme, primitives, themeTokenNames } from "@toraline/tokens";
+import { lightTheme, darkTheme, primitives, themeTokenNames } from "@toraline.tech/tokens";
 
 lightTheme.tokens["color-primary"]; // "var(--purple-500)"
 primitives["purple-500"]; // "#5e00a1"
@@ -73,7 +73,7 @@ primitives["purple-500"]; // "#5e00a1"
 `createTheme` is a function that receives an app's values and returns the CSS of one theme, as text. The app can change a color of the library, add a new color, change the fonts, the text sizes, the spacing unit and the radius. A value the app does not give comes from the default theme.
 
 ```ts
-import { createTheme } from "@toraline/tokens";
+import { createTheme } from "@toraline.tech/tokens";
 
 const css = createTheme({
   name: "ocean",
@@ -167,11 +167,11 @@ The fonts after the variable (`Georgia, serif`) are used while the font file loa
 
 ## Tailwind CSS 4
 
-`css/tailwind.css` is a preset: one CSS file that makes every level 2 token a Tailwind CSS 4 class. Import it after Tailwind, in the global CSS file of the app. It also loads the tokens and the two themes, so the import of `@toraline/tokens/css` is not needed:
+`css/tailwind.css` is a preset: one CSS file that makes every level 2 token a Tailwind CSS 4 class. Import it after Tailwind, in the global CSS file of the app. It also loads the tokens and the two themes, so the import of `@toraline.tech/tokens/css` is not needed:
 
 ```css
 @import "tailwindcss";
-@import "@toraline/tokens/css/tailwind.css";
+@import "@toraline.tech/tokens/css/tailwind.css";
 ```
 
 ```html
@@ -198,7 +198,7 @@ The preset also makes the Tailwind variant `dark:` follow `data-theme="dark"`. E
 Tailwind builds its classes from CSS files, before the page exists. A color that an app adds through `createTheme` becomes a class when Tailwind finds it in a CSS file. `createTailwindTheme` returns that CSS:
 
 ```ts
-import { createTailwindTheme, createTheme } from "@toraline/tokens";
+import { createTailwindTheme, createTheme } from "@toraline.tech/tokens";
 
 const themeInputs = [
   { name: "light", isDefault: true, colors: { brand: "#b34700" } },
@@ -220,7 +220,7 @@ Write `css` to a file before the build, and import the file after the preset:
 
 ```css
 @import "tailwindcss";
-@import "@toraline/tokens/css/tailwind.css";
+@import "@toraline.tech/tokens/css/tailwind.css";
 @import "./theme.generated.css";
 ```
 
@@ -228,7 +228,7 @@ The classes `bg-brand`, `text-brand` and the others now exist, and each theme gi
 
 ## Save the theme a person chose
 
-The choice is saved in a cookie named `toraline-theme`. A cookie is a small named value that the browser keeps and sends to the server with every request. The React provider in `@toraline/ui/theme` writes the cookie. This package has the functions that read it, with no React:
+The choice is saved in a cookie named `toraline-theme`. A cookie is a small named value that the browser keeps and sends to the server with every request. The React provider in `@toraline.tech/ui/theme` writes the cookie. This package has the functions that read it, with no React:
 
 | Function or value | What it does |
 |---|---|
@@ -244,7 +244,7 @@ An app that renders on a server (Next.js) reads the cookie on the server and wri
 An app with no server rendering puts the script of `createThemeScript` inside `<head>`. The browser runs it before it paints the page:
 
 ```ts
-import { createThemeScript } from "@toraline/tokens";
+import { createThemeScript } from "@toraline.tech/tokens";
 
 const html = `<head><script>${createThemeScript()}</script></head>`;
 ```

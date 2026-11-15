@@ -10,7 +10,7 @@ export default defineConfig({
         resolve: {
           // The tests of packages/ui read the source of the tokens package, not its built files.
           alias: {
-            "@toraline/tokens": fileURLToPath(
+            "@toraline.tech/tokens": fileURLToPath(
               new URL("./packages/tokens/src/index.ts", import.meta.url),
             ),
           },

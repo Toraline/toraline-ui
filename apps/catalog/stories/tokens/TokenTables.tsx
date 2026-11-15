@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
-import { darkTheme, lightTheme, primitives, themeTokenNames } from "@toraline/tokens";
-import type { ThemeTokenName } from "@toraline/tokens";
+import { darkTheme, lightTheme, primitives, themeTokenNames } from "@toraline.tech/tokens";
+import type { ThemeTokenName } from "@toraline.tech/tokens";
 import "./token-tables.css";
 
 /**
  * The tables of the tokens page. They read the lists and the values of
- * @toraline/tokens, so a token that the library adds or changes appears here
+ * @toraline.tech/tokens, so a token that the library adds or changes appears here
  * with no change in this file.
  *
  * A level 1 token is a raw value, for example --purple-500.

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ThemeToggle } from "@toraline/ui/theme";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
 
 const cardStyle: CSSProperties = {
   maxWidth: "32rem",

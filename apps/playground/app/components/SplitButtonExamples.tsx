@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SplitButton } from "@toraline/ui";
+import { SplitButton } from "@toraline.tech/ui";
 
 /**
  * The examples of SplitButton. This file is a Client Component because the
