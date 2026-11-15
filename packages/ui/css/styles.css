@@ -18,4 +18,5 @@
  */
 @layer theme, base, components, utilities;
 
+@import "./button.css";
 @import "./theme-toggle.css";

@@ -14,6 +14,11 @@ export default function Page() {
         opens in the theme you chose.
       </p>
       <ThemeToggle className="mt-4" />
+      <p className="mt-4">
+        <a className="text-primary underline" href="/components">
+          The components of the library
+        </a>
+      </p>
 
       <section className="mt-6 rounded border border-border bg-surface-raised p-4 shadow">
         <h2 className="font-heading text-xl font-bold">A card</h2>

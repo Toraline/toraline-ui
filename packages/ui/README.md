@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. None is built yet |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -95,6 +95,34 @@ A button. Each press shows the next theme of `themes`. After the last theme it g
 - `children` replaces the text that is shown, for example with an icon.
 - `className` adds classes. The button also accepts every other prop of `<button>`.
 
+## The components
+
+All of them come from `@toraline/ui`. They need the CSS of step 1 above. The page `/components` of [`apps/playground`](../../apps/playground/README.md) shows each one with every variant and state.
+
+### `Button`
+
+```tsx
+import { Button } from "@toraline/ui";
+
+<Button variant="danger" size="sm" onClick={deleteOrder}>
+  Delete
+</Button>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `variant` | `"primary"` (default), `"secondary"`, `"danger"` | The look. `primary`: the main action. `secondary`: another action. `danger`: an action that deletes |
+| `size` | `"sm"`, `"md"` (default), `"lg"` | The size |
+| `loading` | `true`, `false` (default) | `true` while the action is running. The button shows a spinner (a small turning circle), and a press does nothing |
+| `disabled` | The HTML attribute | The button cannot get focus and cannot be pressed |
+| `type` | `"button"` (default), `"submit"`, `"reset"` | The HTML attribute. The default is `"button"`, so a button inside a form does not send the form by accident |
+
+- Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to it too.
+- Keyboard: Tab moves the focus to it, Enter and Space press it.
+- Screen reader: a loading button has `aria-busy="true"` and `aria-disabled="true"`. It keeps the keyboard focus, so a person who pressed it with the keyboard does not lose their place.
+- The lists `buttonVariants` and `buttonSizes` and the types `ButtonProps`, `ButtonVariant` and `ButtonSize` are exported.
+- It is a Client Component, because it has a click handler of its own.
+
 ## Styling on top
 
 The styles of the library are in the cascade layer `components`. A cascade layer is a named group of CSS rules with a fixed priority. A Tailwind CSS class (layer `utilities`) and the CSS of an app that is in no layer both win over the library's styles. Example: `<ThemeToggle className="rounded-full" />`.
@@ -119,7 +147,7 @@ These rules were decided in TOR-1009. The reasons are in [`docs/decisions.md`](.
 
 A variant is one of the looks of a component, for example `primary` or `danger`.
 
-1. The variants are one list in the component's file, and the type comes from the list: `export const buttonVariants = ["primary", "secondary"] as const`. Sizes work the same way (`buttonSizes`). The lists are exported, so a test or a catalog can show every value.
+1. The variants are one list in the component's file, and the type comes from the list: `export const buttonVariants = ["primary", "secondary"] as const`. Sizes work the same way (`buttonSizes`). The lists are exported, so a test or a catalog can show every value. When the component's file starts with `"use client"`, the lists are in a second file with no `"use client"`, `src/<name>/<name>-options.ts`. Next.js does not let a Server Component read a value that a `"use client"` file exports; it can only render its components.
 2. The component writes the variant and the size on its element as the attributes `data-variant` and `data-size`. The CSS selects them: `.tui-button[data-variant="primary"]`.
 3. A state (disabled, loading, error, selected, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The CSS selects the same attribute, for example `.tui-input__field[aria-invalid="true"]`. The look and what a screen reader says cannot differ, because both come from one attribute.
 

@@ -17,6 +17,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 |---|---|
 | TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
 | TOR-1007 | The headings use the font Fraunces. The rest of the text uses the default font of the library |
+| TOR-997 | The page `/components` shows every component of `@toraline/ui` with every variant and state. The theme button on that page changes the theme |
 | TOR-1008 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-brand` is a color this app added. Changing the theme changes all of them |
 
 ## The files
@@ -31,6 +32,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 | `app/layout.tsx` | Reads the theme cookie on the server and writes `data-theme` on `<html>` |
 | `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file and the component styles. It has no other CSS |
 | `app/page.tsx` | The test page. It has no CSS of its own: only classes |
+| `app/components/page.tsx` | The page of the components, at `/components` |
 
 ## How "no flash of the wrong theme" was checked
 
@@ -90,3 +92,30 @@ Checked on the built app on 2026-11-15 (Tailwind CSS 4.3.5), in a browser, with 
 | Text on the added color | `text-brand-foreground` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
 
 The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a top margin of `16px`. This shows that a class of the app wins over the library's styles. The browser console had no error.
+
+## How the components were checked
+
+The page `/components` is a Server Component. It imports the components from `@toraline/ui`. The build of this app fails when a component that needs the browser has no `"use client"`.
+
+Commands, run from the repository root on 2026-11-15 (Next.js 16.4.6, Tailwind CSS 4.3.5):
+
+```bash
+npm run build
+(cd apps/playground && npx next start -p 3987) &
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3987/components   # 200
+pkill -f "next start -p 3987"
+```
+
+The page was then opened in a browser. The colors below were read with `getComputedStyle`, once with `data-theme="light"` and once with `data-theme="dark"` on `<html>`. Transitions were turned off while reading, because a color that is still changing gives a value between the two themes. In each cell: background, then text.
+
+### Button (TOR-1010)
+
+| Button | Light theme | Dark theme |
+|---|---|---|
+| `primary` | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
+| `secondary` | `rgb(255, 255, 255)`, `rgb(94, 0, 161)`, border `rgb(94, 0, 161)` | `rgb(39, 48, 62)`, `rgb(181, 147, 234)`, border `rgb(181, 147, 234)` |
+| `danger` | `rgb(217, 45, 45)`, `rgb(255, 255, 255)` | `rgb(244, 120, 120)`, `rgb(15, 25, 40)` |
+| Disabled (every variant) | `rgb(255, 255, 255)`, `rgb(111, 117, 126)`, border `rgb(207, 209, 212)` | `rgb(15, 25, 40)`, `rgb(159, 163, 169)`, border `rgb(63, 71, 83)` |
+| Loading `primary` | The same as `primary` | The same as `primary` |
+
+Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The spinner of a loading button has the animation `tui-button-spin`. The button with `className="rounded-full"` has a fully round corner, where the library's style gives `8px`: the class of the app wins.

@@ -6,3 +6,6 @@
  * The parts of the theme (provider, hook, toggle) are in "@toraline/ui/theme".
  */
 export const packageName = "@toraline/ui";
+
+export { Button, buttonSizes, buttonVariants } from "./button";
+export type { ButtonProps, ButtonSize, ButtonVariant } from "./button";
