@@ -8,6 +8,8 @@ dist/
 /build
 /coverage
 storybook-static/
+.next/
+next-env.d.ts
 
 # made per user, never committed
 local-docs/

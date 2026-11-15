@@ -102,6 +102,29 @@ To change the light or the dark theme of the library, use its name: `createTheme
 
 `getAddedColorNames(input)` returns the colors of an input that the library does not have. For the example above: `["brand"]`.
 
+## Save the theme a person chose
+
+The choice is saved in a cookie named `toraline-theme`. A cookie is a small named value that the browser keeps and sends to the server with every request. The React provider in `@toraline/ui/theme` writes the cookie. This package has the functions that read it, with no React:
+
+| Function or value | What it does |
+|---|---|
+| `THEME_COOKIE_NAME` | The cookie name: `"toraline-theme"` |
+| `THEME_ATTRIBUTE` | The attribute name: `"data-theme"` |
+| `resolveTheme(savedTheme, themes, defaultTheme)` | Returns `savedTheme` when it is one of `themes`. Otherwise returns `defaultTheme`, or the first of `themes` |
+| `readThemeCookie(cookieHeader)` | Finds the saved theme in the text of a `Cookie` header. Returns `undefined` when there is none |
+| `serializeThemeCookie(theme)` | Builds the text that saves the theme when it is assigned to `document.cookie` |
+| `createThemeScript({ themes, defaultTheme, cookieName })` | Builds a small script, as text, that reads the cookie and writes `data-theme` on `<html>` |
+
+An app that renders on a server (Next.js) reads the cookie on the server and writes `data-theme` on `<html>`. The page then arrives in the right theme. The working example is in [`packages/ui/README.md`](../ui/README.md).
+
+An app with no server rendering puts the script of `createThemeScript` inside `<head>`. The browser runs it before it paints the page:
+
+```ts
+import { createThemeScript } from "@toraline/tokens";
+
+const html = `<head><script>${createThemeScript()}</script></head>`;
+```
+
 ## Level 2 tokens: the full list
 
 Every theme gives a value to each of these 21 tokens.

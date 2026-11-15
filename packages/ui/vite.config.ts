@@ -3,9 +3,12 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     lib: {
-      entry: "src/index.ts",
+      // One file per entry of the package: "@toraline/ui" and "@toraline/ui/theme".
+      entry: {
+        index: "src/index.ts",
+        theme: "src/theme/index.ts",
+      },
       formats: ["es"],
-      fileName: "index",
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime", "@toraline/tokens"],

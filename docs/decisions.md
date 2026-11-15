@@ -12,6 +12,23 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Where the theme code lives and how the choice is saved (TOR-1006)
+- Decision: the React provider (`ThemeProvider`), the hook (`useTheme`) and the toggle (`ThemeToggle`) are in `packages/ui/src/theme/`, published as the entry `@toraline/ui/theme`. The code with no React (cookie name, `resolveTheme`, `readThemeCookie`, `serializeThemeCookie`, `createThemeScript`) is in `packages/tokens/src/theme-storage.ts`.
+- Why: `packages/tokens` stays free of React. The entry `@toraline/ui/theme` starts with `"use client"`, which Next.js needs for code that runs in the browser. A server file (the root layout) cannot call a function from a `"use client"` file, so the functions the server calls are in `@toraline/tokens`.
+- Decision: the choice is saved in a cookie, `toraline-theme`, for 1 year, with `Path=/` and `SameSite=Lax`. A Next.js app reads it in the root layout with `cookies()` and writes `data-theme` on `<html>`.
+- Why: the server receives a cookie with the request, so the HTML it sends already has the right theme. The browser's `localStorage` is not sent to the server; with it, the server cannot know the theme.
+- Cost: reading a cookie in the root layout makes Next.js render every page at request time. For an app that needs pages built once, `createThemeScript` returns a script for `<head>` that reads the same cookie before the page paints.
+- Decision: a person who has not chosen gets the app's default theme. The library does not read the dark mode setting of the operating system.
+- Why: the tickets do not ask for it, and the server cannot read that setting on the first request.
+- Decision: `ThemeToggle` is a `<button>` that goes to the next theme of the app's list on each press. Its accessible name (the text a screen reader says) tells the state: `Theme: dark. Switch to light.`
+- Why: an app can have more than 2 themes. The attribute `aria-pressed` can only say "on" or "off", which fits 2 themes only.
+- Decision: the library's component styles are a plain CSS file, `packages/ui/css/styles.css` (`@toraline/ui/styles.css`), with every rule in the cascade layer `components` and class names that start with `tui-`.
+- Why: a Tailwind class and an app's own CSS both win over a rule in that layer, so an app can style on top with `className`. Phase 3 may change how components are styled; today this covers only the toggle.
+- Decision: the test app is `apps/playground` (Next.js 16.4.6, React 19.3.1), private. `make check` builds it, because the root `build` script runs every workspace. The build takes about 4 seconds.
+- Decision: Vitest runs browser tests with `jsdom` 31.0.1 and `@testing-library/react` 16.3.3. A test file that needs a page starts with `// @vitest-environment jsdom`.
+- Alternatives: `localStorage` with a script (what the library `next-themes` does); a `ThemeScript` React component; a switch with `aria-checked` for exactly 2 themes; Tailwind classes inside the component; `happy-dom` in place of `jsdom`.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Shape of the theme function (TOR-1005)
 - Decision: `createTheme(input)` in `packages/tokens/src/create-theme.ts` returns the CSS of one theme as text: one `[data-theme="<name>"]` block with every level 2 token. The input type is `ThemeInput`: `name`, `base` (`"light"` or `"dark"`, the default theme that gives the missing values), `isDefault`, `colors`, `fonts`, `radius`.
 - Why: text works everywhere. An app can put it in a `<style>` element on the server, or write it to a CSS file. The block always has every token, so a theme never depends on which other theme was loaded before it.

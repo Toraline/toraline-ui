@@ -9,8 +9,9 @@ The component library of Toraline: styled React components, with configurable th
 | Path | Content | State |
 |---|---|---|
 | `packages/tokens` | Design tokens, themes, and the function that builds a theme | Phase 2, in progress. See [its README](packages/tokens/README.md) |
-| `packages/ui` | The styled components, published as `@toraline/ui` | Skeleton. Built in phase 3 |
+| `packages/ui` | The styled components, published as `@toraline/ui` | Has the theme provider and toggle. See [its README](packages/ui/README.md). The other components are built in phase 3 |
 | `apps/catalog` | The catalog (Storybook) | Placeholder. Built in phase 4 |
+| `apps/playground` | A private Next.js app that tests the themes in a real page | See [its README](apps/playground/README.md) |
 | `legacy/` | The old library: Create React App, styled-components 5, Storybook 6 | Unchanged |
 | `docs/decisions.md` | Technical decisions, newest first | |
 | `AGENTS.md`, `agent/` | How AI agents work in this repository | |
