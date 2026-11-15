@@ -5,6 +5,7 @@ import postcss from "postcss";
 import { describe, expect, test } from "vitest";
 import { createTheme } from "./create-theme";
 import { createTailwindTheme } from "./tailwind";
+import { primitives } from "./primitives";
 import { lightTheme, themeTokenNames } from "./themes";
 
 const presetPath = fileURLToPath(new URL("../css/tailwind.css", import.meta.url));
@@ -91,6 +92,28 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     expect(css).toMatch(/\[data-theme="?dark"?\] \{[^}]*--color-primary: var\(--purple-200\);/);
     expect(css).toContain("--purple-500: #5e00a1;");
     expect(css).toContain("--purple-200: #b593ea;");
+  });
+
+  test("its block of level 1 colors has exactly the colors of primitives.ts", () => {
+    const preset = readFileSync(presetPath, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const scaleColors = Object.fromEntries(
+      [...preset.matchAll(/--(color-[a-z]+-\d+):\s*([^;]+);/g)].map((match) => [match[1], match[2]]),
+    );
+    const primitiveColors = Object.fromEntries(
+      Object.entries(primitives).filter(([name]) => name.startsWith("color-")),
+    );
+    expect(scaleColors).toEqual(primitiveColors);
+  });
+
+  test("a level 1 color is a Tailwind color class with the value of Intraweb", async () => {
+    const css = await buildCss(["bg-brand-700", "text-slate-500", "border-red-600"]);
+    expect(css).toContain(".bg-brand-700 { background-color: var(--color-brand-700); }");
+    expect(css).toContain(".text-slate-500 { color: var(--color-slate-500); }");
+    expect(css).toContain(".border-red-600 { border-color: var(--color-red-600); }");
+    expect(css).toContain("--color-brand-700: #42637c;");
+    // Tailwind has its own red-600. The value of Intraweb replaces it.
+    expect(css).toContain("--color-red-600: #d92d20;");
+    expect(css).not.toMatch(/--color-red-600: oklch/);
   });
 
   test("the font of the page is --font-body", async () => {

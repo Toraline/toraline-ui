@@ -292,6 +292,13 @@ A test checks the contrast of the text colors on their backgrounds in both theme
 
 | Group | Tokens |
 |---|---|
+| Slate (the neutral scale) | `--color-slate-50`, then `--color-slate-100` to `--color-slate-900` in steps of 100 |
+| Brand (the blue of the brand) | `--color-brand-50`, then `--color-brand-100` to `--color-brand-900` in steps of 100 |
+| Pink (the accent color) | `--color-pink-50`, `--color-pink-100`, `--color-pink-400`, `--color-pink-700` |
+| Cream (the highlight background) | `--color-cream-100` |
+| Green (success) | `--color-green-50`, `--color-green-200`, `--color-green-500`, `--color-green-700` |
+| Orange (warning) | `--color-orange-50`, `--color-orange-200`, `--color-orange-400`, `--color-orange-700` |
+| Red (error and danger) | `--color-red-50`, `--color-red-200`, `--color-red-600`, `--color-red-700` |
 | Purple | `--purple-50`, `--purple-100`, `--purple-200`, `--purple-300`, `--purple-400`, `--purple-500`, `--purple-600`, `--purple-700` |
 | Grey | `--grey-100` (white) to `--grey-900` (darkest), in steps of 100 |
 | Red | `--red-200`, `--red-300`, `--red-500`, `--red-600`, `--red-700` |
@@ -305,7 +312,15 @@ A test checks the contrast of the text colors on their backgrounds in both theme
 
 The level 2 tokens `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 4 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
 
-### Where the colors come from
+### The color scales of Intraweb
+
+The 7 scales whose names start with `--color-` are the color scales of the design system of the app Intraweb, with the same names and the same values (the `@theme` block of Intraweb's `globals.css`). A test (`src/intraweb.test.ts`) compares them with a copy of that block, `src/intraweb-fixtures/globals-theme.css`.
+
+With the Tailwind preset each one is also a Tailwind color: `--color-brand-700` gives the classes `bg-brand-700`, `text-brand-700`, `border-brand-700` and the others. Where Tailwind has a color with the same name (`red-600`, `green-500`), the value of Intraweb replaces the value of Tailwind. The other colors of Tailwind (`red-500`, `blue-600`) stay as Tailwind defines them.
+
+The scales purple, grey, red (`--red-*`) and green (`--green-*`), and `--black` and `--white`, are the colors of the first version of this library. The level 2 tokens still point to them. They are removed when the themes get the values of Intraweb (TOR-1133).
+
+### Where the first colors come from
 
 The colors of the old library (`legacy/src/lib/config/theme.ts`) are the starting point. The grey scale keeps the old numbers. The other scales have new numbers:
 

@@ -12,6 +12,17 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Level 1 colors: the color scales of Intraweb (TOR-1132)
+- Decision: the level 1 colors of `@toraline.tech/tokens` are the 7 color scales of the design system of the app Intraweb: slate and brand (50 to 900), pink, cream, green, orange and red. 37 colors. Each has the name and the value of the `@theme` block of Intraweb's `globals.css`, for example `--color-brand-700: #42637c`.
+- Why: phase 6 (TOR-1122) makes the default look of the library the look of Intraweb, so that Intraweb can install the library and look the same.
+- Decision: the names start with `--color-`, as in Intraweb. The other level 1 tokens keep their names (`--space-*`, `--font-size-*`, `--font-stack-*`).
+- Why: `--color-*` is the Tailwind CSS 4 namespace for colors (documentation of Tailwind, page "Theme variables", table "Theme variable namespaces", read on 2026-11-15). So each level 1 color is also a Tailwind color class (`bg-brand-700`), and a component copied from Intraweb that uses such a class works unchanged. The entry of TOR-1004 chose names outside the Tailwind namespaces so that a level 1 token never changes a Tailwind class. For colors this entry replaces that choice, on purpose: `--color-red-600` of Intraweb replaces `red-600` of Tailwind, as it does in Intraweb.
+- Decision: the colors are written in two places: `css/primitives.css` (plain CSS variables on `:root`, for an app with no Tailwind) and an `@theme` block of the Tailwind preset `css/tailwind.css` (so Tailwind makes the classes). A test compares both with `src/primitives.ts`.
+- Decision: Intraweb's scale `zinc` is not copied. In Intraweb it is a copy of slate for old screens that still use the Tailwind color `zinc`.
+- Decision: a copy of Intraweb's `@theme` block is in `packages/tokens/src/intraweb-fixtures/globals-theme.css`, with the commit and the date of the copy. The test `src/intraweb.test.ts` compares the level 1 colors with it.
+- Alternatives: keeping the names without `color-` (`--brand-700`) and mapping them in the preset; only an `@theme` block and no plain CSS file.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The components are styled with Tailwind CSS 4 classes (TOR-1205)
 - Decision: every component of `@toraline.tech/ui` is styled only with Tailwind CSS 4 classes, written in its `.tsx` file the way the app Intraweb writes its components: one text of classes for each variant and each size (`Record<ButtonVariant, string>`). The classes read the tokens through the Tailwind preset of `@toraline.tech/tokens`. The package has no CSS file for a component and no class name of its own. No token was renamed, and the look did not change.
 - Why: the approved design says "Components are styled with Tailwind 4 classes that read the tokens". The code gave each component its own class in plain CSS files, and Tailwind was optional.

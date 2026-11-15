@@ -1,7 +1,7 @@
 /*
  * The Tailwind CSS 4 preset of the Toraline tokens.
  *
- * Import this file after "tailwindcss". It does 4 things:
+ * Import this file after "tailwindcss". It does 5 things:
  * 1. It loads the level 1 tokens, the light theme and the dark theme.
  * 2. It makes every level 2 token a Tailwind class. Examples:
  *    --color-primary -> bg-primary, text-primary, border-primary
@@ -10,8 +10,9 @@
  *    --spacing       -> the unit of p-4, gap-2 and every other spacing class
  *    --radius        -> rounded
  *    --shadow        -> shadow
- * 3. It makes --font-body the font of the page.
- * 4. It makes the Tailwind variant "dark:" follow data-theme="dark".
+ * 3. It makes every level 1 color a Tailwind color, for example bg-brand-700.
+ * 4. It makes --font-body the font of the page.
+ * 5. It makes the Tailwind variant "dark:" follow data-theme="dark".
  *
  * How it works: a variable inside "@theme" tells Tailwind that the classes exist.
  * Each class reads the CSS variable when the page is shown (for example
@@ -67,6 +68,53 @@
  */
 @theme inline {
   --shadow: var(--shadow);
+}
+
+/*
+ * The level 1 colors as Tailwind colors: bg-brand-700, text-slate-500 and the
+ * others. The names and the values are the ones of Intraweb. Where Tailwind has
+ * a color with the same name (for example red-600), this value replaces it.
+ * This block must stay equal to the "color-" entries of src/primitives.ts.
+ * A test compares the two.
+ */
+@theme {
+  --color-slate-50: #f7f8fa;
+  --color-slate-100: #f1f3f6;
+  --color-slate-200: #e4e7ec;
+  --color-slate-300: #d0d5dd;
+  --color-slate-400: #98a2b3;
+  --color-slate-500: #667085;
+  --color-slate-600: #475467;
+  --color-slate-700: #344054;
+  --color-slate-800: #1d2939;
+  --color-slate-900: #101828;
+  --color-brand-50: #f2f6f9;
+  --color-brand-100: #e3ecf2;
+  --color-brand-200: #c8d8e4;
+  --color-brand-300: #a9c2d4;
+  --color-brand-400: #8eaec5;
+  --color-brand-500: #6f93ae;
+  --color-brand-600: #557a96;
+  --color-brand-700: #42637c;
+  --color-brand-800: #344f63;
+  --color-brand-900: #263a49;
+  --color-pink-50: #fbf4f2;
+  --color-pink-100: #f5e6e1;
+  --color-pink-400: #d7ada1;
+  --color-pink-700: #9a5f50;
+  --color-cream-100: #fff5ec;
+  --color-green-50: #ecfdf3;
+  --color-green-200: #abefc6;
+  --color-green-500: #17b26a;
+  --color-green-700: #067647;
+  --color-orange-50: #fffaeb;
+  --color-orange-200: #fedf89;
+  --color-orange-400: #fdb022;
+  --color-orange-700: #b54708;
+  --color-red-50: #fef3f2;
+  --color-red-200: #fecdca;
+  --color-red-600: #d92d20;
+  --color-red-700: #b42318;
 }
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
