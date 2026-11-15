@@ -1,0 +1,60 @@
+/* The styles of Tabs: the row of tabs and the panel with the content of the selected tab. */
+@layer components {
+  .tui-tabs {
+    font-family: var(--font-body);
+  }
+
+  .tui-tabs__list {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .tui-tabs__tab {
+    margin: 0 0 -2px;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 6);
+    border: 0;
+    border-bottom: 4px solid transparent;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background-color: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 700;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .tui-tabs__tab:hover {
+    background-color: var(--color-surface-muted);
+    color: var(--color-text);
+  }
+
+  /* The selected tab: the main text color, and a line in the primary color under it. */
+  .tui-tabs__tab[aria-selected="true"] {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-text);
+  }
+
+  .tui-tabs__tab:focus-visible,
+  .tui-tabs__panel:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .tui-tabs__panel {
+    padding: calc(var(--spacing) * 4) 0;
+    color: var(--color-text);
+    font-size: var(--text-base);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tui-tabs__tab {
+      transition:
+        background-color 0.15s,
+        border-color 0.15s,
+        color 0.15s;
+    }
+  }
+}

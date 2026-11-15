@@ -1,0 +1,7 @@
+/*
+ * Everything an app needs: the level 1 tokens, the light theme and the dark theme.
+ * Import this one file, or import the three files below one by one.
+ */
+@import "./primitives.css";
+@import "./themes/light.css";
+@import "./themes/dark.css";

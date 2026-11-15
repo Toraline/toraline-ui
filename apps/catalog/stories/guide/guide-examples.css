@@ -1,0 +1,40 @@
+/*
+ * The CSS of the live examples of the guide. It stands for the CSS file of an
+ * app: its rules are in no cascade layer, so they win over the library's styles.
+ */
+.guide-example {
+  display: grid;
+  justify-items: start;
+  gap: calc(var(--spacing) * 4);
+  padding: calc(var(--spacing) * 6);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.guide-example__heading {
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+}
+
+/* Guide 3, step 4: a style that uses the color the app added. */
+.guide-brand-note {
+  margin: 0;
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
+  border-radius: var(--radius);
+  background-color: var(--color-brand);
+  color: var(--color-brand-foreground);
+}
+
+/* Guide 3, step 2: a class of the app on a component. */
+.guide-round {
+  border-radius: 9999px;
+}
+
+/* Guide 3, step 3: an inner part of a component. */
+.guide-search .tui-input__field {
+  border-radius: 9999px;
+}

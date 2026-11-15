@@ -1,0 +1,84 @@
+/*
+ * Level 1 tokens: raw values.
+ *
+ * A level 1 token is a CSS variable that holds one raw value and says nothing
+ * about where the value is used. Example: --purple-500.
+ * Components never use these directly. They use the level 2 tokens, which are
+ * defined in themes/light.css and themes/dark.css.
+ *
+ * This file must stay equal to src/primitives.ts. A test compares the two.
+ */
+:root {
+  /* Purple. --purple-500 is the brand color of Toraline. */
+  --purple-50: #f6efff;
+  --purple-100: #d0b1ff;
+  --purple-200: #b593ea;
+  --purple-300: #833cda;
+  --purple-400: #6f1dc0;
+  --purple-500: #5e00a1;
+  --purple-600: #51009b;
+  --purple-700: #3d0069;
+
+  /* Grey. --grey-100 is white, --grey-900 is the darkest. */
+  --grey-100: #ffffff;
+  --grey-200: #f3f3f4;
+  --grey-300: #e7e8e9;
+  --grey-400: #cfd1d4;
+  --grey-500: #9fa3a9;
+  --grey-600: #6f757e;
+  --grey-700: #3f4753;
+  --grey-800: #27303e;
+  --grey-900: #0f1928;
+
+  /* Red. */
+  --red-200: #f8a3a3;
+  --red-300: #f47878;
+  --red-500: #f04848;
+  --red-600: #d92d2d;
+  --red-700: #b42020;
+
+  /* Green. */
+  --green-300: #84d235;
+  --green-400: #7ec36d;
+  --green-500: #68a15f;
+  --green-700: #2f6f14;
+
+  /* Black and white. */
+  --black: #000000;
+  --white: #ffffff;
+
+  /* Spacing. The number is a multiple of 0.25rem (4 pixels at the default font size). */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Font sizes. */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Font stacks. A font stack is a list of fonts; the browser uses the first one the device has. */
+  --font-stack-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-stack-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Radius sizes: how round a corner is. */
+  --radius-size-none: 0;
+  --radius-size-sm: 0.25rem;
+  --radius-size-md: 0.5rem;
+  --radius-size-lg: 1rem;
+  --radius-size-full: 9999px;
+
+  /* Shadow sizes. */
+  --shadow-size-sm: 0 1px 2px rgb(15 25 40 / 0.12);
+  --shadow-size-md: 0 4px 12px rgb(15 25 40 / 0.16);
+  --shadow-size-lg: 0 12px 32px rgb(15 25 40 / 0.2);
+}

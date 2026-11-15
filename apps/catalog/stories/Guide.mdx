@@ -1,0 +1,25 @@
+import { Canvas, Markdown, Meta } from "@storybook/addon-docs/blocks";
+import guide from "../../../docs/guide.md?raw";
+import * as GuideStories from "./Guide.stories";
+
+<Meta title="Guide/How to use the library" />
+
+{/* The text of the guide is the file docs/guide.md of the repository. The root README links to the same file. */}
+
+<Markdown>{guide}</Markdown>
+
+## Live examples
+
+These two examples run the real components, with the values of the guide.
+
+### The result of guide 2
+
+The button "Save" is blue, not purple, because the theme of the app changed the main color. The heading has the font of the app. Change the theme with the control **Theme** of the toolbar, or with the button of the example.
+
+<Canvas of={GuideStories.ThemeOfTheApp} sourceState="none" />
+
+### The result of guide 3
+
+The first button is as the library styles it. The second button and the field have round corners, from classes of the app.
+
+<Canvas of={GuideStories.StyleOnTop} sourceState="none" />

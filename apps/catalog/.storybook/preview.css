@@ -1,0 +1,20 @@
+/*
+ * The CSS of the catalog itself. It is not part of the library.
+ *
+ * It gives the page behind a story the colors and the font of the current
+ * theme, the way an app does on its <body>.
+ */
+
+/* The page of one story. */
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+/* The box around a story inside a documentation page. */
+.docs-story {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}

@@ -2,6 +2,29 @@
   "name": "@toraline/catalog",
   "version": "0.0.0",
   "private": true,
-  "description": "The catalog of the Toraline component library. Storybook arrives in phase 4 (TOR-998).",
-  "type": "module"
+  "description": "The catalog of the Toraline component library: Storybook, with every component in every theme. It is never published.",
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev --port 6006",
+    "build": "storybook build --output-dir storybook-static",
+    "typecheck": "tsc -p tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@toraline/tokens": "*",
+    "@toraline/ui": "*",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "10.6.7",
+    "@storybook/addon-docs": "10.6.7",
+    "@storybook/addon-vitest": "10.6.7",
+    "@storybook/react-vite": "10.6.7",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/browser": "5.1.0",
+    "@vitest/browser-playwright": "5.1.0",
+    "playwright": "1.65.1",
+    "storybook": "10.6.7"
+  }
 }

@@ -1,0 +1,41 @@
+/*
+ * The dark theme: one block of level 2 tokens.
+ *
+ * It applies when the root element of the page has data-theme="dark".
+ *
+ * This file must stay equal to "darkTheme" in src/themes.ts. A test compares the two.
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-surface: var(--grey-900);
+  --color-surface-raised: var(--grey-800);
+  --color-surface-muted: var(--grey-800);
+  --color-text: var(--grey-200);
+  --color-text-muted: var(--grey-500);
+  --color-border: var(--grey-700);
+  --color-border-strong: var(--grey-600);
+  --color-primary: var(--purple-200);
+  --color-primary-hover: var(--purple-100);
+  --color-primary-foreground: var(--grey-900);
+  --color-danger: var(--red-300);
+  --color-danger-hover: var(--red-200);
+  --color-danger-foreground: var(--grey-900);
+  --color-success: var(--green-400);
+  --color-success-foreground: var(--grey-900);
+  --color-focus-ring: var(--purple-100);
+  --color-overlay: rgb(0 0 0 / 0.7);
+
+  --font-body: var(--font-stack-sans);
+  --font-heading: var(--font-stack-sans);
+  --font-mono: var(--font-stack-mono);
+
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+
+  --spacing: var(--space-1);
+
+  --radius: var(--radius-size-md);
+  --shadow: var(--shadow-size-md);
+}

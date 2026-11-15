@@ -1,0 +1,30 @@
+{
+  "name": "@toraline/playground",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A Next.js app that tests the tokens, the themes and the theme toggle of the Toraline component library. It is never published.",
+  "type": "module",
+  "scripts": {
+    "theme": "node scripts/write-theme-css.ts",
+    "predev": "npm run theme",
+    "dev": "next dev",
+    "prebuild": "npm run theme",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@toraline/tokens": "*",
+    "@toraline/ui": "*",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tailwindcss": "4.3.5"
+  }
+}

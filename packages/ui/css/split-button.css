@@ -1,0 +1,148 @@
+/*
+ * The styles of SplitButton: the main button, the button that opens the menu
+ * (the trigger), and the menu with its actions (the items).
+ */
+@layer components {
+  .tui-split-button {
+    position: relative;
+    display: inline-flex;
+    gap: calc(var(--spacing) * 1);
+    font-family: var(--font-body);
+  }
+
+  .tui-split-button__main,
+  .tui-split-button__trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 700;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .tui-split-button__main {
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  .tui-split-button__trigger {
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .tui-split-button__main:hover,
+  .tui-split-button__trigger:hover,
+  .tui-split-button__trigger[aria-expanded="true"] {
+    background-color: var(--color-primary-hover);
+  }
+
+  .tui-split-button__main:disabled,
+  .tui-split-button__trigger:disabled {
+    border-color: var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .tui-split-button__main:focus-visible,
+  .tui-split-button__trigger:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* The arrow points to where the menu opens, and turns over while the menu is open. */
+  .tui-split-button__arrow {
+    width: 0.875em;
+    height: 0.875em;
+  }
+
+  .tui-split-button[data-placement="top"] .tui-split-button__arrow,
+  .tui-split-button[data-placement="bottom"]
+    .tui-split-button__trigger[aria-expanded="true"]
+    .tui-split-button__arrow {
+    transform: rotate(180deg);
+  }
+
+  .tui-split-button[data-placement="top"]
+    .tui-split-button__trigger[aria-expanded="true"]
+    .tui-split-button__arrow {
+    transform: none;
+  }
+
+  /* The menu sits above the page and does not move the content around it. */
+  .tui-split-button__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 100%;
+    margin: calc(var(--spacing) * 2) 0;
+    padding: calc(var(--spacing) * 1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-surface-raised);
+    box-shadow: var(--shadow);
+  }
+
+  .tui-split-button[data-placement="top"] .tui-split-button__menu {
+    top: auto;
+    bottom: 100%;
+  }
+
+  .tui-split-button__item {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+    border: 0;
+    border-radius: var(--radius);
+    background-color: transparent;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* The action under the pointer, and the action that has the keyboard focus. */
+  .tui-split-button__item:hover,
+  .tui-split-button__item:focus {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    outline: 0;
+  }
+
+  .tui-split-button__item:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .tui-split-button__item-icon {
+    display: inline-flex;
+    flex: none;
+    width: 1em;
+    height: 1em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tui-split-button__main,
+    .tui-split-button__trigger {
+      transition: background-color 0.15s;
+    }
+
+    .tui-split-button__arrow {
+      transition: transform 0.15s;
+    }
+  }
+}

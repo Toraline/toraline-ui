@@ -1,0 +1,99 @@
+/*
+ * The CSS of the token tables of the catalog. It is not part of the library.
+ * Every class name starts with "catalog-".
+ */
+.catalog-token-scroll {
+  overflow-x: auto;
+}
+
+.catalog-token-scroll:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.catalog-token-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.catalog-token-table caption {
+  padding-block: calc(var(--spacing) * 2);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  text-align: left;
+}
+
+.catalog-token-table th,
+.catalog-token-table td {
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  border: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.catalog-token-table code {
+  font-family: var(--font-mono);
+}
+
+/*
+ * A cell that shows a value in one theme. The cell has the attribute
+ * data-theme, so every token inside it has the value of that theme, whatever
+ * the theme of the page is.
+ */
+.catalog-token-table__theme-cell {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.catalog-token-table__value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+}
+
+.catalog-token-table__raw {
+  overflow-wrap: anywhere;
+}
+
+/* The samples. */
+.catalog-token-sample {
+  display: inline-flex;
+  flex: none;
+  align-items: flex-end;
+  gap: calc(var(--spacing) * 1);
+}
+
+.catalog-token-sample__color,
+.catalog-token-sample__radius,
+.catalog-token-sample__shadow {
+  display: inline-block;
+  width: 3em;
+  height: 3em;
+  border: 1px solid var(--color-border-strong);
+}
+
+.catalog-token-sample__color {
+  border-radius: 0.25em;
+}
+
+.catalog-token-sample__radius {
+  border-width: 2px;
+  background-color: var(--color-surface-muted);
+}
+
+.catalog-token-sample__shadow {
+  border-color: var(--color-border);
+  background-color: var(--color-surface-raised);
+}
+
+.catalog-token-sample__space {
+  display: inline-block;
+  height: 1.5em;
+  background-color: var(--color-primary);
+}
