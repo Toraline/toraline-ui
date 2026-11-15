@@ -9,7 +9,7 @@ The component library of Toraline: styled React components, with configurable th
 | Path | Content | State |
 |---|---|---|
 | `packages/tokens` | Design tokens, the light and dark themes, the function that builds a theme, and the Tailwind CSS 4 preset | Built in phase 2. See [its README](packages/tokens/README.md) |
-| `packages/ui` | The styled components, published as `@toraline/ui` | Has the theme provider and toggle, the rules every component follows, and the template of a component. See [its README](packages/ui/README.md). Phase 3 is building the first 6 components. Built so far: Button, Input |
+| `packages/ui` | The styled components, published as `@toraline/ui` | Has the theme provider and toggle, the rules every component follows, and the template of a component. See [its README](packages/ui/README.md). Phase 3 is building the first 6 components. Built so far: Button, Input, Toggle |
 | `apps/catalog` | The catalog (Storybook) | Placeholder. Built in phase 4 |
 | `apps/playground` | A private Next.js app that tests the themes in a real page | See [its README](apps/playground/README.md) |
 | `legacy/` | The old library: Create React App, styled-components 5, Storybook 6 | Unchanged |

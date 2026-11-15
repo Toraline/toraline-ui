@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -142,6 +142,30 @@ import { Input } from "@toraline/ui";
 - `className` goes to the outermost element, a `<div>` that holds the label, the field and the message. The inner classes are `tui-input__label`, `tui-input__field`, `tui-input__error` and `tui-input__error-icon`.
 - Screen reader: the label is a `<label>` linked to the field with `for` and `id`. With an error, the field has `aria-invalid="true"`, and `aria-describedby` points to the message, so the message is read with the field.
 - It has no `"use client"`: it also renders in a Server Component.
+
+### `Toggle`
+
+A switch: a control that is on or off. It is not `ThemeToggle`, the button that changes the theme.
+
+```tsx
+import { Toggle } from "@toraline/ui";
+
+<Toggle label="Send e-mails" checked={sendEmails} onChange={(event) => setSendEmails(event.target.checked)} />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements | The visible name of the switch, shown next to it. It says what the switch controls and does not change with the state. A switch with no `label` needs `aria-label` |
+| `checked` and `onChange` | The HTML attribute and the React event | The app holds the state: `checked` is `true` when the switch is on |
+| `defaultChecked` | `true`, `false` | The state the switch starts in, when the app does not hold the state |
+| `disabled` | The HTML attribute | The switch cannot get focus and cannot be changed |
+
+- Main native element: an `<input type="checkbox" role="switch">`. Every other prop (`name`, `value`, `id`) and `ref` go to it.
+- `className` goes to the outermost element, a `<label>` that holds the switch and its text. The inner classes are `tui-toggle__input`, `tui-toggle__track`, `tui-toggle__thumb`, `tui-toggle__check` and `tui-toggle__label`. The switch has its size in `em`, so a font size on the outermost element changes its size.
+- Keyboard: Tab moves the focus to it, Space changes it. A click on the label also changes it.
+- Screen reader: the role `switch` with the state of the checkbox, read as "on" or "off".
+- A person who cannot see colors still sees the state: the circle is on the left when off, and on the right with a check mark when on.
+- It has no `"use client"`: it also renders in a Server Component. With `onChange`, the file of the app that gives the function is a Client Component.
 
 ## Styling on top
 

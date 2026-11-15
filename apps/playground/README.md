@@ -132,3 +132,15 @@ Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16p
 | Disabled field: background, text, border | `rgb(243, 243, 244)`, `rgb(15, 25, 40)`, `rgb(207, 209, 212)` | `rgb(39, 48, 62)`, `rgb(243, 243, 244)`, `rgb(63, 71, 83)` |
 
 Every `<label>` on the page has a `for` equal to the `id` of its field. The field with `className="max-w-40"` is `160px` wide, and the others are `448px` wide: the class of the app is on the outermost element and wins.
+
+### Toggle (TOR-1012)
+
+The track is the long rounded part of the switch. The thumb is the circle that moves inside it.
+
+| State | Light theme | Dark theme |
+|---|---|---|
+| Off: track, border, thumb | `rgb(255, 255, 255)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(15, 25, 40)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` |
+| On: track, border, thumb | `rgb(47, 111, 20)`, `rgb(47, 111, 20)`, `rgb(255, 255, 255)` | `rgb(126, 195, 109)`, `rgb(126, 195, 109)`, `rgb(15, 25, 40)` |
+| Disabled: track, border, thumb, label | `rgb(243, 243, 244)`, `rgb(207, 209, 212)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)`, `rgb(159, 163, 169)`, `rgb(159, 163, 169)` |
+
+Off, the thumb has no `transform` and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.

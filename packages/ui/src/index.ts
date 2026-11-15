@@ -12,3 +12,6 @@ export type { ButtonProps, ButtonSize, ButtonVariant } from "./button";
 
 export { Input } from "./input";
 export type { InputProps } from "./input";
+
+export { Toggle } from "./toggle";
+export type { ToggleProps } from "./toggle";

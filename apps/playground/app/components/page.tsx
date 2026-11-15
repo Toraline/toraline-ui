@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button, Input, buttonSizes, buttonVariants } from "@toraline/ui";
+import { Button, Input, Toggle, buttonSizes, buttonVariants } from "@toraline/ui";
 import { ThemeToggle } from "@toraline/ui/theme";
 
 /**
@@ -89,6 +89,23 @@ export default function ComponentsPage() {
             className="max-w-40"
           />
         </div>
+      </Section>
+
+      <Section title="Toggle">
+        <Row label="Off and on. Press one to change it">
+          <Toggle label="Starts off" name="off" />
+          <Toggle label="Starts on" name="on" defaultChecked />
+        </Row>
+        <Row label="Disabled">
+          <Toggle label="Disabled, off" name="disabled-off" disabled />
+          <Toggle label="Disabled, on" name="disabled-on" disabled defaultChecked />
+        </Row>
+        <Row label="With no visible label (aria-label)">
+          <Toggle aria-label="Send e-mails" name="no-label" />
+        </Row>
+        <Row label="With a class of the app (text-lg)">
+          <Toggle label="Larger" name="app-class" className="text-lg" />
+        </Row>
       </Section>
     </main>
   );
