@@ -19,4 +19,5 @@
 @layer theme, base, components, utilities;
 
 @import "./button.css";
+@import "./input.css";
 @import "./theme-toggle.css";

@@ -1,0 +1,76 @@
+/* The styles of Input: the label, the field and the error message. */
+@layer components {
+  .tui-input {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1);
+    font-family: var(--font-body);
+  }
+
+  .tui-input__label {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .tui-input__field {
+    width: 100%;
+    padding: calc(var(--spacing) * 3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.5;
+  }
+
+  .tui-input__field::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+  }
+
+  .tui-input__field:hover {
+    border-color: var(--color-text);
+  }
+
+  .tui-input__field:focus-visible {
+    border-color: var(--color-primary);
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Error: the border has the danger color, also while the field has the focus. */
+  .tui-input__field[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+
+  .tui-input__field:disabled {
+    border-color: var(--color-border);
+    background-color: var(--color-surface-muted);
+    cursor: not-allowed;
+  }
+
+  .tui-input__error {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    margin: 0;
+    color: var(--color-danger);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .tui-input__error-icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tui-input__field {
+      transition: border-color 0.15s;
+    }
+  }
+}

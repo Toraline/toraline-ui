@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -122,6 +122,26 @@ import { Button } from "@toraline/ui";
 - Screen reader: a loading button has `aria-busy="true"` and `aria-disabled="true"`. It keeps the keyboard focus, so a person who pressed it with the keyboard does not lose their place.
 - The lists `buttonVariants` and `buttonSizes` and the types `ButtonProps`, `ButtonVariant` and `ButtonSize` are exported.
 - It is a Client Component, because it has a click handler of its own.
+
+### `Input`
+
+```tsx
+import { Input } from "@toraline/ui";
+
+<Input label="Title" name="title" error={titleError} />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements | The visible name of the field, shown above it. A click on it moves the focus to the field. A field with no `label` needs `aria-label` |
+| `error` | Text or elements | The error message, shown under the field with an icon. When it is given, the field has the danger color on its border |
+| `disabled` | The HTML attribute | The field cannot get focus and cannot be changed |
+| `id` | Text | Optional. The component makes an id when it is missing |
+
+- Main native element: the `<input>`. Every other prop (`name`, `value`, `defaultValue`, `onChange`, `type`, `placeholder`, `required`) and `ref` go to it.
+- `className` goes to the outermost element, a `<div>` that holds the label, the field and the message. The inner classes are `tui-input__label`, `tui-input__field`, `tui-input__error` and `tui-input__error-icon`.
+- Screen reader: the label is a `<label>` linked to the field with `for` and `id`. With an error, the field has `aria-invalid="true"`, and `aria-describedby` points to the message, so the message is read with the field.
+- It has no `"use client"`: it also renders in a Server Component.
 
 ## Styling on top
 

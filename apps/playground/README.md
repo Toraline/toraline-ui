@@ -119,3 +119,16 @@ The page was then opened in a browser. The colors below were read with `getCompu
 | Loading `primary` | The same as `primary` | The same as `primary` |
 
 Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The spinner of a loading button has the animation `tui-button-spin`. The button with `className="rounded-full"` has a fully round corner, where the library's style gives `8px`: the class of the app wins.
+
+### Input (TOR-1011)
+
+| Part | Light theme | Dark theme |
+|---|---|---|
+| Field: background, text, border | `rgb(255, 255, 255)`, `rgb(15, 25, 40)`, `rgb(111, 117, 126)` | `rgb(15, 25, 40)`, `rgb(243, 243, 244)`, `rgb(111, 117, 126)` |
+| Label | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
+| Placeholder | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
+| Field with an error: border | `rgb(217, 45, 45)` | `rgb(244, 120, 120)` |
+| Error message | `rgb(217, 45, 45)` | `rgb(244, 120, 120)` |
+| Disabled field: background, text, border | `rgb(243, 243, 244)`, `rgb(15, 25, 40)`, `rgb(207, 209, 212)` | `rgb(39, 48, 62)`, `rgb(243, 243, 244)`, `rgb(63, 71, 83)` |
+
+Every `<label>` on the page has a `for` equal to the `id` of its field. The field with `className="max-w-40"` is `160px` wide, and the others are `448px` wide: the class of the app is on the outermost element and wins.

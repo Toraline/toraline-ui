@@ -9,3 +9,6 @@ export const packageName = "@toraline/ui";
 
 export { Button, buttonSizes, buttonVariants } from "./button";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./button";
+
+export { Input } from "./input";
+export type { InputProps } from "./input";

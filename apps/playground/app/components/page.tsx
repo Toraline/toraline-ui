@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button, buttonSizes, buttonVariants } from "@toraline/ui";
+import { Button, Input, buttonSizes, buttonVariants } from "@toraline/ui";
 import { ThemeToggle } from "@toraline/ui/theme";
 
 /**
@@ -69,6 +69,26 @@ export default function ComponentsPage() {
             Round
           </Button>
         </Row>
+      </Section>
+
+      <Section title="Input">
+        <div className="mt-4 grid max-w-md gap-4">
+          <Input label="Empty" name="empty" />
+          <Input label="With a placeholder" name="placeholder" placeholder="Order number" />
+          <Input label="With a value" name="value" defaultValue="Order 12" />
+          <Input
+            label="With an error"
+            name="error"
+            defaultValue="Order"
+            error="The order number is required."
+          />
+          <Input label="Disabled" name="disabled" defaultValue="Order 12" disabled />
+          <Input
+            label="With a class of the app (max-w-40)"
+            name="app-class"
+            className="max-w-40"
+          />
+        </div>
       </Section>
     </main>
   );
