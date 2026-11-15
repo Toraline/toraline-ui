@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { THEME_COOKIE_NAME, resolveTheme } from "@toraline/tokens";
-import { ThemeProvider } from "@toraline/ui/theme";
+import { THEME_COOKIE_NAME, resolveTheme } from "@toraline.tech/tokens";
+import { ThemeProvider } from "@toraline.tech/ui/theme";
 import { themes } from "../theme.config";
 import { fraunces } from "./fonts";
 import "./globals.css";

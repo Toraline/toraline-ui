@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Toggle } from "@toraline/ui";
+import { Toggle } from "@toraline.tech/ui";
 
 /**
  * A switch: a control that is on or off.

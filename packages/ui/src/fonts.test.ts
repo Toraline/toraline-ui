@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { darkTheme, lightTheme, primitives } from "@toraline/tokens";
+import { darkTheme, lightTheme, primitives } from "@toraline.tech/tokens";
 
 /**
  * The rule of TOR-1007: no library file names a font outside the tokens.

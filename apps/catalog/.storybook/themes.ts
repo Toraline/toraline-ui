@@ -1,4 +1,4 @@
-import { DEFAULT_THEMES } from "@toraline/tokens";
+import { DEFAULT_THEMES } from "@toraline.tech/tokens";
 
 /**
  * The themes the catalog can show, in the order of the toolbar control.

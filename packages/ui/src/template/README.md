@@ -1,6 +1,6 @@
 # Template of a component
 
-This folder is the starting point of a new component of `@toraline/ui`. `Example` is a small, working component: it is type checked, linted and tested with the rest of the package. It is not exported from the package, so an app cannot import it.
+This folder is the starting point of a new component of `@toraline.tech/ui`. `Example` is a small, working component: it is type checked, linted and tested with the rest of the package. It is not exported from the package, so an app cannot import it.
 
 The rules a component follows are in [`packages/ui/README.md`](../../README.md#rules-every-component-follows).
 

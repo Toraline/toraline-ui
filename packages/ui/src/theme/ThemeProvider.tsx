@@ -8,7 +8,7 @@ import {
   THEME_COOKIE_NAME,
   resolveTheme,
   serializeThemeCookie,
-} from "@toraline/tokens";
+} from "@toraline.tech/tokens";
 
 /** What useTheme returns. */
 export type ThemeContextValue = {

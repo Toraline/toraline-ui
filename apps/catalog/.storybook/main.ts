@@ -57,8 +57,8 @@ const config: StorybookConfig = {
         // The catalog reads the source of the two packages, not their built
         // files. So the catalog opens with no build before it, a change in a
         // component shows at once, and the table of props reads the comments
-        // of the source. The CSS imports ("@toraline/tokens/css",
-        // "@toraline/ui/styles.css") are not in this list: they already
+        // of the source. The CSS imports ("@toraline.tech/tokens/css",
+        // "@toraline.tech/ui/styles.css") are not in this list: they already
         // point to files that need no build.
         alias: [
           {

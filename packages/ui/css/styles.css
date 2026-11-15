@@ -1,8 +1,8 @@
 /*
- * The styles of the components of @toraline/ui.
+ * The styles of the components of @toraline.tech/ui.
  *
  * Each component has one file in this folder, and this file imports them all.
- * An app imports only this file: @import "@toraline/ui/styles.css".
+ * An app imports only this file: @import "@toraline.tech/ui/styles.css".
  *
  * Every rule is inside the cascade layer "components". A cascade layer is a
  * named group of CSS rules with a fixed priority. Tailwind CSS puts its
@@ -13,7 +13,7 @@
  * The first line gives the layers the same order Tailwind CSS gives them, so
  * the order is the same when this file loads before Tailwind CSS.
  *
- * The rules use only level 2 tokens of @toraline/tokens. A test
+ * The rules use only level 2 tokens of @toraline.tech/tokens. A test
  * (src/styles.test.ts) checks the rules of this folder.
  */
 @layer theme, base, components, utilities;

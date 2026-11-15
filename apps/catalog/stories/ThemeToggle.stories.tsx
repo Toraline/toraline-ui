@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ThemeToggle } from "@toraline/ui/theme";
+import { ThemeToggle } from "@toraline.tech/ui/theme";
 
 /** A half-filled circle, used as the icon of the theme button. It has the color of the text. */
 function ContrastIcon() {

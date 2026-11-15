@@ -4,9 +4,9 @@
     "types": ["node", "vite/client"],
     "allowImportingTsExtensions": true,
     "paths": {
-      "@toraline/tokens": ["../../packages/tokens/src/index.ts"],
-      "@toraline/ui": ["../../packages/ui/src/index.ts"],
-      "@toraline/ui/theme": ["../../packages/ui/src/theme/index.ts"]
+      "@toraline.tech/tokens": ["../../packages/tokens/src/index.ts"],
+      "@toraline.tech/ui": ["../../packages/ui/src/index.ts"],
+      "@toraline.tech/ui/theme": ["../../packages/ui/src/theme/index.ts"]
     }
   },
   "include": [".storybook", "stories", "vitest.projects.ts"]

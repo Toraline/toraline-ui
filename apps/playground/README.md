@@ -17,14 +17,14 @@ npm run dev -w @toraline/playground         # development server on http://local
 |---|---|
 | TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
 | TOR-1007 | The headings use the font Fraunces. The rest of the text uses the default font of the library |
-| TOR-997 | The page `/components` shows every component of `@toraline/ui` with every variant and state. The theme button on that page changes the theme |
+| TOR-997 | The page `/components` shows every component of `@toraline.tech/ui` with every variant and state. The theme button on that page changes the theme |
 | TOR-1008 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-brand` is a color this app added. Changing the theme changes all of them |
 
 ## The files
 
 | File | What it is |
 |---|---|
-| `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline/tokens` |
+| `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline.tech/tokens` |
 | `scripts/write-theme-css.ts` | Runs `createTailwindTheme` and `createTheme` on the inputs and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
 | `postcss.config.mjs` | Tells Next.js to run Tailwind CSS 4 |
 | `app/fonts.ts` | Loads the font Fraunces with `next/font/local` into the CSS variable `--font-fraunces` |
@@ -96,7 +96,7 @@ The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a to
 
 ## How the components were checked
 
-The page `/components` is a Server Component. It imports the components from `@toraline/ui`. The build of this app fails when a component that needs the browser has no `"use client"`.
+The page `/components` is a Server Component. It imports the components from `@toraline.tech/ui`. The build of this app fails when a component that needs the browser has no `"use client"`.
 
 Commands, run from the repository root on 2026-11-15 (Next.js 16.4.6, Tailwind CSS 4.3.5):
 

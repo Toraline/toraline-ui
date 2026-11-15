@@ -2,13 +2,13 @@ import { useEffect, useLayoutEffect } from "react";
 import type { ReactNode } from "react";
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { useGlobals } from "storybook/preview-api";
-import { THEME_ATTRIBUTE, resolveTheme } from "@toraline/tokens";
-import { ThemeProvider, useTheme } from "@toraline/ui/theme";
+import { THEME_ATTRIBUTE, resolveTheme } from "@toraline.tech/tokens";
+import { ThemeProvider, useTheme } from "@toraline.tech/ui/theme";
 
 // The tokens and the two themes of the library.
-import "@toraline/tokens/css";
+import "@toraline.tech/tokens/css";
 // The styles of the library's components.
-import "@toraline/ui/styles.css";
+import "@toraline.tech/ui/styles.css";
 // The CSS of the catalog itself.
 import "./preview.css";
 

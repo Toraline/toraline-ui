@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { createTheme } from "@toraline/tokens";
-import type { ThemeInput } from "@toraline/tokens";
-import { Button, Input } from "@toraline/ui";
-import { ThemeToggle, useTheme } from "@toraline/ui/theme";
+import { createTheme } from "@toraline.tech/tokens";
+import type { ThemeInput } from "@toraline.tech/tokens";
+import { Button, Input } from "@toraline.tech/ui";
+import { ThemeToggle, useTheme } from "@toraline.tech/ui/theme";
 import "./guide-examples.css";
 
 /**

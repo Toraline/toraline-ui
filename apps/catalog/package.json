@@ -10,8 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@toraline/tokens": "*",
-    "@toraline/ui": "*",
+    "@toraline.tech/tokens": "*",
+    "@toraline.tech/ui": "*",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

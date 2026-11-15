@@ -1,4 +1,4 @@
-import type { ThemeInput } from "@toraline/tokens";
+import type { ThemeInput } from "@toraline.tech/tokens";
 
 /** The heading font of this app: the font that app/fonts.ts loads, then fonts every device has. */
 const headingFont = "var(--font-fraunces), Georgia, serif";

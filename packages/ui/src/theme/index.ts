@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * @toraline/ui/theme
+ * @toraline.tech/ui/theme
  *
  * The React parts of the theme: the provider, the hook and the toggle.
  * They run in the browser, so this entry is a Client Component entry

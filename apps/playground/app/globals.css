@@ -1,8 +1,8 @@
 /* Tailwind CSS 4. */
 @import "tailwindcss";
 /* The Tailwind preset of the library: the tokens, the two themes, and one class for every level 2 token. */
-@import "@toraline/tokens/css/tailwind.css";
+@import "@toraline.tech/tokens/css/tailwind.css";
 /* The themes of this app and the classes of the colors it added, built from theme.config.ts. */
 @import "./theme.generated.css";
 /* The styles of the library's components. */
-@import "@toraline/ui/styles.css";
+@import "@toraline.tech/ui/styles.css";

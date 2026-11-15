@@ -88,7 +88,7 @@ test.each([lightTheme, darkTheme])(
       ["color-danger", "color-surface"],
       ["color-danger-foreground", "color-danger"],
       ["color-danger-foreground", "color-danger-hover"],
-      // Pairs the components of @toraline/ui use (TOR-997).
+      // Pairs the components of @toraline.tech/ui use (TOR-997).
       ["color-primary", "color-surface-raised"],
       ["color-primary", "color-surface-muted"],
       ["color-text-muted", "color-surface-raised"],
