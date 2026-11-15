@@ -4,15 +4,15 @@ The design tokens and the themes of the Toraline component library. A design tok
 
 ## Installation
 
-**The package is not published yet.** Today (2026-11-15) `@toraline.tech/tokens` is not on the npm registry. The first version will be `2.0.0-beta.0`.
+**The package is not published yet.** Today (2026-11-15) `@toraline.tech/tokens` is not on the npm registry. The first version will be `0.1.0`.
 
 After the first release:
 
 ```bash
-npm install @toraline.tech/tokens@next
+npm install @toraline.tech/tokens
 ```
 
-- `@next` selects the newest test version. After the full release `2.0.0`, leave `@next` out.
+- The library is at version `0.x`: tokens may still change between versions.
 - An app that also uses `@toraline.tech/ui` installs both packages in the same version.
 - The package needs no React. Tailwind CSS 4 is optional.
 - The package has ES modules only (files read with `import`), with type files for TypeScript.

@@ -4,7 +4,7 @@ The component library of Toraline: styled React components, with configurable th
 
 **To use the library in an app, read the [guide](docs/guide.md):** install it, build the theme of the app, and style on top of a component.
 
-**The new packages are not published yet.** `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be `2.0.0-beta.0`. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
+**The new packages are not published yet.** `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be `0.1.0`. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 **This is the branch `main`**, the new library (version 2). Until 2026-11-15 it was named `v2`. The old library is unchanged in [`legacy/`](legacy/), and on the branch `old-package`, which was named `main` until that day. Its package is `@toraline/toraline-ui`.
 
@@ -35,7 +35,7 @@ make catalog     # open the catalog (Storybook) on http://localhost:6006
 make catalog-build # build the static catalog into apps/catalog/storybook-static
 make catalog-test  # run every story as a test, in each theme, with the accessibility check
 make pack        # build the two packages, write their tarballs into .pack/tarballs/ and list the files of each
-make version VERSION=2.0.0-beta.1  # set the version of the two packages
+make version VERSION=0.1.1  # set the version of the two packages
 make doctor      # check the machine and the project
 ```
 

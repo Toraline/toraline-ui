@@ -12,6 +12,14 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The first version is `0.1.0`, not `2.0.0-beta.0` (TOR-1193)
+- Decision: "V2" is only the internal name of the rebuilt library. Its versions are `0.x`. The first one is `0.1.0`. `1.0.0` is released after the full rebrand, which is based on the feedback of the apps that use the library. The earlier entry that names `2.0.0-beta.0` is replaced by this one.
+- Why: the library is a pre-release: it is tested in Toraline's internal apps and not used for real. A version that starts with `0` says that anything may still change.
+- Consequence: `0.1.0` has no dash, so the release workflow and the publish guard give it the npm tag `latest`, and `npm install @toraline.tech/ui` with no version installs it. The docs no longer tell an app to use `@next`. A version with a dash still gets the tag `next`.
+- Consequence: while the version is `0.x`, a change that breaks an app raises the middle number (`0.1.1` becomes `0.2.0`).
+- The release workflow is now named "Release".
+- Decided by: Juliana, 2026-11-15.
+
 ## 2026-11-15 - The branch `v2` is renamed `main`, and the old `main` is renamed `old-package` (TOR-1191)
 - Decision: on GitHub, the branch with the 2023 code (`main` until today) is now `old-package`. The branch with version 2 (`v2` until today) is now `main` and is the default branch. Earlier entries of this file say `v2` and `main` with their old meaning.
 - Why: GitHub starts a workflow by hand only when its file is on the default branch. The release workflow was only on `v2`, so the first release could not start.

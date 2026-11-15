@@ -45,7 +45,7 @@ pack: ## Build the two published packages, write their tarballs into .pack/ and 
 	@npm pack --workspace @toraline.tech/tokens --workspace @toraline.tech/ui --pack-destination .pack/tarballs
 	@ls -l .pack/tarballs
 
-version: ## Set the version of the two published packages (VERSION=2.0.0-beta.1)
+version: ## Set the version of the two published packages (VERSION=0.1.1)
 	@node scripts/set-version.mjs "$(VERSION)"
 	@npm install --no-audit --no-fund
 
