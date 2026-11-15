@@ -62,3 +62,6 @@ export type { CheckboxControlProps, CheckboxProps } from "./checkbox/index.js";
 
 export { StatusBadge, statusBadgeVariants } from "./status-badge/index.js";
 export type { StatusBadgeProps, StatusBadgeVariant } from "./status-badge/index.js";
+
+export { CountBadge, countBadgeVariants } from "./count-badge/index.js";
+export type { CountBadgeProps, CountBadgeVariant } from "./count-badge/index.js";

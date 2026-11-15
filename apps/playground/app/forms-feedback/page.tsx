@@ -3,12 +3,14 @@ import type { ReactNode } from "react";
 import {
   Checkbox,
   CheckboxControl,
+  CountBadge,
   DecimalInput,
   Field,
   Select,
   StatusBadge,
   Textarea,
   controlSizes,
+  countBadgeVariants,
   parseDecimalInput,
   statusBadgeVariants,
 } from "@toraline.tech/ui";
@@ -172,6 +174,19 @@ export default function FormsFeedbackPage() {
         <Row label="With a dot">
           {statusBadgeVariants.map((variant) => (
             <StatusBadge key={variant} variant={variant} label={variant} dot />
+          ))}
+        </Row>
+      </Section>
+
+      <Section title="CountBadge">
+        <Row label="Variants">
+          {countBadgeVariants.map((variant) => (
+            <CountBadge key={variant} variant={variant} count={3} label={`3 pending orders, ${variant}`} />
+          ))}
+        </Row>
+        <Row label="Counts">
+          {[0, 42, 1234].map((count) => (
+            <CountBadge key={count} count={count} label={`${count} messages`} />
           ))}
         </Row>
       </Section>

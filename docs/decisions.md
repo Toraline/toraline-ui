@@ -57,6 +57,13 @@ Format of one entry:
 - Decision: the component also accepts `className`, the other props of `<span>` and `ref` (Intraweb's accepts none), as every component of the library.
 - Alternatives: `children` for the text; a new token for the grey of the neutral dot.
 
+### CountBadge (TOR-1151)
+- Decision: `CountBadge` has the props (`count`, `label`, `variant`, `className`), the 2 variants and the class lists of Intraweb's `components/ui/count-badge.tsx`. The text is `font-heading text-xs/4 font-medium`, the computed values of the text style `label-sm`.
+- Decision (the name for a screen reader): the number that is shown is a `<span aria-hidden="true">`, and `label` is a second `<span>` with the class `sr-only` (on the page, not shown). Intraweb writes `aria-label={label}` on the outer `<span>`.
+- Why: the ARIA rules do not allow `aria-label` on an element with no role, and a screen reader does not always read it there; then the person hears only "3". Text that is on the page is always read. The box of the badge does not change: an element with `sr-only` takes no room. The accessibility check of the story tests (axe-core) accepts both ways.
+- Decision: the library does not shorten a long number (`99+`) and does not hide the badge for 0. Intraweb's does neither.
+- Alternatives: `role="img"` with `aria-label` (a screen reader then says "image"); `aria-label` as in Intraweb.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

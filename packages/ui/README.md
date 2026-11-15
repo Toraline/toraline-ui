@@ -692,3 +692,26 @@ import { StatusBadge } from "@toraline.tech/ui";
 - The text must say the state by itself. The color and the dot are decoration; a screen reader skips the dot.
 - Main native element: the `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The dot has `data-slot="dot"`.
 - The list `statusBadgeVariants` and the types `StatusBadgeProps` and `StatusBadgeVariant` are exported. It has no `"use client"`.
+
+### `CountBadge`
+
+A small pill with a number: how many things wait, for example next to the text of a tab or a link of a menu.
+
+```tsx
+import { CountBadge } from "@toraline.tech/ui";
+
+<CountBadge count={pendingOrders} label={`${pendingOrders} pending orders`} />
+<CountBadge count={12} label="12 messages not read" variant="brand" />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `count` | A number, required | The number the badge shows |
+| `label` | Text, required | What the number means, with the number in it (`"3 pending orders"`). It is not shown. A screen reader reads it in the place of the number |
+| `variant` | `"warning"` (default), `"brand"` | The look. `warning`: things that need attention. `brand`: a plain count, in the color of the main action |
+
+- The badge is 20 pixels high and at least 20 pixels wide: one digit is a circle, and a longer number makes it wider. The text is 12 pixels in the weight 500 of the heading font, with digits of the same width.
+- Screen reader: the number that is shown has `aria-hidden="true"`, and `label` is on the page as text that is not shown (`sr-only`). Intraweb writes `label` as `aria-label` on the `<span>`; a screen reader does not always read `aria-label` on an element with no role.
+- The app writes `label`, in its own language. The library does not format the number: `count={1234}` shows `1234`.
+- Main native element: the outermost `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The inner parts have `data-slot="count"` and `data-slot="label"`.
+- The list `countBadgeVariants` and the types `CountBadgeProps` and `CountBadgeVariant` are exported. It has no `"use client"`.

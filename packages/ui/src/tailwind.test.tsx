@@ -30,10 +30,12 @@ import {
 import {
   Checkbox,
   CheckboxControl,
+  CountBadge,
   DecimalInput,
   Select,
   StatusBadge,
   Textarea,
+  countBadgeVariants,
   statusBadgeVariants,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
@@ -191,6 +193,9 @@ async function renderEveryComponent(): Promise<string[]> {
       <CheckboxControl aria-label="Paid, changed" changed />
       {statusBadgeVariants.map((variant) => (
         <StatusBadge key={variant} variant={variant} label="State" dot />
+      ))}
+      {countBadgeVariants.map((variant) => (
+        <CountBadge key={variant} variant={variant} count={3} label="3 pending orders" />
       ))}
     </ThemeProvider>,
   );
