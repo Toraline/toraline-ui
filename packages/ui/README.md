@@ -657,3 +657,47 @@ A dialog above the page, for a task that needs the whole attention. The app rend
 - The dialog is rendered in `<body>` (a portal), so it renders nothing on the server.
 - The list `modalSizes` and the types `ModalProps` and `ModalSize` are exported.
 - It is a Client Component. `onClose` is a function, so the file of the app that renders a Modal is a Client Component too. `title`, `actions` and `children` can be elements that a Server Component made.
+
+### `Drawer`
+
+```tsx
+"use client";
+import { Button, Drawer } from "@toraline.tech/ui";
+
+{isOpen ? (
+  <Drawer
+    title="Order 12"
+    onClose={close}
+    footer={
+      <Button type="submit" form="order-form">
+        Save
+      </Button>
+    }
+  >
+    <form id="order-form">...</form>
+  </Drawer>
+) : null}
+```
+
+A panel on the right side of the screen that leaves the page next to it visible and usable, for example the details of the row a person chose in a list. The app renders the Drawer while it is open, and stops rendering it in `onClose`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the panel. It is also its name for a screen reader |
+| `onClose` | A function. Required | Called when a person closes the panel: the button with the cross or the Escape key |
+| `children` | Elements | The content. It scrolls; the header and the footer stay in place |
+| `footer` | Elements | Stays at the bottom of the panel, outside the part that scrolls. Its content is lined up to the right |
+| `actions` | Elements | Buttons or links next to the title, before the button that closes |
+| `wide` | `true`, `false` (default) | `true`: the panel is 896 pixels wide at most, for a form with a table. `false`: 512 pixels |
+| `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+
+- Focus: when the panel opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the panel itself. When it closes, the focus goes back to the element that had it before.
+- Keyboard: Tab and Shift+Tab stay inside the panel while the focus is in it; after the last element (in the footer) comes the first. Escape closes the panel. With several overlays open, Escape closes only the newest one.
+- Pointer: the panel has no dark layer. A person can still click the page next to it, and the focus then stays where they clicked.
+- Screen reader: the panel has `role="dialog"`, `aria-modal="false"` and `aria-labelledby` with the id of its title.
+- Content with nothing to stop at (only text) is in the Tab order itself, so a person who uses the keyboard can scroll it.
+- While the panel is open, `<body>` has the attribute `data-drawer-open` with the value `narrow` or `wide`. The library adds no style for it. An app that wants the page to make room writes its own rule, as Intraweb does: `body[data-drawer-open="narrow"] main { padding-right: 34rem; }`.
+- On a screen less than 768 pixels wide the panel covers the screen.
+- Main element: the `<div role="dialog">`, which is also the outermost element. `className`, every other prop and `ref` go to it. The parts have `data-slot`: `header`, `title`, `actions`, `body`, `footer`.
+- The panel is rendered in `<body>` (a portal), so it renders nothing on the server.
+- It is a Client Component. `onClose` is a function, so the file of the app that renders a Drawer is a Client Component too.

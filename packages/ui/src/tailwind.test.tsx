@@ -27,7 +27,7 @@ import {
   tabNavVariants,
 } from "./index";
 // Phase 9: overlays
-import { CloseButton, Modal, modalSizes } from "./index";
+import { CloseButton, Drawer, Modal, modalSizes } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -102,6 +102,17 @@ function OverlayExamples() {
         <Modal key={size} title={`A dialog, ${size}`} size={size} onClose={() => undefined}>
           The content
         </Modal>
+      ))}
+      {[false, true].map((wide) => (
+        <Drawer
+          key={String(wide)}
+          title={`A side panel, wide: ${wide}`}
+          wide={wide}
+          footer="The footer"
+          onClose={() => undefined}
+        >
+          The content
+        </Drawer>
       ))}
     </>
   );
@@ -347,6 +358,9 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["rounded-t-2xl", "md:rounded-xl"],
     ["pl-4", "md:pl-6"],
     ["p-4", "md:p-6"],
+    // Phase 9, Drawer: the same, for the footer and the width.
+    ["px-4", "md:px-6"],
+    ["w-full", "md:max-w-lg"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

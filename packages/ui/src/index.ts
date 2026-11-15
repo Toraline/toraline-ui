@@ -71,3 +71,6 @@ export type { CloseButtonProps } from "./close-button/index.js";
 
 export { Modal, modalSizes } from "./modal/index.js";
 export type { ModalProps, ModalSize } from "./modal/index.js";
+
+export { Drawer } from "./drawer/index.js";
+export type { DrawerProps } from "./drawer/index.js";

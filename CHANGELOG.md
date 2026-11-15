@@ -51,6 +51,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - `useAnchoredPanel`: a hook that places a floating panel (a menu, a popover, a filter) next to the button that opened it, on the other side when there is no room, and inside the window. `computeAnchoredPosition` is the same rule as a plain function.
 - CloseButton: the button with a cross that closes a dialog or a side panel. Its name for a screen reader is `"Close"` unless the app gives `aria-label`.
 - Modal: a dialog above the page, in the sizes `md`, `lg`, `xl` and `full`. The focus goes into it, Tab stays inside, Escape closes only the newest overlay, and the focus goes back to the element that opened it.
+- Drawer: a panel on the right side of the screen with a footer that stays at the bottom. It leaves the page next to it usable. It has the same 3 focus rules as Modal. While it is open, `<body>` has the attribute `data-drawer-open`.
 
 ## 0.1.0 (2026-11-15)
 

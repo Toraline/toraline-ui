@@ -12,6 +12,19 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Drawer: a side panel that leaves the page usable (TOR-1159)
+- Decision: `Drawer` has the elements, the classes and the rules of Intraweb's `Drawer` (`components/ui/overlay.tsx`): `footer`, `wide`, `actions`, no dark layer, `aria-modal="false"`, and the attribute `data-drawer-open` (`narrow` or `wide`) on `<body>` while it is open. The library ships no CSS for that attribute: making room for the panel is a rule of the layout of the app (Intraweb: `body[data-drawer-open="narrow"] main { padding-right: 34rem; }` from 1280 pixels).
+- Decision (the 3 focus rules of the ticket, for a panel that is not modal): the focus goes into the panel when it opens and back when it closes; Escape closes it; Tab and Shift+Tab stay inside the panel while the focus is in it. The pointer is not held: a click on the page next to the panel works, and the focus then stays on the page. The focus that lands outside is not brought back, unlike in Modal.
+- Why: the ticket asks for the same 3 rules as Modal, and Intraweb's Drawer exists so that the list next to it stays usable. Base UI has the same mode for its dialog (`modal="trap-focus"`). `aria-modal` stays `"false"`, because the page is not blocked.
+- Accessibility problems of Intraweb's Drawer, fixed here:
+  1. The Tab key leaves the panel to the address bar of the browser, because the panel is the last element of `<body>`. Here it goes around inside the panel.
+  2. Content that is only text and is taller than the panel cannot be scrolled with the keyboard in a browser that does not put a scrolling element in the Tab order (the rule `scrollable-region-focusable` of axe-core failed in the story "Long Content"). Here such content gets `tabindex="0"` and the focus ring.
+  3. The same server problem as Modal (`document.body` while the server renders).
+- Decision: `wide` stays a true or false prop, as in Intraweb, and is written as `data-wide`. It is not a list of sizes: there are 2 widths, and Intraweb's screens write `wide`.
+- States of the list "States to check": rest, open and closed (stories "Closed", "Open"); keyboard focus (story "Keyboard", tests); hover, pressed, disabled, read-only, loading, error, selected: do not apply to a panel; empty: no footer (story "Without Footer"); long content (story "Long Content"); right-to-left: considered, not supported, the panel is always on the right (`right-0`, `md:rounded-l-2xl`), as in Intraweb; both themes: every story test; reduced motion: the panel has no animation.
+- Alternatives: holding the focus as in Modal (`aria-modal="true"`), which would block the list; no Tab rule at all, as in Intraweb; a list `drawerSizes`.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Modal and CloseButton, and what every overlay that takes the focus shares (TOR-1158)
 - Decision: `Modal` has the elements, the classes and the rules of Intraweb's `Modal` (`components/ui/overlay.tsx`): the sizes `md`, `lg`, `xl`, `full` (default `lg`), the sheet at the bottom of a narrow screen, the dark layer that closes it, the page that does not scroll, the focus that goes to the element with `data-overlay-autofocus` or to the dialog, and Escape that closes only the newest overlay. The app renders the Modal while it is open, as in Intraweb. There is no prop `open`.
 - Decision: the shared code is in `packages/ui/src/shared/overlay/`. `use-overlay-layer.ts` has the list of open overlays, the focus on open and on close, Escape, and the Tab key. `OverlayHeader.tsx` is the header of Modal and Drawer.
