@@ -10,6 +10,7 @@ import {
   buttonVariants,
 } from "@toraline/ui";
 import { ThemeToggle } from "@toraline/ui/theme";
+import { SplitButtonExamples } from "./SplitButtonExamples";
 
 /**
  * The page of the components. It shows every component of @toraline/ui with
@@ -159,6 +160,10 @@ export default function ComponentsPage() {
             aria-label="Breadcrumb with next/link"
           />
         </Row>
+      </Section>
+
+      <Section title="SplitButton">
+        <SplitButtonExamples />
       </Section>
     </main>
   );

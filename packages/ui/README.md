@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle, Tabs, BreadCrumbs |
+| The components | `@toraline/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -221,6 +221,45 @@ import { BreadCrumbs } from "@toraline/ui";
 - Keyboard: Tab goes through the links. The current page is not a link and does not get focus.
 - Screen reader: a navigation region with an ordered list. The current page has `aria-current="page"`. The `/` between steps has `aria-hidden="true"`, so it is not read.
 - It has no `"use client"`: it also renders in a Server Component.
+
+### `SplitButton`
+
+A main button for the main action, and next to it a small button that opens a menu with more actions.
+
+```tsx
+"use client";
+import { SplitButton } from "@toraline/ui";
+
+<SplitButton
+  onClick={downloadAll}
+  menuPlacement="top"
+  items={[
+    { label: "Download the invoice", onSelect: downloadInvoice },
+    { label: "Send by e-mail", onSelect: sendByEmail },
+  ]}
+>
+  Download all
+</SplitButton>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `children` | Text or elements | The text of the main button |
+| `onClick` | A function | The main action |
+| `items` | A list of `{ label, onSelect, icon }` | The actions of the menu. `onSelect` is called when a person chooses the action. `icon` is optional and is shown before the text |
+| `menuPlacement` | `"bottom"` (default), `"top"` | Where the menu opens: under the buttons, or above them (upwards) |
+| `menuLabel` | Text. When missing: `"More options"` | The name a screen reader says for the button that opens the menu, and for the menu |
+| `disabled` | The HTML attribute | Disables both buttons |
+
+- Main native element: the main `<button>`. Every other prop and `ref` go to it.
+- `className` goes to the outermost element, a `<div>` that holds the two buttons and the menu. The inner classes are `tui-split-button__main`, `tui-split-button__trigger`, `tui-split-button__arrow`, `tui-split-button__menu`, `tui-split-button__item` and `tui-split-button__item-icon`.
+- Keyboard, on the button that opens the menu: Enter, Space and Down arrow open the menu with the focus on the first action. Up arrow opens it with the focus on the last action.
+- Keyboard, in the menu: the Up and Down arrows move between actions, and go around. Home goes to the first action, End to the last. A letter goes to the next action that starts with it. Enter and Space choose the action, close the menu and give the focus back to the button that opened the menu. Escape closes the menu and gives the focus back. Tab closes the menu and moves the focus to the next element of the page.
+- A press outside the component also closes the menu.
+- Screen reader: the button that opens the menu has `aria-haspopup="menu"` and `aria-expanded` (`"true"` while the menu is open). The menu has the role `menu`, and each action the role `menuitem`.
+- The menu sits above the page content and does not push it down. Limit: the menu does not move by itself when there is no room on the chosen side. The app chooses the side with `menuPlacement`.
+- The list `splitButtonMenuPlacements` and the types `SplitButtonProps`, `SplitButtonItem` and `SplitButtonMenuPlacement` are exported.
+- It is a Client Component, because it holds state. The actions are functions, so the file of the app that uses it is a Client Component too.
 
 ## Styling on top
 

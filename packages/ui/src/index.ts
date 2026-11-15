@@ -21,3 +21,10 @@ export type { TabItem, TabsProps } from "./tabs";
 
 export { BreadCrumbs } from "./breadcrumbs";
 export type { BreadCrumbsProps, Crumb } from "./breadcrumbs";
+
+export { SplitButton, splitButtonMenuPlacements } from "./split-button";
+export type {
+  SplitButtonItem,
+  SplitButtonMenuPlacement,
+  SplitButtonProps,
+} from "./split-button";

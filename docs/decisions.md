@@ -12,6 +12,26 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Choices made in the 6 components (TOR-1010 to TOR-1015)
+- Decision (Button): the variants are `primary`, `secondary` and `danger`; the sizes are `sm`, `md` and `lg`. `type` is `"button"` when missing.
+- Why: the old Button had no variant and no size (it showed the fixed text "oi" on the primary color), so there was nothing to keep but the primary look. `danger` comes from the prop `isWarning` of the button on the old branch `v1`. A default of `"button"` stops a button inside a form from sending the form by accident.
+- Decision (Button): a loading button has `aria-busy` and `aria-disabled`, and its click handler stops the press. It does not get the HTML attribute `disabled`. A disabled button has the same quiet look in every variant: `--color-text-muted` on `--color-surface`.
+- Why: an element that gets `disabled` loses the keyboard focus, and a person who pressed the button with the keyboard would lose their place. The quiet look has a contrast of 4.64 (light) and 6.96 (dark); less opacity on the variant's colors would go below 4.5.
+- Decision (Input): the label is always above the field. The old label that sat inside the empty field and moved up on focus is not kept.
+- Why: the moving label hid the placeholder, had the muted color at rest, and needed a background equal to the surface behind the field.
+- Decision (Toggle): an `<input type="checkbox" role="switch">` inside a `<label>`. On is the success color, as in the old Toggle (green). The Enter key does not change it.
+- Why: the browser gives the Space key, the form value and the state for a screen reader. The WAI-ARIA switch pattern makes Enter optional, and Enter in a form field sends the form.
+- Decision (Tabs): a tab is selected as soon as it gets the focus with an arrow key (automatic activation). Only the content of the selected tab is on the page. The component is exported as `Tabs`.
+- Why: the WAI-ARIA tabs pattern recommends automatic activation when the content shows with no delay, and the content is already in memory. The old component also rendered only the selected content.
+- Decision (BreadCrumbs): the links are `<a>` elements unless the app gives `linkComponent`.
+- Why: the apps use Next.js, where a plain `<a>` loads the whole page again. The library must not import `next/link` itself, because it is not only for Next.js.
+- Decision (SplitButton): the option to open the menu upwards is the prop `menuPlacement` (`"bottom"` or `"top"`). The menu is placed with CSS (`position: absolute`) inside the component, sits above the page content, and does not move by itself when there is no room.
+- Why: the old remote branch `TR-82-Adicionar-opcao-de-abrir-o-botao-multiplo-pra-cima` was read on 2026-11-15: its SplitButton is the same file as on `main`, with no option to open upwards, so there was no old prop name or behaviour to keep. Placing the menu with CSS needs no dependency. Moving it by itself to stay on screen is the hard behaviour for which the conventions name Base UI.
+- Decision (SplitButton): the menu follows the WAI-ARIA menu button pattern. It always moves the focus into the menu when it opens, also after a mouse click.
+- Decision (all): a prop has the HTML or React name. So the old `url` is `href`, the old `mainButtonText` is `children`, the old `onClickMainButton` is `onClick`, the old `dropdownButtons` with `text`, `onClick`, `Icon` is `items` with `label`, `onSelect`, `icon`, and the old `component` and `isActive` of a tab are `content` and `defaultSelectedId`.
+- Alternatives: `ghost` and `link` button variants; `disabled` for a loading button; a floating label; a `<button role="switch">`; manual activation of tabs; a `renderLink` function; Base UI's menu for the split button.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Component conventions (TOR-1009)
 - Decision: the package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles. A component uses the native HTML element that has the behaviour (`<button>`, `<input type="checkbox" role="switch">`, `<label>`, `<a>`, `<nav>`). Behaviour that HTML does not have (arrow keys between tabs, the menu of the split button) is written by hand, following the WAI-ARIA Authoring Practices Guide. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a popup that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
 - Why: of the 6 components of phase 3, 4 need only native elements. The other 2 (tabs, menu button) are short patterns: a few key handlers each. A library would add a dependency to every app for that. Checked on 2026-11-15: `@base-ui/react` 1.9.0, `radix-ui` 1.8.1 and `react-aria-components` 1.22.1 all accept React 19. Base UI is the fallback because it is stable (1.x), has no styles, and its documentation covers every hard component named above. Its menu renders in another part of the page (a portal) and its documentation asks the app to add `isolation: isolate` to its root element; a hand-written menu needs no setup in the app.

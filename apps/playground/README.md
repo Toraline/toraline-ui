@@ -1,6 +1,6 @@
 # playground
 
-A Next.js 16 app, with React 19 and Tailwind CSS 4, that tests the tokens, the themes and the theme toggle of the library in a real page. It is private: it is never published. `make check` builds it.
+A Next.js 16 app, with React 19 and Tailwind CSS 4, that tests the tokens, the themes, the theme toggle and the components of the library in real pages. It is private: it is never published. `make check` builds it.
 
 ## How to run it
 
@@ -33,6 +33,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 | `app/globals.css` | Imports Tailwind CSS, the Tailwind preset of the library, the generated theme file and the component styles. It has no other CSS |
 | `app/page.tsx` | The test page. It has no CSS of its own: only classes |
 | `app/components/page.tsx` | The page of the components, at `/components` |
+| `app/components/SplitButtonExamples.tsx` | The examples of SplitButton. It is a Client Component, because the actions of a menu are functions |
 
 ## How "no flash of the wrong theme" was checked
 
@@ -164,3 +165,34 @@ With the keyboard, starting with the focus on the tab "All": Right arrow selecte
 | Current page | `rgb(15, 25, 40)`, font size `18px` | `rgb(243, 243, 244)`, font size `18px` |
 
 In the first example the links go to `/` and `/components`, and the element with `aria-current="page"` has the text "BreadCrumbs". The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's style gives `700`.
+
+### SplitButton (TOR-1015)
+
+Read while the menu of the first split button was open, with the focus on its second action:
+
+| Part | Light theme | Dark theme |
+|---|---|---|
+| Main button: background, text | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
+| Button that opens the menu, while the menu is open: background | `rgb(61, 0, 105)` | `rgb(208, 177, 255)` |
+| Menu: background, border | `rgb(255, 255, 255)`, `rgb(207, 209, 212)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)` |
+| Action: text | `rgb(94, 0, 161)` | `rgb(181, 147, 234)` |
+| Action with the focus: background, text | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
+| Disabled buttons: background, text | Not read | `rgb(15, 25, 40)`, `rgb(159, 163, 169)` |
+
+With the keyboard:
+
+1. Focus on the button that opens the first menu, then Enter: the menu opened under the buttons, and `aria-expanded` was `"true"`.
+2. Down arrow: the focus moved to "Download the contract".
+3. Escape: the menu closed, and the focus was back on the button that opened it.
+4. Focus on the button of the second split button (`menuPlacement="top"`), then Up arrow: the menu opened above the buttons (its bottom edge at `603px`, the top edge of the buttons at `611px`), with the focus on the last action, "Send by e-mail".
+5. Enter: the page showed "Last action: Send by e-mail", the menu closed, and the focus was back on the button that opened it.
+
+The split button with `className="shadow"` has the shadow of the theme.
+
+### The whole page
+
+- A new browser tab was opened on `/components`. The theme button, the first switch, the tab "Orders" and the first menu were pressed. Then `/` was opened. The browser console had no message on either page.
+- `curl -s -H 'Cookie: toraline-theme=dark' http://localhost:3987/components` answered with `<html lang="en" data-theme="dark" ...>`. The HTML of the server already had the 13 buttons, 6 fields, 6 switches, 2 rows of tabs, 3 current pages of breadcrumbs and 4 buttons that open a menu.
+- The server was stopped after the checks.
+
+Not checked: a real screen reader (VoiceOver or NVDA), and browsers other than the one built into the Claude desktop app.
