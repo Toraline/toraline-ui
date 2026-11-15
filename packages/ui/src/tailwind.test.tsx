@@ -26,6 +26,8 @@ import {
   splitButtonMenuPlacements,
   tabNavVariants,
 } from "./index";
+// Phase 9: overlays
+import { CloseButton, Modal, modalSizes } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -90,6 +92,20 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
 }
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** The overlays of phase 9, open. An overlay is rendered in <body>, outside the element that holds the other components. */
+function OverlayExamples() {
+  return (
+    <>
+      <CloseButton />
+      {modalSizes.map((size) => (
+        <Modal key={size} title={`A dialog, ${size}`} size={size} onClose={() => undefined}>
+          The content
+        </Modal>
+      ))}
+    </>
+  );
+}
 
 /** Renders every component in every variant, size and state, and returns every class on the page. */
 async function renderEveryComponent(): Promise<string[]> {
@@ -171,7 +187,9 @@ async function renderEveryComponent(): Promise<string[]> {
 
   const classNames = new Set<string>();
   const collect = () => {
-    for (const element of container.querySelectorAll("[class]")) {
+    // The whole <body>: the components are in "container", and an overlay is next to it.
+    expect(document.body.contains(container)).toBe(true);
+    for (const element of document.body.querySelectorAll("[class]")) {
       for (const className of (element.getAttribute("class") ?? "").split(/\s+/)) {
         if (className !== "") {
           classNames.add(className);
@@ -185,6 +203,9 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: `More options, ${menuPlacement}` }));
     collect();
   }
+  // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
+  render(<OverlayExamples />);
+  collect();
   return [...classNames];
 }
 
@@ -319,6 +340,13 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
     ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
+    // Phase 9, Modal: the classes of a wide screen win over the classes of a narrow one.
+    ["items-end", "md:items-start"],
+    ["max-h-[92dvh]", "md:max-h-none"],
+    ["overflow-y-auto", "md:overflow-visible"],
+    ["rounded-t-2xl", "md:rounded-xl"],
+    ["pl-4", "md:pl-6"],
+    ["p-4", "md:p-6"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

@@ -597,3 +597,63 @@ It returns `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (fo
 - The panel is placed again when the page scrolls, when the window changes its size and when the panel changes its size.
 - A press outside the panel and the button closes the panel. Escape closes it, gives the focus back to the button, and does not reach a Modal or a Drawer that is open under it.
 - The function `computeAnchoredPosition` computes the position from 3 rectangles, with no browser. It also has the sides `"right"` and `"left"`, which Tooltip uses.
+
+### `CloseButton`
+
+```tsx
+import { CloseButton } from "@toraline.tech/ui";
+
+<CloseButton aria-label="Fechar" onClick={close} />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `aria-label` | Text. When missing: `"Close"` | The name of the button for a screen reader |
+| `onClick` | A function | What the press does |
+| `variant`, `size`, `disabled` | The props of [`IconButton`](#iconbutton) | When missing: `ghost` and `md` (40 pixels) |
+
+- It is an `IconButton` whose icon is a cross, drawn by the library. Every other prop and `ref` go to its `<button>`.
+- It has no `"use client"`. The press is a function, so the file of the app that gives `onClick` is a Client Component.
+
+### `Modal`
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button, Modal } from "@toraline.tech/ui";
+
+export function NewClient() {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>New client</Button>
+      {isOpen ? (
+        <Modal title="New client" size="md" closeLabel="Close" onClose={() => setIsOpen(false)}>
+          ...
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+```
+
+A dialog above the page, for a task that needs the whole attention. The app renders the Modal while it is open, and stops rendering it in `onClose`. There is no prop `open`.
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title of the dialog. It is also its name for a screen reader |
+| `onClose` | A function. Required | Called when a person closes the dialog: the button with the cross, the Escape key, or a click on the dark layer |
+| `children` | Elements | The content |
+| `actions` | Elements | Buttons or links next to the title, before the button that closes |
+| `size` | `"md"`, `"lg"` (default), `"xl"`, `"full"` | The widest the dialog gets: 512, 672, 896 and 1152 pixels |
+| `closeLabel` | Text. When missing: `"Close"` | The name of the button that closes, for a screen reader |
+
+- Focus: when the dialog opens, the focus goes to the element inside it that has the attribute `data-overlay-autofocus`, or to the dialog itself. When it closes, the focus goes back to the element that had it before, for example the button that opened it.
+- Keyboard: Tab and Shift+Tab stay inside the dialog; after the last element comes the first. Escape closes the dialog. With several overlays open, Escape closes only the newest one.
+- Pointer: a click on the dark layer closes the dialog. A press that starts inside the dialog and ends on the dark layer (a person selects text) does not. The page behind does not scroll.
+- Screen reader: the dialog has `role="dialog"`, `aria-modal="true"` and `aria-labelledby` with the id of its title.
+- On a screen less than 768 pixels wide the dialog is a sheet at the bottom of the screen, at most 92% of its height.
+- Main element: the `<div role="dialog">`. `className`, every other prop and `ref` go to it. This is an exception to "className goes on the outermost element": the outermost element is the dark layer. The parts have `data-slot`: `backdrop`, `handle`, `header`, `title`, `actions`, `body`.
+- The dialog is rendered in `<body>` (a portal), so it renders nothing on the server.
+- The list `modalSizes` and the types `ModalProps` and `ModalSize` are exported.
+- It is a Client Component. `onClose` is a function, so the file of the app that renders a Modal is a Client Component too. `title`, `actions` and `children` can be elements that a Server Component made.

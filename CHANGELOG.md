@@ -49,6 +49,8 @@ The components get the shape of the same components of the app Intraweb: variant
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 - Overlays (phase 9, TOR-1125). An overlay is a part of the screen that opens above the page. They are written by hand, from the overlays of Intraweb, and an app sets up nothing for them.
 - `useAnchoredPanel`: a hook that places a floating panel (a menu, a popover, a filter) next to the button that opened it, on the other side when there is no room, and inside the window. `computeAnchoredPosition` is the same rule as a plain function.
+- CloseButton: the button with a cross that closes a dialog or a side panel. Its name for a screen reader is `"Close"` unless the app gives `aria-label`.
+- Modal: a dialog above the page, in the sizes `md`, `lg`, `xl` and `full`. The focus goes into it, Tab stays inside, Escape closes only the newest overlay, and the focus goes back to the element that opened it.
 
 ## 0.1.0 (2026-11-15)
 

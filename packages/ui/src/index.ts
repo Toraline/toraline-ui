@@ -65,3 +65,9 @@ export type {
   AnchoredStyle,
   UseAnchoredPanelOptions,
 } from "./anchored-panel/index.js";
+
+export { CloseButton } from "./close-button/index.js";
+export type { CloseButtonProps } from "./close-button/index.js";
+
+export { Modal, modalSizes } from "./modal/index.js";
+export type { ModalProps, ModalSize } from "./modal/index.js";

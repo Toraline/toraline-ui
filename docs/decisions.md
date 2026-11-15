@@ -12,6 +12,23 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - Modal and CloseButton, and what every overlay that takes the focus shares (TOR-1158)
+- Decision: `Modal` has the elements, the classes and the rules of Intraweb's `Modal` (`components/ui/overlay.tsx`): the sizes `md`, `lg`, `xl`, `full` (default `lg`), the sheet at the bottom of a narrow screen, the dark layer that closes it, the page that does not scroll, the focus that goes to the element with `data-overlay-autofocus` or to the dialog, and Escape that closes only the newest overlay. The app renders the Modal while it is open, as in Intraweb. There is no prop `open`.
+- Decision: the shared code is in `packages/ui/src/shared/overlay/`. `use-overlay-layer.ts` has the list of open overlays, the focus on open and on close, Escape, and the Tab key. `OverlayHeader.tsx` is the header of Modal and Drawer.
+- Accessibility problems of Intraweb's Modal, fixed here:
+  1. The Tab key leaves the dialog and reaches the page behind, while the dialog says `aria-modal="true"`. Here Tab and Shift+Tab stay inside, and the focus that lands outside in another way is brought back. An element inside another element with `data-overlay-panel` (a menu rendered in `<body>`) counts as inside.
+  2. `createPortal(..., document.body)` runs while the server renders, where `document` does not exist. Here the Modal renders nothing on the server and during hydration (`useSyncExternalStore`).
+- Decision: `closeLabel` (default `"Close"`) is the name of the button with the cross. Intraweb has the fixed text "Fechar". `CloseButton` has `aria-label` with the same default, and accepts the props of IconButton.
+- Why a default: the library has English defaults for the few names it needs (`"Breadcrumb"`, `"More options"`). The texts of the 2 confirmation dialogs have no default (entry of TOR-1160).
+- Decision: `className`, the other props and `ref` go to the dialog (`<div role="dialog">`), not to the dark layer, which is the outermost element. An app changes the width or the corners of the dialog, not the layer.
+- Decision: the title is `font-heading text-lg/7 font-medium`, the values of Intraweb's text style `heading-section` (the text style classes are in `rem`, see the entry of TOR-1143).
+- Decision: the small bar of the sheet has `bg-(--border-strong)`. Intraweb has `bg-slate-300`, a Tailwind color, which the rules of the styles do not allow. In the light theme it is the same color (`#d0d5dd`). In the dark theme the library shows `#414651`; Intraweb shows `#d0d5dd`, a light bar on a dark sheet.
+- Decision: `max-w-lg`, `max-w-2xl`, `max-w-4xl` and `max-w-6xl` are Tailwind's own container widths, not tokens, as a breakpoint is.
+- Not built in this ticket: the question before unsaved changes are lost. It comes with DiscardConfirmation (TOR-1160).
+- States of the list "States to check": rest, open and closed (stories "Closed", "Open"); keyboard focus (story "Keyboard", tests); hover, pressed: the buttons inside are Buttons; disabled, read-only, loading, error, selected: do not apply to a dialog; empty: a Modal with no content shows its header (test "is a dialog"); long content (story "Long Content"); right-to-left: considered, the header follows the direction of the page except its paddings (`pr-3`, `pl-4`); both themes: every story test; reduced motion: the Modal has no animation.
+- Alternatives: the HTML element `<dialog>` with `showModal()`, which keeps the focus inside by itself, rejected because Intraweb's Drawer leaves the page usable and its overlays stack with their own rules, and because the markup would differ; a prop `open`; `inert` on the rest of the page.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Shared positioning: `useAnchoredPanel` and `computeAnchoredPosition` (TOR-1157)
 - Decision: the code that places a floating panel is in `packages/ui/src/anchored-panel/`, in 2 files. `anchored-position.ts` computes the position from 3 rectangles (the anchor, the panel, the window) and has no React and no browser code. `use-anchored-panel.ts` is Intraweb's hook `useAnchoredPanel` (`components/ui/use-anchored-panel.ts`): open or closed, the 2 refs, the press outside, Escape, and placing again on scroll and resize.
 - Why 2 files: the rule "below, above, near the edge" is then tested with plain numbers. jsdom, the browser-like page of the unit tests, does not lay out a page. The hook is tested too, with a button and a panel whose sizes the test gives.
