@@ -5,7 +5,7 @@ The styled React components of the Toraline component library.
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline/ui/theme` | Built in phase 2 |
-| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle |
+| The components | `@toraline/ui` | Phase 3 (TOR-997) builds 6: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Built so far: Button, Input, Toggle, Tabs |
 | The styles of everything above | `@toraline/ui/styles.css` | One CSS file |
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
@@ -166,6 +166,35 @@ import { Toggle } from "@toraline/ui";
 - Screen reader: the role `switch` with the state of the checkbox, read as "on" or "off".
 - A person who cannot see colors still sees the state: the circle is on the left when off, and on the right with a check mark when on.
 - It has no `"use client"`: it also renders in a Server Component. With `onChange`, the file of the app that gives the function is a Client Component.
+
+### `Tabs`
+
+A row of tabs, and under it the content of the selected tab.
+
+```tsx
+import { Tabs } from "@toraline/ui";
+
+<Tabs
+  aria-label="Orders by kind"
+  tabs={[
+    { id: "all", label: "All", content: <AllOrders /> },
+    { id: "open", label: "Open", content: <OpenOrders /> },
+  ]}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `tabs` | A list of `{ id, label, content }` | The tabs, in the order they are shown. `id` is a name no other tab has. `label` is the text of the tab. `content` is what the page shows while the tab is selected |
+| `defaultSelectedId` | The `id` of a tab | The tab that is selected at the start. When missing: the first tab |
+| `selectedId` and `onSelectedIdChange` | The `id` of a tab, and a function that receives an `id` | The app holds the state. Without them, the component holds it |
+| `aria-label` or `aria-labelledby` | Text, or the id of an element | The name of the row of tabs for a screen reader |
+
+- Main native element: the outermost `<div>`. `className`, every other prop and `ref` go to it. The inner classes are `tui-tabs__list`, `tui-tabs__tab` and `tui-tabs__panel`.
+- Keyboard: Tab moves the focus to the selected tab, and Tab again moves it to the content. The Left and Right arrow keys move to the tab before or after and select it; after the last tab comes the first. Home selects the first tab, End the last.
+- Screen reader: the row has the role `tablist`, each tab the role `tab`, and the content the role `tabpanel`. The selected tab has `aria-selected="true"`, the others `"false"`. The content takes its name from the selected tab.
+- Only the content of the selected tab is on the page.
+- It is a Client Component, because it holds state.
 
 ## Styling on top
 

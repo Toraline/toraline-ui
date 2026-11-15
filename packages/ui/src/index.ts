@@ -15,3 +15,6 @@ export type { InputProps } from "./input";
 
 export { Toggle } from "./toggle";
 export type { ToggleProps } from "./toggle";
+
+export { Tabs } from "./tabs";
+export type { TabItem, TabsProps } from "./tabs";

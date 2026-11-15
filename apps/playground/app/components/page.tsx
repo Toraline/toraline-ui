@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button, Input, Toggle, buttonSizes, buttonVariants } from "@toraline/ui";
+import { Button, Input, Tabs, Toggle, buttonSizes, buttonVariants } from "@toraline/ui";
 import { ThemeToggle } from "@toraline/ui/theme";
 
 /**
@@ -24,6 +24,13 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
     </div>
   );
 }
+
+const orderTabs = [
+  { id: "all", label: "All", content: <p>The content of the tab "All".</p> },
+  { id: "orders", label: "Orders", content: <p>The content of the tab "Orders".</p> },
+  { id: "premium", label: "Premium", content: <p>The content of the tab "Premium".</p> },
+  { id: "support", label: "Support", content: <p>The content of the tab "Support".</p> },
+];
 
 export default function ComponentsPage() {
   return (
@@ -105,6 +112,20 @@ export default function ComponentsPage() {
         </Row>
         <Row label="With a class of the app (text-lg)">
           <Toggle label="Larger" name="app-class" className="text-lg" />
+        </Row>
+      </Section>
+
+      <Section title="Tabs">
+        <Row label="The first tab is selected. Use the Left and Right arrow keys">
+          <Tabs tabs={orderTabs} aria-label="Orders by kind" className="w-full" />
+        </Row>
+        <Row label='Starts on the tab "Premium" (defaultSelectedId), with a class of the app (mt-6)'>
+          <Tabs
+            tabs={orderTabs}
+            defaultSelectedId="premium"
+            aria-label="Orders by kind, second example"
+            className="mt-6 w-full"
+          />
         </Row>
       </Section>
     </main>

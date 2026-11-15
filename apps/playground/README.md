@@ -144,3 +144,14 @@ The track is the long rounded part of the switch. The thumb is the circle that m
 | Disabled: track, border, thumb, label | `rgb(243, 243, 244)`, `rgb(207, 209, 212)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)`, `rgb(159, 163, 169)`, `rgb(159, 163, 169)` |
 
 Off, the thumb has no `transform` and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.
+
+### Tabs (TOR-1013)
+
+| Part | Light theme | Dark theme |
+|---|---|---|
+| Selected tab: text, line under it | `rgb(15, 25, 40)`, `rgb(94, 0, 161)` | `rgb(243, 243, 244)`, `rgb(181, 147, 234)` |
+| Other tab: text | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
+| Line under the row | `rgb(207, 209, 212)` | `rgb(63, 71, 83)` |
+| Content | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
+
+With the keyboard, starting with the focus on the tab "All": Right arrow selected "Orders". Left arrow 2 times selected "All" and then "Support", the last tab. The content changed to the content of "Support". The second example starts on "Premium", and its `className="mt-6"` gives it a top margin of `24px`.
