@@ -1,6 +1,6 @@
 # toraline-ui: run every command from the repository root.
 .DEFAULT_GOAL := help
-.PHONY: help setup install check build typecheck lint test
+.PHONY: help setup install check build typecheck lint test catalog catalog-build
 
 -include agent/core.mk
 
@@ -13,7 +13,7 @@ install: ## Install the dependencies of every package
 
 setup: install hooks local-docs doctor ## First-time setup on this machine
 
-build: ## Build every package
+build: ## Build every package, the catalog and the playground
 	@npm run build
 
 typecheck: ## Type check every package
@@ -24,5 +24,11 @@ lint: ## Lint the new code (legacy/ is not linted)
 
 test: ## Run the tests of every package
 	@npm test
+
+catalog: ## Open the catalog (Storybook) for development, on http://localhost:6006
+	@npm run dev -w @toraline/catalog
+
+catalog-build: ## Build the static catalog into apps/catalog/storybook-static
+	@npm run build -w @toraline/catalog
 
 check: build typecheck lint test ## What must pass before a commit (the profile's check_command)

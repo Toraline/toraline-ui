@@ -12,6 +12,21 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The catalog: Storybook with a theme control in the toolbar (TOR-1016)
+- Decision: the catalog is Storybook 10.6.7 with the framework `@storybook/react-vite` 10.6.7, in the workspace `apps/catalog`. A framework is the Storybook package that knows the component library (React) and the build tool (Vite). The versions are exact, with no `^`. The configuration is in `apps/catalog/.storybook/`, and the stories are in `apps/catalog/stories/`.
+- Why: Storybook 10.6.7 was the current version on 2026-11-15, and it accepts Vite 8 and React 19, which the repository already uses. Stories in `apps/catalog` keep `packages/ui` free of any Storybook dependency and of files that its build and its type files would have to skip.
+- Decision: the catalog reads the source of `@toraline/tokens` and `@toraline/ui` (`packages/*/src`), through Vite aliases in `.storybook/main.ts` and `paths` in `apps/catalog/tsconfig.json`. An alias is a rule that sends an import to another file.
+- Why: `make catalog` then needs no build before it, a change in a component shows in the open catalog at once, and the table of props can read the comments of the source. The built files have no comments.
+- Decision: the theme control is a Storybook global named `theme`, shown in the toolbar. A global is a value that every story shares. Its items are `DEFAULT_THEMES` of `@toraline/tokens`. A decorator (a function that wraps every story) writes the value on `<html data-theme="...">` and puts `ThemeProvider` around the story. When a press on `ThemeToggle` inside a story changes the theme, the decorator updates the global, so the toolbar names the same theme.
+- Why: `data-theme` on `<html>` with `ThemeProvider` is what an app does, so a story looks and behaves as in an app. The list comes from the library, so a theme that the library adds appears in the toolbar with no change in the catalog. The addon `@storybook/addon-themes` was not used: it does the same with one more dependency, and it cannot follow `ThemeToggle`.
+- Decision: Storybook's own background control is off (`features.backgrounds: false`). The page behind a story gets `--color-surface` and `--color-text` from `apps/catalog/.storybook/preview.css`.
+- Why: the background control changes only the color behind a story. With it, a person could put a light background behind dark theme components.
+- Decision: Storybook sends no usage data (`core.disableTelemetry: true`) and does not ask the network for its news (`core.disableWhatsNewNotifications: true`).
+- Decision: the script that builds the static catalog is named `build`, so the root `npm run build`, and with it `make check`, builds the catalog. The build takes about 3 seconds. `make catalog` opens the catalog on port 6006, and `make catalog-build` builds only the catalog, into `apps/catalog/storybook-static` (ignored by git).
+- Decision: ESLint reads the folder `.storybook` (it skips a folder whose name starts with a dot unless told), and uses the recommended rules of `eslint-plugin-storybook` 10.6.7 for the story files.
+- Alternatives: stories next to each component in `packages/ui/src`; reading the built packages, as `apps/playground` does; `@storybook/addon-themes`; a theme control with fixed items `light` and `dark`.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Choices made in the 6 components (TOR-1010 to TOR-1015)
 - Decision (Button): the variants are `primary`, `secondary` and `danger`; the sizes are `sm`, `md` and `lg`. `type` is `"button"` when missing.
 - Why: the old Button had no variant and no size (it showed the fixed text "oi" on the primary color), so there was nothing to keep but the primary look. `danger` comes from the prop `isWarning` of the button on the old branch `v1`. A default of `"button"` stops a button inside a form from sending the form by accident.

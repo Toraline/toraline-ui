@@ -53,6 +53,8 @@ make setup       # first time on this machine: npm install, hooks, local-docs, d
 make doctor      # check the machine and the project
 make worktree TICKET=123 SLUG=short-slug
 make check       # what must pass before a commit
+make catalog     # open the catalog (Storybook) on http://localhost:6006
+make catalog-build # build the static catalog into apps/catalog/storybook-static
 make sync-skills # copy the current core from the boilerplate
 ```
 
