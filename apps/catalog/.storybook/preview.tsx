@@ -100,6 +100,12 @@ const preview: Preview = {
   parameters: {
     // The space around a story.
     layout: "padded",
+    options: {
+      // The order of the sidebar: the guide first, then the tokens, then the components.
+      storySort: {
+        order: ["Guide", ["How to use the library", "Live examples"], "Foundations", "Components"],
+      },
+    },
     a11y: {
       // "error": an accessibility problem in a story makes the test of that story fail.
       test: "error",

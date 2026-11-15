@@ -12,6 +12,19 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The guide: one Markdown file, shown in the catalog and linked from the README (TOR-1018)
+- Decision: the text of the guide is one Markdown file, `docs/guide.md`. The catalog page `apps/catalog/stories/Guide.mdx` imports that file as text and shows it, and adds two live examples under it. The root `README.md` links to `docs/guide.md`.
+- Why: the ticket asks for a page in the catalog that the root README also links to. The catalog is not deployed, so a link to a catalog page works only on a machine that runs it. GitHub shows a Markdown file as a page, and does not do that for an MDX file. One file for both places cannot go out of date in one of them.
+- Decision: the live examples are stories (`Guide/Live examples`), built with the same colors and class names as the guide. The example of guide 2 builds its two themes with `createTheme` and puts the CSS in a `<style>` element, with theme names that start with `guide-`.
+- Why: as stories, the accessibility tests check them in both themes. The names with `guide-` keep the themes `light` and `dark` of the catalog unchanged for the other stories.
+- Decision: the guide tells an app to add `"type": "module"` to `package.json` and `"allowImportingTsExtensions": true` to `tsconfig.json`.
+- Why: found on 2026-11-15 in an app made by hand with the files of `create-next-app`: without the first, Node 24 prints a warning each time it runs `scripts/write-theme-css.ts`; without the second, `next build` (Next.js 16.4.6) fails with the error TS5097 on the import of `../theme.config.ts`. `apps/playground` has both.
+- Decision: for an app with no Next.js, the guide shows a Vite app that puts the script of `createThemeScript` in `<head>` with a small plugin in `vite.config.ts` (`transformIndexHtml`), and gives no `initialTheme` to `ThemeProvider`.
+- Why: `ThemeProvider` does not read the cookie by itself. It takes the theme that is already on `<html>`. The script must run before the page paints, so it cannot be in the React code.
+- Decision: the guide page is the first page of the catalog (`storySort` in `.storybook/preview.tsx`).
+- Alternatives: the guide written only as an MDX page; a second copy of the text in the README; live examples as plain components of the page, not covered by the tests; `next/font/local` in the guide, as the playground does.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Stories, the tokens page and the accessibility tests (TOR-1017)
 - Decision: a story that shows variants or sizes renders every value of the list that the library exports (`buttonVariants`, `buttonSizes`, `splitButtonMenuPlacements`). So Button has one story `Variants`, and not one story for each variant. Each state (disabled, loading, error, on, open) has its own story.
 - Why: the ticket asks for one story for each variant, and also that a new variant appears without editing the story. Both are not possible together: a story is a named export of a file, and Storybook reads the names without running the file, so a file cannot make its stories from a list. The second request was kept, because a catalog that misses a variant is the larger problem.

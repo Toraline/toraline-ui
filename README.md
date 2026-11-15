@@ -2,6 +2,8 @@
 
 The component library of Toraline: styled React components, with configurable themes and fonts. Each Toraline app installs it.
 
+**To use the library in an app, read the [guide](docs/guide.md):** install it, build the theme of the app, and style on top of a component.
+
 **This is the branch `v2`.** Version 2 is being built here. The old library is unchanged in [`legacy/`](legacy/), and is still released from the branch `main` as `@toraline/toraline-ui`.
 
 ## What is where
@@ -10,9 +12,10 @@ The component library of Toraline: styled React components, with configurable th
 |---|---|---|
 | `packages/tokens` | Design tokens, the light and dark themes, the function that builds a theme, and the Tailwind CSS 4 preset | Built in phase 2. See [its README](packages/tokens/README.md) |
 | `packages/ui` | The styled components, published as `@toraline/ui` | Has the theme provider and toggle, and 6 components built in phase 3: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. It also has the rules every component follows and the template of a component. See [its README](packages/ui/README.md) |
-| `apps/catalog` | The catalog: Storybook 10, with a control in the toolbar that changes the theme of every story | Built in phase 4. Has the stories of the 6 components and of the theme toggle, a page with every token, and an accessibility check that runs on every story in both themes. See [its README](apps/catalog/README.md) |
+| `apps/catalog` | The catalog: Storybook 10, with a control in the toolbar that changes the theme of every story | Built in phase 4. Has the guide as its first page, the stories of the 6 components and of the theme toggle, a page with every token, and an accessibility check that runs on every story in both themes. See [its README](apps/catalog/README.md) |
 | `apps/playground` | A private Next.js app that tests the themes and shows every component in a real page | See [its README](apps/playground/README.md) |
 | `legacy/` | The old library: Create React App, styled-components 5, Storybook 6 | Unchanged |
+| `docs/guide.md` | The guide for a person who uses the library in an app: install, build a theme, style on top. The catalog shows the same file as its first page | Written in phase 4 |
 | `docs/decisions.md` | Technical decisions, newest first | |
 | `AGENTS.md`, `agent/` | How AI agents work in this repository | |
 
