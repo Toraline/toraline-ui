@@ -1317,8 +1317,8 @@ const columns: DataGridColumn<Product>[] = [
 | `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, the page or the page size, for example to write them in the address of the page |
 | `locale` | A language, for example `"pt-BR"` | The language that orders the texts of a sort. When missing: the language of the browser |
 | `labels` | An object | The texts of the grid. Each one that is missing has its English default. See below |
-| `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the checkbox of the browser |
-| `selectComponent` | A component | The field of the page size. When missing: the `<select>` of the browser, in the box of a form control |
+| `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the `CheckboxControl` of this library |
+| `selectComponent` | A component | The field of the page size. When missing: the `Select` of this library |
 | `className` | Classes | They go to the element around the whole grid (`data-slot="data-grid"`) |
 
 A column (`DataGridColumn<Row>`):

@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { ComponentProps, ElementType, ReactNode } from "react";
 import { Button } from "../button/index.js";
+import { CheckboxControl } from "../checkbox/index.js";
 import { ActionsTh, DataTable, DataTableMessage, Td, Th, Tr } from "../data-table/index.js";
 import { IconButton } from "../icon-button/index.js";
+import { Select as SelectControl } from "../select/index.js";
 import { classNames } from "../shared/class-names.js";
-import { controlClassNames } from "../shared/control.js";
 import { focusRingClass } from "../shared/focus-ring.js";
 import { TextInput } from "../text-input/index.js";
 import {
@@ -76,14 +77,14 @@ const checkedRowClass = "data-checked:bg-selected";
 
 type RowKey = string | number;
 
-/** The checkbox the grid shows when the app gives none: the checkbox of the browser. */
-function NativeCheckbox(props: DataGridCheckboxProps) {
-  return <input {...props} type="checkbox" className="size-4" />;
+/** The checkbox the grid shows when the app gives none: the CheckboxControl of this library. */
+function DefaultCheckbox(props: DataGridCheckboxProps) {
+  return <CheckboxControl {...props} />;
 }
 
-/** The field the grid shows when the app gives none: the <select> of the browser, in the box of a form control. */
-function NativeSelect({ size, className, ...selectProps }: DataGridSelectProps) {
-  return <select {...selectProps} className={controlClassNames(size, className)} data-size={size} />;
+/** The field the grid shows when the app gives none: the Select of this library. */
+function DefaultSelect(props: DataGridSelectProps) {
+  return <SelectControl {...props} />;
 }
 
 export type DataGridProps<Row> = {
@@ -137,9 +138,9 @@ export type DataGridProps<Row> = {
   locale?: string;
   /** The texts of the grid. Each one that is missing has its English default. */
   labels?: Partial<DataGridLabels>;
-  /** The component of the checkbox of a row and of the header. When missing: the checkbox of the browser. */
+  /** The component of the checkbox of a row and of the header. When missing: the CheckboxControl of this library. */
   checkboxComponent?: ElementType<DataGridCheckboxProps>;
-  /** The component of the field that chooses the number of rows of a page. When missing: the <select> of the browser. */
+  /** The component of the field that chooses the number of rows of a page. When missing: the Select of this library. */
   selectComponent?: ElementType<DataGridSelectProps>;
   /** Classes for the element around the whole grid. */
   className?: string;
@@ -180,8 +181,8 @@ export function DataGrid<Row>({
   onStateChange,
   locale,
   labels: givenLabels,
-  checkboxComponent: Checkbox = NativeCheckbox,
-  selectComponent: Select = NativeSelect,
+  checkboxComponent: Checkbox = DefaultCheckbox,
+  selectComponent: Select = DefaultSelect,
   className,
 }: DataGridProps<Row>) {
   const labels = { ...defaultLabels, ...givenLabels };
