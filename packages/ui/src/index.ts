@@ -12,6 +12,9 @@ export type { IconComponent } from "./shared/icon.js";
 export { Button, ButtonLink, buttonSizes, buttonVariants } from "./button/index.js";
 export type { ButtonLinkProps, ButtonProps, ButtonSize, ButtonVariant } from "./button/index.js";
 
+export { Field } from "./field/index.js";
+export type { FieldControlProps, FieldProps } from "./field/index.js";
+
 export { IconButton, iconButtonSizes, iconButtonVariants } from "./icon-button/index.js";
 export type {
   IconButtonProps,

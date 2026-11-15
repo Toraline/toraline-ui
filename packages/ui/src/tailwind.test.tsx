@@ -11,6 +11,7 @@ import {
   BreadCrumbs,
   Button,
   ButtonLink,
+  Field,
   IconButton,
   Input,
   SplitButton,
@@ -120,6 +121,12 @@ async function renderEveryComponent(): Promise<string[]> {
           />
         )),
       )}
+      <Field label="Name" optional hint="As it is written on the invoice.">
+        <input />
+      </Field>
+      <Field label="Name" error="The name is required.">
+        <input />
+      </Field>
       <Input label="Title" error="The title is required." />
       <Toggle label="Send e-mails" />
       <Tabs tabs={tabs} />
@@ -227,6 +234,7 @@ describe("the classes of the components use only tokens", () => {
     expect(variableNames).toContain("icon-default");
     expect(variableNames).toContain("font-body");
     expect(variableNames).toContain("text-base");
+    expect(variableNames).toContain("text-xs");
     expect(variableNames).toContain("spacing");
     expect(variableNames).toContain("radius-md");
     expect(variableNames).toContain("radius-lg");

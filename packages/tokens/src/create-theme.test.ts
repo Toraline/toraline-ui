@@ -47,9 +47,14 @@ describe("createTheme", () => {
   });
 
   test("a changed text size and a changed spacing unit", () => {
-    const css = createTheme({ name: "compact", textSizes: { base: "0.9375rem" }, spacing: "0.2rem" });
+    const css = createTheme({
+      name: "compact",
+      textSizes: { xs: "0.6875rem", base: "0.9375rem" },
+      spacing: "0.2rem",
+    });
     expect(readCssVariables(css)).toEqual({
       ...lightTheme.tokens,
+      "text-xs": "0.6875rem",
       "text-base": "0.9375rem",
       spacing: "0.2rem",
     });

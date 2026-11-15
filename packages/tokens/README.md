@@ -117,7 +117,7 @@ The input, type `ThemeInput`:
 | `isDefault` | No | `true`: the theme also applies when `<html>` has no `data-theme` |
 | `colors` | No | The value is any CSS color. The key decides what the color is. See "The keys of `colors`" below |
 | `fonts` | No | `body`, `heading`, `mono`. The value is any CSS `font-family` value |
-| `textSizes` | No | `sm`, `base`, `lg`. The value is any CSS length. Changes `--text-sm`, `--text-base`, `--text-lg` |
+| `textSizes` | No | `xs`, `sm`, `base`, `lg`. The value is any CSS length. Changes `--text-xs`, `--text-sm`, `--text-base`, `--text-lg` |
 | `spacing` | No | Any CSS length. Changes `--spacing`, the unit of every padding and gap of a component |
 | `radius` | No | Any CSS length, or an object. One value changes `--radius-md`, the corner of a button and a field. An object changes each size it names: `{ md: "0.625rem", lg: "1rem", xl: "1.25rem", "2xl": "1.5rem" }` |
 | `shadows` | No | An object with `sm`, `card`, `lg`, `xl`, `2xl`. The value is any CSS `box-shadow` value |
@@ -274,7 +274,7 @@ Each class reads the CSS variable when the page is shown. Changing `data-theme` 
 | Each `--data-<name>` | Every Tailwind color class with `data-<name>`: `bg-data-1`, `text-data-1`, `fill-data-1`, `stroke-data-1` and the others |
 | Each level 1 color `--color-<scale>-<step>` | Every Tailwind color class: `bg-brand-700`, `text-slate-500`, `border-red-600` and the others |
 | `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` is also the font of the page, and the class `font-sans`, the name Intraweb uses for it |
-| `--text-sm`, `--text-base`, `--text-lg` | `text-sm`, `text-base`, `text-lg`. Tailwind already has these classes, with the same sizes. With the preset they read the token |
+| `--text-xs`, `--text-sm`, `--text-base`, `--text-lg` | `text-xs`, `text-sm`, `text-base`, `text-lg`. Tailwind already has these classes, with the same sizes. With the preset they read the token |
 | `--spacing` | It is the unit of every Tailwind spacing class: `p-4` is `calc(var(--spacing) * 4)`. Tailwind already uses this variable, with the same value |
 | `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl` | `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, and the classes for one side or one corner, for example `rounded-t-md` |
 | `--shadow-sm`, `--shadow-card`, `--shadow-lg`, `--shadow-xl`, `--shadow-2xl` | `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl`, `shadow-2xl` |
@@ -365,7 +365,7 @@ const html = `<head><script>${createThemeScript()}</script></head>`;
 
 The color tokens have the names of the design system of the app Intraweb. The first part of a name is the group, and says where the color is used: `--bg-*` a background, `--text-*` a text, `--border-*` a border, `--icon-*` an icon, `--data-*` a chart or a progress bar. With the Tailwind preset, a token is a class of its group only: `--bg-primary` is the class `bg-primary`, and there is no class `text-page`.
 
-Every theme gives a value to each of these 75 tokens.
+Every theme gives a value to each of these 76 tokens.
 
 | Token | Tailwind class | What it is for | Light | Dark |
 |---|---|---|---|---|
@@ -431,7 +431,8 @@ Every theme gives a value to each of these 75 tokens.
 | `--font-body` | `font-body`, `font-sans` | Font of normal text | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-heading` | `font-heading` | Font of headings and buttons | `--font-stack-display` | `--font-stack-display` |
 | `--font-mono` | `font-mono` | Font of code | `--font-stack-mono` | `--font-stack-mono` |
-| `--text-sm` | `text-sm` | Font size of small text: a small button, a label, an error message | `--font-size-sm` | `--font-size-sm` |
+| `--text-xs` | `text-xs` | Font size of the smallest text: the hint under a field | `--font-size-xs` | `--font-size-xs` |
+| `--text-sm` | `text-sm` | Font size of small text: a button, a label, an error message | `--font-size-sm` | `--font-size-sm` |
 | `--text-base` | `text-base` | Font size of normal text in a component | `--font-size-md` | `--font-size-md` |
 | `--text-lg` | `text-lg` | Font size of large text: a large button | `--font-size-lg` | `--font-size-lg` |
 | `--spacing` | `p-4`, `gap-2`, ... | The spacing unit. Every padding and gap of a component is a multiple of it: the Tailwind class `px-4` is `calc(var(--spacing) * 4)` | `--space-1` | `--space-1` |
@@ -478,7 +479,7 @@ The limit of 3 for a border comes from the accessibility rule for the parts of a
 | Font sizes | `--font-size-xs`, `--font-size-sm`, `--font-size-md`, `--font-size-lg`, `--font-size-xl`, `--font-size-2xl`, `--font-size-3xl` |
 | Font stacks | `--font-stack-sans` (Inter), `--font-stack-display` (Poppins), `--font-stack-mono`. A font stack is a list of fonts; the browser uses the first one it has |
 
-The level 2 tokens `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 4 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
+The level 2 tokens `--text-xs`, `--text-sm`, `--text-base`, `--text-lg` and `--spacing` point to 5 of the font size and spacing tokens. The other font sizes and spacing values have no level 2 token yet. A level 2 token is added when a component needs one.
 
 ### The color scales of Intraweb
 

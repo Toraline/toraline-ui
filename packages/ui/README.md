@@ -219,6 +219,41 @@ import { Plus } from "lucide-react";
 - Give the component, not an element: `icon={Plus}`, not `icon={<Plus />}`.
 - The icons the library draws itself (the error icon of Field, the arrow of SplitButton) are small `<svg>` elements inside the components.
 
+### `Field`
+
+A field of a form: a label, one control, and under it a hint or an error message, all linked for a screen reader.
+
+```tsx
+import { Field, TextInput } from "@toraline.tech/ui";
+
+<Field label="Client name" hint="As it is written on the invoice." error={nameError}>
+  <TextInput name="name" />
+</Field>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `label` | Text or elements. Required | The visible name of the field, shown above the control. A click on it moves the focus to the control |
+| `children` | One element, or a function. Required | The control: `<TextInput />`, a native `<select>`, a `<textarea>`. See "How a control gets linked" below |
+| `hint` | Text or elements | A short help text, shown under the control while the field has no error |
+| `error` | Text or elements | The error message, shown under the control with an icon, in the place of the hint |
+| `optional` | `true`, `false` (default) | `true` for a field that a person may leave empty. The label then shows a mark |
+| `optionalText` | Text. When missing: `"(optional)"` | The text of the mark. An app in another language gives it: `optionalText="(opcional)"` |
+| `id` | Text | The id of the control. When missing: the id the control already has, or one that the component makes |
+
+How a control gets linked:
+
+1. When the control is the direct child, Field gives it 3 props: `id`, `aria-describedby` and `aria-invalid`. Every control of the library and every native control accepts them. The control keeps its own `aria-describedby` (Field adds to it) and its own `aria-invalid`.
+2. When the control is not the direct child, give a function. It receives the 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`.
+3. The id of the hint is the id of the control followed by `-hint`, and the id of the error message is the id followed by `-error`.
+
+- The parts and their looks are the ones of the Field of the app Intraweb. Intraweb's usage, `<Field id="name" label="Nome"><TextInput id="name" /></Field>`, works unchanged. Two things differ: the text of the mark is English unless the app gives `optionalText`, and Field now writes `aria-describedby` and `aria-invalid` on the control, which Intraweb's screens wrote by hand.
+- Main native element: the outermost `<div>`. `className`, every other prop and `ref` go to it. `id` is the exception: it is the id of the control. The inner parts have the attribute `data-slot` with the values `label`, `optional`, `hint`, `error` and `error-icon`.
+- Screen reader: the label is a `<label>` linked to the control with `for` and `id`. The hint or the error message that is shown is read with the control. With an error the control has `aria-invalid="true"`.
+- The hint and the mark have the color `text-tertiary`. On a card (`bg-surface`) its contrast is 4.97 (light theme) and 5.18 (dark theme). On the page background (`bg-page`) of the light theme it is 4.48, below the limit of 4.5: a value of Intraweb, recorded in [`docs/decisions.md`](../../docs/decisions.md).
+- The types `FieldProps` and `FieldControlProps` are exported.
+- It has no `"use client"`: it also renders in a Server Component. A function as `children` is then written in a Server Component too.
+
 ### `Input`
 
 ```tsx
@@ -413,7 +448,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
    - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
-4. A font size is `text-sm`, `text-base` or `text-lg`, written with the line height: `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
+4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg`, written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a size in `em` or `%` (`size-[1em]`; a size in `em` follows the font size of the component), a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
 7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`. When that order is not the one needed, the class names both conditions: `aria-invalid:enabled:border-invalid`.

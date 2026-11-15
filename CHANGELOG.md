@@ -21,6 +21,8 @@ The components get the shape of the same components of the app Intraweb: variant
 - Button has no `"use client"` any more, so a Server Component can give it an icon component. Only its `<button>` runs in the browser.
 - ButtonLink: a link that looks like a Button, with the same variants, sizes and icon. It renders an `<a>`, or the link component the app gives in `linkComponent`, for example the `Link` of `next/link`. The library does not import Next.js.
 - IconButton: a button that shows only an icon, with the variants `ghost`, `secondary`, `soft` and `primary` and the sizes `sm`, `md` and `lg` (32, 40 and 48 pixels). The types require `aria-label`.
+- Field: wraps any form control with a label, a hint, an error message with its icon, and the mark of an optional field. It links them to the control for a screen reader: `id`, `aria-describedby` and `aria-invalid`.
+- `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 
 ## 0.1.0 (2026-11-15)
 

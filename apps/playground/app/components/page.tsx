@@ -5,6 +5,7 @@ import {
   BreadCrumbs,
   Button,
   ButtonLink,
+  Field,
   IconButton,
   Input,
   Tabs,
@@ -39,6 +40,10 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
     </div>
   );
 }
+
+/** The classes of a plain control, to show that Field works with any control. */
+const plainInputClass =
+  "min-h-10 w-full rounded-md border border-default bg-surface px-3 py-2 text-sm/5 text-primary";
 
 const orderTabs = [
   { id: "all", label: "All", content: <p>The content of the tab "All".</p> },
@@ -160,6 +165,29 @@ export default function ComponentsPage() {
             />
           ))}
         </Row>
+      </Section>
+
+      <Section title="Field">
+        <div className="mt-4 grid max-w-md gap-4">
+          <Field label="With a hint" hint="As it is written on the invoice.">
+            <input className={plainInputClass} name="field-hint" />
+          </Field>
+          <Field label="With an error" hint="This hint is not shown." error="The name is required.">
+            <input className={plainInputClass} name="field-error" />
+          </Field>
+          <Field label="Optional" optional>
+            <input className={plainInputClass} name="field-optional" />
+          </Field>
+          <Field label="Opcional, em português" optional optionalText="(opcional)">
+            <input className={plainInputClass} name="field-optional-text" />
+          </Field>
+          <Field label="With a native select" hint="Field works with any control.">
+            <select className={plainInputClass} name="field-select">
+              <option>Monthly</option>
+              <option>By the hour</option>
+            </select>
+          </Field>
+        </div>
       </Section>
 
       <Section title="Input">
