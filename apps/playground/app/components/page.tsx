@@ -1,9 +1,10 @@
-import { Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   BreadCrumbs,
   Button,
+  ButtonLink,
   Input,
   Tabs,
   Toggle,
@@ -99,6 +100,32 @@ export default function ComponentsPage() {
           <Button className="rounded-full" data-testid="button-app-class">
             Round
           </Button>
+        </Row>
+      </Section>
+
+      <Section title="ButtonLink">
+        <Row label="A plain <a>, in every variant">
+          {buttonVariants.map((variant) => (
+            <ButtonLink key={variant} variant={variant} href="/">
+              {variant}
+            </ButtonLink>
+          ))}
+        </Row>
+        <Row label="With the Link of next/link (linkComponent), in every size, with an icon">
+          {buttonSizes.map((size) => (
+            <ButtonLink
+              key={size}
+              linkComponent={Link}
+              href="/"
+              prefetch={false}
+              size={size}
+              variant="secondary"
+              icon={ArrowRight}
+              data-testid={`button-link-next-${size}`}
+            >
+              To the first page
+            </ButtonLink>
+          ))}
         </Row>
       </Section>
 

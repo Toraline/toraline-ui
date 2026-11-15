@@ -19,6 +19,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - Button: the variants `soft` (a quiet background in the brand color) and `ghost` (no background and no border). The list `buttonVariants` now has 5 values: `primary`, `secondary`, `soft`, `danger`, `ghost`.
 - Button: the prop `icon`, an icon component shown before the text: `<Button icon={Plus}>`. An icon of the package `lucide-react` works as it is. The library does not depend on `lucide-react`. The type is `IconComponent`.
 - Button has no `"use client"` any more, so a Server Component can give it an icon component. Only its `<button>` runs in the browser.
+- ButtonLink: a link that looks like a Button, with the same variants, sizes and icon. It renders an `<a>`, or the link component the app gives in `linkComponent`, for example the `Link` of `next/link`. The library does not import Next.js.
 
 ## 0.1.0 (2026-11-15)
 

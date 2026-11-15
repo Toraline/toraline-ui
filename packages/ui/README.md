@@ -147,6 +147,36 @@ import { Button } from "@toraline.tech/ui";
 - The lists `buttonVariants` and `buttonSizes` and the types `ButtonProps`, `ButtonVariant` and `ButtonSize` are exported.
 - It has no `"use client"`: a Server Component can render it and give it an icon component. Only its `<button>`, which stops the press of a loading button, runs in the browser. A function such as `onClick` still needs a Client Component, as every function does.
 
+### `ButtonLink`
+
+A link that looks like a Button. Use it when a press goes to another page.
+
+```tsx
+import Link from "next/link";
+import { ButtonLink } from "@toraline.tech/ui";
+
+<ButtonLink linkComponent={Link} href="/orders/new" variant="secondary">
+  New order
+</ButtonLink>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `href` | An address | Where the link goes. It is the prop of the link component |
+| `linkComponent` | A component. When missing: `"a"` | The component that renders the link. It receives `href`, `className`, `children` and every other prop. A Next.js app gives the `Link` of `next/link`, so a press does not load the whole page again. The library does not import Next.js |
+| `variant` | The variants of Button. `"primary"` is the default | The look |
+| `size` | The sizes of Button. `"md"` is the default | The size |
+| `icon` | An icon component | An icon shown before the text. See [Icons](#icons) |
+
+- It has the same classes as Button: both read them from one file.
+- Main native element: the `<a>`, or the link component of the app. `className`, every other prop and `ref` go to it. With `linkComponent={Link}`, TypeScript accepts the props of that `Link`, for example `prefetch`.
+- Keyboard: Tab moves the focus to it, Enter follows it.
+- Screen reader: it is read as a link, not as a button.
+- It has no state `disabled` and no state `loading`: a link cannot be disabled. A page that must not offer the link does not render it.
+- The type `ButtonLinkProps` is exported.
+- It has no `"use client"`: it also renders in a Server Component.
+- Intraweb's own `ButtonLink` imports `next/link`. To move to this one, Intraweb adds `linkComponent={Link}`, or keeps a file of 5 lines that does it once: `export const ButtonLink = (props) => <UiButtonLink linkComponent={Link} {...props} />`.
+
 ### Icons
 
 The library has no icon set and does not depend on one. A component with the prop `icon` receives a React component that draws one icon as an `<svg>`:

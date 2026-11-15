@@ -12,6 +12,16 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - ButtonLink: the app gives its link component (TOR-1139)
+- Decision: `ButtonLink` renders an `<a>`, or the component the app gives in the prop `linkComponent`, the same approach as `linkComponent` of BreadCrumbs. It has the classes of Button, from the same file, and it is in the folder `src/button/`, as in Intraweb.
+- Why: Intraweb's `ButtonLink` imports `next/link`. The library is not only for Next.js and must not import it.
+- Decision: the props type is generic: `ButtonLinkProps<LinkComponent>` is the props of the link component plus the library's own. With `linkComponent={Link}` TypeScript accepts and checks the props of that `Link` (`prefetch`, `replace`, `href` as an object).
+- What changes for Intraweb: its `<ButtonLink href="...">` needs `linkComponent={Link}`. One small file in Intraweb can add it once for every screen. Nothing else changes: `variant`, `size`, `icon` and `className` have the same names and values.
+- Decision: no `disabled` and no `loading` for ButtonLink. Intraweb's has none, and an `<a>` cannot be disabled.
+- Checked on 2026-11-15: the page `/components` of the playground (a Server Component) renders ButtonLink with a plain `<a>` and with the `Link` of Next.js 16.4.6.
+- Alternatives: a prop `asChild` (needs a helper that joins props, as Radix's `Slot`); a function `renderLink`; exporting only the class function and letting the app build the link.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Button: the variants, sizes and icon of Intraweb; icons are components the app gives (TOR-1138)
 - Decision: Button has the 5 variants (`primary`, `secondary`, `soft`, `danger`, `ghost`), the 3 sizes and the class lists of Intraweb's `components/ui/button.tsx`. The smallest heights are 32, 40 and 48 pixels (`min-h-8`, `min-h-10`, `min-h-12`). The classes are in `packages/ui/src/button/button-class.ts`, which Button and ButtonLink share.
 - Decision (icons): the prop `icon` receives a component, as in Intraweb: `<Button icon={Plus}>`. Its type is `IconComponent` (`packages/ui/src/shared/icon.ts`): a component that accepts `className` and `aria-hidden`. `lucide-react` is not a dependency of the library. Intraweb's usage needs no change. Every later component with an icon uses this type.

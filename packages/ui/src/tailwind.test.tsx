@@ -10,6 +10,7 @@ import { themeTokenNames } from "@toraline.tech/tokens";
 import {
   BreadCrumbs,
   Button,
+  ButtonLink,
   Input,
   SplitButton,
   Tabs,
@@ -99,6 +100,11 @@ async function renderEveryComponent(): Promise<string[]> {
         <Button key={variant} variant={variant} loading>
           Save
         </Button>
+      ))}
+      {buttonVariants.map((variant) => (
+        <ButtonLink key={variant} variant={variant} href="/orders" icon={PlusIcon}>
+          Orders
+        </ButtonLink>
       ))}
       <Input label="Title" error="The title is required." />
       <Toggle label="Send e-mails" />
