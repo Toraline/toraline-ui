@@ -95,9 +95,15 @@ const preview: Preview = {
     theme: defaultCatalogTheme,
   },
   decorators: [withTheme],
+  // Every component gets a documentation page, built from its stories and its props.
+  tags: ["autodocs"],
   parameters: {
     // The space around a story.
     layout: "padded",
+    a11y: {
+      // "error": an accessibility problem in a story makes the test of that story fail.
+      test: "error",
+    },
   },
 };
 

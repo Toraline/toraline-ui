@@ -17,4 +17,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --no-audit --no-fund
+      # The story tests of the catalog run in a real browser. This step downloads
+      # that browser (Chromium with no window) and the system libraries it needs.
+      - run: npx playwright install --with-deps --only-shell chromium
       - run: make check

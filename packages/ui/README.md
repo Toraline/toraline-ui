@@ -91,7 +91,7 @@ A button. Each press shows the next theme of `themes`. After the last theme it g
 
 - It is a real `<button type="button">`, so it works with the Tab, Enter and Space keys.
 - It shows the current theme as text: `Theme: dark`.
-- A screen reader says the current theme and what a press does: `Theme: dark. Switch to light.` The prop `formatLabel={(theme, nextTheme) => "..."}` changes this text.
+- A screen reader says the current theme and what a press does: `Theme: dark. Switch to light.` The prop `formatLabel={(theme, nextTheme) => "..."}` changes this text. Keep the text the button shows (`Theme: dark`) in it: a person who controls the device with the voice says the text they see.
 - `children` replaces the text that is shown, for example with an icon.
 - `className` adds classes. The button also accepts every other prop of `<button>`.
 

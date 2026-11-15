@@ -55,6 +55,7 @@ make worktree TICKET=123 SLUG=short-slug
 make check       # what must pass before a commit
 make catalog     # open the catalog (Storybook) on http://localhost:6006
 make catalog-build # build the static catalog into apps/catalog/storybook-static
+make catalog-test  # run every story as a test, in each theme, with the accessibility check
 make sync-skills # copy the current core from the boilerplate
 ```
 

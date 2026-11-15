@@ -7,6 +7,8 @@ export type ThemeToggleProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "ty
   /**
    * Builds the name a screen reader says for the button.
    * When missing: "Theme: <current>. Switch to <next>."
+   * Keep the text the button shows ("Theme: <current>") in the name: a person
+   * who controls the device with the voice says the text they see.
    */
   formatLabel?: (theme: string, nextTheme: string) => string;
 };

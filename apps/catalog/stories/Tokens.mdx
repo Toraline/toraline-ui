@@ -1,0 +1,63 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as TokenStories from "./Tokens.stories";
+
+<Meta of={TokenStories} />
+
+# Tokens
+
+This page shows every design token of the library. The tables read the values from the package `@toraline/tokens`, so they are always the current values.
+
+## Words this page uses
+
+- **Design token**: a named value of the design, for example a color or a font. It is stored as a CSS variable.
+- **Level 1 token**: a raw value. The name says what the value is. Example: `--purple-500` is `#5e00a1`.
+- **Level 2 token**: a meaning. The name says what the value is for. Example: `--color-primary` is the color of the main action. Components use only level 2 tokens.
+- **Theme**: one set of values for the level 2 tokens. The library has the themes `light` and `dark`.
+
+## How to read a table
+
+Each row is one level 2 token. Each theme has one column. A cell shows, in this order:
+
+1. A sample drawn with the value.
+2. The level 1 token that the value points to, when there is one.
+3. The raw value.
+
+A cell always has the colors of its own theme. The control **Theme** in the toolbar changes the page around the tables, not the cells.
+
+## Colors
+
+<Canvas of={TokenStories.Colors} sourceState="none" />
+
+## Fonts
+
+The default fonts are the fonts of the device. An app sets its own fonts with the function `createTheme`. The page **Guide** shows how.
+
+<Canvas of={TokenStories.Fonts} sourceState="none" />
+
+## Text sizes
+
+<Canvas of={TokenStories.TextSizes} sourceState="none" />
+
+## Spacing
+
+`--spacing` is the spacing unit. A component writes every padding and gap as a multiple of it, for example `calc(var(--spacing) * 4)`. The bars of the sample are 1, 2, 4 and 8 units wide.
+
+<Canvas of={TokenStories.Spacing} sourceState="none" />
+
+## Radius
+
+<Canvas of={TokenStories.Radius} sourceState="none" />
+
+## Shadow
+
+<Canvas of={TokenStories.Shadow} sourceState="none" />
+
+## Other tokens
+
+<Canvas of={TokenStories.OtherTokens} sourceState="none" />
+
+## Level 1 tokens
+
+These are the raw values. They are the same in every theme.
+
+<Canvas of={TokenStories.Level1} sourceState="none" />

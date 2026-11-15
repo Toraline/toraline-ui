@@ -18,7 +18,9 @@ const config: StorybookConfig = {
 
   // An addon is a plugin of Storybook.
   // addon-docs builds the documentation pages and the table of props of each component.
-  addons: ["@storybook/addon-docs"],
+  // addon-a11y checks each story for accessibility problems, with the tool axe-core.
+  // addon-vitest runs each story as a test.
+  addons: ["@storybook/addon-docs", "@storybook/addon-a11y", "@storybook/addon-vitest"],
 
   // The catalog has its own theme control in the toolbar (see preview.tsx).
   // Storybook's own background control would only change the color behind a

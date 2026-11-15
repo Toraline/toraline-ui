@@ -2,11 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node", "vite/client"],
+    "allowImportingTsExtensions": true,
     "paths": {
       "@toraline/tokens": ["../../packages/tokens/src/index.ts"],
       "@toraline/ui": ["../../packages/ui/src/index.ts"],
       "@toraline/ui/theme": ["../../packages/ui/src/theme/index.ts"]
     }
   },
-  "include": [".storybook", "stories"]
+  "include": [".storybook", "stories", "vitest.projects.ts"]
 }
