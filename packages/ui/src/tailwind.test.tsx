@@ -61,6 +61,19 @@ import {
   popoverAligns,
   tooltipSides,
 } from "./index";
+// Phase 10: data
+import {
+  ActionsTh,
+  DataGrid,
+  DataTable,
+  DataTableMessage,
+  DetailPanel,
+  ListItem,
+  Td,
+  Th,
+  Tr,
+  tableCellAlignments,
+} from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -123,6 +136,30 @@ function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" 
     </svg>
   );
 }
+
+// Phase 10: data
+type GridRow = { id: number; name: string; price: number };
+const gridRows: GridRow[] = [
+  { id: 1, name: "Coffee", price: 7 },
+  { id: 2, name: "Cheese bread", price: 9.5 },
+];
+const gridColumns = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (row: GridRow) => row.name,
+    sortValue: (row: GridRow) => row.name,
+    searchValue: (row: GridRow) => row.name,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right" as const,
+    cell: (row: GridRow) => row.price,
+    sortValue: (row: GridRow) => row.price,
+    footer: (rows: GridRow[]) => rows.length,
+  },
+];
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
 
@@ -328,6 +365,85 @@ async function renderEveryComponent(): Promise<string[]> {
           <ProgressRing key={`${tone}-${size}`} tone={tone} size={size} label={`Stock, ${tone}, ${size}`} value={1} max={4} />
         )),
       )}
+      {/* Phase 10: data */}
+      {[false, true].map((stackOnMobile) => (
+        <DataTable key={String(stackOnMobile)} caption="Orders" stackOnMobile={stackOnMobile}>
+          <thead>
+            <tr>
+              {tableCellAlignments.map((align) => (
+                <Th key={align} align={align}>
+                  Client
+                </Th>
+              ))}
+              <ActionsTh />
+            </tr>
+          </thead>
+          <tbody>
+            <Tr hoverable selected>
+              {tableCellAlignments.map((align) => (
+                <Td key={align} align={align} data-label="Client">
+                  Fernando Dias
+                </Td>
+              ))}
+              <Td />
+            </Tr>
+            <DataTableMessage colSpan={4}>No orders yet.</DataTableMessage>
+          </tbody>
+        </DataTable>
+      ))}
+      {/* A grid with every feature, then a grid with groups, an empty grid and a loading grid. */}
+      <DataGrid
+        caption="Products"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        isRowSelected={(row) => row.id === 2}
+        rowActions={() => <button type="button">Edit</button>}
+        renderExpanded={(row) => (row.id === 1 ? "More about the product" : null)}
+        toolbar={<button type="button">New product</button>}
+        search={{ placeholder: "Search the products" }}
+        selection={{ actions: () => <button type="button">Archive</button> }}
+        pageSize={10}
+        defaultState={{ sort: { columnId: "name", descending: false } }}
+      />
+      <DataGrid
+        caption="Products by category"
+        columns={gridColumns}
+        rows={gridRows}
+        groups={[{ key: "drinks", title: "Drinks", actions: <button type="button">Rename</button>, rows: gridRows }]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+      />
+      <DataGrid
+        caption="Products that match"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        search={{ placeholder: "Search" }}
+        defaultState={{ search: "no product has this text" }}
+      />
+      <DataGrid
+        caption="Products that load"
+        columns={gridColumns}
+        rows={[]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        loading
+      />
+      <ListItem title="Day off request" meta="12/10" value="8 h" status={<span>Open</span>} icon={PlusIcon} href="/requests/1" selected />
+      <ListItem title="Ana" onClick={() => undefined} />
+      <ListItem title="No action" />
+      <DetailPanel
+        title="Request #12"
+        status={<span>Open</span>}
+        onClose={() => undefined}
+        fields={[{ label: "Type", value: "Vacation" }]}
+        footer={<button type="button">Approve</button>}
+      >
+        A note of the manager.
+      </DetailPanel>
     </ThemeProvider>,
   );
 
@@ -343,6 +459,9 @@ async function renderEveryComponent(): Promise<string[]> {
       }
     }
   };
+  collect();
+  // Phase 10: the bar of the selected rows is on the page only while a row is selected.
+  await user.click(screen.getByRole("checkbox", { name: "Select all" }));
   collect();
   // An open menu is on the page only while it is open.
   for (const menuPlacement of splitButtonMenuPlacements) {
@@ -444,8 +563,9 @@ describe("the classes of the components use only tokens", () => {
     // A breakpoint of Tailwind ("lg:") is a media query with a width in rem. It
     // is Tailwind's own value for the width of the screen, not a length of a
     // component, so the width of a media query is left out of this check.
+    // "max-md:" (phase 10, a table shown as blocks) is the same breakpoint, as "width < 48rem".
     const withoutBreakpoints = utilitiesLayer(cssOfClasses).replace(
-      /@media \(width >= \d+(\.\d+)?rem\)/g,
+      /@media \(width (>=|<) \d+(\.\d+)?rem\)/g,
       "@media (breakpoint)",
     );
     expect(withoutBreakpoints).toContain("@media (breakpoint)");
@@ -527,6 +647,19 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["opacity-0", "group-hover/tooltip:opacity-100"],
     ["invisible", "group-has-focus-visible/tooltip:visible"],
     ["opacity-0", "group-has-focus-visible/tooltip:opacity-100"],
+    // Phase 10: data
+    // Tr: the row of the open record wins over the row under the pointer.
+    ["hover:bg-subtle", "aria-[current=true]:bg-selected"],
+    // DataTable with stackOnMobile: the classes of a narrow screen win over the classes of a cell.
+    ["border-b", "max-md:[&_td]:[border:0]"],
+    ["py-2.5", "max-md:[&_td]:py-1.5"],
+    // DataGrid: a row whose checkbox is checked wins over the row under the pointer,
+    // and the header of the sorted column wins over the look at rest.
+    ["hover:bg-subtle", "data-checked:bg-selected"],
+    ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
+    ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
+    // DetailPanel: the width of a wide screen wins over the full width.
+    ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

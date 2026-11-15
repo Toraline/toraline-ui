@@ -291,3 +291,18 @@ A temporary page, outside both repositories, rendered Intraweb's own files (`ove
 | The tooltip for a screen reader | `aria-hidden="true"` | `role="tooltip"`, linked with `aria-describedby` unless the element has the same text as its `aria-label` |
 
 Not checked: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, a touch screen, Intraweb's themes `cozy`, `old` and `glass`, and Intraweb's `DeleteOverlay` in its "blocked" state.
+
+## The data components (phase 10, the route `/data`)
+
+The route `/data` shows DataTable (with an actions column, with no rows, in a narrow container, and as blocks on a narrow screen), DataGrid, ListItem and DetailPanel. The page `app/data/page.tsx` is a Server Component. DataGrid holds state and its columns are functions, so it is used through the Client Component `app/data/ProductsGrid.tsx`.
+
+Checked on 2026-11-15 in the built app (`next start`), with Chromium driven by Playwright, at 1280 and 375 pixels wide, in the light and the dark theme:
+
+- The browser console had no message.
+- The page is not wider than the window (375 pixels at 375). Only the box of a table wider than its box scrolls sideways, and only that box can get the keyboard focus.
+- In the DataGrid, a press on the header "Price" sorts ascending (`aria-sort="ascending"`), the button of the next page shows "2 of 3", and the checkbox of the header selects the 23 rows.
+- The values of the first table, light and dark: the card `rgb(255, 255, 255)` and `rgb(22, 27, 38)` with a corner of `16px`; a header cell `rgb(247, 248, 250)` and `rgb(31, 36, 47)`, text of `12px` in `rgb(102, 112, 133)` and `rgb(138, 141, 148)`, padding `10px 12px`; a cell with text in `rgb(52, 64, 84)` and `rgb(206, 207, 210)`; the row of the open record `rgb(242, 246, 249)` and `rgb(28, 39, 51)`.
+
+The comparison of each component with Intraweb's own file, value by value, is in the 4 entries of phase 10 in [`docs/decisions.md`](../../docs/decisions.md) (TOR-1164 to TOR-1167).
+
+Not checked: a real screen reader (VoiceOver or NVDA), and browsers other than Chromium.

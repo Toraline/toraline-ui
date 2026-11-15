@@ -1,0 +1,117 @@
+import type { ComponentProps, ReactNode, Ref } from "react";
+import type { ControlSize } from "../shared/control.js";
+import type { TableCellAlignment } from "../data-table/index.js";
+
+/*
+ * The lists and the types of DataGrid. DataGrid.tsx starts with "use client",
+ * and a Server Component cannot read a value that such a file exports. So the
+ * values are in this file, which has no "use client".
+ */
+
+/** The numbers of rows a person can choose for one page. */
+export const dataGridPageSizes = [10, 25, 50, 100] as const;
+
+/** One column of a DataGrid. "Row" is the type of one record. */
+export type DataGridColumn<Row> = {
+  /** A name no other column of the grid has. The sort names the column by it. */
+  id: string;
+  /** The text of the header cell. It is also the name of the column in a row shown as a block on a narrow screen. */
+  header: string;
+  /** What the cell of this column shows for a record. */
+  cell: (row: Row) => ReactNode;
+  /** The side the content is aligned to. "right" is for numbers. When missing: the left. */
+  align?: TableCellAlignment;
+  /**
+   * Turns on the sort by this column: a press on the header sorts the rows by
+   * this value. A record with null always goes to the end.
+   */
+  sortValue?: (row: Row) => string | number | null;
+  /** The text of this column that the search field looks in. */
+  searchValue?: (row: Row) => string;
+  /** The content of the footer cell, computed from the rows after the search (every page). */
+  footer?: (rows: Row[]) => ReactNode;
+};
+
+/** A block of rows with its own header row, for example the products of one category. */
+export type DataGridGroup<Row> = {
+  /** A name no other group has. */
+  key: string | number;
+  /** The title of the group. The number of its rows is shown after it. */
+  title: ReactNode;
+  /** The buttons of the header row of the group. */
+  actions?: ReactNode;
+  /** Props for the <tr> of the header row of the group, for example the handlers of a drag. */
+  headerProps?: ComponentProps<"tr">;
+  /** The records of the group, in the order they are shown. */
+  rows: readonly Row[];
+};
+
+/** The column the rows are sorted by and the direction, or null when the rows are in the order the app gave. */
+export type DataGridSort = { columnId: string; descending: boolean } | null;
+
+/** What a person changed in the grid: the search text, the sort, the page and the number of rows of a page. */
+export type DataGridState = {
+  search: string;
+  sort: DataGridSort;
+  /** The page that is shown. The first page is 1. */
+  page: number;
+  pageSize: number;
+};
+
+/** The texts the grid shows or gives to a screen reader. The library has no translations: an app in another language gives them. */
+export type DataGridLabels = {
+  /** The name of the column of the buttons of each row. Only a screen reader says it. */
+  actions: string;
+  /** The button that empties the search field. */
+  clearFilters: string;
+  /** The message when the search finds no row. */
+  noResults: string;
+  /** The message while "loading" is true. */
+  loading: string;
+  /** The text of the first cell of the footer row, when the first column has no footer. */
+  total: string;
+  /** The name of the bar of the actions for the selected rows, for a screen reader. */
+  bulkActions: string;
+  /** The text of the bar: how many rows are selected. */
+  selectedCount: (count: number) => string;
+  /** The button that clears the selection. */
+  clearSelection: string;
+  /** The name of the checkbox of the header, which selects every row. */
+  selectAll: string;
+  /** The name of the checkbox of one row. It receives the result of getRowLabel. */
+  selectRow: (rowLabel: string) => string;
+  /** The name of the region with the page controls, for a screen reader. */
+  pagination: string;
+  /** Which rows are on the page: the number of the first one, of the last one, and of all the rows. */
+  pageRange: (firstRow: number, lastRow: number, rowCount: number) => string;
+  /** The label of the field that chooses the number of rows of a page. */
+  rowsPerPage: string;
+  /** The page that is shown and the number of pages. */
+  pageOf: (page: number, pageCount: number) => string;
+  /** The name of the button of the page before. */
+  previousPage: string;
+  /** The name of the button of the page after. */
+  nextPage: string;
+};
+
+/**
+ * The props the grid gives to the checkbox of a row and of the header. The
+ * component must give "ref" to its <input>: the grid uses it to show the
+ * header checkbox as "some rows are selected".
+ */
+export type DataGridCheckboxProps = {
+  ref?: Ref<HTMLInputElement>;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: () => void;
+  "aria-label": string;
+};
+
+/** The props the grid gives to the field that chooses the number of rows of a page. "children" are <option> elements. */
+export type DataGridSelectProps = {
+  size: ControlSize;
+  className: string;
+  value: number;
+  onChange: (event: { target: { value: string } }) => void;
+  children: ReactNode;
+};

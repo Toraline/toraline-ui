@@ -133,3 +133,38 @@ export type { PopoverAlign, PopoverProps } from "./popover/index.js";
 
 export { Tooltip, tooltipSides } from "./tooltip/index.js";
 export type { TooltipProps, TooltipSide } from "./tooltip/index.js";
+
+// Phase 10: data
+export {
+  ActionsTh,
+  DataTable,
+  DataTableMessage,
+  Td,
+  Th,
+  Tr,
+  tableCellAlignments,
+} from "./data-table/index.js";
+export type {
+  ActionsThProps,
+  DataTableMessageProps,
+  DataTableProps,
+  TableCellAlignment,
+  TdProps,
+  ThProps,
+  TrProps,
+} from "./data-table/index.js";
+export { DataGrid, dataGridPageSizes } from "./data-grid/index.js";
+export type {
+  DataGridCheckboxProps,
+  DataGridColumn,
+  DataGridGroup,
+  DataGridLabels,
+  DataGridProps,
+  DataGridSelectProps,
+  DataGridSort,
+  DataGridState,
+} from "./data-grid/index.js";
+export { ListItem } from "./list-item/index.js";
+export type { ListItemProps } from "./list-item/index.js";
+export { DetailPanel } from "./detail-panel/index.js";
+export type { DetailField, DetailPanelProps } from "./detail-panel/index.js";

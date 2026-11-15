@@ -110,6 +110,13 @@ test.each([lightTheme, darkTheme])(
       ["text-tertiary", "bg-subtle"],
       // Phase 9: the text of a tooltip.
       ["text-inverse", "bg-tooltip"],
+      // Phase 10: data. The selected row of a table and the selected item of a list.
+      ["text-primary", "bg-subtle"],
+      ["text-primary", "bg-selected"],
+      ["text-body", "bg-selected"],
+      ["text-tertiary", "bg-selected"],
+      ["text-secondary", "bg-selected"],
+      ["text-secondary", "bg-subtle"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
@@ -143,6 +150,11 @@ test.each([lightTheme, darkTheme])(
       ["icon-strong", "bg-subtle"],
       ["icon-brand", "bg-primary-subtle"],
       ["icon-brand", "bg-primary-muted"],
+      // Phase 10: data. The line on the left of the selected row and of the selected item.
+      ["border-brand", "bg-selected"],
+      ["bg-primary", "bg-selected"],
+      ["icon-default", "bg-subtle"],
+      ["icon-default", "bg-selected"],
     ];
     for (const [foreground, background] of pairs) {
       expect(

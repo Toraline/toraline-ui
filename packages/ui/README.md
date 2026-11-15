@@ -1197,3 +1197,236 @@ A small label next to an element, shown while the pointer is over the element an
 - A tooltip is not a replacement for a name: an element with only an icon still needs `aria-label`. Do not put a link or a button inside `label`.
 - The list `tooltipSides` and the types `TooltipProps` and `TooltipSide` are exported.
 - It is a Client Component. A Server Component can render it: `label` and `children` are text and elements.
+
+## The data components (phase 10)
+
+They come from `@toraline.tech/ui`, as the components above, and follow the same rules. The route `/data` of [`apps/playground`](../../apps/playground/README.md) shows them.
+
+### `DataTable`, `Tr`, `Th`, `Td`, `ActionsTh`, `DataTableMessage`
+
+A table of data inside a card. It is a real `<table>`: the app writes `<thead>`, `<tbody>` and `<tfoot>` itself, with the parts of the library inside.
+
+```tsx
+import { Pencil } from "lucide-react";
+import { ActionsTh, DataTable, DataTableMessage, IconButton, Td, Th, Tr } from "@toraline.tech/ui";
+
+<DataTable caption="Orders">
+  <thead>
+    <tr>
+      <Th>Client</Th>
+      <Th align="right">Total</Th>
+      <ActionsTh />
+    </tr>
+  </thead>
+  <tbody>
+    {orders.length === 0 ? <DataTableMessage colSpan={3}>No orders yet.</DataTableMessage> : null}
+    {orders.map((order) => (
+      <Tr key={order.id} hoverable selected={order.id === openOrderId}>
+        <Td>{order.client}</Td>
+        <Td align="right">{order.total}</Td>
+        <Td className="w-12" align="right">
+          <IconButton icon={Pencil} size="sm" aria-label={`Edit the order of ${order.client}`} />
+        </Td>
+      </Tr>
+    ))}
+  </tbody>
+</DataTable>
+```
+
+| Part | Prop | Values | Meaning |
+|---|---|---|---|
+| `DataTable` | `caption` | Text or elements | The name of the table. A screen reader says it; it is not shown. The table needs `caption`, `aria-label` or `aria-labelledby`: TypeScript refuses a table with none of them |
+| `DataTable` | `stackOnMobile` | `true`, `false` (default) | `true`: on a screen less than 768 pixels wide, each row is a block, and each cell is one line with the name of its column on the left. Each `Td` then needs the attribute `data-label` with the name of its column. A cell with no `data-label` (the cell of the buttons) is a line of its own |
+| `Tr` | `selected` | `true`, `false` (default) | The row of the record that is open, for example in a panel next to the table. The row gets `aria-current="true"`, the background `bg-selected` and a line in the brand color on its left |
+| `Tr` | `hoverable` | `true`, `false` (default) | The row has a quiet background while the pointer is over it |
+| `Th` | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. When missing: the left |
+| `Th` | `scope` | `"col"` (default), `"row"`, `"colgroup"`, `"rowgroup"` | The HTML attribute: what the header cell names |
+| `Td` | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers: it also gives every digit the same width (`tabular-nums`), so the numbers of a column line up |
+| `ActionsTh` | `label` | Text. Default `"Actions"` | The name of the column of the buttons of each row. Only a screen reader says it |
+| `DataTableMessage` | `colSpan` | A number. Required | The number of columns of the table. The part is one row with one message as wide as the table: a table with no rows, or a table whose rows are loading |
+
+- The classes are the ones of the DataTable of the app Intraweb (`components/ui/data-table.tsx`). The look was compared with Intraweb's in both themes.
+- Main native element: the `<table>`. Every other prop and `ref` go to it. `className` goes to the box around the table (`data-slot="box"`), which is the card.
+- Each part (`Tr`, `Th`, `Td`) gives `className`, every other prop and `ref` to its own element. A plain `<tr>` works too. `DataTableMessage` gives them to its `<td>`.
+- A table wider than its box scrolls sideways. While it is wider, the box can get the keyboard focus (`tabindex="0"`), so the arrow keys scroll it, and it has `role="group"` and the name of the table. A table that fits adds no stop for the Tab key.
+- A table whose rows are loading: give `aria-busy="true"` to `DataTable` and the text in a `DataTableMessage`.
+- A footer row is a `<tfoot>` with classes of the app, for example `<tr className="bg-subtle font-medium">` and `<Td className="border-t text-strong">`.
+- The list `tableCellAlignments` and the types `DataTableProps`, `TrProps`, `ThProps`, `TdProps`, `ActionsThProps`, `DataTableMessageProps` and `TableCellAlignment` are exported.
+- They have no `"use client"`: they also render in a Server Component. Only the box around the table runs in the browser, to measure its width.
+
+### `DataGrid`
+
+A table of records with a search field, a sort by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
+
+```tsx
+"use client";
+
+import { DataGrid } from "@toraline.tech/ui";
+import type { DataGridColumn } from "@toraline.tech/ui";
+
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    sortValue: (product) => product.name,
+    searchValue: (product) => product.name,
+  },
+  {
+    id: "stock",
+    header: "Stock",
+    align: "right",
+    cell: (product) => product.stock,
+    sortValue: (product) => product.stock,
+    footer: (rows) => rows.reduce((sum, product) => sum + product.stock, 0),
+  },
+];
+
+<DataGrid
+  caption="Products"
+  columns={columns}
+  rows={products}
+  getRowKey={(product) => product.id}
+  getRowLabel={(product) => product.name}
+  search={{ placeholder: "Search the products" }}
+  pageSize={25}
+  rowActions={(product) => <IconButton icon={Pencil} size="sm" aria-label={`Edit ${product.name}`} />}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `caption` | Text. Required | The name of the table. A screen reader says it; it is not shown |
+| `columns` | A list of columns. Required | See the table of a column below |
+| `rows` | A list of records. Required | Every record, not one page of them |
+| `getRowKey` | A function. Required | A value no other record has, for example its id |
+| `getRowLabel` | A function. Required | The name of the record for a screen reader, for example in the name of its checkbox |
+| `search` | `{ placeholder }` | Turns on the search field. It looks in the columns with `searchValue`, with no difference for capital letters and accents |
+| `toolbar` | Elements | The filters and the buttons of the screen, shown above the table, after the search field |
+| `pageSize` | A number | Turns on the pages: the number of rows of a page until the person chooses another |
+| `pageSizeOptions` | A list of numbers. Default `10, 25, 50, 100` | The numbers a person can choose. `pageSize` is added when it is not in the list |
+| `selection` | `{ actions: (rows, clear) => elements }` | Turns on a checkbox in each row and one in the header, which selects every row the search found. While a row is selected, a bar shows the number of selected rows and what `actions` returns. `clear()` clears the selection |
+| `rowActions` | A function | The buttons of the last column of a row |
+| `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
+| `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
+| `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
+| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no selection and no pages |
+| `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
+| `loading` | `true`, `false` (default) | `true` while the records load: the table has `aria-busy="true"` and shows the text of `labels.loading` in the place of the rows |
+| `defaultState` | `{ search, sort, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null` |
+| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, the page or the page size, for example to write them in the address of the page |
+| `locale` | A language, for example `"pt-BR"` | The language that orders the texts of a sort. When missing: the language of the browser |
+| `labels` | An object | The texts of the grid. Each one that is missing has its English default. See below |
+| `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the checkbox of the browser |
+| `selectComponent` | A component | The field of the page size. When missing: the `<select>` of the browser, in the box of a form control |
+| `className` | Classes | They go to the element around the whole grid (`data-slot="data-grid"`) |
+
+A column (`DataGridColumn<Row>`):
+
+| Field | Values | Meaning |
+|---|---|---|
+| `id` | Text. Required | A name no other column has |
+| `header` | Text. Required | The text of the header cell, and the name of the column in a row shown as a block |
+| `cell` | A function. Required | What the cell shows for a record |
+| `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers |
+| `sortValue` | A function that returns a text, a number or `null` | Turns on the sort by this column. A press on the header sorts ascending, a second press descending, a third press removes the sort. A record with `null` is always at the end. A text with a number is ordered by the number (`P9` before `P10`) |
+| `searchValue` | A function that returns a text | The text of this column that the search looks in |
+| `footer` | A function that receives the rows after the search | The content of the footer cell. The footer row is shown when a column has `footer` |
+
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`).
+
+- The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
+- The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
+- Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
+- Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
+- `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
+- Not in the library yet, and still only in Intraweb: the filter of a column, the menu that chooses the columns, the editing of cells, the rows inside a row, another view in the place of the table, and saving the state in the address of the page or in the browser. The reasons are in the entry of TOR-1165 of [`docs/decisions.md`](../../docs/decisions.md).
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
+
+### `ListItem`
+
+One row of a list of records: an icon, a title and a second line, and a value and a status on the right.
+
+```tsx
+import { CalendarDays } from "lucide-react";
+import Link from "next/link";
+import { ListItem } from "@toraline.tech/ui";
+
+<ul>
+  {requests.map((request) => (
+    <li key={request.id}>
+      <ListItem
+        title={request.title}
+        meta={request.date}
+        value={request.hours}
+        icon={CalendarDays}
+        href={`/requests/${request.id}`}
+        linkComponent={Link}
+        selected={request.id === openRequestId}
+      />
+    </li>
+  ))}
+</ul>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The main text. One line: a long text ends with "…" |
+| `meta` | Text or elements | The second line, for example a date. One line: a long text ends with "…" |
+| `value` | Text or elements | The value on the right, for example `"8 h"`. Its digits all have the same width |
+| `status` | Elements | Shown under the value, usually a badge with the status of the record |
+| `icon` | An icon component | An icon shown before the text, in a box of 40 pixels. See [Icons](#icons). It is decoration: a screen reader skips it |
+| `selected` | `true`, `false` (default) | The item that is open, for example in a panel next to the list. It gets `aria-current="true"`, the background `bg-selected` and a short line in the brand color on its left |
+| `href` | An address | With it, the item is a link |
+| `onClick` | A function | Called on a press. With it and no `href`, the item is a `<button>` |
+| `linkComponent` | A component. Default `"a"` | The component that renders the link. A Next.js app gives the `Link` of `next/link` |
+
+- The parts and the classes are the ones of the ListItem of the app Intraweb (`components/ui/list-item.tsx`). The item is at least 64 pixels high.
+- With no `href` and no `onClick` the item is a `<div>` that cannot be pressed: it has no arrow on the right and no background under the pointer.
+- Main native element: the `<a>`, the `<button>` or the `<div>`. `className`, every other prop and `ref` go to it. The HTML attribute `title` is not accepted: `title` is the main text.
+- The component renders no `<li>`: put each item inside an `<li>` of a list.
+- Keyboard: Tab moves the focus to a link or a button; Enter follows the link; Enter and Space press the button. The focus ring is drawn inside the item.
+- Screen reader: it reads the title, the second line, the value and the status as the name of the link or the button. The selected item has `aria-current="true"`.
+- The inner parts have `data-slot`: `icon`, `text`, `title`, `meta`, `end`, `value`, `chevron`.
+- The type `ListItemProps` is exported.
+- It has no `"use client"`: it also renders in a Server Component. An item with `onClick` needs a Client Component around it, because a function cannot go from a Server Component to the browser.
+
+### `DetailPanel`
+
+The detail of the selected record, shown next to a list. It does not cover the page and does not keep the focus inside: the list can still be used.
+
+```tsx
+import { Button, DetailPanel } from "@toraline.tech/ui";
+
+<DetailPanel
+  title="Vacation of Marina Lopes"
+  status={<StatusBadge status="open" />}
+  onClose={closePanel}
+  fields={[
+    { label: "Period", value: "01/11/2026 to 10/11/2026" },
+    { label: "Hours", value: "80 h" },
+  ]}
+  footer={<Button onClick={approve}>Approve</Button>}
+/>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements. Required | The title, an `<h2>`. It is the name of the panel for a screen reader |
+| `status` | Elements | Shown under the title, usually a badge with the status of the record |
+| `onClose` | A function | Called on a press of the close button. Without it, the panel has no close button |
+| `closeLabel` | Text. Default `"Close"` | The name of the close button for a screen reader |
+| `fields` | A list of `{ label, value }` | The fields of the record, shown as a list of names and values. `label` is a text no other field of the panel has; `value` is text or elements |
+| `footer` | Elements | The actions of the record, shown at the bottom, on the right |
+| `children` | Elements | More content, shown after the fields |
+
+- The parts and the classes are the ones of the DetailPanel of the app Intraweb (`components/ui/detail-panel.tsx`). The look was compared with Intraweb's in both themes.
+- Width: as wide as its container, and 360 pixels from a screen 1280 pixels wide (`xl:w-90 xl:shrink-0`), so it sits next to a list in a row. Give `className` to change it.
+- Main native element: the `<aside>`. `className`, every other prop and `ref` go to it. The HTML attribute `title` is not accepted: `title` is the title of the panel.
+- Screen reader: the panel is a complementary region with the name of its title. The fields are a description list (`<dl>`).
+- Keyboard: Tab moves the focus to the close button and to the buttons of the footer. The content scrolls when the app limits the height of the panel (`className="max-h-96"`); while it scrolls, it can get the keyboard focus, so the arrow keys scroll it.
+- While the record loads, the app gives its own text as `children` and `aria-busy="true"`.
+- The inner parts have `data-slot`: `header`, `title`, `body`, `fields`, `footer`.
+- The types `DetailPanelProps` and `DetailField` are exported.
+- It has no `"use client"`: it also renders in a Server Component. A panel with `onClose` needs a Client Component around it, because a function cannot go from a Server Component to the browser.
