@@ -797,6 +797,7 @@ import { StatCard } from "@toraline.tech/ui";
 | `icon` | An icon component | An icon in a box of 40 pixels before the label. See [Icons](#icons). It is decoration: a screen reader skips it |
 | `tone` | `"default"` (default), `"tinted"` | `default`: a white card. `tinted`: the quiet brand color, for the number that matters most |
 | `trend` | An object, see below | How the number changed, shown under the number |
+| `progress` | `{ value, max, label, tone }` | A [`ProgressBar`](#progressbar-and-progressring) at the bottom of the card, for a number that goes towards a goal. The keys are the props of ProgressBar with the same names; `label` is shown above the bar |
 
 The object of `trend` (the type `StatCardTrend`):
 
@@ -811,4 +812,37 @@ The object of `trend` (the type `StatCardTrend`):
 - The app writes every text and formats every number. The card adds only the sign of the change.
 - The color of the change says good or bad. The sign says the direction, so the color is not the only way to read it. A screen reader reads the sign, the value and the comparison.
 - Main native element: the `<section>`. `className`, every other prop and `ref` go to it. It has `data-tone`. The inner parts have `data-slot`: `header`, `icon`, `label`, `value`, `trend`, `trend-value` (with `data-direction` and `data-meaning`), `trend-icon`, `trend-comparison`.
-- The list `statCardTones` and the types `StatCardProps`, `StatCardTone` and `StatCardTrend` are exported. It has no `"use client"`.
+- The list `statCardTones` and the types `StatCardProps`, `StatCardTone`, `StatCardTrend` and `StatCardProgress` are exported. It has no `"use client"`.
+
+### `ProgressBar` and `ProgressRing`
+
+How much of a whole is done: as a filled part of a line (`ProgressBar`) or of a circle (`ProgressRing`).
+
+```tsx
+import { ProgressBar, ProgressRing } from "@toraline.tech/ui";
+
+<ProgressBar label="Hours of the month" value={30} max={40} valueText="30 of 40 h" />
+<ProgressBar label="Goal" value={82} tone="success" hideLabel />
+
+<ProgressRing label="Ideal stock" value={1} max={4} tone="warning" />
+<ProgressRing label="Ideal stock" value={1} max={4} size="sm" />
+```
+
+| Prop | Component | Values | Meaning |
+|---|---|---|---|
+| `value` | Both | A number, required | How much is done, from 0 to `max`. A value outside is shown as 0 or as `max` |
+| `max` | Both | A number. Default: `100` | The value that means "all done" |
+| `label` | Both | Text, required | What it measures. ProgressBar shows it above the bar. ProgressRing does not show it. In both it is the name a screen reader says |
+| `tone` | Both | `"brand"` (default), `"success"`, `"warning"`, `"danger"` | The color of the filled part. `brand`: a plain measure. `success`: good. `warning`: needs attention. `danger`: bad |
+| `valueText` | `ProgressBar` | Text. Default: the percentage, `"75%"` | The text of the value, shown on the right of the label and read by a screen reader |
+| `hideLabel` | `ProgressBar` | `true`, `false` (default) | `true` shows only the bar. A screen reader still says the label and the value |
+| `size` | `ProgressRing` | `"md"` (default), `"sm"` | `md`: 64 pixels, with the percentage in the middle. `sm`: 40 pixels, with no text, for a row of a list or a table |
+
+- Screen reader: the track of ProgressBar and the outermost element of ProgressRing have `role="progressbar"`, `aria-label` (the label), `aria-valuemin="0"`, `aria-valuemax`, `aria-valuenow` (the value, kept between 0 and `max`) and `aria-valuetext` (the percentage, or `valueText`). A screen reader says, for example, "Hours of the month, 75%". The drawing of the ring and the percentage in its middle have `aria-hidden="true"`.
+- The percentage is a whole number: `value / max`, rounded. A `max` of 0 or less shows 0%.
+- The bar is 8 pixels high and as wide as its container. The app writes `label` and `valueText`, in its own language.
+- The filled part does not move by itself: there is no animation. Neither component shows "loading with no known end".
+- Contrast: in the light theme the filled part of the tones `success` and `warning` has a contrast below 3 on the track and on a card (the values are in [`docs/decisions.md`](../../docs/decisions.md)). The value is always there as text for a screen reader; for a person who sees, use these tones with the label shown, or the ring `md`.
+- `ProgressBar`: the outermost element is a `<div>` that holds the row of the label and the track. `className`, every other prop and `ref` go to it. It has `data-tone`; the inner parts have `data-slot`: `header`, `label`, `value`, `track`, `fill`.
+- `ProgressRing`: the outermost element is the `<div role="progressbar">`. `className`, every other prop and `ref` go to it. It has `data-size` and `data-tone`; the inner parts have `data-slot`: `drawing`, `track`, `fill`, `percent`.
+- The lists `progressTones` and `progressRingSizes` and the types `ProgressBarProps`, `ProgressRingProps`, `ProgressTone` and `ProgressRingSize` are exported. Neither has `"use client"`.

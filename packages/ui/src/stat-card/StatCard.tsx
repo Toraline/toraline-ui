@@ -1,4 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
+import { ProgressBar } from "../progress/index.js";
+import type { ProgressBarProps } from "../progress/index.js";
 import { classNames } from "../shared/class-names.js";
 import type { IconComponent } from "../shared/icon.js";
 
@@ -9,7 +11,7 @@ export type StatCardTone = (typeof statCardTones)[number];
 /*
  * The classes of the card. They are the ones of the StatCard of the app
  * Intraweb (components/ui/stat-card.tsx): a card with a small label, one
- * large number, and under it how the number changed.
+ * large number, and under it how the number changed and a progress bar.
  */
 const rootClass = "flex flex-col gap-3 rounded-lg p-4 shadow-card md:rounded-xl md:p-5";
 
@@ -70,6 +72,9 @@ export type StatCardTrend = {
   upIsGood?: boolean;
 };
 
+/** The progress bar under the number: these props of ProgressBar. "label" is shown above the bar. */
+export type StatCardProgress = Pick<ProgressBarProps, "value" | "max" | "label" | "tone">;
+
 export type StatCardProps = Omit<ComponentProps<"section">, "children"> & {
   /** What the number is, shown as a heading of level 3: "Sales of the month". */
   label: ReactNode;
@@ -85,6 +90,8 @@ export type StatCardProps = Omit<ComponentProps<"section">, "children"> & {
   tone?: StatCardTone;
   /** How the number changed since an earlier period, shown under the number. */
   trend?: StatCardTrend;
+  /** A progress bar at the bottom of the card, for a number that goes towards a goal: { value: 30, max: 40, label: "Goal of the month" }. */
+  progress?: StatCardProgress;
 };
 
 /** The arrow of the change. The shapes are the icons "trending-up" and "trending-down" of Lucide (https://lucide.dev, ISC license), the icons Intraweb shows here. */
@@ -117,7 +124,7 @@ function TrendIcon({ direction }: { direction: StatCardTrend["direction"] }) {
 }
 
 /**
- * A card with one number: a label, the number, and how it changed.
+ * A card with one number: a label, the number, how it changed, and how far it is from a goal.
  *
  * - It is a <section>. The label is an <h3>, and the number a <p>.
  * - The app writes every text: the label, the number, the change and what it
@@ -133,6 +140,7 @@ export function StatCard({
   icon: Icon,
   tone = "default",
   trend,
+  progress,
   className,
   ...sectionProps
 }: StatCardProps) {
@@ -177,6 +185,7 @@ export function StatCard({
           ) : null}
         </p>
       ) : null}
+      {progress !== undefined ? <ProgressBar {...progress} /> : null}
     </section>
   );
 }

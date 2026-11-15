@@ -10,6 +10,8 @@ import {
   EmptyState,
   Field,
   Panel,
+  ProgressBar,
+  ProgressRing,
   Select,
   StatCard,
   StatusBadge,
@@ -17,6 +19,8 @@ import {
   controlSizes,
   countBadgeVariants,
   parseDecimalInput,
+  progressRingSizes,
+  progressTones,
   statCardTones,
   statusBadgeVariants,
 } from "@toraline.tech/ui";
@@ -252,7 +256,36 @@ export default function FormsFeedbackPage() {
           trend={{ direction: "up", value: "5%", comparison: "vs. last month", upIsGood: false }}
         />
         <StatCard label="Late orders" value={2} trend={{ direction: "down", value: "8%" }} />
+        <StatCard
+          label="Hours of the month"
+          value="30 h"
+          progress={{ value: 30, max: 40, label: "Goal of the month", tone: "success" }}
+        />
       </div>
+
+      <Section title="ProgressBar and ProgressRing">
+        <div className="mt-4 grid max-w-sm gap-4">
+          {progressTones.map((tone) => (
+            <ProgressBar key={tone} tone={tone} label={`Hours of the month, ${tone}`} value={30} max={40} />
+          ))}
+          <ProgressBar label="With its own text" value={30} max={40} valueText="30 of 40 h" />
+          <ProgressBar label="Only the bar" value={30} max={40} hideLabel />
+        </div>
+        {progressRingSizes.map((size) => (
+          <Row key={size} label={`ProgressRing, size ${size}`}>
+            {progressTones.map((tone) => (
+              <ProgressRing
+                key={tone}
+                size={size}
+                tone={tone}
+                label={`Ideal stock, ${tone}, ${size}`}
+                value={3}
+                max={4}
+              />
+            ))}
+          </Row>
+        ))}
+      </Section>
     </main>
   );
 }

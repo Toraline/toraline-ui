@@ -146,6 +146,27 @@ describe("StatCard", () => {
     expect(downPath).toBe("M16 17h6v-6");
   });
 
+  test("progress: a progress bar at the bottom of the card, with its label and its percentage", () => {
+    const { container } = render(
+      <StatCard
+        label="Hours"
+        value="30 h"
+        trend={{ direction: "up", value: "2 h" }}
+        progress={{ value: 30, max: 40, label: "Goal of the month", tone: "success" }}
+      />,
+    );
+    const bar = screen.getByRole("progressbar", { name: "Goal of the month" });
+    expect(bar.getAttribute("aria-valuenow")).toBe("30");
+    expect(bar.getAttribute("aria-valuetext")).toBe("75%");
+    expect(screen.getByText("Goal of the month")).toBeDefined();
+    expect(screen.getByText("75%")).toBeDefined();
+    expect((bar.firstElementChild as HTMLElement).className.split(" ")).toContain("bg-data-success");
+    // The bar is the last part of the card, after the trend.
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.lastElementChild).toBe(bar.parentElement);
+    expect(card.lastElementChild?.previousElementSibling?.getAttribute("data-slot")).toBe("trend");
+  });
+
   test("it cannot get the focus", () => {
     const { container } = render(<StatCard label="Sales" value={42} />);
     expect((container.firstElementChild as HTMLElement).tabIndex).toBe(-1);

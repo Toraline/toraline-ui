@@ -90,6 +90,25 @@ export const UpIsBad: Story = {
   ),
 };
 
+/** The prop "progress": a progress bar at the bottom of the card, for a number that goes towards a goal. In every tone of the card. */
+export const WithProgress: Story = {
+  render: (args) => (
+    <div className="grid gap-4">
+      {statCardTones.map((tone) => (
+        <StatCard
+          {...args}
+          key={tone}
+          tone={tone}
+          label={`Hours of the month, ${tone}`}
+          value="30 h"
+          trend={{ direction: "up", value: "2 h", comparison: "vs. last month" }}
+          progress={{ value: 30, max: 40, label: `Goal of the month, ${tone}`, tone: "success" }}
+        />
+      ))}
+    </div>
+  ),
+};
+
 /** Empty: the app shows a dash when it has no number yet. */
 export const WithoutNumber: Story = {
   args: { value: "—" },

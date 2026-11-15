@@ -34,11 +34,15 @@ import {
   DecimalInput,
   EmptyState,
   Panel,
+  ProgressBar,
+  ProgressRing,
   Select,
   StatCard,
   StatusBadge,
   Textarea,
   countBadgeVariants,
+  progressRingSizes,
+  progressTones,
   statCardTones,
   statusBadgeVariants,
 } from "./index";
@@ -219,6 +223,15 @@ async function renderEveryComponent(): Promise<string[]> {
         />
       ))}
       <StatCard label="Costs" value="R$ 300" trend={{ direction: "up", value: "5%", upIsGood: false }} />
+      <StatCard label="Hours" value="30 h" progress={{ value: 30, max: 40, label: "Goal of the month" }} />
+      {progressTones.map((tone) => (
+        <ProgressBar key={tone} tone={tone} label={`Goal, ${tone}`} value={30} max={40} />
+      ))}
+      {progressTones.map((tone) =>
+        progressRingSizes.map((size) => (
+          <ProgressRing key={`${tone}-${size}`} tone={tone} size={size} label={`Stock, ${tone}, ${size}`} value={1} max={4} />
+        )),
+      )}
     </ThemeProvider>,
   );
 
