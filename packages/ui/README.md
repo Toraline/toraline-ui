@@ -715,3 +715,34 @@ import { CountBadge } from "@toraline.tech/ui";
 - The app writes `label`, in its own language. The library does not format the number: `count={1234}` shows `1234`.
 - Main native element: the outermost `<span>`. `className`, every other prop and `ref` go to it. It has `data-variant`. The inner parts have `data-slot="count"` and `data-slot="label"`.
 - The list `countBadgeVariants` and the types `CountBadgeProps` and `CountBadgeVariant` are exported. It has no `"use client"`.
+
+### `Panel`
+
+A card that groups content: the box with a shadow that holds one part of a page.
+
+```tsx
+import { Button, Panel } from "@toraline.tech/ui";
+
+<Panel
+  id="contract"
+  title="Contract"
+  subtitle="What the client pays for each month"
+  actions={<Button variant="secondary" size="sm">Edit</Button>}
+>
+  <p>Monthly contract, signed in March.</p>
+</Panel>
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `title` | Text or elements | The title of the card: a heading of level 2 (`<h2>`) at its top |
+| `subtitle` | Text or elements | A quiet line under the title. It is shown only when the card has a title |
+| `actions` | Elements | Buttons or links at the top right of the card. In a narrow card they go under the title |
+| `children` | Elements | The content of the card |
+| `id` | The HTML attribute | Makes the card the target of a link (`href="#contract"`). The card stops 24 pixels under the top of the window |
+
+- The card has the background `bg-surface`, the shadow `shadow-card`, a corner of 12 pixels and a padding of 16 pixels. From the breakpoint `md` of Tailwind CSS (a screen 768 pixels wide or more) the corner is 16 pixels and the padding 24 pixels. Its parts are 16 pixels apart.
+- With no title and no actions the card has no header.
+- The title is always an `<h2>`, as in Intraweb. A page whose cards are under a heading of another level gives no `title` and writes its own heading in `children`.
+- Main native element: the `<section>`. `className`, every other prop and `ref` go to it. The prop `title` replaces the HTML attribute `title` (a tooltip). The inner parts have `data-slot`: `header`, `titles`, `title`, `subtitle`, `actions`.
+- The type `PanelProps` is exported. It has no `"use client"`.

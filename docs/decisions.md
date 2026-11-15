@@ -64,6 +64,14 @@ Format of one entry:
 - Decision: the library does not shorten a long number (`99+`) and does not hide the badge for 0. Intraweb's does neither.
 - Alternatives: `role="img"` with `aria-label` (a screen reader then says "image"); `aria-label` as in Intraweb.
 
+### Panel (TOR-1152)
+- Decision: `Panel` has the props (`id`, `title`, `subtitle`, `actions`, `className`, `children`), the elements and the class lists of Intraweb's `components/ui/panel.tsx`. `title` and `subtitle` accept text or elements (Intraweb: text only).
+- Decision: the title is `font-heading text-lg/7 font-medium`, the computed values of Intraweb's text style `heading-section` (18 pixels, a line of 28 pixels, weight 500).
+- Decision: the title is always an `<h2>`, as in Intraweb. No prop chooses the level of the heading: the ticket does not ask for one.
+- Decision: the `<section>` gets no `aria-labelledby` that points to the title. Intraweb's has none. With it every card would be a region in the list of regions of a screen reader, and a page of Intraweb has many cards.
+- Decision: the props type is the props of `<section>` without the HTML attribute `title`, plus the component's own. So `aria-label`, `data-*` and `ref` work, which Intraweb's Panel does not accept.
+- Alternatives: a prop for the level of the heading; `aria-labelledby` on the `<section>`.
+
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
 - Decision: the comparison with Intraweb was done with a temporary page outside both repositories, which rendered Intraweb's own component files next to the components of the two package files of `make pack`, and a Playwright script that read the computed styles of every element. The page and the script are not committed. The result is in `apps/playground/README.md`, section "The same components next to Intraweb's (phase 7)": 244,248 values compared in both themes, at rest, with the pointer over the control and with the keyboard focus, in 3 window widths. 3 kinds of value differ, each with its reason.

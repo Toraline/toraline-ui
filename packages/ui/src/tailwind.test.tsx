@@ -32,6 +32,7 @@ import {
   CheckboxControl,
   CountBadge,
   DecimalInput,
+  Panel,
   Select,
   StatusBadge,
   Textarea,
@@ -197,6 +198,9 @@ async function renderEveryComponent(): Promise<string[]> {
       {countBadgeVariants.map((variant) => (
         <CountBadge key={variant} variant={variant} count={3} label="3 pending orders" />
       ))}
+      <Panel title="Contract" subtitle="Signed in March" actions={<Button size="sm">Edit</Button>}>
+        Content
+      </Panel>
     </ThemeProvider>,
   );
 
@@ -358,6 +362,9 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["bg-surface", "checked:bg-primary"],
     ["checked:border-brand", "hover:border-hover"],
     ["checked:bg-primary", "checked:hover:bg-primary-hover"],
+    // Panel: the classes of a wide screen win over the classes of a narrow one.
+    ["rounded-lg", "md:rounded-xl"],
+    ["p-4", "md:p-6"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);

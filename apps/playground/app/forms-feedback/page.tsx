@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  Button,
   Checkbox,
   CheckboxControl,
   CountBadge,
   DecimalInput,
   Field,
+  Panel,
   Select,
   StatusBadge,
   Textarea,
@@ -190,6 +192,33 @@ export default function FormsFeedbackPage() {
           ))}
         </Row>
       </Section>
+
+      <h2 className="mt-8 font-heading text-xl font-semibold">Panel</h2>
+      <div className="mt-4 grid gap-4">
+        <Panel>
+          <p className="text-sm text-body">A panel with only its content.</p>
+        </Panel>
+        <Panel
+          id="contract"
+          title="Contract"
+          subtitle="What the client pays for each month"
+          actions={
+            <>
+              <Button variant="secondary" size="sm">
+                Edit
+              </Button>
+              <Button size="sm">New contract</Button>
+            </>
+          }
+        >
+          <p className="text-sm text-body">
+            A panel with a title, a subtitle and two actions. Its id is &quot;contract&quot;.
+          </p>
+        </Panel>
+        <Panel actions={<Button size="sm">Edit</Button>}>
+          <p className="text-sm text-body">A panel with an action and no title.</p>
+        </Panel>
+      </div>
     </main>
   );
 }

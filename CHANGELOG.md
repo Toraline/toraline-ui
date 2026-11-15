@@ -53,6 +53,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - Checkbox and CheckboxControl (phase 8): a checkbox with its label, and only the box (20 pixels) for a list or a table. The box is a real `<input type="checkbox">`. `changed` on CheckboxControl marks a value that is not saved yet.
 - StatusBadge (phase 8): a badge with the state of a thing, in the variants `neutral`, `success`, `warning`, `error` and `info`, with an optional dot.
 - CountBadge (phase 8): a small pill with a number, in the variants `warning` and `brand`. `label` says what the number means to a screen reader.
+- Panel (phase 8): the card that groups content, with an optional title, subtitle and actions.
 
 ## 0.1.0 (2026-11-15)
 

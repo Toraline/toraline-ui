@@ -65,3 +65,6 @@ export type { StatusBadgeProps, StatusBadgeVariant } from "./status-badge/index.
 
 export { CountBadge, countBadgeVariants } from "./count-badge/index.js";
 export type { CountBadgeProps, CountBadgeVariant } from "./count-badge/index.js";
+
+export { Panel } from "./panel/index.js";
+export type { PanelProps } from "./panel/index.js";
