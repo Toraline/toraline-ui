@@ -13,11 +13,12 @@ import {
   ButtonLink,
   Field,
   IconButton,
-  Input,
   SplitButton,
   Tabs,
+  TextInput,
   Toggle,
   buttonSizes,
+  controlSizes,
   buttonVariants,
   iconButtonSizes,
   iconButtonVariants,
@@ -122,12 +123,14 @@ async function renderEveryComponent(): Promise<string[]> {
         )),
       )}
       <Field label="Name" optional hint="As it is written on the invoice.">
-        <input />
+        <TextInput />
       </Field>
       <Field label="Name" error="The name is required.">
-        <input />
+        <TextInput />
       </Field>
-      <Input label="Title" error="The title is required." />
+      {controlSizes.map((size) => (
+        <TextInput key={size} size={size} icon={PlusIcon} aria-label={`Search, ${size}`} />
+      ))}
       <Toggle label="Send e-mails" />
       <Tabs tabs={tabs} />
       <BreadCrumbs crumbs={crumbs} />
@@ -251,7 +254,15 @@ describe("the classes of the components use only tokens", () => {
   });
 
   test("no length is written in rem", () => {
-    expect(utilitiesLayer(cssOfClasses)).not.toMatch(/\d(\.\d+)?rem\b/);
+    // A breakpoint of Tailwind ("lg:") is a media query with a width in rem. It
+    // is Tailwind's own value for the width of the screen, not a length of a
+    // component, so the width of a media query is left out of this check.
+    const withoutBreakpoints = utilitiesLayer(cssOfClasses).replace(
+      /@media \(width >= \d+(\.\d+)?rem\)/g,
+      "@media (breakpoint)",
+    );
+    expect(withoutBreakpoints).toContain("@media (breakpoint)");
+    expect(withoutBreakpoints).not.toMatch(/\d(\.\d+)?rem\b/);
   });
 });
 
@@ -272,11 +283,18 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["text-body", "hover:text-primary"],
     // IconButton: the pointer over it wins over the look at rest.
     ["text-icon", "hover:text-icon-strong"],
-    // Input: the focus wins over the pointer, and disabled wins over both.
+    // TextInput: the focus wins over the pointer, a field that is not valid wins over
+    // both, and the pointer over a disabled field changes nothing.
     ["border-default", "hover:border-hover"],
-    ["hover:border-hover", "focus-visible:border-focus"],
-    ["focus-visible:border-focus", "disabled:border-default"],
+    ["hover:border-hover", "focus:border-focus"],
+    ["focus:border-focus", "aria-invalid:border-invalid"],
+    ["hover:border-hover", "disabled:hover:border-default"],
+    ["bg-surface", "disabled:bg-subtle"],
     ["text-primary", "disabled:text-tertiary"],
+    // TextInput, size "md": the classes of a wide screen win over the classes of a small one.
+    ["min-h-12", "lg:min-h-10"],
+    ["py-2.5", "lg:py-2"],
+    ["text-base/6", "lg:text-sm/5"],
     // Toggle: on wins over off, and disabled wins over on.
     ["bg-surface", "peer-checked:bg-primary"],
     ["border-strong", "peer-checked:border-brand"],
@@ -299,10 +317,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     expect(winningIndex).toBeGreaterThan(losingIndex);
   });
 
-  test("the error border of Input applies only to a field that is not disabled", () => {
-    expect(cssFromSource).toContain(
-      `${selectorOf("aria-invalid:enabled:border-invalid")}[aria-invalid="true"]:enabled`,
-    );
+  test("the border of a field that is not valid is selected by aria-invalid", () => {
+    expect(cssFromSource).toContain(`${selectorOf("aria-invalid:border-invalid")}[aria-invalid="true"]`);
   });
 
   test("a movement or a transition is only for a person who did not ask for less motion", () => {

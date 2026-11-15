@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Field } from "@toraline.tech/ui";
+import { Field, TextInput } from "@toraline.tech/ui";
 
-/** The classes of the plain <input> of these stories. A real form uses a control of the library. */
-const plainInputClass =
+/** The classes of the native controls of the story "With Other Controls". */
+const plainControlClass =
   "min-h-10 w-full rounded-md border border-default bg-surface px-3 py-2 text-sm/5 text-primary";
 
 /**
  * A field of a form: a label, one control, and under it a hint or an error
- * message, all linked for a screen reader. The control of these stories is a
- * plain <input>, to show that Field works with any control.
+ * message, all linked for a screen reader. The control of these stories is
+ * TextInput. The story "With Other Controls" shows that Field works with any control.
  *
  * The stories are on a card (the background "surface"), where a form is in an
  * app. The hint and the mark "(optional)" have the color "text-tertiary" of
@@ -20,7 +20,7 @@ const meta = {
   component: Field,
   args: {
     label: "Client name",
-    children: <input className={plainInputClass} name="client-name" />,
+    children: <TextInput name="client-name" />,
   },
   argTypes: {
     // An element cannot be edited in the panel "Controls".
@@ -74,13 +74,13 @@ export const WithOtherControls: Story = {
   render: () => (
     <div className="grid gap-4">
       <Field label="Kind of contract" hint="It decides how the hours are counted.">
-        <select className={plainInputClass} name="kind">
+        <select className={plainControlClass} name="kind">
           <option>Monthly</option>
           <option>By the hour</option>
         </select>
       </Field>
       <Field label="Notes" optional error="The notes can have 200 characters at most.">
-        <textarea className={plainInputClass} name="notes" rows={3} />
+        <textarea className={plainControlClass} name="notes" rows={3} />
       </Field>
     </div>
   ),

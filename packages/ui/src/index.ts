@@ -22,8 +22,11 @@ export type {
   IconButtonVariant,
 } from "./icon-button/index.js";
 
-export { Input } from "./input/index.js";
-export type { InputProps } from "./input/index.js";
+export { TextInput } from "./text-input/index.js";
+export type { TextInputProps } from "./text-input/index.js";
+
+export { controlSizes } from "./shared/control.js";
+export type { ControlSize } from "./shared/control.js";
 
 export { Toggle } from "./toggle/index.js";
 export type { ToggleProps } from "./toggle/index.js";

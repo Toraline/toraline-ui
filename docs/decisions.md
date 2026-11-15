@@ -12,6 +12,21 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - TextInput replaces Input; the sizes and classes every form control shares (TOR-1142)
+- Decision: `Input` is removed. `TextInput` is only the text field, with the class lists of Intraweb's `TextInput` (`components/ui/form-controls.tsx`), and `Field` (entry of TOR-1141) has the label, the hint and the error message. `CHANGELOG.md` has the table that moves an app from `Input` to `Field` + `TextInput`.
+- Why: version `0.1.0` is on npm since 2026-11-15, and no app uses it for real yet. Two components that do the same thing would have to be kept alike.
+- Decision (sizes of a control): the list `controlSizes` is `["md", "sm"]`, the type `ControlSize`, as Intraweb's. `md` is at least 48 pixels high with text of 16 pixels, and at least 40 pixels with text of 14 pixels from Tailwind's breakpoint `lg` (64rem, 1024 pixels). `sm` is 32 pixels. The classes of the box of a control are in `packages/ui/src/shared/control.ts` (`controlClassNames`). The Select, Textarea and DecimalInput of phase 8 use the same file.
+- Decision: the prop is `size`, as in Intraweb, and it replaces the HTML attribute `size` of `<input>` (the number of characters), which a field with classes does not need.
+- Decision: the focus look is Intraweb's: `focus:border-focus focus:ring-3 focus:ring-info focus:outline-none`. This replaces, for form controls, rule 4 of "Behaviour and accessibility" (every element with the focus shows `focusRingClass`) and the sentence of the entry of TOR-1131 "the field with the focus keeps the outline of the library". The focus look uses `focus:`, not `focus-visible:`: a browser shows the focus of a text field after a click too.
+- Contrast of the focus look: the border `--border-focus` on `--bg-surface` is 3 or more in both themes (test of `packages/tokens/src/tokens.test.ts`).
+- Decision: not valid is `aria-invalid:border-invalid`, with no `enabled:`. As in Intraweb, the red border stays while the field has the focus and while it is disabled.
+- Decision: `className` goes to the `<input>`, also when the field has an icon and is inside a wrapper `<div>`. This is an exception to the rule "className goes on the outermost element".
+- Why: it is what Intraweb's TextInput does, and its screens give width classes (`w-24`, `max-w-40`) that must reach the field. With no icon there is no wrapper, as in Intraweb, so a field in a row of a form is laid out the same way.
+- Decision: the icon is on the left (`left-3`, `pl-9`), as in Intraweb. Right-to-left text was considered and is not supported in this phase: Intraweb has one writing direction.
+- Decision (the test of the rule "no length in rem"): the width of a media query of a Tailwind breakpoint (`@media (width >= 64rem)`) is left out of the check. A breakpoint is Tailwind's own value, not a length written by a component. The size `md` needs the breakpoint `lg`.
+- Alternatives: keeping `Input` as a thin wrapper around Field and TextInput, marked as deprecated; a prop named `controlSize`; the outline of the library for the focus; a wrapper around every TextInput so that `className` always goes to the outermost element.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - Field: how a control is linked, and the new token `--text-xs` (TOR-1141)
 - Decision: `Field` has the parts and the classes of Intraweb's `Field` (`components/ui/form-controls.tsx`): label, the mark of an optional field, the control, a hint, and an error message with the icon `triangle-alert` in the place of the hint.
 - Decision (how a control plugs into Field): Field gives 3 props to its child: `id`, `aria-describedby` and `aria-invalid`. When the child is one element, Field copies it with these props (`cloneElement` of React). When the control is deeper, the app gives a function as `children`, which receives the 3 props (the type `FieldControlProps`). Every control of phase 8 (Select, Textarea, DecimalInput, Checkbox) only has to pass `id` and the `aria-` attributes to its native element, which the conventions already ask.

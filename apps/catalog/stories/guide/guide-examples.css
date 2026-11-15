@@ -36,6 +36,6 @@
 }
 
 /* Guide 3, step 4: an inner part of a component. */
-.guide-search [data-slot="field"] {
-  border-radius: 9999px;
+.guide-search [data-slot="label"] {
+  text-transform: uppercase;
 }

@@ -254,25 +254,35 @@ How a control gets linked:
 - The types `FieldProps` and `FieldControlProps` are exported.
 - It has no `"use client"`: it also renders in a Server Component. A function as `children` is then written in a Server Component too.
 
-### `Input`
+### `TextInput`
+
+A text field: one line of text. It has no label of its own: put it inside [`Field`](#field).
 
 ```tsx
-import { Input } from "@toraline.tech/ui";
+import { Search } from "lucide-react";
+import { Field, TextInput } from "@toraline.tech/ui";
 
-<Input label="Title" name="title" error={titleError} />
+<Field label="Client name" error={nameError}>
+  <TextInput name="name" />
+</Field>
+
+<TextInput aria-label="Search an order" type="search" icon={Search} size="sm" />
 ```
 
 | Prop | Values | Meaning |
 |---|---|---|
-| `label` | Text or elements | The visible name of the field, shown above it. A click on it moves the focus to the field. A field with no `label` needs `aria-label` |
-| `error` | Text or elements | The error message, shown under the field with an icon. When it is given, the border of the field has the color of an invalid field (`--border-invalid`) |
-| `disabled` | The HTML attribute | The field cannot get focus and cannot be changed |
-| `id` | Text | Optional. The component makes an id when it is missing |
+| `size` | `"md"` (default), `"sm"` | `md`: 48 pixels high with text of 16 pixels on a small screen, and 40 pixels with text of 14 pixels from the breakpoint `lg` of Tailwind CSS (a screen 1024 pixels wide or more). `sm`: 32 pixels, for a table or a row of filters. It replaces the HTML attribute `size` |
+| `icon` | An icon component | An icon shown inside the field, on the left. See [Icons](#icons) |
+| `type` | `"text"` (default), and every other type of `<input>` | The HTML attribute |
+| `aria-invalid` | `true` | The field has the red border of a field that is not valid. Field sets it when it has an error |
+| `disabled` | The HTML attribute | The field cannot get focus and cannot be changed. It has a quiet background and a quiet text |
 
-- Main native element: the `<input>`. Every other prop (`name`, `value`, `defaultValue`, `onChange`, `type`, `placeholder`, `required`) and `ref` go to it.
-- `className` goes to the outermost element, a `<div>` that holds the label, the field and the message. The inner parts have the attribute `data-slot` with the values `label`, `field`, `error` and `error-icon`.
-- Screen reader: the label is a `<label>` linked to the field with `for` and `id`. With an error, the field has `aria-invalid="true"`, and `aria-describedby` points to the message, so the message is read with the field.
-- It has no `"use client"`: it also renders in a Server Component.
+- The sizes and the looks are the ones of the `TextInput` of the app Intraweb. The focus look is Intraweb's: the border in the focus color and a ring of 3 pixels, with no outline. A phone makes the page larger when a field with text smaller than 16 pixels gets the focus, which is why `md` has text of 16 pixels on a small screen.
+- Main native element: the `<input>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `required`, `readOnly`) and `ref` go to it. With an icon, the `<input>` is inside a `<div data-slot="wrapper">` as wide as its container, and `className` still goes to the `<input>`, as in Intraweb.
+- Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
+- A read-only field (`readOnly`) has no look of its own.
+- The list `controlSizes` and the types `TextInputProps` and `ControlSize` are exported. Every form control of the library has these sizes.
+- It has no `"use client"`: it also renders in a Server Component. With `onChange`, the file of the app that gives the function is a Client Component.
 
 ### `Toggle`
 
@@ -399,7 +409,7 @@ Every component accepts `className`. The classes go on the outermost element of 
 1. **A Tailwind class of the app replaces the class of the library that sets the same CSS property.** Example: `<Button className="rounded-full">` has `rounded-full` and no longer has the library's `rounded-md`. The library `tailwind-merge` does this, inside every component. It works for a token class against a token class (`bg-surface` replaces `bg-primary`), and for a standard Tailwind class against a token class (`bg-red-500` replaces `bg-primary`). A class replaces only a class for the same CSS property: `text-brand` (a text color) does not remove `text-sm` (a font size), `border-brand` (a border color) does not remove `border` (a border width), and `bg-promo` does not remove the text color.
 2. **A class replaces only a class with the same Tailwind variant.** A Tailwind variant is the part of a Tailwind class before the `:`, which says when the class applies. It is not a variant of a component. `bg-red-500` replaces `bg-primary`. It does not replace `hover:bg-primary-hover` or `disabled:bg-subtle`. To change the look of a state, give a class with the Tailwind variant of that state: `hover:bg-red-600`, `disabled:bg-red-200`.
 3. **CSS of the app that is in no cascade layer wins too.** A cascade layer is a named group of CSS rules with a fixed priority. The Tailwind classes are in the layer `utilities`, and CSS in no layer has a higher priority than every layer. A class of the app that is inside `@layer components` or `@layer base` does not win.
-4. **An inner part** of a component has the attribute `data-slot`, for example `data-slot="field"` on the `<input>` of Input. An app can select it in its own CSS: `.search [data-slot="field"] { border-radius: 9999px; }`.
+4. **An inner part** of a component has the attribute `data-slot`, for example `data-slot="label"` on the `<label>` of Field. An app can select it in its own CSS: `.search [data-slot="label"] { text-transform: uppercase; }`.
 
 ## Rules every component follows
 
@@ -427,7 +437,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 
 1. The props type is the props of the native HTML element plus the component's own props: `ComponentProps<"button"> & { variant?: ButtonVariant }`. Each own prop has a short comment.
 2. A prop has the name HTML or React already uses when one exists: `disabled`, `checked`, `href`, `onChange`.
-3. `className` is joined after the library's classes with the helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` from `src/shared/class-names.ts`, and goes on the outermost element. The helper removes a class of the library when a later class sets the same CSS property.
+3. `className` is joined after the library's classes with the helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` from `src/shared/class-names.ts`, and goes on the outermost element. One exception: the `className` of TextInput goes to its `<input>`, also when an icon puts the `<input>` inside a wrapper. The helper removes a class of the library when a later class sets the same CSS property.
 4. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
 5. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
 6. A relative import names the file with `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. The built type files keep the import as written, and TypeScript in an app that uses the Node module rules needs the full file name. `make check` fails when a built type file has a relative import without `.js`.
@@ -438,7 +448,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 1. A component uses the native HTML element that already has the behaviour: `<button>`, `<input>`, `<label>`, `<a>`, `<nav>`. The browser then gives the keyboard and the screen reader support.
 2. Behaviour that HTML does not have (arrow keys between tabs, a menu) is written by hand in the component, following the pattern of the WAI-ARIA Authoring Practices Guide (https://www.w3.org/WAI/ARIA/apg/patterns/). The package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles, for example Base UI, Radix or React Aria.
 3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
-4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`). `outline-focus` is the class of the token `--border-focus`.
+4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`). `outline-focus` is the class of the token `--border-focus`. One exception: a form control (TextInput) shows the focus look of Intraweb's controls, the border in the focus color and a ring of 3 pixels (`focus:border-focus focus:ring-3 focus:ring-info focus:outline-none`), from `src/shared/control.ts`.
 5. An icon that is only decoration has `aria-hidden="true"`. An icon is drawn with `currentColor`, so it has the color of the text.
 6. A class of a movement or a transition has the Tailwind variant `motion-safe:`, so a person who asked the device for less motion gets none.
 

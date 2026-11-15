@@ -10,6 +10,21 @@ The components get the shape of the same components of the app Intraweb: variant
 
 ### Breaking changes, with what an app must change
 
+- **`Input` is removed. `Field` and `TextInput` replace it.** `Input` was a text field with its own label and error message. Now `Field` has the label, the hint and the error message, and `TextInput` is only the text field, as in Intraweb. To move an app:
+
+  | Before | After |
+  |---|---|
+  | `import { Input } from "@toraline.tech/ui"` | `import { Field, TextInput } from "@toraline.tech/ui"` |
+  | `<Input label="Title" name="title" error={titleError} />` | `<Field label="Title" error={titleError}><TextInput name="title" /></Field>` |
+  | `<Input aria-label="Search" name="search" />` (no visible label) | `<TextInput aria-label="Search" name="search" />` |
+  | `id="title"` on `Input` | `id="title"` on `Field` or on `TextInput`; one is enough |
+  | `className` on `Input` (it went to the element around the label, the field and the message) | `className` on `Field` for that element; `className` on `TextInput` for the `<input>` |
+  | `ref`, `name`, `value`, `onChange`, `placeholder`, `disabled`, `type` on `Input` | The same props on `TextInput` |
+  | CSS of the app that selects `[data-slot="field"]` | Select the `<input>` with a class the app gives to `TextInput` |
+  | The type `InputProps` | `TextInputProps` and `FieldProps` |
+
+  What looks different: the field is 48 pixels high on a small screen and 40 pixels on a screen 1024 pixels wide or more (it was about 50 pixels everywhere). With the focus it shows a border and a ring (it showed an outline). The error icon is a triangle (it was a circle with a cross). A field with an error keeps its red border while it is disabled.
+
 - **Button: new sizes.** The heights are now 32 pixels (`sm`), 40 (`md`) and 48 (`lg`), with the paddings of Intraweb. The font size is 14 pixels for `sm` and `md` (it was 16 for `md`) and 16 for `lg` (it was 18). The app changes nothing; a layout that depended on the old heights must be looked at.
 - **Button: a disabled button has half of its opacity**, in the colors of its variant, as in Intraweb. It was grey for every variant. An app that gave `disabled:` color classes to a Button can remove them.
 - **Button: no pointer cursor.** The pointer over a button is the normal arrow, as in Intraweb and as Tailwind CSS 4 sets it. An app that wants the hand gives `className="cursor-pointer"`.
@@ -22,6 +37,7 @@ The components get the shape of the same components of the app Intraweb: variant
 - ButtonLink: a link that looks like a Button, with the same variants, sizes and icon. It renders an `<a>`, or the link component the app gives in `linkComponent`, for example the `Link` of `next/link`. The library does not import Next.js.
 - IconButton: a button that shows only an icon, with the variants `ghost`, `secondary`, `soft` and `primary` and the sizes `sm`, `md` and `lg` (32, 40 and 48 pixels). The types require `aria-label`.
 - Field: wraps any form control with a label, a hint, an error message with its icon, and the mark of an optional field. It links them to the control for a screen reader: `id`, `aria-describedby` and `aria-invalid`.
+- TextInput: a text field with the sizes `md` and `sm`, an icon on the left (`icon`), and the focus, disabled and not valid looks of Intraweb's text field. The list `controlSizes` and the type `ControlSize` are the sizes of every form control.
 - `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
 
 ## 0.1.0 (2026-11-15)

@@ -486,16 +486,18 @@ Every component accepts `className`. The classes go on the outermost element of 
    <Button className="round">Save</Button>
    ```
 
-4. **An inner part of a component:** a component with more than one element gives each inner element the attribute `data-slot`, with the name of the part. Use it after your own class. This rule makes the field of one Input round:
+4. **An inner part of a component:** a component with more than one element gives each inner element the attribute `data-slot`, with the name of the part. Use it after your own class. This rule writes the label of one Field in capital letters:
 
    ```css
-   .search [data-slot="field"] {
-     border-radius: 9999px;
+   .search [data-slot="label"] {
+     text-transform: uppercase;
    }
    ```
 
    ```tsx
-   <Input className="search" label="Search" name="search" />
+   <Field className="search" label="Search">
+     <TextInput name="search" />
+   </Field>
    ```
 
 5. **With the colors of the theme in your own CSS:** use the tokens, so the style follows the theme.

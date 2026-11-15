@@ -33,7 +33,7 @@ The control does what an app does: it writes the attribute `data-theme` on `<htm
 | Guide | Live examples | The two examples of the guide as stories, so the accessibility check covers them |
 | Foundations | Tokens | One page with every token: the colors in their 5 groups (backgrounds, text, borders, icons, charts), fonts, text sizes, spacing, the 4 radius sizes and the 5 shadows, with the value in each theme, then the 9 text styles and the level 1 tokens. The tables read `@toraline.tech/tokens`, so they always show the current values |
 | Foundations | Theme sample | A card that uses only level 2 tokens, with the button that changes the theme |
-| Components | Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton, ThemeToggle | For each component: a page **Docs** with the table of props, and one story for each state |
+| Components | Button, ButtonLink, IconButton, Field, TextInput, Toggle, Tabs, BreadCrumbs, SplitButton, ThemeToggle | For each component: a page **Docs** with the table of props, and one story for each state |
 
 A story that shows variants or sizes reads the list that the library exports (`buttonVariants`, `buttonSizes`, `splitButtonMenuPlacements`). A new variant appears in the catalog with no change in the story file. So there is one story named **Variants** that shows every variant, and not one story for each variant: a story is a named export of a file, and a file cannot make its exports from a list.
 

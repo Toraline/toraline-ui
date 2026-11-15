@@ -1,4 +1,4 @@
-import { ArrowRight, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -7,8 +7,8 @@ import {
   ButtonLink,
   Field,
   IconButton,
-  Input,
   Tabs,
+  TextInput,
   Toggle,
   buttonSizes,
   buttonVariants,
@@ -42,7 +42,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /** The classes of a plain control, to show that Field works with any control. */
-const plainInputClass =
+const plainControlClass =
   "min-h-10 w-full rounded-md border border-default bg-surface px-3 py-2 text-sm/5 text-primary";
 
 const orderTabs = [
@@ -167,47 +167,45 @@ export default function ComponentsPage() {
         </Row>
       </Section>
 
-      <Section title="Field">
+      <Section title="Field and TextInput">
         <div className="mt-4 grid max-w-md gap-4">
-          <Field label="With a hint" hint="As it is written on the invoice.">
-            <input className={plainInputClass} name="field-hint" />
+          <Field label="Empty">
+            <TextInput name="empty" />
           </Field>
-          <Field label="With an error" hint="This hint is not shown." error="The name is required.">
-            <input className={plainInputClass} name="field-error" />
+          <Field label="With a placeholder and a hint" hint="As it is written on the invoice.">
+            <TextInput name="placeholder" placeholder="Order number" />
+          </Field>
+          <Field label="With an error" hint="This hint is not shown." error="The order number is required.">
+            <TextInput name="error" defaultValue="Order" />
           </Field>
           <Field label="Optional" optional>
-            <input className={plainInputClass} name="field-optional" />
+            <TextInput name="optional" />
           </Field>
           <Field label="Opcional, em português" optional optionalText="(opcional)">
-            <input className={plainInputClass} name="field-optional-text" />
+            <TextInput name="optional-text" />
+          </Field>
+          <Field label="Disabled">
+            <TextInput name="disabled" defaultValue="Order 12" disabled />
+          </Field>
+          <Field label="With an icon of lucide-react (icon={Search})">
+            <TextInput name="search" type="search" icon={Search} placeholder="Search an order" />
+          </Field>
+          <Field label='Size "sm": 32 pixels high'>
+            <TextInput name="small" size="sm" />
+          </Field>
+          <Field label="With a class of the app (max-w-40)">
+            <TextInput name="app-class" className="max-w-40" />
           </Field>
           <Field label="With a native select" hint="Field works with any control.">
-            <select className={plainInputClass} name="field-select">
+            <select className={plainControlClass} name="field-select">
               <option>Monthly</option>
               <option>By the hour</option>
             </select>
           </Field>
         </div>
-      </Section>
-
-      <Section title="Input">
-        <div className="mt-4 grid max-w-md gap-4">
-          <Input label="Empty" name="empty" />
-          <Input label="With a placeholder" name="placeholder" placeholder="Order number" />
-          <Input label="With a value" name="value" defaultValue="Order 12" />
-          <Input
-            label="With an error"
-            name="error"
-            defaultValue="Order"
-            error="The order number is required."
-          />
-          <Input label="Disabled" name="disabled" defaultValue="Order 12" disabled />
-          <Input
-            label="With a class of the app (max-w-40)"
-            name="app-class"
-            className="max-w-40"
-          />
-        </div>
+        <Row label="With no Field (aria-label)">
+          <TextInput aria-label="Order number" name="no-field" className="max-w-60" />
+        </Row>
       </Section>
 
       <Section title="Toggle">
