@@ -38,6 +38,7 @@ npm run dev -w @toraline/playground         # development server on http://local
 | `app/components/ControlledTabsExample.tsx` | Tabs with the state held by the app (`value` and `onChange`). It is a Client Component, because it holds state |
 | `app/tab-nav/layout.tsx`, `app/tab-nav/page.tsx`, `app/tab-nav/orders/page.tsx`, `app/tab-nav/clients/page.tsx` | The 3 routes of TabNav and the layout they share |
 | `app/tab-nav/SalesTabNav.tsx` | The TabNav of those routes. It is a Client Component, because it reads the current path with `usePathname` of Next.js, and it gives TabNav the `Link` of `next/link` |
+| `app/forms-feedback/page.tsx` | The page of the form controls and the feedback components of phase 8 (TOR-1124), at `/forms-feedback`: Select, Textarea, DecimalInput, Checkbox, CheckboxControl, StatusBadge, CountBadge, Panel, EmptyState, StatCard, ProgressBar and ProgressRing, each with every variant, size and state. It is a Server Component, and gives icons of `lucide-react` to EmptyState and StatCard. How it was checked, and the comparison with Intraweb, are in the entry of TOR-1124 of `docs/decisions.md` |
 
 ## How "no flash of the wrong theme" was checked
 

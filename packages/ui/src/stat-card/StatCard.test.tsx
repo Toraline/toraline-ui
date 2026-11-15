@@ -37,7 +37,7 @@ describe("StatCard", () => {
     );
     const label = screen.getByRole("heading", { level: 3, name: "Sales" });
     expect(label.className.split(" ")).toEqual(
-      expect.arrayContaining(["text-sm/5", "font-medium", "text-secondary"]),
+      expect.arrayContaining(["font-heading", "text-sm/5", "font-medium", "text-secondary"]),
     );
     const value = screen.getByText("R$ 1.200");
     expect(value.tagName).toBe("P");

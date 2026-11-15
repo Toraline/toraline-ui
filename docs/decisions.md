@@ -83,6 +83,7 @@ Format of one entry:
 ### StatCard, and the new tokens `--text-2xl` and `--text-3xl` (TOR-1154)
 - Decision: `StatCard` has the props (`label`, `value`, `icon`, `tone`, `trend`, `className`), the elements and the class lists of Intraweb's `components/ui/stat-card.tsx`. The object of `trend` has the same keys (`direction`, `value`, `comparison`, `upIsGood`). `label` accepts text or elements.
 - Decision: the prop `progress` (a progress bar under the number) is added with ProgressBar, in TOR-1155, because the tickets put ProgressBar after StatCard.
+- Decision: the label has `font-heading`. In Intraweb the label is an `<h3>` with no font class, and Intraweb's global CSS gives the heading font to every `h1` to `h4`. The library has no such global rule, so the class is written on the label. The comparison with Intraweb found this.
 - Decision: `icon` has the type `IconComponent`. The two arrows of the trend are inline `<svg>` elements with the shapes of Lucide's `trending-up` and `trending-down`.
 - Decision: the tone and the meaning of the trend (good or bad) choose a class from a map, as a variant does, and are written as `data-tone` and `data-meaning`. They are not states with an HTML or ARIA attribute.
 - Decision: the card adds the sign of the change itself, `+` or `−` (the minus sign U+2212), as Intraweb does. It is a symbol, not a text of a language.
@@ -103,6 +104,45 @@ Format of one entry:
 - Does not apply: an animation of the filled part (Intraweb has none, so "reduced motion" changes nothing), and a bar with no known end (indeterminate).
 - Contrast, recorded and not changed (the values are Intraweb's): in the light theme the filled part of the tone `success` is 2.23 on the track and 2.76 on a card, and of the tone `warning` 1.48 and 1.84, below the 3 that WCAG 1.4.11 asks for a part of a graphic. `brand` (3.67, 4.55) and `danger` (3.90, 4.83) pass. In the dark theme every tone is 4.27 or more. The track on a card is 1.24 (light) and 1.45 (dark); it is the empty part. The pairs are in the test of `packages/tokens/src/tokens.test.ts` ("phase 8, known"). The value is always there as text for a screen reader, and as visible text except with `hideLabel` and in the ring `sm`. The fix, if Juliana wants one, is a change of `--data-success` and `--data-warning` of the light theme in Intraweb's design system.
 - Alternatives: the native `<progress>` element (its filled part cannot be styled the same way in every browser); a prop `valueText` on ProgressRing (Intraweb has none).
+
+### Phase 8: what was compared with Intraweb, and the states of each component
+- How: a temporary page outside both repositories rendered copies of Intraweb's own component files (`form-controls.tsx`, `status-badge.tsx`, `count-badge.tsx`, `panel.tsx`, `empty-state.tsx`, `stat-card.tsx`, `progress.tsx`, with Intraweb's `globals.css` and theme files, commit `f8ad4c2`) next to a second page with the built files of `packages/ui` and `packages/tokens`. Both were built with Tailwind CSS 4.3.5 and had the same Inter and Poppins files. A Playwright script (Chromium with no window) read 83 computed CSS properties, the rendered width and height, the color of the placeholder and 12 attributes, for every element of 73 samples, in the light and the dark theme, in windows 1280, 800 and 390 pixels wide, at rest, with the pointer over the first control of a sample and with the focus on it: 277,848 values. The page and the script are not committed.
+- Result: 495 values differ, in 7 kinds. Every other value is equal.
+
+| # | Where | Intraweb | Library | Why |
+|---|---|---|---|---|
+| 1 | Select: `background-image` | The arrow, with spaces and quotes in the text of the image | The same arrow, with `%20` and `%27` | The same picture, written as one word so that it can be a class. A screenshot of both pages shows the same arrow |
+| 2 | A Select with `className="w-auto"` and a DecimalInput with `className="w-24"`: the width | 592 pixels: the class of the app does not win | 274 and 96 pixels: the class of the app wins | In Intraweb `w-full` of the control comes later in the built CSS than `w-auto` and `w-24`, so the control stays as wide as its container. In the library `classNames` removes `w-full` when the app gives a width class. See "What Intraweb must change" below |
+| 3 | Checkbox: the text of the label | Text directly in the `<label>` | The text is in a `<span data-slot="label">` | The convention of the parts. The `<label>` has the same width and height |
+| 4 | StatusBadge `neutral`, the dot | `#98a2b3` in both themes (`bg-slate-400`) | `#98a2b3` (light), `#61646c` (dark), and the dot has the text color `text-muted` | A level 1 color is not allowed in a component (part "StatusBadge") |
+| 5 | CountBadge | `aria-label` on the `<span>`, the number as its text | Two inner `<span>` elements: the number (`aria-hidden`) and the label (`sr-only`) | Part "CountBadge". The box has the same size and colors |
+| 6 | ProgressRing `sm` | An inner `<span>` with `sr-only` and `aria-hidden` | No inner `<span>` | Part "ProgressBar and ProgressRing". Nobody sees or hears that element |
+| 7 | CheckboxControl with `changed`, dark theme: the ring | `#fedf89` | `#93370d` | A level 1 color is not allowed (part "Checkbox and CheckboxControl"). The light theme is equal |
+
+- What the script cannot see, and differs on purpose: with "reduce motion" on in the device the library's controls have no color transition; the library's elements have `data-slot`, `data-variant`, `data-tone` and `data-size`; the library's components accept `className`, the other props of their element and `ref`.
+- What Intraweb must change to use each component: Select, Textarea, Checkbox, CheckboxControl, StatusBadge, CountBadge, Panel, ProgressBar and ProgressRing: only the import. A Select, a DecimalInput or a Textarea that gets a width class (`w-auto`, `w-40`, `w-24`) becomes that wide, where today it stays as wide as its container; each such screen must be looked at (Intraweb writes `w-auto!` where it needs the class to win today). DecimalInput: the import, and `parseDecimalInput` and `decimalToInput` may be imported from the library. EmptyState and StatCard: the import; an icon of `lucide-react` works as it is. Field (phase 7): `optionalText="(opcional)"`.
+- Checked in the playground on 2026-11-15, with `next start` and a Playwright script: the route `/forms-feedback` answers 200 in both themes, every component has its styles, and the browser console has no message.
+- The states of the list "States to check" (`agent/skills/design-component/reference.md`). "Story" means a story of the catalog shows it, in both themes.
+
+| State | Select, Textarea, DecimalInput | Checkbox, CheckboxControl | StatusBadge, CountBadge | Panel, EmptyState, StatCard | ProgressBar, ProgressRing |
+|---|---|---|---|---|---|
+| Rest | Story | Story | Story | Story | Story |
+| Hover | A darker border. Compared by the script | A darker border; a darker background when checked. Compared by the script | Does not apply | Does not apply: the card has no action of its own | Does not apply |
+| Keyboard focus | The border and the ring of a control. Story "Focused" | The outline of the library. Story "Focused" | Does not apply: no focus | Does not apply: the focus goes to the actions the app gives | Does not apply: no focus |
+| Pressed | Does not apply: Intraweb has no look for it | Does not apply | Does not apply | Does not apply | Does not apply |
+| Disabled | Story. Quiet background and text | Story. Half opacity | Does not apply | Does not apply | Does not apply |
+| Read-only | Story for Textarea and DecimalInput. No look of its own. Select: does not apply, HTML has no read-only select | Does not apply | Does not apply | Does not apply | Does not apply |
+| Loading | Does not apply | Does not apply | Does not apply | Does not apply. EmptyState also shows "could not load": story | Does not apply: no bar with no known end |
+| Error | Story "Invalid" and "Inside Field". DecimalInput: story "Not A Number" | Does not apply: no look for it, as in Intraweb | The variant `error` of StatusBadge | StatCard: a bad change is red. Story | The tone `danger` |
+| Empty | Select: story "Empty" (a first option with no value). Textarea and DecimalInput: story "Default" | Not checked: story | CountBadge: the count 0, story "Counts" | Panel: no header, and no content (stories). EmptyState: only the title (story). StatCard: no number yet (story) | 0%: story |
+| Selected or checked | Select: story "With Value" | Story "Checked" | Does not apply | Does not apply | Full, 100%: story |
+| Open and closed | Select: the list is the browser's own | Does not apply | Does not apply | Does not apply | Does not apply |
+| Long content | Story "Long Content" (Select, Textarea) and "Narrow And Right Aligned" (DecimalInput) | Story "Long Label" | Story "Long Text" (one line) and "Counts" (1234) | Story "Long Content" in each | Story "Long Content" (ProgressBar). ProgressRing: does not apply, it shows no label |
+| Right-to-left text | Considered, not supported: the arrow of Select is always on the right | Follows the direction of the page | Follows the direction of the page | Follows the direction of the page | Considered, not supported: the bar fills from the left, the ring clockwise |
+| Light and dark theme | Every story test runs in both | Every story test runs in both | Every story test runs in both | Every story test runs in both | Every story test runs in both |
+| Reduced motion | No transition (`motion-safe:`) | No transition (`motion-safe:`) | Nothing moves | Nothing moves | Nothing moves |
+
+- Not verified: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, the Figma file (no access), and a phone.
 
 ## 2026-11-15 - Phase 7: what was compared with Intraweb, and the states of each component (TOR-1123)
 - Design source: the components of Intraweb (`prontera-e-juno`, commit `f8ad4c2`) and the text of the tickets. Figma was not read: this session had no access to it.
