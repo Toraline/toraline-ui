@@ -34,7 +34,7 @@ make pack     # in this repository; writes 2 files into .pack/tarballs/
 npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.1.0.tgz     # in the app, in place of step 2
 ```
 
-Replace `<path>` with the folder of this repository.
+Replace `<path>` with the folder of this repository. The 3 guides were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6 (Tailwind CSS 4.3.3), and the section "Without Next.js" in an app made with `npm create vite@latest` (Vite 8.3). The results are in `apps/catalog/README.md`.
 
 What you need: Node 24, React 19 and Tailwind CSS 4.
 

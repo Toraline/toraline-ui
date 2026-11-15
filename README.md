@@ -2,6 +2,8 @@
 
 The component library of Toraline: styled React components, with configurable themes and fonts. Each Toraline app installs it.
 
+The default look is the look of the app Intraweb, an app of Toraline: the same colors, fonts, radius sizes and shadows, with the same token names and the same Tailwind class names (phase 6, TOR-1122).
+
 **To use the library in an app, read the [guide](docs/guide.md):** install it, build the theme of the app, and style on top of a component.
 
 **The new packages are not published yet.** `@toraline.tech/ui` and `@toraline.tech/tokens` are not on the npm registry. The first version will be `0.1.0`. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
@@ -12,7 +14,7 @@ The component library of Toraline: styled React components, with configurable th
 
 | Path | Content | State |
 |---|---|---|
-| `packages/tokens` | Design tokens, the light and dark themes, the function that builds a theme, and the Tailwind CSS 4 preset. To be published as `@toraline.tech/tokens` | Built in phase 2. See [its README](packages/tokens/README.md) |
+| `packages/tokens` | Design tokens, the light and dark themes, the function that builds a theme, and the Tailwind CSS 4 preset. To be published as `@toraline.tech/tokens` | Built in phase 2. Since phase 6 the tokens have the names and the values of Intraweb. See [its README](packages/tokens/README.md) |
 | `packages/ui` | The styled components. To be published as `@toraline.tech/ui` | Has the theme provider and toggle, and 6 components built in phase 3: Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. It also has the rules every component follows and the template of a component. See [its README](packages/ui/README.md) |
 | `apps/catalog` | The catalog: Storybook 10, with a control in the toolbar that changes the theme of every story | Built in phase 4. Has the guide as its first page, the stories of the 6 components and of the theme toggle, a page with every token, and an accessibility check that runs on every story in both themes. See [its README](apps/catalog/README.md) |
 | `apps/playground` | A private Next.js app that tests the themes and shows every component in a real page | See [its README](apps/playground/README.md) |

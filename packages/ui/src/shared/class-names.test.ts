@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { colorTokenNames } from "@toraline.tech/tokens";
+import { colorTokenNames, textStyleNames } from "@toraline.tech/tokens";
 import { classNames } from "./class-names";
 
 describe("classNames joins classes", () => {
@@ -46,7 +46,12 @@ describe("a class of the app replaces the library's class for the same property"
     ["token radius sizes", "rounded-md", "rounded-2xl", "rounded-2xl"],
     ["the radius of one side and a Tailwind radius", "rounded-l-md rounded-r-none", "rounded-full", "rounded-full"],
     ["token shadows", "shadow-sm", "shadow-lg", "shadow-lg"],
+    ["the shadow of a card and another token shadow", "shadow-card", "shadow-lg", "shadow-lg"],
+    ["a token shadow and the shadow of a card", "shadow-2xl px-4", "shadow-card", "px-4 shadow-card"],
+    ["the shadow of a card and no shadow", "shadow-card", "shadow-none", "shadow-none"],
     ["a token shadow and a Tailwind shadow", "shadow-lg", "shadow-md", "shadow-md"],
+    ["the two classes of the font of normal text", "font-body", "font-sans", "font-sans"],
+    ["the font of normal text and the font of headings", "font-sans font-medium", "font-heading", "font-medium font-heading"],
     ["token font sizes", "text-base/normal", "text-sm", "text-sm"],
     ["a token font size and a Tailwind font size", "text-base/normal", "text-xl", "text-xl"],
     ["token fonts", "font-body font-bold", "font-heading", "font-bold font-heading"],
@@ -80,6 +85,41 @@ describe("a class of the app replaces the library's class for the same property"
       expect(classNames(backgroundName, "bg-surface")).toBe("bg-surface");
       expect(classNames("bg-surface", backgroundName)).toBe(backgroundName);
     }
+  });
+
+  test("the shadow of a card is a shadow, not a shadow color", () => {
+    // A shadow color stays next to a shadow: they are two CSS values.
+    expect(classNames("shadow-card", "shadow-red-500")).toBe("shadow-card shadow-red-500");
+    expect(classNames("shadow-lg", "shadow-red-500")).toBe("shadow-lg shadow-red-500");
+  });
+
+  test("every radius token replaces another radius", () => {
+    for (const radiusClass of ["rounded-md", "rounded-lg", "rounded-xl", "rounded-2xl"]) {
+      expect(classNames("rounded-full", radiusClass)).toBe(radiusClass);
+      expect(classNames(radiusClass, "rounded-none")).toBe("rounded-none");
+    }
+  });
+
+  test("only the last text style stays", () => {
+    expect(textStyleNames).toHaveLength(9);
+    for (const textStyleName of textStyleNames) {
+      expect(classNames("label px-4", textStyleName)).toBe(`px-4 ${textStyleName}`);
+      expect(classNames(textStyleName, "heading-page")).toBe("heading-page");
+    }
+  });
+
+  test("a text style replaces the earlier classes for what it sets, and keeps the text color", () => {
+    expect(
+      classNames(
+        "font-body text-sm/normal font-bold tracking-wide uppercase tabular-nums text-primary",
+        "caption-overline",
+      ),
+    ).toBe("text-primary caption-overline");
+    expect(classNames("text-base leading-6 text-brand", "heading-card")).toBe("text-brand heading-card");
+  });
+
+  test("a class after a text style stays, and it wins because Tailwind writes it later in the CSS", () => {
+    expect(classNames("label", "text-lg font-bold text-danger")).toBe("label text-lg font-bold text-danger");
   });
 
   test("a font weight class does not remove a font class", () => {

@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The result of guide 2. The button "Save" is blue, not purple: the theme of
+ * The result of guide 2. The button "Save" is blue, not blue-grey: the theme of
  * the app changed the main color. Change the theme with the toolbar or with
  * the button: the example follows.
  */

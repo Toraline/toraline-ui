@@ -18,7 +18,7 @@ const rootClass = "group/split-button relative inline-flex gap-1 font-body";
 
 /** What the main button and the trigger share. */
 const buttonClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-body text-base/normal font-bold text-inverse",
+  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-heading text-base/normal font-medium text-inverse",
   "hover:bg-primary-hover",
   "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "motion-safe:transition-[background-color] motion-safe:ease-[ease]",

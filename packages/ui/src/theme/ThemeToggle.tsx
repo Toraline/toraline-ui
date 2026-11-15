@@ -6,7 +6,7 @@ import { focusRingClass } from "../shared/focus-ring.js";
 import { useTheme } from "./ThemeProvider.js";
 
 const themeToggleClass = classNames(
-  "inline-flex cursor-pointer items-center gap-2 rounded-md border border-default bg-surface px-4 py-2 font-body text-base/normal text-strong",
+  "inline-flex cursor-pointer items-center gap-2 rounded-md border border-default bg-surface px-4 py-2 font-heading text-base/normal font-medium text-strong",
   "hover:border-hover hover:bg-subtle",
   focusRingClass,
 );

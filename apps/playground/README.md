@@ -15,16 +15,16 @@ npm run dev -w @toraline/playground         # development server on http://local
 
 | Ticket | What to look at |
 |---|---|
-| TOR-1006 | The button `Theme: light` changes the theme. After a reload the page opens in the theme that was chosen, and never shows the other theme first |
+| TOR-1006 | The button `Theme: light` changes the theme: `light`, then `dark`, then `paper`, a theme of this app. After a reload the page opens in the theme that was chosen, and never shows another theme first |
 | TOR-1007, TOR-1135 | In the themes `light` and `dark` the headings use the font Poppins and the rest of the text uses the font Inter: the default fonts of the library. In the theme `paper`, a theme of this app, the headings use the font Fraunces, which the app set through the theme function |
 | TOR-997 | The page `/components` shows every component of `@toraline.tech/ui` with every variant and state. The theme button on that page changes the theme |
-| TOR-1008 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-brand` is a color this app added. Changing the theme changes all of them |
+| TOR-1008, TOR-1122 | Every color, font, radius and shadow on the page comes from a token class, for example `bg-primary`. `bg-promo` is a color this app added. Changing the theme changes all of them. The classes have the names of the app Intraweb, and the values of the themes `light` and `dark` are Intraweb's |
 
 ## The files
 
 | File | What it is |
 |---|---|
-| `theme.config.ts` | The themes of this app: a list of inputs for the theme function `createTheme` of `@toraline.tech/tokens` |
+| `theme.config.ts` | The 3 themes of this app: a list of inputs for the theme function `createTheme` of `@toraline.tech/tokens`. `light` and `dark` are the themes of the library with one added color. `paper` is this app's own: a cream page and the heading font Fraunces |
 | `scripts/write-theme-css.ts` | Runs `createTailwindTheme` and `createTheme` on the inputs and writes `app/theme.generated.css`. It runs by itself before `npm run dev` and `npm run build`. Git ignores the file it writes |
 | `postcss.config.mjs` | Tells Next.js to run Tailwind CSS 4 |
 | `app/fonts.ts` | Loads 3 fonts with `next/font/local`: Inter into the CSS variable `--font-inter`, Poppins (weights 400, 500 and 600) into `--font-poppins`, and Fraunces into `--font-fraunces`. The library reads the first two variables. `theme.config.ts` gives the third to the theme function |
@@ -53,11 +53,14 @@ Results:
 
 | Request | The `<html>` tag in the server's answer |
 |---|---|
-| With `Cookie: toraline-theme=dark` | `<html lang="en" data-theme="dark">` |
-| With no cookie | `<html lang="en" data-theme="light">` |
-| With a cookie value that is not a theme | `<html lang="en" data-theme="light">` |
+| With `Cookie: toraline-theme=dark` | `<html lang="en" data-theme="dark" class="...">` |
+| With `Cookie: toraline-theme=paper` | `<html lang="en" data-theme="paper" class="...">` |
+| With no cookie | `<html lang="en" data-theme="light" class="...">` |
+| With a cookie value that is not a theme | `<html lang="en" data-theme="light" class="...">` |
 
-The same server was then opened in a browser. With the keyboard: Tab moved the focus to the button, Enter changed `data-theme` to `dark`, the page background changed from `rgb(255, 255, 255)` to `rgb(15, 25, 40)`, and the cookie `toraline-theme=dark` was saved. After a reload the page had `data-theme="dark"` and the dark background. The browser console had no error.
+`class="..."` stands for the 3 classes of `next/font` that define the font variables. These 4 requests were run again on 2026-11-15, after phase 6 (TOR-1122).
+
+Before phase 6 the same server was also opened in a browser. With the keyboard: Tab moved the focus to the button, Enter changed `data-theme` to `dark` and the page background to the dark value, and the cookie `toraline-theme=dark` was saved. After a reload the page had `data-theme="dark"` and the dark background. The browser console had no error. After phase 6 the same was checked with a click in place of the keyboard, in a new app that followed the guide (see `apps/catalog/README.md`).
 
 ## How the fonts were checked
 
@@ -77,22 +80,23 @@ The browser reported these fonts as loaded (`document.fonts`): in the theme `lig
 
 The classes of the page (`app/layout.tsx` and `app/page.tsx`):
 
-- Token classes: `bg-surface`, `bg-surface-raised`, `bg-surface-muted`, `bg-primary`, `bg-danger`, `bg-success`, `bg-brand`, `text-text`, `text-text-muted`, `text-primary`, `text-primary-foreground`, `text-danger-foreground`, `text-success-foreground`, `text-brand-foreground`, `border-border`, `font-heading`, `font-mono`, `rounded`, `shadow`.
-- Standard Tailwind classes for spacing, size and layout, which have no token: `mx-auto`, `max-w-2xl`, `p-4`, `p-8`, `px-3`, `py-1`, `mt-2`, `mt-4`, `mt-6`, `flex`, `flex-wrap`, `gap-3`, `border`, `font-bold`, `text-xl`, `text-3xl`.
+- Token classes: `bg-page`, `bg-surface`, `bg-primary`, `bg-error`, `bg-success`, `bg-promo`, `text-primary`, `text-brand`, `text-tertiary`, `text-inverse`, `text-error`, `text-success`, `text-on-promo`, `border-default`, `font-heading`, `font-mono`, `rounded-md`, `rounded-xl`, `shadow-card`.
+- Standard Tailwind classes for spacing, size and layout, which have no token: `mx-auto`, `max-w-2xl`, `p-4`, `p-8`, `px-3`, `py-1`, `mt-2`, `mt-4`, `mt-6`, `flex`, `flex-wrap`, `gap-3`, `border`, `font-bold`, `text-xl`, `text-3xl`, `underline`.
 
-Checked on the built app on 2026-11-15 (Tailwind CSS 4.3.5), in a browser, with `getComputedStyle`, before and after one press of the toggle:
+Checked on the built app on 2026-11-15 (Next.js 16.4.6, Tailwind CSS 4.3.5), in a browser with no window (Chromium, through Playwright), with `getComputedStyle`. The theme was chosen with the cookie `toraline-theme`. Transitions were turned off while reading, because a color that is still changing gives a value between two colors. Every value of the columns "Light theme" and "Dark theme" is the value of Intraweb for that token.
 
 | What | Class | Light theme | Dark theme |
 |---|---|---|---|
-| Page background | `bg-surface` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
-| Page text | `text-text` | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
-| Heading color | `text-primary` | `rgb(94, 0, 161)` | `rgb(181, 147, 234)` |
-| Card background | `bg-surface-raised` | `rgb(255, 255, 255)` | `rgb(39, 48, 62)` |
-| Card border | `border-border` | `rgb(207, 209, 212)` | `rgb(63, 71, 83)` |
-| Card corner | `rounded` | `8px` | `8px` |
-| Card shadow | `shadow` | `rgba(15, 25, 40, 0.12) 0px 1px 2px` | `rgba(15, 25, 40, 0.16) 0px 4px 12px` |
-| Added color | `bg-brand` | `rgb(179, 71, 0)` | `rgb(255, 179, 122)` |
-| Text on the added color | `text-brand-foreground` | `rgb(255, 255, 255)` | `rgb(15, 25, 40)` |
+| Page background | `bg-page` | `rgb(241, 243, 246)` | `rgb(12, 17, 29)` |
+| Page text | `text-primary` | `rgb(16, 24, 40)` | `rgb(245, 245, 246)` |
+| Heading color | `text-brand` | `rgb(66, 99, 124)` | `rgb(169, 194, 212)` |
+| Card background | `bg-surface` | `rgb(255, 255, 255)` | `rgb(22, 27, 38)` |
+| Card border | `border-default` | `rgb(228, 231, 236)` | `rgb(51, 55, 65)` |
+| Card corner | `rounded-xl` | `16px` | `16px` |
+| Card shadow | `shadow-card` | `rgba(16, 24, 40, 0.04) 0px 1px 2px, rgba(16, 24, 40, 0.04) 0px 4px 16px` | The same |
+| Hint text | `text-tertiary` | `rgb(102, 112, 133)` | `rgb(138, 141, 148)` |
+| Added color | `bg-promo` | `rgb(179, 71, 0)` | `rgb(255, 179, 122)` |
+| Text on the added color | `text-on-promo` | `rgb(255, 255, 255)` | `rgb(12, 17, 29)` |
 
 The class `mt-4` on the toggle (`<ThemeToggle className="mt-4" />`) gave it a top margin of `16px`. This shows that a class of the app is applied on a component of the library. The browser console had no error.
 
@@ -109,36 +113,30 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3987/components   # 200
 pkill -f "next start -p 3987"
 ```
 
-The values below were read when the components were styled with CSS files (TOR-997). On 2026-11-15 the components changed to Tailwind classes (TOR-1205). The computed style of every element of `/` and `/components` was read before and after that change with a temporary Playwright script, in both themes: at rest, with the pointer over each control, and with the keyboard focus on each control. The screenshots of the 2 pages in the 2 themes are the same, byte for byte. The values that differ change nothing a person sees:
-
-- The thumb of an "on" switch is moved with the CSS property `translate` (`20px`), where it was `transform`. The arrow of a split button is turned with `rotate` (`180deg`), where it was `transform`. The transitions name the new properties.
-- The animation of the spinner has a new name, `spin`. It still takes `0.7s`.
-- A tab and an action of a menu have `border-style: solid` on the sides whose border is `0px` wide, where it was `none`.
-
-The page was then opened in a browser. The colors below were read with `getComputedStyle`, once with `data-theme="light"` and once with `data-theme="dark"` on `<html>`. Transitions were turned off while reading, because a color that is still changing gives a value between the two themes. In each cell: background, then text.
+The values below were read on 2026-11-15, after phase 6 (TOR-1122), with a temporary Playwright script: Chromium with no window, `getComputedStyle`, the theme chosen with the cookie, transitions turned off. In each cell: background, then text, unless the row says something else. Every color is the value of Intraweb for the token of that part.
 
 ### Button (TOR-1010)
 
 | Button | Light theme | Dark theme |
 |---|---|---|
-| `primary` | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
-| `secondary` | `rgb(255, 255, 255)`, `rgb(94, 0, 161)`, border `rgb(94, 0, 161)` | `rgb(39, 48, 62)`, `rgb(181, 147, 234)`, border `rgb(181, 147, 234)` |
-| `danger` | `rgb(217, 45, 45)`, `rgb(255, 255, 255)` | `rgb(244, 120, 120)`, `rgb(15, 25, 40)` |
-| Disabled (every variant) | `rgb(255, 255, 255)`, `rgb(111, 117, 126)`, border `rgb(207, 209, 212)` | `rgb(15, 25, 40)`, `rgb(159, 163, 169)`, border `rgb(63, 71, 83)` |
-| Loading `primary` | The same as `primary` | The same as `primary` |
+| `primary` | `rgb(66, 99, 124)`, `rgb(255, 255, 255)` | `rgb(142, 174, 197)`, `rgb(12, 17, 29)` |
+| `secondary` | `rgb(255, 255, 255)`, `rgb(29, 41, 57)`, border `rgb(228, 231, 236)` | `rgb(22, 27, 38)`, `rgb(228, 231, 236)`, border `rgb(51, 55, 65)` |
+| `danger` | `rgb(255, 255, 255)`, `rgb(180, 35, 24)`, border `rgb(254, 205, 202)` | `rgb(22, 27, 38)`, `rgb(249, 112, 102)`, border `rgb(122, 39, 26)` |
+| Disabled (every variant) | `rgb(247, 248, 250)`, `rgb(102, 112, 133)`, border `rgb(228, 231, 236)` | `rgb(31, 36, 47)`, `rgb(138, 141, 148)`, border `rgb(51, 55, 65)` |
+| Loading (every variant) | The same as the variant | The same as the variant |
 
-Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The spinner of a loading button has the animation `spin`. The button with `className="rounded-full"` has a fully round corner, where the library's class `rounded` gives `8px`: the class of the app replaces it.
+The font of every button is `poppins, "poppins Fallback", ui-sans-serif, system-ui, sans-serif`, with a weight of `500`. Sizes: `sm` has a font size of `14px` and a padding of `4px 12px`; `md` has `16px` and `8px 16px`; `lg` has `18px` and `12px 24px`. The corner is `8px` (`rounded-md`). The spinner of a loading button has the animation `spin`. The button with `className="rounded-full"` has a fully round corner and no class `rounded-md`: the class of the app replaces it.
 
 ### Input (TOR-1011)
 
 | Part | Light theme | Dark theme |
 |---|---|---|
-| Field: background, text, border | `rgb(255, 255, 255)`, `rgb(15, 25, 40)`, `rgb(111, 117, 126)` | `rgb(15, 25, 40)`, `rgb(243, 243, 244)`, `rgb(111, 117, 126)` |
-| Label | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
-| Placeholder | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
-| Field with an error: border | `rgb(217, 45, 45)` | `rgb(244, 120, 120)` |
-| Error message | `rgb(217, 45, 45)` | `rgb(244, 120, 120)` |
-| Disabled field: background, text, border | `rgb(243, 243, 244)`, `rgb(15, 25, 40)`, `rgb(207, 209, 212)` | `rgb(39, 48, 62)`, `rgb(243, 243, 244)`, `rgb(63, 71, 83)` |
+| Field: background, text, border | `rgb(255, 255, 255)`, `rgb(16, 24, 40)`, `rgb(228, 231, 236)` | `rgb(22, 27, 38)`, `rgb(245, 245, 246)`, `rgb(51, 55, 65)` |
+| Label | `rgb(29, 41, 57)` | `rgb(228, 231, 236)` |
+| Placeholder | `rgb(102, 112, 133)` | `rgb(138, 141, 148)` |
+| Field with an error: border | `rgb(217, 45, 32)` | `rgb(249, 112, 102)` |
+| Error message | `rgb(180, 35, 24)` | `rgb(249, 112, 102)` |
+| Disabled field: background, text, border | `rgb(247, 248, 250)`, `rgb(102, 112, 133)`, `rgb(228, 231, 236)` | `rgb(31, 36, 47)`, `rgb(138, 141, 148)`, `rgb(51, 55, 65)` |
 
 Every `<label>` on the page has a `for` equal to the `id` of its field. The field with `className="max-w-40"` is `160px` wide, and the others are `448px` wide: the class of the app is on the outermost element and wins.
 
@@ -148,31 +146,31 @@ The track is the long rounded part of the switch. The thumb is the circle that m
 
 | State | Light theme | Dark theme |
 |---|---|---|
-| Off: track, border, thumb | `rgb(255, 255, 255)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(15, 25, 40)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` |
-| On: track, border, thumb | `rgb(47, 111, 20)`, `rgb(47, 111, 20)`, `rgb(255, 255, 255)` | `rgb(126, 195, 109)`, `rgb(126, 195, 109)`, `rgb(15, 25, 40)` |
-| Disabled: track, border, thumb, label | `rgb(243, 243, 244)`, `rgb(207, 209, 212)`, `rgb(111, 117, 126)`, `rgb(111, 117, 126)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)`, `rgb(159, 163, 169)`, `rgb(159, 163, 169)` |
+| Off: track, border, thumb | `rgb(255, 255, 255)`, `rgb(208, 213, 221)`, `rgb(102, 112, 133)` | `rgb(22, 27, 38)`, `rgb(65, 70, 81)`, `rgb(138, 141, 148)` |
+| On: track, border, thumb, check mark | `rgb(66, 99, 124)`, `rgb(66, 99, 124)`, `rgb(255, 255, 255)`, `rgb(66, 99, 124)` | `rgb(142, 174, 197)`, `rgb(142, 174, 197)`, `rgb(22, 27, 38)`, `rgb(169, 194, 212)` |
+| Disabled: track, border, thumb, label | `rgb(247, 248, 250)`, `rgb(228, 231, 236)`, `rgb(152, 162, 179)`, `rgb(102, 112, 133)` | `rgb(31, 36, 47)`, `rgb(51, 55, 65)`, `rgb(97, 100, 108)`, `rgb(138, 141, 148)` |
 
-Off, the thumb is not moved (`translate` is `none`) and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.
+The label of a switch that is not disabled is `rgb(52, 64, 84)` (light) and `rgb(206, 207, 210)` (dark). Off, the thumb is not moved (`translate` is `none`) and the check mark has an opacity of `0`. On, the thumb is moved `20px` to the right and the check mark has an opacity of `1`. A click on the first switch changed it from off to on. The switch with `className="text-lg"` is `49.5px` wide, and the others are `44px` wide.
 
 ### Tabs (TOR-1013)
 
 | Part | Light theme | Dark theme |
 |---|---|---|
-| Selected tab: text, line under it | `rgb(15, 25, 40)`, `rgb(94, 0, 161)` | `rgb(243, 243, 244)`, `rgb(181, 147, 234)` |
-| Other tab: text | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
-| Line under the row | `rgb(207, 209, 212)` | `rgb(63, 71, 83)` |
-| Content | `rgb(15, 25, 40)` | `rgb(243, 243, 244)` |
+| Selected tab: text, line under it | `rgb(66, 99, 124)`, `rgb(66, 99, 124)` | `rgb(169, 194, 212)`, `rgb(142, 174, 197)` |
+| Other tab: text | `rgb(71, 84, 103)` | `rgb(164, 167, 174)` |
+| Line under the row | `rgb(228, 231, 236)` | `rgb(51, 55, 65)` |
+| Content | `rgb(16, 24, 40)` | `rgb(245, 245, 246)` |
 
-With the keyboard, starting with the focus on the tab "All": Right arrow selected "Orders". Left arrow 2 times selected "All" and then "Support", the last tab. The content changed to the content of "Support". The second example starts on "Premium", and its `className="mt-6"` gives it a top margin of `24px`.
+The font of a tab is Poppins with a weight of `500`. With the keyboard, starting with the focus on the tab "All": Right arrow selected "Orders". Left arrow 2 times selected "All" and then "Support", the last tab. The content changed to the content of "Support". The second example starts on "Premium", and its `className="mt-6"` gives it a top margin of `24px`.
 
 ### BreadCrumbs (TOR-1014)
 
 | Part | Light theme | Dark theme |
 |---|---|---|
-| Link and separator | `rgb(111, 117, 126)` | `rgb(159, 163, 169)` |
-| Current page | `rgb(15, 25, 40)`, font size `18px` | `rgb(243, 243, 244)`, font size `18px` |
+| Link and separator | `rgb(71, 84, 103)` | `rgb(164, 167, 174)` |
+| Current page | `rgb(16, 24, 40)`, font size `18px` | `rgb(245, 245, 246)`, font size `18px` |
 
-In the first example the links go to `/` and `/components`, and the element with `aria-current="page"` has the text "BreadCrumbs". The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's class `font-bold` gives `700`.
+The third example renders its links with the `Link` of `next/link`, and its `className="font-normal"` gives it a font weight of `400`, where the library's class `font-bold` gives `700`.
 
 ### SplitButton (TOR-1015)
 
@@ -180,27 +178,26 @@ Read while the menu of the first split button was open, with the focus on its se
 
 | Part | Light theme | Dark theme |
 |---|---|---|
-| Main button: background, text | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
-| Button that opens the menu, while the menu is open: background | `rgb(61, 0, 105)` | `rgb(208, 177, 255)` |
-| Menu: background, border | `rgb(255, 255, 255)`, `rgb(207, 209, 212)` | `rgb(39, 48, 62)`, `rgb(63, 71, 83)` |
-| Action: text | `rgb(94, 0, 161)` | `rgb(181, 147, 234)` |
-| Action with the focus: background, text | `rgb(94, 0, 161)`, `rgb(255, 255, 255)` | `rgb(181, 147, 234)`, `rgb(15, 25, 40)` |
-| Disabled buttons: background, text | Not read | `rgb(15, 25, 40)`, `rgb(159, 163, 169)` |
+| Main button: background, text | `rgb(66, 99, 124)`, `rgb(255, 255, 255)` | `rgb(142, 174, 197)`, `rgb(12, 17, 29)` |
+| Button that opens the menu, while the menu is open: background | `rgb(52, 79, 99)` | `rgb(169, 194, 212)` |
+| Menu: background, border, corner | `rgb(255, 255, 255)`, `rgb(241, 243, 246)`, `12px` | `rgb(22, 27, 38)`, `rgb(31, 36, 47)`, `12px` |
+| Menu: shadow (`shadow-lg`) | `rgba(16, 24, 40, 0.03) 0px 4px 6px -2px, rgba(16, 24, 40, 0.08) 0px 12px 16px -4px` | The same |
+| Action: text | `rgb(52, 64, 84)` | `rgb(206, 207, 210)` |
+| Action with the focus: background | `rgb(247, 248, 250)` | `rgb(31, 36, 47)` |
+| Disabled buttons: background, text | `rgb(247, 248, 250)`, `rgb(102, 112, 133)` | `rgb(31, 36, 47)`, `rgb(138, 141, 148)` |
 
-With the keyboard:
+With the keyboard, in both themes:
 
-1. Focus on the button that opens the first menu, then Enter: the menu opened under the buttons, and `aria-expanded` was `"true"`.
+1. Focus on the button that opens the first menu, then Enter: the menu opened, and `aria-expanded` was `"true"`.
 2. Down arrow: the focus moved to "Download the contract".
 3. Escape: the menu closed, and the focus was back on the button that opened it.
-4. Focus on the button of the second split button (`menuPlacement="top"`), then Up arrow: the menu opened above the buttons (its bottom edge at `603px`, the top edge of the buttons at `611px`), with the focus on the last action, "Send by e-mail".
-5. Enter: the page showed "Last action: Send by e-mail", the menu closed, and the focus was back on the button that opened it.
 
-The split button with `className="shadow"` has the shadow of the theme.
+Checked before phase 6 and not again: the menu that opens upwards (`menuPlacement="top"`), choosing an action with Enter, and the split button with a class of the app.
 
 ### The whole page
 
-- A new browser tab was opened on `/components`. The theme button, the first switch, the tab "Orders" and the first menu were pressed. Then `/` was opened. The browser console had no message on either page.
-- `curl -s -H 'Cookie: toraline-theme=dark' http://localhost:3987/components` answered with `<html lang="en" data-theme="dark" ...>`. The HTML of the server already had the 13 buttons, 6 fields, 6 switches, 2 rows of tabs, 3 current pages of breadcrumbs and 4 buttons that open a menu.
+- The browser console had no message on `/` and on `/components`, in both themes.
+- The page `/components` has 29 buttons inside its sections, 6 fields, 6 switches, 2 rows of tabs, 3 current pages of breadcrumbs and 4 buttons that open a menu.
 - The server was stopped after the checks.
 
-Not checked: a real screen reader (VoiceOver or NVDA), and browsers other than the one built into the Claude desktop app.
+Not checked: a real screen reader (VoiceOver or NVDA), browsers other than Chromium, the theme `paper` on the page `/components`, and the look of each control with the pointer over it.

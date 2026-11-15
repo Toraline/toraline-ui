@@ -12,10 +12,11 @@ const listClass = "flex flex-wrap border-b-2 border-b-default";
  * One tab. The selected tab is selected by aria-selected, the attribute a
  * screen reader reads: it has the brand color, and a line in the brand color
  * under it. The negative margin puts that line on the line of the row.
- * The colors are the ones of the tabs of the app Intraweb.
+ * The colors, the font of headings and the medium weight are the ones of the
+ * tabs of the app Intraweb.
  */
 const tabClass = classNames(
-  "m-0 -mb-[2px] cursor-pointer rounded-t-md rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-body text-base/normal font-bold text-secondary",
+  "m-0 -mb-[2px] cursor-pointer rounded-t-md rounded-b-none border-0 border-b-4 border-b-transparent bg-transparent px-6 py-2 font-heading text-base/normal font-medium text-secondary",
   "hover:text-primary",
   "aria-selected:border-b-brand aria-selected:text-brand",
   "motion-safe:transition-[border-color,color] motion-safe:ease-[ease]",

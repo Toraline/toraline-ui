@@ -10,9 +10,11 @@ The styled React components of the Toraline component library.
 
 The components are styled with Tailwind CSS 4 classes that read the tokens of [`@toraline.tech/tokens`](../tokens/README.md). The package has no CSS of its own for a component. So the app must use Tailwind CSS 4.
 
+The default look is the look of the app Intraweb, an app of Toraline: its colors, its fonts (Inter for normal text, Poppins for headings and buttons), its radius sizes and its shadows. The tokens and the Tailwind classes have the names Intraweb uses. The library downloads no font: the app loads Inter and Poppins. Guide 1 of [`docs/guide.md`](../../docs/guide.md) shows how.
+
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
 
-A theme is a set of colors, fonts and corner sizes. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline.tech/tokens`](../tokens/README.md).
+A theme is a set of colors, fonts, corner sizes and shadows. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline.tech/tokens`](../tokens/README.md).
 
 ## Installation
 
@@ -153,7 +155,7 @@ import { Input } from "@toraline.tech/ui";
 | Prop | Values | Meaning |
 |---|---|---|
 | `label` | Text or elements | The visible name of the field, shown above it. A click on it moves the focus to the field. A field with no `label` needs `aria-label` |
-| `error` | Text or elements | The error message, shown under the field with an icon. When it is given, the field has the danger color on its border |
+| `error` | Text or elements | The error message, shown under the field with an icon. When it is given, the border of the field has the color of an invalid field (`--border-invalid`) |
 | `disabled` | The HTML attribute | The field cannot get focus and cannot be changed |
 | `id` | Text | Optional. The component makes an id when it is missing |
 
@@ -284,8 +286,8 @@ import { SplitButton } from "@toraline.tech/ui";
 
 Every component accepts `className`. The classes go on the outermost element of the component, after the classes of the library.
 
-1. **A Tailwind class of the app replaces the class of the library that sets the same CSS property.** Example: `<Button className="rounded-full">` has `rounded-full` and no longer has the library's `rounded`. The library `tailwind-merge` does this, inside every component. It works for a token class against a token class (`bg-danger` replaces `bg-primary`), and for a standard Tailwind class against a token class (`bg-red-500` replaces `bg-primary`).
-2. **A class replaces only a class with the same Tailwind variant.** A Tailwind variant is the part of a Tailwind class before the `:`, which says when the class applies. It is not a variant of a component. `bg-red-500` replaces `bg-primary`. It does not replace `hover:bg-primary-hover` or `disabled:bg-surface`. To change the look of a state, give a class with the Tailwind variant of that state: `hover:bg-red-600`, `disabled:bg-red-200`.
+1. **A Tailwind class of the app replaces the class of the library that sets the same CSS property.** Example: `<Button className="rounded-full">` has `rounded-full` and no longer has the library's `rounded-md`. The library `tailwind-merge` does this, inside every component. It works for a token class against a token class (`bg-surface` replaces `bg-primary`), and for a standard Tailwind class against a token class (`bg-red-500` replaces `bg-primary`). A class replaces only a class for the same CSS property: `text-brand` (a text color) does not remove `text-sm` (a font size), `border-brand` (a border color) does not remove `border` (a border width), and `bg-promo` does not remove the text color.
+2. **A class replaces only a class with the same Tailwind variant.** A Tailwind variant is the part of a Tailwind class before the `:`, which says when the class applies. It is not a variant of a component. `bg-red-500` replaces `bg-primary`. It does not replace `hover:bg-primary-hover` or `disabled:bg-subtle`. To change the look of a state, give a class with the Tailwind variant of that state: `hover:bg-red-600`, `disabled:bg-red-200`.
 3. **CSS of the app that is in no cascade layer wins too.** A cascade layer is a named group of CSS rules with a fixed priority. The Tailwind classes are in the layer `utilities`, and CSS in no layer has a higher priority than every layer. A class of the app that is inside `@layer components` or `@layer base` does not win.
 4. **An inner part** of a component has the attribute `data-slot`, for example `data-slot="field"` on the `<input>` of Input. An app can select it in its own CSS: `.search [data-slot="field"] { border-radius: 9999px; }`.
 
@@ -307,9 +309,9 @@ These rules were decided in TOR-1009, and the rules about styles in TOR-1205. Th
 A variant is one of the looks of a component, for example `primary` or `danger`.
 
 1. The variants are one list in the component's file, and the type comes from the list: `export const buttonVariants = ["primary", "secondary"] as const`. Sizes work the same way (`buttonSizes`). The lists are exported, so a test or a catalog can show every value. When the component's file starts with `"use client"`, the lists are in a second file with no `"use client"`, `src/<name>/<name>-options.ts`. Next.js does not let a Server Component read a value that a `"use client"` file exports; it can only render its components.
-2. The classes of each variant and of each size are one object in the component's file, with one text of Tailwind classes for each value: `const variantClass: Record<ButtonVariant, string> = { primary: "bg-primary text-primary-foreground", ... }`. The type makes the build fail when a value has no classes. The objects are not exported.
+2. The classes of each variant and of each size are one object in the component's file, with one text of Tailwind classes for each value: `const variantClass: Record<ButtonVariant, string> = { primary: "bg-primary text-inverse", ... }`. The type makes the build fail when a value has no classes. The objects are not exported.
 3. The component also writes the variant and the size on its element as the attributes `data-variant` and `data-size`, so a test or the CSS of an app can select them.
-4. A state (disabled, loading, error, selected, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The class of the state has the Tailwind variant that selects the same attribute: `disabled:bg-surface`, `aria-invalid:enabled:border-danger`, `aria-selected:text-text`, `peer-checked:bg-success`. The look and what a screen reader says cannot differ, because both come from one attribute. The component does not choose the classes of a state in its code. One exception: a loading Button leaves out the class of the pointer over it (`hover:`), so that a color the app gave stays while it loads.
+4. A state (disabled, loading, error, selected, on, open) is written once, as the HTML or ARIA attribute that a screen reader reads: `disabled`, `aria-busy`, `aria-invalid`, `aria-selected`, `checked`, `aria-expanded`. ARIA attributes are HTML attributes that describe an element to a screen reader. The class of the state has the Tailwind variant that selects the same attribute: `disabled:bg-subtle`, `aria-invalid:enabled:border-invalid`, `aria-selected:text-brand`, `peer-checked:bg-primary`. The look and what a screen reader says cannot differ, because both come from one attribute. The component does not choose the classes of a state in its code. One exception: a loading Button leaves out the class of the pointer over it (`hover:`), so that a color the app gave stays while it loads.
 
 ### Props
 
@@ -326,7 +328,7 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 1. A component uses the native HTML element that already has the behaviour: `<button>`, `<input>`, `<label>`, `<a>`, `<nav>`. The browser then gives the keyboard and the screen reader support.
 2. Behaviour that HTML does not have (arrow keys between tabs, a menu) is written by hand in the component, following the pattern of the WAI-ARIA Authoring Practices Guide (https://www.w3.org/WAI/ARIA/apg/patterns/). The package uses no library of primitives. A library of primitives is a set of components with behaviour and no styles, for example Base UI, Radix or React Aria.
 3. When a later component needs behaviour that is hard to write correctly (a dialog that keeps the focus inside, a select, a combobox, a tooltip or a menu that must move to stay on screen), the library to use is Base UI (`@base-ui/react`).
-4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring`).
+4. Every element that can get focus shows the focus ring: the classes of `focusRingClass` from `src/shared/focus-ring.ts` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`). `outline-focus` is the class of the token `--border-focus`.
 5. An icon that is only decoration has `aria-hidden="true"`. An icon is drawn with `currentColor`, so it has the color of the text.
 6. A class of a movement or a transition has the Tailwind variant `motion-safe:`, so a person who asked the device for less motion gets none.
 
@@ -334,11 +336,12 @@ A variant is one of the looks of a component, for example `primary` or `danger`.
 
 1. A component is styled only with Tailwind CSS 4 classes, written in its `.tsx` file. The package has no CSS file for a component. Its only CSS file is `css/tailwind.css`, which tells the Tailwind of an app to read the built files.
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
-3. A color is always a token class: `bg-primary`, `text-text-muted`, `border-border-strong`, `outline-focus-ring`. `border-current` and `border-transparent` are allowed. A standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
-4. A font size is `text-sm`, `text-base` or `text-lg`, written with the line height: `text-base/normal`. A font is `font-body`, `font-heading` or `font-mono`. The radius is `rounded`, and the shadow is `shadow`.
+3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
+   - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
+4. A font size is `text-sm`, `text-base` or `text-lg`, written with the line height: `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a size in `em` or `%` (`size-[1em]`; a size in `em` follows the font size of the component), a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
-7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`. When that order is not the one needed, the class names both conditions: `aria-invalid:enabled:border-danger`.
+7. When two classes of one element set the same property in different states, the state that must win has the Tailwind variant that Tailwind writes later in the CSS. The order Tailwind uses: no Tailwind variant, `hover:`, `focus:`, `focus-visible:`, `disabled:`, then `aria-*:`. When that order is not the one needed, the class names both conditions: `aria-invalid:enabled:border-invalid`.
 8. An element that another class must select gets a marker class with the name of the component: `group/toggle`, `group/split-button`. `peer` needs no name.
 9. An inner element has the attribute `data-slot` with the name of the part, so an app can select it.
 10. Text on its background has a contrast of 4.5 or more in both themes. Each pair of text token and background token that a component uses is in the contrast test of `packages/tokens/src/tokens.test.ts`.

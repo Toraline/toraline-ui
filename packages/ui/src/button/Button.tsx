@@ -9,10 +9,11 @@ import type { ButtonSize, ButtonVariant } from "./button-options.js";
  * The classes every button has. A state is selected by the attribute a screen
  * reader reads: "disabled:" by the HTML attribute disabled, "aria-busy:" by aria-busy.
  * Disabled is the same quiet look for every variant.
- * The colors of each part are the ones of the Button of the app Intraweb.
+ * The colors of each part, the font of headings and the medium weight are the
+ * ones of the Button of the app Intraweb.
  */
 const baseClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent font-body font-semibold",
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent font-heading font-medium",
   "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
   "enabled:aria-busy:cursor-progress",
   "motion-safe:transition-[background-color,border-color] motion-safe:ease-[ease]",

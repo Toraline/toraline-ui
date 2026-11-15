@@ -1,4 +1,47 @@
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+import { textStyleNames } from "@toraline.tech/tokens";
+
+/**
+ * "tailwind-merge" is the library that removes a class when a later class sets
+ * the same CSS property. It knows the classes of Tailwind CSS. It needs to be
+ * told about 2 kinds of class of the Tailwind preset of @toraline.tech/tokens:
+ *
+ * 1. The shadow of a card. Its name is not one of the shadow sizes of Tailwind,
+ *    so without this line the class is read as a shadow color, and it would
+ *    stay next to another shadow.
+ * 2. The text styles. A text style is one class that sets the font, the size,
+ *    the line height and the weight of a text together. Only one text style
+ *    stays, the last one. A text style also removes an earlier class for the
+ *    font, the font size, the line height, the font weight, the letter spacing,
+ *    the capital letters or the width of digits, because it sets them itself.
+ *    A class for one of these that comes after a text style stays, and wins:
+ *    Tailwind writes the text styles before those classes in the built CSS.
+ *
+ * The color classes of the tokens need no line here: any name after the first
+ * part of a color class is read as a color. The tests of this file check it for
+ * every color token.
+ */
+const mergeClasses = extendTailwindMerge<"text-style">({
+  extend: {
+    theme: {
+      shadow: ["card"],
+    },
+    classGroups: {
+      "text-style": [...textStyleNames],
+    },
+    conflictingClassGroups: {
+      "text-style": [
+        "font-family",
+        "font-size",
+        "leading",
+        "font-weight",
+        "tracking",
+        "text-transform",
+        "fvn-spacing",
+      ],
+    },
+  },
+});
 
 /** A value that classNames accepts. A value that is not a text is skipped. */
 export type ClassNameValue = string | false | null | undefined;
@@ -16,12 +59,13 @@ export type ClassNameValue = string | false | null | undefined;
  * "hover:bg-subtle" replaces "hover:bg-primary-hover", and does not
  * replace "bg-primary" or "disabled:bg-subtle".
  *
- * The comparison is done by the library "tailwind-merge". It knows the token
- * classes of @toraline.tech/tokens with no configuration: it reads any name
- * after the prefix of a color class as a color, so a token color and a color
- * the app added are colors too. The other token classes (font sizes, fonts,
- * radius, shadow) have the names Tailwind CSS already uses. The tests of this
- * file check each kind.
+ * A class replaces only a class for the same CSS property. A text color does
+ * not replace a font size, a border color does not replace a border width,
+ * and a background color does not replace a background size.
+ *
+ * The comparison is done by the library "tailwind-merge", set up above for the
+ * token classes of @toraline.tech/tokens. A color the app added is a color
+ * too. The tests of this file check each kind.
  *
  * A class that is not a Tailwind class is kept as it is.
  *
@@ -30,5 +74,5 @@ export type ClassNameValue = string | false | null | undefined;
  * type files included, and builds the CSS of every class name it finds there.
  */
 export function classNames(...values: ClassNameValue[]): string {
-  return twMerge(...values);
+  return mergeClasses(...values);
 }

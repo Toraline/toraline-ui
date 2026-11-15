@@ -138,7 +138,7 @@ Each use of a color has its own token. An app that changes its main color gives 
 
 `createTheme` refuses 2 kinds of key, with an error that says what to write:
 
-- A name with no group that is the end of a class of the library, for example `primary`, `surface`, `brand` or `danger`. `primary` would add `--color-primary`, and the classes `bg-primary` and `text-primary` would still read the tokens of the library. Write the full token name: `bg-primary`.
+- A name with no group that is the end of a class of the library, for example `primary`, `surface`, `brand` or `danger`. `primary` would add a new color for every CSS property, and the classes `bg-primary` and `text-primary` would still read the tokens of the library, so the app would see no change. Write the full token name: `bg-primary`.
 - `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl` to `text-9xl`, and a name that starts with `text-shadow`. Tailwind CSS uses the variables with these names for font sizes and text shadows.
 
 To change the light or the dark theme of the library, use its name: `createTheme({ name: "dark", base: "dark", colors: { "bg-primary": "#88ccff" } })`. The block comes later in the page than the library's block, so its values win.
