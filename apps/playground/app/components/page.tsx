@@ -1,15 +1,18 @@
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   BreadCrumbs,
   Button,
   ButtonLink,
+  IconButton,
   Input,
   Tabs,
   Toggle,
   buttonSizes,
   buttonVariants,
+  iconButtonSizes,
+  iconButtonVariants,
 } from "@toraline.tech/ui";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
 import { SplitButtonExamples } from "./SplitButtonExamples";
@@ -125,6 +128,36 @@ export default function ComponentsPage() {
             >
               To the first page
             </ButtonLink>
+          ))}
+        </Row>
+      </Section>
+
+      <Section title="IconButton">
+        <Row label="Variants">
+          {iconButtonVariants.map((variant) => (
+            <IconButton key={variant} variant={variant} icon={Trash2} aria-label={`Delete, ${variant}`} />
+          ))}
+        </Row>
+        <Row label="Sizes: a square of 32, 40 and 48 pixels">
+          {iconButtonSizes.map((size) => (
+            <IconButton
+              key={size}
+              size={size}
+              variant="secondary"
+              icon={Trash2}
+              aria-label={`Delete, size ${size}`}
+            />
+          ))}
+        </Row>
+        <Row label="Disabled">
+          {iconButtonVariants.map((variant) => (
+            <IconButton
+              key={variant}
+              variant={variant}
+              icon={Trash2}
+              aria-label={`Delete, ${variant}, disabled`}
+              disabled
+            />
           ))}
         </Row>
       </Section>

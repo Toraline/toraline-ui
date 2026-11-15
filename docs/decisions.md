@@ -12,6 +12,15 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - IconButton: the variants and sizes of Intraweb, and a required name (TOR-1140)
+- Decision: `IconButton` has the variants (`ghost`, `secondary`, `soft`, `primary`), the sizes (`sm`, `md`, `lg`: a square of 32, 40 and 48 pixels) and the class lists of Intraweb's `components/ui/icon-button.tsx`. The default variant is `ghost`, as in Intraweb.
+- Decision: the props type removes `children` and makes `aria-label` a required text. A test checks that TypeScript refuses an IconButton with no `aria-label`.
+- Why: a button with no text has no name for a screen reader unless the app gives one. A missing name is then an error when the app is built, not a problem found later.
+- Decision: it has its own lists `iconButtonVariants` and `iconButtonSizes`, not the lists of Button: the variants differ (no `danger`), and the icon of `md` is 20 pixels (16 in Button).
+- Decision: no state `loading`. Intraweb's has none, and the ticket does not ask for it. Without a click handler of its own the file needs no `"use client"`.
+- Decision: no `aria-labelledby` in place of `aria-label`. Intraweb's type is the same. An app that needs it can ask for it later.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - ButtonLink: the app gives its link component (TOR-1139)
 - Decision: `ButtonLink` renders an `<a>`, or the component the app gives in the prop `linkComponent`, the same approach as `linkComponent` of BreadCrumbs. It has the classes of Button, from the same file, and it is in the folder `src/button/`, as in Intraweb.
 - Why: Intraweb's `ButtonLink` imports `next/link`. The library is not only for Next.js and must not import it.

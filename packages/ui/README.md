@@ -177,6 +177,33 @@ import { ButtonLink } from "@toraline.tech/ui";
 - It has no `"use client"`: it also renders in a Server Component.
 - Intraweb's own `ButtonLink` imports `next/link`. To move to this one, Intraweb adds `linkComponent={Link}`, or keeps a file of 5 lines that does it once: `export const ButtonLink = (props) => <UiButtonLink linkComponent={Link} {...props} />`.
 
+### `IconButton`
+
+A button that shows only an icon.
+
+```tsx
+import { Trash2 } from "lucide-react";
+import { IconButton } from "@toraline.tech/ui";
+
+<IconButton icon={Trash2} aria-label="Delete the order" onClick={deleteOrder} />
+```
+
+| Prop | Values | Meaning |
+|---|---|---|
+| `icon` | An icon component. Required | The icon. See [Icons](#icons) |
+| `aria-label` | Text. Required | The name of the button for a screen reader. The button has no visible text, so TypeScript refuses an IconButton with no `aria-label` |
+| `variant` | `"ghost"` (default), `"secondary"`, `"soft"`, `"primary"` | The look. `ghost`: no background and no border. `secondary`: a border. `soft`: a quiet background in the brand color. `primary`: the main action |
+| `size` | `"sm"`, `"md"` (default), `"lg"` | A square of 32, 40 or 48 pixels, with an icon of 16, 20 or 24 pixels |
+| `disabled` | The HTML attribute | The button cannot get focus and cannot be pressed. It has half of its opacity |
+| `type` | `"button"` (default), `"submit"`, `"reset"` | The HTML attribute |
+
+- The variants, the sizes and the colors are the ones of the IconButton of the app Intraweb.
+- Main native element: the `<button>`. `className`, every other prop and `ref` go to it. It has no `children`.
+- Keyboard: Tab moves the focus to it, Enter and Space press it.
+- Screen reader: it says the text of `aria-label`. The icon has `aria-hidden="true"`.
+- The lists `iconButtonVariants` and `iconButtonSizes` and the types `IconButtonProps`, `IconButtonVariant` and `IconButtonSize` are exported.
+- It has no `"use client"`: it also renders in a Server Component.
+
 ### Icons
 
 The library has no icon set and does not depend on one. A component with the prop `icon` receives a React component that draws one icon as an `<svg>`:

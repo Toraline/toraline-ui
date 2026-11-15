@@ -134,6 +134,13 @@ test.each([lightTheme, darkTheme])(
       ["border-brand", "bg-surface"],
       // The thumb of a switch that is off.
       ["icon-default", "bg-surface"],
+      // The icon of an icon button: ghost, secondary and soft, at rest and with the pointer over it.
+      ["icon-default", "bg-page"],
+      ["icon-strong", "bg-muted"],
+      ["icon-strong", "bg-surface"],
+      ["icon-strong", "bg-subtle"],
+      ["icon-brand", "bg-primary-subtle"],
+      ["icon-brand", "bg-primary-muted"],
     ];
     for (const [foreground, background] of pairs) {
       expect(

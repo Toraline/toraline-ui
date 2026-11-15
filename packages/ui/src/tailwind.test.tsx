@@ -11,12 +11,15 @@ import {
   BreadCrumbs,
   Button,
   ButtonLink,
+  IconButton,
   Input,
   SplitButton,
   Tabs,
   Toggle,
   buttonSizes,
   buttonVariants,
+  iconButtonSizes,
+  iconButtonVariants,
   splitButtonMenuPlacements,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
@@ -106,6 +109,17 @@ async function renderEveryComponent(): Promise<string[]> {
           Orders
         </ButtonLink>
       ))}
+      {iconButtonVariants.map((variant) =>
+        iconButtonSizes.map((size) => (
+          <IconButton
+            key={`${variant}-${size}`}
+            variant={variant}
+            size={size}
+            icon={PlusIcon}
+            aria-label={`Add, ${variant}, ${size}`}
+          />
+        )),
+      )}
       <Input label="Title" error="The title is required." />
       <Toggle label="Send e-mails" />
       <Tabs tabs={tabs} />
@@ -248,6 +262,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["bg-surface", "hover:bg-subtle"],
     ["bg-primary-subtle", "hover:bg-primary-muted"],
     ["text-body", "hover:text-primary"],
+    // IconButton: the pointer over it wins over the look at rest.
+    ["text-icon", "hover:text-icon-strong"],
     // Input: the focus wins over the pointer, and disabled wins over both.
     ["border-default", "hover:border-hover"],
     ["hover:border-hover", "focus-visible:border-focus"],

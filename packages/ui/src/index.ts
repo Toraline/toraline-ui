@@ -12,6 +12,13 @@ export type { IconComponent } from "./shared/icon.js";
 export { Button, ButtonLink, buttonSizes, buttonVariants } from "./button/index.js";
 export type { ButtonLinkProps, ButtonProps, ButtonSize, ButtonVariant } from "./button/index.js";
 
+export { IconButton, iconButtonSizes, iconButtonVariants } from "./icon-button/index.js";
+export type {
+  IconButtonProps,
+  IconButtonSize,
+  IconButtonVariant,
+} from "./icon-button/index.js";
+
 export { Input } from "./input/index.js";
 export type { InputProps } from "./input/index.js";
 
