@@ -47,6 +47,17 @@ Skills are in [`agent/skills/`](agent/skills/). `.claude/skills` and `.cursor/sk
 
 Linear is reached through any tool or MCP server with `linear` in its name. Without access, ask the person for the ticket's content. Never invent it.
 
+This repository has 6 skills of its own (pack `project`), for the design and the build of one component or screen. Their descriptions start with `toraline-ui`. The order for one component:
+
+1. `/design-component <ticket>`: the design brief, approved by the person. For a screen of an app: `/design-screen <ticket>`.
+2. `/figma-component <ticket>`: the component in the library's Figma file.
+3. `/build-component <ticket>`: the component in code.
+4. `/review-component <ticket>`: brief, Figma, code and Intraweb compared.
+
+`/sync-tokens-figma` compares the tokens in code with the variables in Figma, at any time.
+
+Figma is reached through any tool or MCP server with `figma` in its name. Without access, a skill says what it could not check. It never says a Figma change was made when it was not.
+
 ## Commands
 
 ```bash
