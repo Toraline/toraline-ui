@@ -4,8 +4,12 @@ export { dataGridPageSizes } from "./data-grid-options.js";
 export type {
   DataGridCheckboxProps,
   DataGridColumn,
+  DataGridColumnFilter,
+  DataGridFilters,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridOption,
   DataGridSelectProps,
   DataGridSort,
   DataGridState,

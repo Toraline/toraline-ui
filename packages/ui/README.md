@@ -1256,7 +1256,7 @@ import { ActionsTh, DataTable, DataTableMessage, IconButton, Td, Th, Tr } from "
 
 ### `DataGrid`
 
-A table of records with a search field, a sort by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
+A table of records with a search field, a sort and a filter by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, filters, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
 
 ```tsx
 "use client";
@@ -1310,11 +1310,11 @@ const columns: DataGridColumn<Product>[] = [
 | `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
 | `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
 | `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
-| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no selection and no pages |
+| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no filter, no selection and no pages |
 | `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
 | `loading` | `true`, `false` (default) | `true` while the records load: the table has `aria-busy="true"` and shows the text of `labels.loading` in the place of the rows |
-| `defaultState` | `{ search, sort, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null` |
-| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, the page or the page size, for example to write them in the address of the page |
+| `defaultState` | `{ search, sort, filters, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null`. `filters` is described in [The filter of a column](#the-filter-of-a-column) |
+| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, a filter, the page or the page size, for example to write them in the address of the page |
 | `locale` | A language, for example `"pt-BR"` | The language that orders the texts of a sort. When missing: the language of the browser |
 | `labels` | An object | The texts of the grid. Each one that is missing has its English default. See below |
 | `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the `CheckboxControl` of this library |
@@ -1331,18 +1331,66 @@ A column (`DataGridColumn<Row>`):
 | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers |
 | `sortValue` | A function that returns a text, a number or `null` | Turns on the sort by this column. A press on the header sorts ascending, a second press descending, a third press removes the sort. A record with `null` is always at the end. A text with a number is ordered by the number (`P9` before `P10`) |
 | `searchValue` | A function that returns a text | The text of this column that the search looks in |
-| `footer` | A function that receives the rows after the search | The content of the footer cell. The footer row is shown when a column has `footer` |
+| `footer` | A function that receives the rows after the search and the filters | The content of the footer cell. The footer row is shown when a column has `footer` |
+| `filter` | `{ type: "options", options, value, defaultValues }` or `{ type: "text", value }` | Turns on the filter of this column. See [The filter of a column](#the-filter-of-a-column) |
 
-The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`).
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`).
 
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: the filter of a column, the menu that chooses the columns, the editing of cells, the rows inside a row, another view in the place of the table, and saving the state in the address of the page or in the browser. The reasons are in the entry of TOR-1165 of [`docs/decisions.md`](../../docs/decisions.md).
-- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- Not in the library yet, and still only in Intraweb: the menu that chooses the columns, the editing of cells, the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
+
+#### The filter of a column
+
+A column with `filter` has a small button in its header. A press opens a panel with a list of choices or a text field. Each change filters the rows at once.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    // A text field: the rows whose name has the text.
+    filter: { type: "text", value: (product) => product.name },
+  },
+  {
+    id: "status",
+    header: "Status",
+    cell: (product) => (product.active ? "Active" : "Inactive"),
+    // A list of choices. "Active" is checked until a person changes the filter.
+    filter: {
+      type: "options",
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ],
+      value: (product) => (product.active ? "active" : "inactive"),
+      defaultValues: ["active"],
+    },
+  },
+];
+```
+
+| Field of `filter` | Values | Meaning |
+|---|---|---|
+| `type` | `"options"`, `"text"`. Required | A list of choices with a checkbox each, or a text field |
+| `value` | A function. Required | For `"text"`: the text of a record that the filter looks in, with no difference for capital letters and accents. For `"options"`: the value of a record, or a list of values; with a list, one checked value is enough |
+| `options` | A list of `{ value, label }`. Required for `"options"` | The choices, in the order they are shown |
+| `defaultValues` | A list of values. Only for `"options"` | The choices that are checked until a person changes the filter, for example only the active records |
+
+- With no choice checked, a list of choices filters nothing.
+- The state of the grid has the filters: `state.filters` is an object with one entry for each column whose filter a person changed. The key is the `id` of the column. The value is the list of the checked values, or the text. A column that is not in the object has its default. An empty list means that a person unchecked the defaults. `defaultState.filters` has the same shape.
+- "Clear filters" is shown while the search field has a text or `state.filters` has an entry. It empties the search field and puts every filter back to its default. The defaults of a column do not count as a change.
+- The button of the header has the brand colors and `data-active` while its filter hides rows, and its name ends with the text of `labels.filterColumn(header, true)`.
+- Keyboard: Enter or Space on the button opens the panel, and the focus goes to its first control. Tab and Shift+Tab stay inside the panel. Space checks a choice. Escape closes the panel and gives the focus back to the button; it does not reach a Modal or a Drawer under it. A press outside closes the panel.
+- Screen reader: the button has `aria-haspopup="dialog"` and `aria-expanded`. The panel is a dialog named "Filter" and the header of the column. It does not block the page.
+- The panel is rendered in `<body>` with [`useAnchoredPanel`](#useanchoredpanel), as the menu of ActionMenu is: the box of the table scrolls and would cut a panel inside it. Its choices are the library's `Checkbox` and its text field is `TextInput`.
+- A grid with `groups` shows no filter.
 
 ### `ListItem`
 

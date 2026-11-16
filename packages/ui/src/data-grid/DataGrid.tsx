@@ -18,16 +18,18 @@ import {
   ChevronsUpDownIcon,
   SearchIcon,
 } from "./DataGridIcons.js";
+import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
 import type {
   DataGridCheckboxProps,
   DataGridColumn,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
   DataGridSelectProps,
   DataGridState,
 } from "./data-grid-options.js";
-import { nextSort, searchAndSortRows } from "./data-grid-rows.js";
+import { nextSort, searchAndSortRows, withFilterValue } from "./data-grid-rows.js";
 
 /*
  * The classes are the ones of the DataGrid of the app Intraweb
@@ -52,6 +54,11 @@ const defaultLabels: DataGridLabels = {
   pageOf: (page, pageCount) => `${page} of ${pageCount}`,
   previousPage: "Previous page",
   nextPage: "Next page",
+  filterColumn: (columnHeader, isActive) => `Filter ${columnHeader}${isActive ? " (filter on)" : ""}`,
+  filterChoices: (columnHeader) => `Show ${columnHeader}`,
+  filterSelectAll: "Select all",
+  filterClear: "Clear",
+  filterContains: "Contains…",
 };
 
 /**
@@ -97,7 +104,7 @@ export type DataGridProps<Row> = {
   /**
    * Shows the rows in blocks, each with a header row, in the order given.
    * "rows" is still the full list. With groups there is no search, no sort, no
-   * selection and no pages: the order is the order of the groups.
+   * filter, no selection and no pages: the order is the order of the groups.
    */
   groups?: readonly DataGridGroup<Row>[];
   /** A value no other record has, for example its id. */
@@ -130,9 +137,9 @@ export type DataGridProps<Row> = {
   emptyMessage?: ReactNode;
   /** true while the records are loading: the table has aria-busy="true" and shows the text of "labels.loading" in the place of the rows. */
   loading?: boolean;
-  /** The search text, the sort, the page and the number of rows of a page the grid starts with, for example read from the address of the page. */
+  /** The search text, the sort, the filters, the page and the number of rows of a page the grid starts with, for example read from the address of the page. */
   defaultState?: Partial<DataGridState>;
-  /** Called after a person changes the search text, the sort, the page or the number of rows of a page, for example to write them in the address of the page. */
+  /** Called after a person changes the search text, the sort, a filter, the page or the number of rows of a page, for example to write them in the address of the page. */
   onStateChange?: (state: DataGridState) => void;
   /** The language that orders the texts of a sort, for example "pt-BR". When missing: the language of the browser. */
   locale?: string;
@@ -147,14 +154,16 @@ export type DataGridProps<Row> = {
 };
 
 /**
- * A table of records with a search field, a sort by column, pages, a selection
- * with actions for the selected rows, a footer row with totals, and groups of rows.
+ * A table of records with a search field, a sort and a filter by column, pages,
+ * a selection with actions for the selected rows, a footer row with totals, and
+ * groups of rows.
  * Every feature is turned on by its prop or by a field of a column.
  *
  * - The app gives every record in "rows". The grid searches, sorts and cuts
  *   them into pages in the browser. It loads no data.
  * - The table is a DataTable with "stackOnMobile": on a narrow screen each row is a block.
- * - Keyboard: every control is a native button, field or checkbox.
+ * - Keyboard: every control is a native button, field or checkbox. The panel
+ *   of a filter keeps the Tab key inside it, and Escape closes it.
  * - Screen reader: the header cell of a column that can be sorted has
  *   "aria-sort". The bar of the selected rows and the page controls are named
  *   regions. The row of the open record has aria-current="true".
@@ -189,6 +198,7 @@ export function DataGrid<Row>({
   const [state, setState] = useState<DataGridState>(() => ({
     search: defaultState?.search ?? "",
     sort: defaultState?.sort ?? null,
+    filters: defaultState?.filters ?? {},
     page: Math.max(1, defaultState?.page ?? 1),
     pageSize: defaultState?.pageSize ?? pageSize ?? dataGridPageSizes[1],
   }));
@@ -198,14 +208,18 @@ export function DataGrid<Row>({
   const isFlat = groups === undefined;
   // Without the prop "search" there is no field to empty, so a search text of defaultState does nothing.
   const searchText = search ? state.search : "";
-  const foundRows = isFlat ? searchAndSortRows(rows, columns, searchText, state.sort, locale) : [...rows];
+  const foundRows = isFlat
+    ? searchAndSortRows(rows, columns, searchText, state.sort, locale, state.filters)
+    : [...rows];
   const isPaginated = isFlat && pageSize !== undefined;
   const pageCount = isPaginated ? Math.max(1, Math.ceil(foundRows.length / state.pageSize)) : 1;
   const page = Math.min(state.page, pageCount);
   const pageRows = isPaginated
     ? foundRows.slice((page - 1) * state.pageSize, page * state.pageSize)
     : foundRows;
-  const hasFilters = isFlat && searchText !== "";
+  // A filter that is the default of its column is not in "state.filters", so it does not count.
+  const hasChangedFilters = columns.some((column) => column.filter !== undefined && column.id in state.filters);
+  const hasFilters = isFlat && (searchText !== "" || hasChangedFilters);
 
   const isSelectable = isFlat && selection !== undefined && !loading;
   const selectedRows = isSelectable ? foundRows.filter((row) => checkedKeys.has(getRowKey(row))) : [];
@@ -233,7 +247,11 @@ export function DataGrid<Row>({
   }
 
   function clearFilters() {
-    update({ search: "", page: 1 });
+    update({ search: "", filters: {}, page: 1 });
+  }
+
+  function setFilter(column: DataGridColumn<Row>, value: DataGridFilterValue) {
+    update({ filters: withFilterValue(column, state.filters, value), page: 1 });
   }
 
   function clearSelection() {
@@ -283,6 +301,14 @@ export function DataGrid<Row>({
           ) : (
             column.header
           )}
+          {isFlat && column.filter ? (
+            <DataGridColumnFilter
+              column={column}
+              filters={state.filters}
+              onChange={(value) => setFilter(column, value)}
+              labels={labels}
+            />
+          ) : null}
         </div>
       </Th>
     );

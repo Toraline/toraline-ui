@@ -11,6 +11,38 @@ import type { TableCellAlignment } from "../data-table/index.js";
 /** The numbers of rows a person can choose for one page. */
 export const dataGridPageSizes = [10, 25, 50, 100] as const;
 
+/** One choice of a list: of the filter of a column, or of a cell that is edited with a select. */
+export type DataGridOption = {
+  /** The value the grid keeps and gives back to the app. */
+  value: string;
+  /** The text a person reads. */
+  label: string;
+};
+
+/**
+ * The filter in the header of a column.
+ *
+ * - "options": a list of choices with a checkbox each. A row is shown when its
+ *   value is one of the checked choices. With no choice checked, every row is shown.
+ * - "text": a text field. A row is shown when its value has the text, with no
+ *   difference for capital letters and accents.
+ */
+export type DataGridColumnFilter<Row> =
+  | {
+      type: "options";
+      /** The choices, in the order they are shown. */
+      options: readonly DataGridOption[];
+      /** The value of a record, or its values: with several, one checked value is enough. */
+      value: (row: Row) => string | readonly string[];
+      /** The choices that are checked until a person changes the filter, for example only the active records. */
+      defaultValues?: readonly string[];
+    }
+  | {
+      type: "text";
+      /** The text of a record that the filter looks in. */
+      value: (row: Row) => string;
+    };
+
 /** One column of a DataGrid. "Row" is the type of one record. */
 export type DataGridColumn<Row> = {
   /** A name no other column of the grid has. The sort names the column by it. */
@@ -28,8 +60,10 @@ export type DataGridColumn<Row> = {
   sortValue?: (row: Row) => string | number | null;
   /** The text of this column that the search field looks in. */
   searchValue?: (row: Row) => string;
-  /** The content of the footer cell, computed from the rows after the search (every page). */
+  /** The content of the footer cell, computed from the rows after the search and the filters (every page). */
   footer?: (rows: Row[]) => ReactNode;
+  /** Turns on the filter of this column: a small button in its header opens a panel with the choices or a text field. */
+  filter?: DataGridColumnFilter<Row>;
 };
 
 /** A block of rows with its own header row, for example the products of one category. */
@@ -49,10 +83,22 @@ export type DataGridGroup<Row> = {
 /** The column the rows are sorted by and the direction, or null when the rows are in the order the app gave. */
 export type DataGridSort = { columnId: string; descending: boolean } | null;
 
-/** What a person changed in the grid: the search text, the sort, the page and the number of rows of a page. */
+/** What a person chose in the filter of one column: the checked values of a list of choices, or the text of a text filter. */
+export type DataGridFilterValue = readonly string[] | string;
+
+/**
+ * The filters a person changed, by the "id" of the column. A column that is
+ * not in the object has its default: the "defaultValues" of a list of choices,
+ * or no text. An empty list means that a person unchecked every choice of a
+ * filter that has defaults.
+ */
+export type DataGridFilters = Record<string, DataGridFilterValue>;
+
+/** What a person changed in the grid: the search text, the sort, the filters, the page and the number of rows of a page. */
 export type DataGridState = {
   search: string;
   sort: DataGridSort;
+  filters: DataGridFilters;
   /** The page that is shown. The first page is 1. */
   page: number;
   pageSize: number;
@@ -62,9 +108,9 @@ export type DataGridState = {
 export type DataGridLabels = {
   /** The name of the column of the buttons of each row. Only a screen reader says it. */
   actions: string;
-  /** The button that empties the search field. */
+  /** The button that empties the search field and puts every filter back to its default. */
   clearFilters: string;
-  /** The message when the search finds no row. */
+  /** The message when the search and the filters find no row. */
   noResults: string;
   /** The message while "loading" is true. */
   loading: string;
@@ -92,6 +138,20 @@ export type DataGridLabels = {
   previousPage: string;
   /** The name of the button of the page after. */
   nextPage: string;
+  /**
+   * The name of the button that opens the filter of a column, and of its
+   * panel. It receives the header of the column, and true while the filter is
+   * not the default of the column.
+   */
+  filterColumn: (columnHeader: string, isActive: boolean) => string;
+  /** The name of the list of choices of a filter, for a screen reader. It receives the header of the column. */
+  filterChoices: (columnHeader: string) => string;
+  /** The button of a filter that checks every choice. */
+  filterSelectAll: string;
+  /** The button of a filter that unchecks every choice. */
+  filterClear: string;
+  /** The placeholder of the text field of a text filter. */
+  filterContains: string;
 };
 
 /**

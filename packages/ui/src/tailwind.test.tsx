@@ -74,6 +74,7 @@ import {
   Tr,
   tableCellAlignments,
 } from "./index";
+import type { DataGridColumn } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -162,6 +163,46 @@ const gridColumns = [
 ];
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** TOR-1209: the parts of the DataGrid that open or that are shown only with their prop. */
+const gridPartsColumns: DataGridColumn<GridRow>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (row) => row.name,
+    filter: { type: "text", value: (row) => row.name },
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (row) => row.price,
+    filter: {
+      type: "options",
+      options: [
+        { value: "cheap", label: "Up to 8" },
+        { value: "other", label: "More than 8" },
+      ],
+      value: (row) => (row.price <= 8 ? "cheap" : "other"),
+      defaultValues: ["cheap"],
+    },
+  },
+];
+
+function GridPartsExamples() {
+  return (
+    <DataGrid
+      caption="Products with filters"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+    />
+  );
+}
+
+/** The buttons that open a part of the DataGrid of TOR-1209, in the order they are pressed. */
+const gridPartsButtonNames = ["Filter Product", "Filter Price (filter on)"];
 
 /** The floating panels of phase 9: each one opens with a press on its button. */
 const floatingButtonNames = [
@@ -474,6 +515,12 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
+  // TOR-1209: the parts of the DataGrid, each one open.
+  render(<GridPartsExamples />);
+  for (const buttonName of gridPartsButtonNames) {
+    await user.click(screen.getByRole("button", { name: buttonName }));
+    collect();
+  }
   // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
   render(<OverlayExamples />);
   collect();
@@ -658,6 +705,13 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["hover:bg-subtle", "data-checked:bg-selected"],
     ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
     ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
+    // TOR-1210, the button of a column filter: a filter that is on wins over the look at rest
+    // and over the pointer, and the pointer over a filter that is on has its own background.
+    ["text-icon", "data-active:text-icon-brand"],
+    ["hover:text-icon-strong", "data-active:text-icon-brand"],
+    ["hover:bg-muted", "data-active:bg-primary-subtle"],
+    ["data-active:bg-primary-subtle", "data-active:hover:bg-primary-muted"],
+    ["border-default", "data-active:border-brand"],
     // DetailPanel: the width of a wide screen wins over the full width.
     ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {

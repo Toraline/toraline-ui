@@ -157,8 +157,12 @@ export { DataGrid, dataGridPageSizes } from "./data-grid/index.js";
 export type {
   DataGridCheckboxProps,
   DataGridColumn,
+  DataGridColumnFilter,
+  DataGridFilters,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridOption,
   DataGridProps,
   DataGridSelectProps,
   DataGridSort,

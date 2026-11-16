@@ -351,3 +351,133 @@ export const StateForTheApp: Story = {
   },
   render: (args) => <GridWithState {...args} />,
 };
+
+/** The columns of the stories of the filter: a text filter, 2 lists of choices, and a list with a default. */
+const filterColumns: DataGridColumn<Product>[] = columns.map((column): DataGridColumn<Product> => {
+  if (column.id === "name") {
+    return { ...column, filter: { type: "text", value: (product) => product.name } };
+  }
+  if (column.id === "category") {
+    return {
+      ...column,
+      filter: {
+        type: "options",
+        options: ["Bakery", "Desserts", "Drinks", "Savory"].map((category) => ({ value: category, label: category })),
+        value: (product) => product.category,
+      },
+    };
+  }
+  if (column.id === "supplier") {
+    return {
+      ...column,
+      filter: {
+        type: "options",
+        options: [
+          { value: "Minas Dairy", label: "Minas Dairy" },
+          { value: "Serra Coffee", label: "Serra Coffee" },
+          { value: "Sweet Farm", label: "Sweet Farm" },
+          { value: "", label: "No supplier" },
+        ],
+        value: (product) => product.supplier ?? "",
+      },
+    };
+  }
+  return column;
+});
+
+const statusColumn: DataGridColumn<Product> = {
+  id: "status",
+  header: "Status",
+  cell: (product) => (product.active ? "Active" : "Inactive"),
+  sortValue: (product) => (product.active ? 0 : 1),
+  filter: {
+    type: "options",
+    options: [
+      { value: "active", label: "Active" },
+      { value: "inactive", label: "Inactive" },
+    ],
+    value: (product) => (product.active ? "active" : "inactive"),
+    defaultValues: ["active"],
+  },
+};
+
+/**
+ * A column with "filter" has a small button in its header. "Status" starts
+ * with the choice "Active" checked ("defaultValues"), so its button is in the
+ * brand color. A default is not a change of the person: "Clear filters" is not shown.
+ */
+export const ColumnFilters: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Filter Status (filter on)" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: "Clear filters" })).toBeNull();
+  },
+};
+
+/**
+ * The panel of a filter with a list of choices, open. The story checks
+ * "Drinks": the rows are filtered at once, the button of the header changes
+ * its color, and "Clear filters" is shown. The panel is in <body>, so the box
+ * of the table does not cut it.
+ */
+export const ColumnFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Category" }));
+    const panel = await page.findByRole("dialog", { name: "Filter Category" });
+    await userEvent.click(within(panel).getByRole("checkbox", { name: "Drinks" }));
+    await expect(canvas.getByRole("button", { name: "Filter Category (filter on)" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Clear filters" })).toBeVisible();
+    await expect(canvas.getByText("Showing 1–9 of 9")).toBeVisible();
+  },
+};
+
+/** The panel of a text filter, open: one text field, which has the focus. The story types "cake". */
+export const TextFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Product" }));
+    const field = await page.findByRole("textbox", { name: "Filter Product" });
+    await expect(field).toHaveFocus();
+    await userEvent.type(field, "cake");
+    await expect(canvas.getByText("Showing 1–2 of 2")).toBeVisible();
+  },
+};
+
+/** The keyboard: Enter on the button of the header opens the panel, Tab goes to a choice, Space checks it, Escape closes the panel and gives the focus back to the button. */
+export const ColumnFilterKeyboard: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 8),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    canvas.getByRole("button", { name: "Filter Supplier" }).focus();
+    await userEvent.keyboard("{Enter}");
+    const panel = await page.findByRole("dialog", { name: "Filter Supplier" });
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(within(panel).getByRole("checkbox", { name: "Minas Dairy" })).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await userEvent.keyboard("{Escape}");
+    await expect(page.queryByRole("dialog")).toBeNull();
+    await expect(canvas.getByRole("button", { name: "Filter Supplier (filter on)" })).toHaveFocus();
+  },
+};

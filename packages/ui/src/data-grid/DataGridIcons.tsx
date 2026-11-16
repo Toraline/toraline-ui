@@ -82,3 +82,14 @@ export function SearchIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** "list-filter": the filter of a column. */
+export function ListFilterIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 5h20" />
+      <path d="M6 12h12" />
+      <path d="M9 19h6" />
+    </Icon>
+  );
+}

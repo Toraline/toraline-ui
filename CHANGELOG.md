@@ -4,7 +4,19 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
-## 0.2.0 (not published yet)
+## 0.3.0 (not published yet)
+
+The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-1209). Nothing breaks: a grid written for 0.2.0 works unchanged.
+
+### New
+
+- DataGrid: the filter of a column (TOR-1210). A column with `filter` has a small button in its header that opens a panel with a list of choices (`type: "options"`, with `defaultValues`) or a text field (`type: "text"`). The state of the grid (`DataGridState`, `defaultState`, `onStateChange`) has the new field `filters`. "Clear filters" puts every filter back to its default. New labels: `filterColumn`, `filterChoices`, `filterSelectAll`, `filterClear`, `filterContains`. New types: `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`.
+
+### Changed
+
+- The type `DataGridState` has the new field `filters`. An app that builds a full `DataGridState` object itself must add `filters: {}`. An app that only reads the state of `onStateChange`, or gives a part of it to `defaultState`, changes nothing.
+
+## 0.2.0 (2026-11-15)
 
 The components get the shape of the same components of the app Intraweb: variants, sizes, props, measures and states (phase 7, TOR-1123). After this version a screen of Intraweb can import these components from the library and look the same.
 
