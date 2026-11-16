@@ -314,6 +314,40 @@ describe("DataGrid: the pages", () => {
     expect(within(navigation).getByRole("button", { name: "Próxima página" })).toBeDefined();
   });
 
+  test("the texts of the pages and of the selected rows can be elements: a text in pieces, as Intraweb writes it", async () => {
+    const user = userEvent.setup();
+    renderGrid({
+      rows: manyProducts,
+      pageSize: 10,
+      selection: { actions: () => null },
+      labels: {
+        selectedCount: (count) => (
+          <>
+            {count} {count === 1 ? "selecionado" : "selecionados"}
+          </>
+        ),
+        pageRange: (firstRow, lastRow, rowCount) => (
+          <>
+            Mostrando {firstRow}–{lastRow} de{" "}
+            {rowCount}
+          </>
+        ),
+        pageOf: (page, pageCount) => (
+          <>
+            {page} de {pageCount}
+          </>
+        ),
+      },
+    });
+    const range = screen.getByText("Mostrando 1–10 de 23");
+    // The pieces of Intraweb: "Mostrando ", "1", "–", "10", " de", " ", "23".
+    expect(range.childNodes).toHaveLength(7);
+    expect(screen.getByText("1 de 3").childNodes).toHaveLength(3);
+    await user.click(screen.getAllByRole("checkbox")[1] as HTMLElement);
+    expect(screen.getByRole("status").textContent).toBe("1 selecionado");
+    expect(screen.getByRole("status").childNodes).toHaveLength(3);
+  });
+
   test("the field of the page size has the full width of the library's Select, with no fixed width", () => {
     renderGrid({ rows: manyProducts, pageSize: 10 });
     const classes = screen.getByRole("combobox", { name: "Per page" }).className.split(" ");

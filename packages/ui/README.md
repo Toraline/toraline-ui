@@ -1355,6 +1355,21 @@ A column (`DataGridColumn<Row>`):
 
 The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `editTable` (`"Edit table"`), `noChanges` (`"No changes"`), `changedRows(count)` (`"2 rows changed"`), `cancelEditing` (`"Cancel"`), `saveChanges(count)` (`"Save changes (2)"`), `savingChanges` (`"Saving…"`), `rowError(rowLabel, errorMessage)` (`"Coffee: The price is not valid."`), `showSubRows(subRowsLabel, rowLabel, count)` (`"Show options of Milk (3)"`), `hideSubRows(subRowsLabel, rowLabel, count)` (`"Hide options of Milk (3)"`), `subRowsCaption(subRowsLabel, rowLabel)` (`"options of Milk"`), `noSubRows` (`"No items."`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
+Three of them, `selectedCount`, `pageRange` and `pageOf`, can return elements in the place of a text (since version 0.3.1). A browser draws one text and the same text given in pieces with a difference of less than 0.1 pixel in its width, which changes the edges of some letters. Intraweb writes these 3 texts in pieces. An app that must look exactly as Intraweb did gives the same pieces:
+
+```tsx
+const labels = {
+  selectedCount: (count: number) => <>{count} {count === 1 ? "selecionado" : "selecionados"}</>,
+  pageRange: (firstRow: number, lastRow: number, rowCount: number) => (
+    <>
+      Mostrando {firstRow}–{lastRow} de{" "}
+      {rowCount}
+    </>
+  ),
+  pageOf: (page: number, pageCount: number) => <>{page} de {pageCount}</>,
+};
+```
+
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.

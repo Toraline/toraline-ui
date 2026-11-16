@@ -188,8 +188,12 @@ export type DataGridLabels = {
   total: string;
   /** The name of the bar of the actions for the selected rows, for a screen reader. */
   bulkActions: string;
-  /** The text of the bar: how many rows are selected. */
-  selectedCount: (count: number) => string;
+  /**
+   * The text of the bar: how many rows are selected. It can return elements, as
+   * "pageRange" and "pageOf" can: a text given in pieces (<>{count} selected</>)
+   * is drawn as Intraweb draws it, which differs from one text by a part of a pixel.
+   */
+  selectedCount: (count: number) => ReactNode;
   /** The button that clears the selection. */
   clearSelection: string;
   /** The name of the checkbox of the header, which selects every row. */
@@ -199,11 +203,11 @@ export type DataGridLabels = {
   /** The name of the region with the page controls, for a screen reader. */
   pagination: string;
   /** Which rows are on the page: the number of the first one, of the last one, and of all the rows. */
-  pageRange: (firstRow: number, lastRow: number, rowCount: number) => string;
+  pageRange: (firstRow: number, lastRow: number, rowCount: number) => ReactNode;
   /** The label of the field that chooses the number of rows of a page. */
   rowsPerPage: string;
   /** The page that is shown and the number of pages. */
-  pageOf: (page: number, pageCount: number) => string;
+  pageOf: (page: number, pageCount: number) => ReactNode;
   /** The name of the button of the page before. */
   previousPage: string;
   /** The name of the button of the page after. */

@@ -1355,6 +1355,21 @@ Uma coluna (`DataGridColumn<Row>`):
 
 Os textos (`labels`), com seus padrões: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `editTable` (`"Edit table"`), `noChanges` (`"No changes"`), `changedRows(count)` (`"2 rows changed"`), `cancelEditing` (`"Cancel"`), `saveChanges(count)` (`"Save changes (2)"`), `savingChanges` (`"Saving…"`), `rowError(rowLabel, errorMessage)` (`"Coffee: The price is not valid."`), `showSubRows(subRowsLabel, rowLabel, count)` (`"Show options of Milk (3)"`), `hideSubRows(subRowsLabel, rowLabel, count)` (`"Hide options of Milk (3)"`), `subRowsCaption(subRowsLabel, rowLabel)` (`"options of Milk"`), `noSubRows` (`"No items."`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
+Três deles, `selectedCount`, `pageRange` e `pageOf`, podem retornar elementos no lugar de um texto (desde a versão 0.3.1). Um navegador desenha um texto e o mesmo texto dado em pedaços com uma diferença de menos de 0,1 pixel na largura, o que muda as bordas de algumas letras. O Intraweb escreve esses 3 textos em pedaços. Um app que precisa ficar exatamente como o Intraweb era dá os mesmos pedaços:
+
+```tsx
+const labels = {
+  selectedCount: (count: number) => <>{count} {count === 1 ? "selecionado" : "selecionados"}</>,
+  pageRange: (firstRow: number, lastRow: number, rowCount: number) => (
+    <>
+      Mostrando {firstRow}–{lastRow} de{" "}
+      {rowCount}
+    </>
+  ),
+  pageOf: (page: number, pageCount: number) => <>{page} de {pageCount}</>,
+};
+```
+
 - As classes são as do DataGrid do app Intraweb (`components/ui/data-grid/`). A tabela, o cabeçalho com uma ordenação, as páginas e a barra das linhas selecionadas foram comparados com os do Intraweb nos dois temas.
 - A tabela é uma [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) com `stackOnMobile`: em uma tela com menos de 768 pixels de largura, cada linha é um bloco. Uma tabela mais larga que a sua caixa rola para os lados.
 - Teclado: todo controle é um elemento nativo. Tab passa pelo campo de busca, pelos botões de ordenação, pelos checkboxes, pelos botões das linhas e pelos controles de página; Enter e Espaço pressionam um botão; Espaço marca um checkbox.
