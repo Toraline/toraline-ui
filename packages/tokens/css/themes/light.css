@@ -36,6 +36,7 @@
   --bg-highlight: var(--color-cream-100);
   --bg-info: var(--color-brand-50);
   --bg-tooltip: var(--color-slate-900);
+  --bg-handle: var(--color-slate-300);
 
   --text-primary: var(--color-slate-900);
   --text-strong: var(--color-slate-800);
@@ -67,6 +68,7 @@
   --border-success: var(--color-green-200);
   --border-info: var(--color-brand-200);
   --border-warning: var(--color-orange-200);
+  --border-changed-ring: var(--color-orange-200);
 
   --icon-default: var(--color-slate-500);
   --icon-strong: var(--color-slate-700);
@@ -79,6 +81,7 @@
   --data-warning: var(--color-orange-400);
   --data-danger: var(--color-red-600);
   --data-track: var(--color-slate-200);
+  --data-neutral: var(--color-slate-400);
 
   --font-body: var(--font-stack-sans);
   --font-heading: var(--font-stack-display);

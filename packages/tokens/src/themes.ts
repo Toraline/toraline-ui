@@ -41,6 +41,7 @@ export const colorTokenNames = [
   "bg-highlight",
   "bg-info",
   "bg-tooltip",
+  "bg-handle",
   // Text colors.
   "text-primary",
   "text-strong",
@@ -72,6 +73,7 @@ export const colorTokenNames = [
   "border-success",
   "border-info",
   "border-warning",
+  "border-changed-ring",
   // Icon colors.
   "icon-default",
   "icon-strong",
@@ -84,6 +86,7 @@ export const colorTokenNames = [
   "data-warning",
   "data-danger",
   "data-track",
+  "data-neutral",
 ] as const;
 
 /** The name of a level 2 color token, without the two dashes. Example: "bg-primary". */
@@ -156,6 +159,7 @@ export const lightTheme: ThemeDefinition = {
     "bg-highlight": "var(--color-cream-100)",
     "bg-info": "var(--color-brand-50)",
     "bg-tooltip": "var(--color-slate-900)",
+    "bg-handle": "var(--color-slate-300)",
 
     "text-primary": "var(--color-slate-900)",
     "text-strong": "var(--color-slate-800)",
@@ -187,6 +191,7 @@ export const lightTheme: ThemeDefinition = {
     "border-success": "var(--color-green-200)",
     "border-info": "var(--color-brand-200)",
     "border-warning": "var(--color-orange-200)",
+    "border-changed-ring": "var(--color-orange-200)",
 
     "icon-default": "var(--color-slate-500)",
     "icon-strong": "var(--color-slate-700)",
@@ -199,6 +204,7 @@ export const lightTheme: ThemeDefinition = {
     "data-warning": "var(--color-orange-400)",
     "data-danger": "var(--color-red-600)",
     "data-track": "var(--color-slate-200)",
+    "data-neutral": "var(--color-slate-400)",
 
     "font-body": "var(--font-stack-sans)",
     "font-heading": "var(--font-stack-display)",
@@ -246,6 +252,7 @@ export const darkTheme: ThemeDefinition = {
     "bg-highlight": "#2a2418",
     "bg-info": "#1c2733",
     "bg-tooltip": "#f1f3f6",
+    "bg-handle": "var(--color-slate-300)",
 
     "text-primary": "#f5f5f6",
     "text-strong": "#e4e7ec",
@@ -277,6 +284,7 @@ export const darkTheme: ThemeDefinition = {
     "border-success": "#085d3a",
     "border-info": "#344f63",
     "border-warning": "#93370d",
+    "border-changed-ring": "var(--color-orange-200)",
 
     "icon-default": "#8a8d94",
     "icon-strong": "#cecfd2",
@@ -289,6 +297,7 @@ export const darkTheme: ThemeDefinition = {
     "data-warning": "#fdb022",
     "data-danger": "#f97066",
     "data-track": "#333741",
+    "data-neutral": "var(--color-slate-400)",
 
     "font-body": "var(--font-stack-sans)",
     "font-heading": "var(--font-stack-display)",

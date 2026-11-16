@@ -5,6 +5,7 @@ import { getTailwindColorMapping } from "./tailwind-variables";
 import { textStyles } from "./text-styles";
 import { colorTokenNames, darkTheme, lightTheme } from "./themes";
 import type { ThemeDefinition } from "./themes";
+import { addedColorTokenNames, addedColorTokens } from "./intraweb-fixtures/added-color-tokens";
 
 /**
  * The default look of this library is the look of the app Intraweb.
@@ -75,7 +76,19 @@ describe("the Tailwind classes of the color tokens", () => {
     const libraryMapping = Object.fromEntries(
       Object.entries(getTailwindColorMapping()).map(([name, value]) => [name.slice(2), value]),
     );
-    expect(libraryMapping).toEqual(intrawebColorMapping);
+    // The 3 tokens the library added have the class of their group, and are not in Intraweb's block.
+    const {
+      "background-color-handle": handle,
+      "border-color-changed-ring": changedRing,
+      "color-data-neutral": dataNeutral,
+      ...mappingOfIntrawebTokens
+    } = libraryMapping;
+    expect([handle, changedRing, dataNeutral]).toEqual([
+      "var(--bg-handle)",
+      "var(--border-changed-ring)",
+      "var(--data-neutral)",
+    ]);
+    expect(mappingOfIntrawebTokens).toEqual(intrawebColorMapping);
   });
 });
 
@@ -91,8 +104,12 @@ describe("the light theme and the dark theme", () => {
     return clean.slice(start, clean.indexOf("}", start));
   };
 
+  /** The color tokens of a theme that Intraweb has too: all of them except the 3 the library added. */
   const colorTokensOf = (theme: ThemeDefinition) =>
-    pickByName(theme.tokens, (name) => (colorTokenNames as readonly string[]).includes(name));
+    pickByName(
+      theme.tokens,
+      (name) => (colorTokenNames as readonly string[]).includes(name) && !addedColorTokenNames.includes(name),
+    );
 
   test.each([
     ["light.css", ':root,\n[data-theme="light"]', lightTheme],
@@ -106,6 +123,18 @@ describe("the light theme and the dark theme", () => {
     // The same order, so the two files can be read side by side.
     expect(Object.keys(colorTokensOf(theme))).toEqual(Object.keys(intrawebTokens));
     expect(block).toContain(`color-scheme: ${theme.colorScheme};`);
+  });
+
+  test("the 3 color tokens the library added have the level 1 color of Intraweb's class, the same in both themes", () => {
+    expect(colorTokenNames).toHaveLength(59 + 3);
+    for (const [name, value] of Object.entries(addedColorTokens)) {
+      expect((lightTheme.tokens as Record<string, string>)[name], name).toBe(value);
+      expect((darkTheme.tokens as Record<string, string>)[name], name).toBe(value);
+    }
+    // The colors of Intraweb's classes "bg-slate-300", "ring-orange-200" and "bg-slate-400".
+    expect(primitives["color-slate-300"]).toBe("#d0d5dd");
+    expect(primitives["color-orange-200"]).toBe("#fedf89");
+    expect(primitives["color-slate-400"]).toBe("#98a2b3");
   });
 
   test("the light block of Intraweb has only semantic tokens", () => {

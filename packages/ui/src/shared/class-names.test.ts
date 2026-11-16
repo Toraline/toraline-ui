@@ -77,7 +77,7 @@ describe("a class of the app replaces the library's class for the same property"
   test("a background token is never read as a background size, position or image", () => {
     // Every background token, after the classes Tailwind has for the other background properties.
     const backgroundNames = colorTokenNames.filter((tokenName) => tokenName.startsWith("bg-"));
-    expect(backgroundNames).toHaveLength(20);
+    expect(backgroundNames).toHaveLength(21);
     for (const backgroundName of backgroundNames) {
       expect(classNames("bg-cover bg-center bg-no-repeat bg-fixed", backgroundName)).toBe(
         `bg-cover bg-center bg-no-repeat bg-fixed ${backgroundName}`,
@@ -130,7 +130,7 @@ describe("a class of the app replaces the library's class for the same property"
     expect(classNames("border border-strong", "border-2")).toBe("border-strong border-2");
     // Every border color token, after a border width and a border style: the three classes stay.
     const borderColorNames = colorTokenNames.filter((tokenName) => tokenName.startsWith("border-"));
-    expect(borderColorNames).toHaveLength(14);
+    expect(borderColorNames).toHaveLength(15);
     for (const borderColorName of borderColorNames) {
       expect(classNames("border border-solid", borderColorName)).toBe(`border border-solid ${borderColorName}`);
       expect(classNames(borderColorName, "border-default")).toBe("border-default");

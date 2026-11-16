@@ -26,7 +26,7 @@ To try a change of the library that is not released yet, an app can install the 
 - **Level 1: raw values.** The name says what the value is. Example: `--color-brand-700` is `#42637c`. File: [`css/primitives.css`](css/primitives.css).
 - **Level 2: meanings.** The name says what the value is for. Example: `--bg-primary` is the background of the main action. Components use only level 2 tokens.
 
-The color tokens of level 2 have the names and the values of the design system of the app Intraweb, an app of Toraline. So the default look of the library is the look of Intraweb. A test compares the two themes with a copy of Intraweb's theme files.
+The color tokens of level 2 have the names and the values of the design system of the app Intraweb, an app of Toraline. So the default look of the library is the look of Intraweb. A test compares the two themes with a copy of Intraweb's theme files. Three color tokens are not in Intraweb's theme files: `--bg-handle`, `--border-changed-ring` and `--data-neutral`. Each one is a level 1 color that a component of Intraweb writes directly in a class, so it has the same value in the light and the dark theme. A theme of an app can change them, as any other color token.
 
 A **theme** is one block of level 2 values. The page selects a theme with the attribute `data-theme` on its root element (`<html>`). The library has two themes:
 
@@ -391,6 +391,7 @@ Every theme gives a value to each of these 78 tokens.
 | `--bg-highlight` | `bg-highlight` | Background that highlights a part of the page | `--color-cream-100` | `#2a2418` |
 | `--bg-info` | `bg-info` | Background of an information message or badge | `--color-brand-50` | `#1c2733` |
 | `--bg-tooltip` | `bg-tooltip` | Background of a tooltip | `--color-slate-900` | `#f1f3f6` |
+| `--bg-handle` | `bg-handle` | The small bar at the top of a Modal shown as a sheet. The same color in both themes | `--color-slate-300` | `--color-slate-300` |
 | `--text-primary` | `text-primary` | Main text and headings | `--color-slate-900` | `#f5f5f6` |
 | `--text-strong` | `text-strong` | Strong text: the label of a field, the text of a secondary button | `--color-slate-800` | `#e4e7ec` |
 | `--text-body` | `text-body` | Normal text: a paragraph, an action of a menu | `--color-slate-700` | `#cecfd2` |
@@ -420,6 +421,7 @@ Every theme gives a value to each of these 78 tokens.
 | `--border-success` | `border-success` | Border of a success message or badge | `--color-green-200` | `#085d3a` |
 | `--border-info` | `border-info` | Border of an information message or badge, and the ring around a field that has the focus | `--color-brand-200` | `#344f63` |
 | `--border-warning` | `border-warning` | Border of a warning message or badge | `--color-orange-200` | `#93370d` |
+| `--border-changed-ring` | `border-changed-ring`, and `ring-(color:--border-changed-ring)` for a ring | The ring around a checkbox whose value was changed and is not saved yet. The same color in both themes | `--color-orange-200` | `--color-orange-200` |
 | `--icon-default` | `text-icon` | Icon | `--color-slate-500` | `#8a8d94` |
 | `--icon-strong` | `text-icon-strong` | Icon that must stand out | `--color-slate-700` | `#cecfd2` |
 | `--icon-brand` | `text-icon-brand` | Icon in the brand color | `--color-brand-700` | `#a9c2d4` |
@@ -430,6 +432,7 @@ Every theme gives a value to each of these 78 tokens.
 | `--data-warning` | `bg-data-warning`, `text-data-warning`, ... | Value that asks for attention in a chart or a progress bar | `--color-orange-400` | `#fdb022` |
 | `--data-danger` | `bg-data-danger`, `text-data-danger`, ... | Bad value in a chart or a progress bar | `--color-red-600` | `#f97066` |
 | `--data-track` | `bg-data-track`, `text-data-track`, ... | The empty part of a progress bar | `--color-slate-200` | `#333741` |
+| `--data-neutral` | `bg-data-neutral`, `text-data-neutral`, ... | Value with no meaning of good or bad: the dot of a neutral StatusBadge. The same color in both themes | `--color-slate-400` | `--color-slate-400` |
 | `--font-body` | `font-body`, `font-sans` | Font of normal text | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-heading` | `font-heading` | Font of headings and buttons | `--font-stack-display` | `--font-stack-display` |
 | `--font-mono` | `font-mono` | Font of code | `--font-stack-mono` | `--font-stack-mono` |
@@ -465,6 +468,8 @@ The values are Intraweb's, and some pairs are below these limits. The library do
 | `--border-strong` on `--bg-surface` | 1.47 | 1.82 | 3 | The border of a switch that is off |
 | `--border-hover` on `--bg-surface` | 2.58 | 2.91 | 3 | The border of a field under the pointer |
 | `--border-danger` on `--bg-surface` | 1.42 | 1.75 | 3 | The border of a danger button |
+
+The 3 tokens with the same value in both themes are decoration, so no limit applies to them. Their contrast is recorded in the same test: `--bg-handle` on `--bg-surface` 1.47 (light) and 11.69 (dark); `--data-neutral` on `--bg-muted` 2.32 and 5.51; `--border-changed-ring` on `--bg-surface` 1.3 and 13.23.
 
 The limit of 3 for a border comes from the accessibility rule for the parts of a control that are not text (WCAG 1.4.11).
 

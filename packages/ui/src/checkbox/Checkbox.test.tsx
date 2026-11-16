@@ -5,6 +5,7 @@ import { createRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Field } from "../field/index";
+import { darkTheme, lightTheme } from "@toraline.tech/tokens";
 import { Checkbox, CheckboxControl } from "./index";
 
 afterEach(cleanup);
@@ -130,9 +131,13 @@ describe("CheckboxControl", () => {
     const changedClasses = changedBox.className.split(" ");
     expect(changedBox.getAttribute("data-changed")).toBe("true");
     expect(changedClasses).toEqual(
-      expect.arrayContaining(["border-changed", "ring-3", "ring-(color:--border-warning)"]),
+      expect.arrayContaining(["border-changed", "ring-3", "ring-(color:--border-changed-ring)"]),
     );
     expect(changedClasses).not.toContain("border-strong");
+    // The ring is the light orange of Intraweb's ring in both themes, not the token of a warning
+    // border, which is dark in the dark theme (before version 0.3.1).
+    expect(lightTheme.tokens["border-changed-ring"]).toBe("var(--color-orange-200)");
+    expect(darkTheme.tokens["border-changed-ring"]).toBe(lightTheme.tokens["border-changed-ring"]);
     // "changed" is not an HTML attribute: it does not reach the <input>.
     expect(changedBox.hasAttribute("changed")).toBe(false);
 

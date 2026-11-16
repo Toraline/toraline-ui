@@ -26,7 +26,7 @@ Para testar uma mudança da biblioteca que ainda não foi publicada, um app pode
 - **Nível 1: valores brutos.** O nome diz o que o valor é. Exemplo: `--color-brand-700` é `#42637c`. Arquivo: [`css/primitives.css`](css/primitives.css).
 - **Nível 2: significados.** O nome diz para que o valor serve. Exemplo: `--bg-primary` é o fundo da ação principal. Os componentes usam apenas tokens de nível 2.
 
-Os tokens de cor de nível 2 têm os nomes e os valores do design system do app Intraweb, um app da Toraline. Por isso a aparência padrão da biblioteca é a aparência do Intraweb. Um teste compara os dois temas com uma cópia dos arquivos de tema do Intraweb.
+Os tokens de cor de nível 2 têm os nomes e os valores do design system do app Intraweb, um app da Toraline. Por isso a aparência padrão da biblioteca é a aparência do Intraweb. Um teste compara os dois temas com uma cópia dos arquivos de tema do Intraweb. Três tokens de cor não estão nos arquivos de tema do Intraweb: `--bg-handle`, `--border-changed-ring` e `--data-neutral`. Cada um é uma cor de nível 1 que um componente do Intraweb escreve direto em uma classe, e por isso tem o mesmo valor no tema claro e no tema escuro. Um tema de um app pode mudar esses tokens, como qualquer outro token de cor.
 
 Um **tema** é um bloco de valores de nível 2. A página seleciona um tema com o atributo `data-theme` no seu elemento raiz (`<html>`). A biblioteca tem dois temas:
 
@@ -391,6 +391,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--bg-highlight` | `bg-highlight` | Fundo que realça uma parte da página | `--color-cream-100` | `#2a2418` |
 | `--bg-info` | `bg-info` | Fundo de uma mensagem ou de um badge de informação | `--color-brand-50` | `#1c2733` |
 | `--bg-tooltip` | `bg-tooltip` | Fundo de um tooltip | `--color-slate-900` | `#f1f3f6` |
+| `--bg-handle` | `bg-handle` | A barrinha no topo de um Modal mostrado como uma folha. A mesma cor nos dois temas | `--color-slate-300` | `--color-slate-300` |
 | `--text-primary` | `text-primary` | Texto principal e títulos | `--color-slate-900` | `#f5f5f6` |
 | `--text-strong` | `text-strong` | Texto forte: o rótulo de um campo, o texto de um botão secundário | `--color-slate-800` | `#e4e7ec` |
 | `--text-body` | `text-body` | Texto normal: um parágrafo, uma ação de um menu | `--color-slate-700` | `#cecfd2` |
@@ -420,6 +421,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--border-success` | `border-success` | Borda de uma mensagem ou de um badge de sucesso | `--color-green-200` | `#085d3a` |
 | `--border-info` | `border-info` | Borda de uma mensagem ou de um badge de informação, e o anel em volta de um campo que tem o foco | `--color-brand-200` | `#344f63` |
 | `--border-warning` | `border-warning` | Borda de uma mensagem ou de um badge de aviso | `--color-orange-200` | `#93370d` |
+| `--border-changed-ring` | `border-changed-ring`, e `ring-(color:--border-changed-ring)` para um anel | O anel em volta de um checkbox cujo valor foi mudado e ainda não foi salvo. A mesma cor nos dois temas | `--color-orange-200` | `--color-orange-200` |
 | `--icon-default` | `text-icon` | Ícone | `--color-slate-500` | `#8a8d94` |
 | `--icon-strong` | `text-icon-strong` | Ícone que precisa se destacar | `--color-slate-700` | `#cecfd2` |
 | `--icon-brand` | `text-icon-brand` | Ícone na cor da marca | `--color-brand-700` | `#a9c2d4` |
@@ -430,6 +432,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--data-warning` | `bg-data-warning`, `text-data-warning`, ... | Valor que pede atenção em um gráfico ou em uma barra de progresso | `--color-orange-400` | `#fdb022` |
 | `--data-danger` | `bg-data-danger`, `text-data-danger`, ... | Valor ruim em um gráfico ou em uma barra de progresso | `--color-red-600` | `#f97066` |
 | `--data-track` | `bg-data-track`, `text-data-track`, ... | A parte vazia de uma barra de progresso | `--color-slate-200` | `#333741` |
+| `--data-neutral` | `bg-data-neutral`, `text-data-neutral`, ... | Valor sem sentido de bom ou ruim: o ponto de um StatusBadge neutro. A mesma cor nos dois temas | `--color-slate-400` | `--color-slate-400` |
 | `--font-body` | `font-body`, `font-sans` | Fonte do texto normal | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-heading` | `font-heading` | Fonte dos títulos e dos botões | `--font-stack-display` | `--font-stack-display` |
 | `--font-mono` | `font-mono` | Fonte de código | `--font-stack-mono` | `--font-stack-mono` |
@@ -465,6 +468,8 @@ Os valores são do Intraweb, e alguns pares estão abaixo desses limites. A bibl
 | `--border-strong` sobre `--bg-surface` | 1.47 | 1.82 | 3 | A borda de um switch que está desligado |
 | `--border-hover` sobre `--bg-surface` | 2.58 | 2.91 | 3 | A borda de um campo sob o ponteiro |
 | `--border-danger` sobre `--bg-surface` | 1.42 | 1.75 | 3 | A borda de um botão de perigo |
+
+Os 3 tokens com o mesmo valor nos dois temas são decoração, então nenhum limite vale para eles. O contraste deles é registrado no mesmo teste: `--bg-handle` sobre `--bg-surface` 1,47 (claro) e 11,69 (escuro); `--data-neutral` sobre `--bg-muted` 2,32 e 5,51; `--border-changed-ring` sobre `--bg-surface` 1,3 e 13,23.
 
 O limite de 3 para uma borda vem da regra de acessibilidade para as partes de um controle que não são texto (WCAG 1.4.11).
 

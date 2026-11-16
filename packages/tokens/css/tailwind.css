@@ -116,6 +116,7 @@
   --background-color-highlight: var(--bg-highlight);
   --background-color-info: var(--bg-info);
   --background-color-tooltip: var(--bg-tooltip);
+  --background-color-handle: var(--bg-handle);
 
   --text-color-primary: var(--text-primary);
   --text-color-strong: var(--text-strong);
@@ -150,6 +151,7 @@
   --border-color-success: var(--border-success);
   --border-color-info: var(--border-info);
   --border-color-warning: var(--border-warning);
+  --border-color-changed-ring: var(--border-changed-ring);
 
   --outline-color-focus: var(--border-focus);
   --ring-color-info: var(--border-info);
@@ -161,6 +163,7 @@
   --color-data-warning: var(--data-warning);
   --color-data-danger: var(--data-danger);
   --color-data-track: var(--data-track);
+  --color-data-neutral: var(--data-neutral);
 }
 
 /*

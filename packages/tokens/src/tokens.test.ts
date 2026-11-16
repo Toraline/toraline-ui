@@ -335,3 +335,25 @@ test.each([lightTheme, darkTheme])(
     }
   },
 );
+
+/**
+ * TOR-1223: the 3 colors that are the same in both themes. Each one is
+ * decoration, so no limit applies: the small bar of a Modal shown as a sheet
+ * (nothing is done with it), the dot of a neutral StatusBadge (the text says
+ * the state), and the ring around a changed checkbox (the orange border,
+ * "border-changed", marks the change too). The values are Intraweb's. In the
+ * dark theme each one is easier to see than the token used before version
+ * 0.3.1 (1.82, 2.4 and 2.29). The numbers are recorded here and in
+ * docs/decisions.md.
+ */
+test.each<[themeName: "light" | "dark", foreground: ThemeTokenName, background: ThemeTokenName, contrast: number]>([
+  ["light", "bg-handle", "bg-surface", 1.47],
+  ["dark", "bg-handle", "bg-surface", 11.69],
+  ["light", "data-neutral", "bg-muted", 2.32],
+  ["dark", "data-neutral", "bg-muted", 5.51],
+  ["light", "border-changed-ring", "bg-surface", 1.3],
+  ["dark", "border-changed-ring", "bg-surface", 13.23],
+])("TOR-1223, recorded, in the %s theme: %s on %s has a contrast of %s", (themeName, foreground, background, contrast) => {
+  const theme = themeName === "light" ? lightTheme : darkTheme;
+  expect(Number(contrastRatio(theme, foreground, background).toFixed(2))).toBe(contrast);
+});
