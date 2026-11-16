@@ -12,6 +12,20 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The documentation in two languages: how the files are stored (TOR-1179)
+- Context: the library is in English only (names, props, built-in texts). Its documentation exists in English and in Brazilian Portuguese (decision of Juliana, TOR-1129).
+- Decision (the file pattern): the Portuguese version of `<name>.md` is `<name>.pt-BR.md`, in the same folder. Example: `docs/guide.pt-BR.md` next to `docs/guide.md`. `pt-BR` is the language tag of Brazilian Portuguese.
+- Decision (the link between the two): line 3 of each file, under the title, names both languages and links to the other one. The English file has `**English** | [Português](<name>.pt-BR.md)`. The Portuguese file has `[English](<name>.md) | **Português**`. In the two package READMEs the link is the full GitHub address, because npm shows a README outside the repository.
+- Decision (covered files): `README.md`, `docs/guide.md`, `docs/releasing.md`, `packages/ui/README.md`, `packages/tokens/README.md`. They are the files a person who uses or releases the library reads.
+- Decision (not covered, with the reason):
+  - `docs/decisions.md` and `CHANGELOG.md`: a record that grows with every ticket. Two copies would differ soon, and an entry is written once and not read as a guide.
+  - `AGENTS.md` and `agent/`: instructions for AI agents. The profile says skill and rule files are in English.
+  - `apps/catalog/README.md`, `apps/playground/README.md` and `docs/workflow/`: for people who work on this repository, who read the code and the commits in English.
+- Decision (the rules of a translation): the English file is the source. The Portuguese file has the same sections in the same order and the same code blocks, byte for byte. Identifiers, prop names, token names, commands and file paths are not translated. A technical term that Brazilian developers use in English stays in English (for example "build", "token", "Server Component"). A link to a covered file points to the Portuguese version of that file.
+- Why: one file next to the other is found without a search, GitHub shows both in the same folder, and a check can pair them by name (TOR-1184).
+- Alternatives: a folder for each language (`docs/pt-BR/guide.md`), which separates the two versions and does not fit a package README; one file with both languages, which doubles what a reader scrolls; a documentation site with its own translation system, which is a new tool.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DataGrid: the mode that edits the table and saves a whole row (TOR-1216)
 - Design source: Intraweb's `components/ui/data-grid/data-grid.tsx` (the state `editing`, `drafts`, `rowErrors` and the function `saveAll`, commit `f8ad4c2` of `prontera-e-juno`), its tests, the one screen that uses the mode (`categories-page.tsx`), and the text of the ticket. Figma was not read: this session had no access to it.
 - Context: TOR-1216 was added to TOR-1209 after its 6 sub-tickets, so that the library's grid covers all 30 files of Intraweb. It is feature 20 of the entry of TOR-1165.
