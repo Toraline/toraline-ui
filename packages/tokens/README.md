@@ -4,6 +4,8 @@
 
 The design tokens and the themes of the Toraline component library. A design token is a named value of the design, for example a color or a font, stored as a CSS variable. This package has no React code.
 
+The catalog is online: https://toraline-ui.vercel.app/ Its page **Foundations > Tokens** shows every token of this package, with its value in each theme.
+
 ## Installation
 
 The package is on npm since 2026-11-15. The first version is `0.1.0`.

@@ -12,6 +12,17 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - `homepage` of the two packages is the online catalog (TOR-1196)
+- Context: the catalog is online at https://toraline-ui.vercel.app/. `homepage` of `packages/ui/package.json` and `packages/tokens/package.json` was the folder of each package on GitHub.
+- Decision: `homepage` of both packages is `https://toraline-ui.vercel.app/`. The address is also in the root `README.md` and in the README of each package, in both languages.
+- Why: the page of a package on npmjs.com shows 2 links, "Repository" and "Homepage". "Repository" already opens the folder of the package on GitHub (`repository.directory`), so a `homepage` with the same folder repeats it. The catalog is what a person who looks at the package wants to see next: every component, every token, and the guide.
+- Both packages name the first page of the catalog. A link to one page of it (for example the tokens page) breaks when a story is renamed.
+- When it shows: npmjs.com reads `homepage` from a published version. The change is visible from the next version on. No version number changed in this ticket.
+- Risk: `toraline-ui.vercel.app` is the address that Vercel gives by default. If the catalog moves to another address, `homepage` and the 6 README lines change with it.
+- Checked on 2026-11-15: the address answers with status 200 and the page of Storybook. Not verified: who deploys it, and from which branch.
+- Alternatives: keep the GitHub folder as `homepage` and name the catalog only in the READMEs; a custom domain for the catalog before any link is written.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The check that the documentation exists in both languages (TOR-1184)
 - Decision: `make check` runs `make docs-check` (`scripts/check-docs-languages.mjs`). For each covered file of TOR-1179 it fails when one version is missing, and when the two versions do not have the same number of headings of each level.
 - Decision (2 checks more than the ticket asked for): it also fails when line 3 of a version does not link to the other version, and when the code blocks of the two versions are not the same, byte for byte. Both are rules of TOR-1179, and both are cheap to check.

@@ -10,7 +10,7 @@
     "dark-mode",
     "tailwindcss"
   ],
-  "homepage": "https://github.com/Toraline/toraline-ui/tree/main/packages/tokens#readme",
+  "homepage": "https://toraline-ui.vercel.app/",
   "bugs": {
     "url": "https://github.com/Toraline/toraline-ui/issues"
   },

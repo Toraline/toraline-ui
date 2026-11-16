@@ -8,6 +8,8 @@ A aparência padrão é a aparência do app Intraweb, um app da Toraline: as mes
 
 **Para usar a biblioteca em um app, leia o [guia](docs/guide.pt-BR.md):** instale a biblioteca, monte o tema do app, e estilize por cima de um componente.
 
+**O catálogo está online: https://toraline-ui.vercel.app/** Ele mostra todo componente em todo tema, o guia, e todos os tokens. O controle **Language** na barra de ferramentas dele mostra o guia e a página de tokens em inglês ou em português.
+
 **Os pacotes estão no npm.** `@toraline.tech/ui` e `@toraline.tech/tokens`, versão `0.1.0`, publicada em 2026-11-15. Versões que começam com `0` são um pré-release: testadas nos apps da própria Toraline, e props e tokens ainda podem mudar. Como uma versão é publicada: [docs/releasing.pt-BR.md](docs/releasing.pt-BR.md). O que mudou em cada versão: [CHANGELOG.md](CHANGELOG.md).
 
 **Este é o branch `main`**, a biblioteca nova (versão 2). Até 2026-11-15 ele se chamava `v2`. A biblioteca antiga está sem mudanças em [`legacy/`](legacy/), e no branch `old-package`, que se chamava `main` até esse dia. O pacote dela é `@toraline/toraline-ui`.

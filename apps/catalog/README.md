@@ -2,7 +2,7 @@
 
 The catalog of the library: a site that shows each component alone, in every theme. It is built with Storybook 10. Storybook is a tool that shows one component at a time, outside of an app. Each example of a component is called a story.
 
-The catalog is private. It is never published and never deployed.
+The catalog is online at https://toraline-ui.vercel.app/ . It is never published to npm: its package is private.
 
 ## Commands
 

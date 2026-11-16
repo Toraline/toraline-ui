@@ -14,6 +14,8 @@ Os componentes são estilizados com classes do Tailwind CSS 4 que leem os tokens
 
 A aparência padrão é a aparência do app Intraweb, um app da Toraline: as cores, as fontes (Inter para o texto normal, Poppins para títulos e botões), os tamanhos de raio e as sombras dele. Os tokens e as classes do Tailwind têm os nomes que o Intraweb usa. A biblioteca não baixa nenhuma fonte: o app carrega a Inter e a Poppins. O guia 1 de [`docs/guide.pt-BR.md`](../../docs/guide.pt-BR.md) mostra como.
 
+O catálogo está online: https://toraline-ui.vercel.app/ Ele mostra todo componente deste pacote, em todo tema, com a tabela das props dele.
+
 As regras que todo componente segue estão em [Regras que todo componente segue](#regras-que-todo-componente-segue).
 
 Um tema é um conjunto de cores, fontes, tamanhos de canto e sombras. A página seleciona um tema com o atributo `data-theme` em `<html>`. Os temas e os valores deles estão em [`@toraline.tech/tokens`](../tokens/README.pt-BR.md).

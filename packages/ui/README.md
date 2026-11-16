@@ -14,6 +14,8 @@ The components are styled with Tailwind CSS 4 classes that read the tokens of [`
 
 The default look is the look of the app Intraweb, an app of Toraline: its colors, its fonts (Inter for normal text, Poppins for headings and buttons), its radius sizes and its shadows. The tokens and the Tailwind classes have the names Intraweb uses. The library downloads no font: the app loads Inter and Poppins. Guide 1 of [`docs/guide.md`](../../docs/guide.md) shows how.
 
+The catalog is online: https://toraline-ui.vercel.app/ It shows every component of this package, in every theme, with the table of its props.
+
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
 
 A theme is a set of colors, fonts, corner sizes and shadows. The page selects a theme with the attribute `data-theme` on `<html>`. The themes and their values are in [`@toraline.tech/tokens`](../tokens/README.md).
