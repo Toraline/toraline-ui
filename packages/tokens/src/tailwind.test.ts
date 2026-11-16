@@ -132,6 +132,23 @@ describe("css/tailwind.css, the Tailwind preset", () => {
     expect(css).toContain(".text-sm { font-size: var(--text-sm);");
   });
 
+  test("the 4 font size classes of the components have their line height as a ratio, written in the class", async () => {
+    const css = await buildCss(["text-xs", "text-sm", "text-base", "text-lg", "lg:text-sm", "text-2xl"]);
+    // The ratio Tailwind gives each class, and Intraweb's screens have. A length ("1.25rem") is not
+    // the same line when the text size of the page is not 100%.
+    const ratios = { xs: "1 / 0.75", sm: "1.25 / 0.875", base: "1.5 / 1", lg: "1.75 / 1.125" };
+    for (const [sizeName, ratio] of Object.entries(ratios)) {
+      expect(css).toContain(
+        `.text-${sizeName} { font-size: var(--text-${sizeName}); line-height: var(--tw-leading, calc(${ratio})); }`,
+      );
+      // The class does not read Tailwind's own variable, which is not a token.
+      expect(css).not.toContain(`var(--text-${sizeName}--line-height)`);
+    }
+    expect(css).toContain("line-height: var(--tw-leading, calc(1.25 / 0.875)); } }");
+    // A size with no ratio in the preset keeps Tailwind's variable.
+    expect(css).toContain("line-height: var(--tw-leading, var(--text-2xl--line-height));");
+  });
+
   test("the other level 2 tokens are Tailwind classes that read the CSS variable", async () => {
     const css = await buildCss([
       "font-body",

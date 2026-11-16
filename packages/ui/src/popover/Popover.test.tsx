@@ -214,6 +214,23 @@ describe("Popover", () => {
     expect(queryPanel()).toBeNull();
   });
 
+  test("autoFocus: an element inside the panel gets the focus when the panel opens", async () => {
+    const user = userEvent.setup();
+    renderPopover({ children: <input autoFocus aria-label="Search" /> });
+    await user.click(getTrigger());
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Search" }));
+    // A panel with "visibility: hidden" cannot give the focus to an element inside it. The page of
+    // these tests does not apply that rule; the story "Focus On Open" checks it in a real browser.
+    expect(getPanel().className.split(" ")).not.toContain("invisible");
+  });
+
+  test("with no autoFocus inside the panel, the focus stays on the button", async () => {
+    const user = userEvent.setup();
+    renderPopover();
+    await user.click(getTrigger());
+    expect(document.activeElement).toBe(getTrigger());
+  });
+
   test("panelClassName goes to the panel, after the library's classes", async () => {
     const user = userEvent.setup();
     renderPopover({ panelClassName: "w-64 p-2" });

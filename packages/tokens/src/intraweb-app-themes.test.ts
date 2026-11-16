@@ -7,6 +7,7 @@ import { createTheme } from "./create-theme";
 import type { ThemeInput } from "./create-theme";
 import { createTailwindTheme } from "./tailwind";
 import { colorTokenNames, darkTheme, lightTheme } from "./themes";
+import { addedColorTokenNames } from "./intraweb-fixtures/added-color-tokens";
 
 /**
  * The app Intraweb has 3 themes of its own, next to light and dark:
@@ -113,14 +114,17 @@ const buildCss = async (classNames: string[], appCss: string) => {
 };
 
 describe("the copies of Intraweb's 3 app themes have what the tests expect", () => {
-  test("cozy gives every color token, the 4 radius sizes and the 5 shadows", () => {
-    expect(Object.keys(cozyInput.colors ?? {})).toEqual([...colorTokenNames]);
+  // The color tokens Intraweb has. The 3 tokens the library added come from the theme an app theme starts from.
+  const intrawebColorTokenNames = colorTokenNames.filter((name) => !addedColorTokenNames.includes(name));
+
+  test("cozy gives every color token of Intraweb, the 4 radius sizes and the 5 shadows", () => {
+    expect(Object.keys(cozyInput.colors ?? {})).toEqual(intrawebColorTokenNames);
     expect(Object.keys(cozyInput.radius ?? {})).toEqual(["md", "lg", "xl", "2xl"]);
     expect(Object.keys(cozyInput.shadows ?? {})).toEqual(["sm", "card", "lg", "xl", "2xl"]);
   });
 
-  test("old gives every color token, the 4 radius sizes and the 5 shadows", () => {
-    expect(Object.keys(oldInput.colors ?? {})).toEqual([...colorTokenNames]);
+  test("old gives every color token of Intraweb, the 4 radius sizes and the 5 shadows", () => {
+    expect(Object.keys(oldInput.colors ?? {})).toEqual(intrawebColorTokenNames);
     expect(Object.keys(oldInput.radius ?? {})).toEqual(["md", "lg", "xl", "2xl"]);
     expect(Object.keys(oldInput.shadows ?? {}).sort()).toEqual(["2xl", "card", "lg", "sm", "xl"]);
   });

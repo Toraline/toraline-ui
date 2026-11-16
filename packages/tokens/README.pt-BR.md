@@ -8,7 +8,7 @@ O catálogo está online: https://toraline-ui.vercel.app/ A página **Foundation
 
 ## Instalação
 
-O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
+O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-15. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 ```bash
 npm install @toraline.tech/tokens
@@ -26,7 +26,7 @@ Para testar uma mudança da biblioteca que ainda não foi publicada, um app pode
 - **Nível 1: valores brutos.** O nome diz o que o valor é. Exemplo: `--color-brand-700` é `#42637c`. Arquivo: [`css/primitives.css`](css/primitives.css).
 - **Nível 2: significados.** O nome diz para que o valor serve. Exemplo: `--bg-primary` é o fundo da ação principal. Os componentes usam apenas tokens de nível 2.
 
-Os tokens de cor de nível 2 têm os nomes e os valores do design system do app Intraweb, um app da Toraline. Por isso a aparência padrão da biblioteca é a aparência do Intraweb. Um teste compara os dois temas com uma cópia dos arquivos de tema do Intraweb.
+Os tokens de cor de nível 2 têm os nomes e os valores do design system do app Intraweb, um app da Toraline. Por isso a aparência padrão da biblioteca é a aparência do Intraweb. Um teste compara os dois temas com uma cópia dos arquivos de tema do Intraweb. Três tokens de cor não estão nos arquivos de tema do Intraweb: `--bg-handle`, `--border-changed-ring` e `--data-neutral`. Cada um é uma cor de nível 1 que um componente do Intraweb escreve direto em uma classe, e por isso tem o mesmo valor no tema claro e no tema escuro. Um tema de um app pode mudar esses tokens, como qualquer outro token de cor.
 
 Um **tema** é um bloco de valores de nível 2. A página seleciona um tema com o atributo `data-theme` no seu elemento raiz (`<html>`). A biblioteca tem dois temas:
 
@@ -276,7 +276,7 @@ Cada classe lê a variável CSS quando a página é mostrada. Mudar `data-theme`
 | Cada `--data-<name>` | Toda classe de cor do Tailwind com `data-<name>`: `bg-data-1`, `text-data-1`, `fill-data-1`, `stroke-data-1` e as outras |
 | Cada cor de nível 1 `--color-<scale>-<step>` | Toda classe de cor do Tailwind: `bg-brand-700`, `text-slate-500`, `border-red-600` e as outras |
 | `--font-body`, `--font-heading`, `--font-mono` | `font-body`, `font-heading`, `font-mono`. `--font-body` também é a fonte da página, e a classe `font-sans`, o nome que o Intraweb usa para ela |
-| `--text-xs`, `--text-sm`, `--text-base`, `--text-lg`, `--text-2xl`, `--text-3xl` | `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-2xl`, `text-3xl`. O Tailwind já tem essas classes. Com o preset elas leem o token. Os tamanhos são os mesmos, exceto `text-3xl`: 32 pixels (`2rem`), o tamanho do número grande do Intraweb, onde o Tailwind sozinho tem 30 pixels (`1.875rem`) |
+| `--text-xs`, `--text-sm`, `--text-base`, `--text-lg`, `--text-2xl`, `--text-3xl` | `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-2xl`, `text-3xl`. O Tailwind já tem essas classes. Com o preset elas leem o token. Os tamanhos são os mesmos, exceto `text-3xl`: 32 pixels (`2rem`), o tamanho do número grande do Intraweb, onde o Tailwind sozinho tem 30 pixels (`1.875rem`). A altura de linha de `text-xs`, `text-sm`, `text-base` e `text-lg` é a proporção que o Tailwind dá a elas (para `text-sm`: `calc(1.25 / 0.875)`), e o preset escreve a proporção na classe, então a classe não lê nenhuma variável que não é um token |
 | `--spacing` | É a unidade de toda classe de espaçamento do Tailwind: `p-4` é `calc(var(--spacing) * 4)`. O Tailwind já usa essa variável, com o mesmo valor |
 | `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl` | `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, e as classes para um lado ou um canto, por exemplo `rounded-t-md` |
 | `--shadow-sm`, `--shadow-card`, `--shadow-lg`, `--shadow-xl`, `--shadow-2xl` | `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl`, `shadow-2xl` |
@@ -391,6 +391,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--bg-highlight` | `bg-highlight` | Fundo que realça uma parte da página | `--color-cream-100` | `#2a2418` |
 | `--bg-info` | `bg-info` | Fundo de uma mensagem ou de um badge de informação | `--color-brand-50` | `#1c2733` |
 | `--bg-tooltip` | `bg-tooltip` | Fundo de um tooltip | `--color-slate-900` | `#f1f3f6` |
+| `--bg-handle` | `bg-handle` | A barrinha no topo de um Modal mostrado como uma folha. A mesma cor nos dois temas | `--color-slate-300` | `--color-slate-300` |
 | `--text-primary` | `text-primary` | Texto principal e títulos | `--color-slate-900` | `#f5f5f6` |
 | `--text-strong` | `text-strong` | Texto forte: o rótulo de um campo, o texto de um botão secundário | `--color-slate-800` | `#e4e7ec` |
 | `--text-body` | `text-body` | Texto normal: um parágrafo, uma ação de um menu | `--color-slate-700` | `#cecfd2` |
@@ -420,6 +421,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--border-success` | `border-success` | Borda de uma mensagem ou de um badge de sucesso | `--color-green-200` | `#085d3a` |
 | `--border-info` | `border-info` | Borda de uma mensagem ou de um badge de informação, e o anel em volta de um campo que tem o foco | `--color-brand-200` | `#344f63` |
 | `--border-warning` | `border-warning` | Borda de uma mensagem ou de um badge de aviso | `--color-orange-200` | `#93370d` |
+| `--border-changed-ring` | `border-changed-ring`, e `ring-(color:--border-changed-ring)` para um anel | O anel em volta de um checkbox cujo valor foi mudado e ainda não foi salvo. A mesma cor nos dois temas | `--color-orange-200` | `--color-orange-200` |
 | `--icon-default` | `text-icon` | Ícone | `--color-slate-500` | `#8a8d94` |
 | `--icon-strong` | `text-icon-strong` | Ícone que precisa se destacar | `--color-slate-700` | `#cecfd2` |
 | `--icon-brand` | `text-icon-brand` | Ícone na cor da marca | `--color-brand-700` | `#a9c2d4` |
@@ -430,6 +432,7 @@ Todo tema dá um valor a cada um destes 78 tokens.
 | `--data-warning` | `bg-data-warning`, `text-data-warning`, ... | Valor que pede atenção em um gráfico ou em uma barra de progresso | `--color-orange-400` | `#fdb022` |
 | `--data-danger` | `bg-data-danger`, `text-data-danger`, ... | Valor ruim em um gráfico ou em uma barra de progresso | `--color-red-600` | `#f97066` |
 | `--data-track` | `bg-data-track`, `text-data-track`, ... | A parte vazia de uma barra de progresso | `--color-slate-200` | `#333741` |
+| `--data-neutral` | `bg-data-neutral`, `text-data-neutral`, ... | Valor sem sentido de bom ou ruim: o ponto de um StatusBadge neutro. A mesma cor nos dois temas | `--color-slate-400` | `--color-slate-400` |
 | `--font-body` | `font-body`, `font-sans` | Fonte do texto normal | `--font-stack-sans` | `--font-stack-sans` |
 | `--font-heading` | `font-heading` | Fonte dos títulos e dos botões | `--font-stack-display` | `--font-stack-display` |
 | `--font-mono` | `font-mono` | Fonte de código | `--font-stack-mono` | `--font-stack-mono` |
@@ -466,6 +469,8 @@ Os valores são do Intraweb, e alguns pares estão abaixo desses limites. A bibl
 | `--border-hover` sobre `--bg-surface` | 2.58 | 2.91 | 3 | A borda de um campo sob o ponteiro |
 | `--border-danger` sobre `--bg-surface` | 1.42 | 1.75 | 3 | A borda de um botão de perigo |
 
+Os 3 tokens com o mesmo valor nos dois temas são decoração, então nenhum limite vale para eles. O contraste deles é registrado no mesmo teste: `--bg-handle` sobre `--bg-surface` 1,47 (claro) e 11,69 (escuro); `--data-neutral` sobre `--bg-muted` 2,32 e 5,51; `--border-changed-ring` sobre `--bg-surface` 1,3 e 13,23.
+
 O limite de 3 para uma borda vem da regra de acessibilidade para as partes de um controle que não são texto (WCAG 1.4.11).
 
 ## Tokens de nível 1
@@ -496,3 +501,7 @@ Com o preset do Tailwind cada uma também é uma cor do Tailwind: `--color-brand
 Os arquivos CSS e os arquivos TypeScript guardam os mesmos valores. `src/tokens.test.ts` falha quando eles diferem, ou quando este README não nomeia um token de nível 2.
 
 As cores são do Intraweb. `src/intraweb.test.ts` falha quando uma cor de nível 1, um token de cor do tema claro ou do tema escuro, ou a classe do Tailwind de um token de cor difere das cópias dos arquivos do Intraweb em `src/intraweb-fixtures/`. Para pegar um valor novo do Intraweb: copie o arquivo de novo, mude a data no primeiro comentário dele, e mude o token no arquivo CSS e no arquivo TypeScript.
+
+## Licença
+
+MIT. O texto está no arquivo [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

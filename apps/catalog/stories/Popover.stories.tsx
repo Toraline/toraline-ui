@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { Button, Popover, Toggle, popoverAligns } from "@toraline.tech/ui";
+import { Button, Popover, TextInput, Toggle, popoverAligns } from "@toraline.tech/ui";
 import { optionList } from "./shared/option-list";
 
 // The panel sits above the page content. This space keeps an open panel inside the story.
@@ -136,6 +136,28 @@ export const LongContent: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: "Columns" }));
     await expect(canvas.getByText(/A long explanation/)).toBeVisible();
+  },
+};
+
+/**
+ * A panel with a search field that has "autoFocus": the field gets the focus
+ * when the panel opens, so a person types at once. Escape gives the focus back
+ * to the button. The test opens the panel and checks where the focus is.
+ */
+export const FocusOnOpen: Story = {
+  args: {
+    label: "Choose an item",
+    panelClassName: "w-72",
+    children: <TextInput autoFocus aria-label="Search an item" placeholder="Name or category" />,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole("button", { name: "Choose an item" });
+    await userEvent.click(trigger);
+    await expect(canvas.getByRole("textbox", { name: "Search an item" })).toHaveFocus();
+    await waitFor(() => expect(canvasElement.querySelector('[data-slot="panel"]')).toBeVisible());
+    await userEvent.keyboard("{Escape}");
+    await expect(trigger).toHaveFocus();
   },
 };
 

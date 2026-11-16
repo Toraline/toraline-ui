@@ -22,7 +22,7 @@ Um tema é um conjunto de cores, fontes, tamanhos de canto e sombras. A página 
 
 ## Instalação
 
-O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
+O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-15. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 ```bash
 npm install @toraline.tech/ui @toraline.tech/tokens
@@ -237,7 +237,7 @@ import { Field, TextInput } from "@toraline.tech/ui";
 | Prop | Valores | Significado |
 |---|---|---|
 | `label` | Texto ou elementos. Obrigatória | O nome visível do campo, mostrado acima do controle. Um clique nele move o foco para o controle |
-| `children` | Um elemento, ou uma função. Obrigatória | O controle: `<TextInput />`, um `<select>` nativo, um `<textarea>`. Veja "Como um controle é ligado" abaixo |
+| `children` | Um elemento, ou uma função. Obrigatória | O controle: `<TextInput />`, um `<select>` nativo, um `<textarea>`, ou um elemento com o controle dentro dele. Veja "Como um controle é ligado" abaixo |
 | `hint` | Texto ou elementos | Um texto curto de ajuda, mostrado abaixo do controle enquanto o campo não tem erro |
 | `error` | Texto ou elementos | A mensagem de erro, mostrada abaixo do controle com um ícone, no lugar da dica |
 | `optional` | `true`, `false` (padrão) | `true` para um campo que uma pessoa pode deixar vazio. O label então mostra uma marca |
@@ -246,9 +246,12 @@ import { Field, TextInput } from "@toraline.tech/ui";
 
 Como um controle é ligado:
 
-1. Quando o controle é o filho direto, Field dá a ele 3 props: `id`, `aria-describedby` e `aria-invalid`. Todo controle da biblioteca e todo controle nativo aceita essas props. O controle mantém o seu próprio `aria-describedby` (Field acrescenta a ele) e o seu próprio `aria-invalid`.
-2. Quando o controle não é o filho direto, dê uma função. Ela recebe as 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`.
-3. O id da dica é o id do controle seguido de `-hint`, e o id da mensagem de erro é o id seguido de `-error`.
+1. Quando o controle é o filho direto, Field dá a ele 3 props: `id`, `aria-describedby` e `aria-invalid`. Todo controle da biblioteca e todo controle nativo aceita essas props. O controle mantém o seu próprio `aria-describedby` (Field acrescenta a ele) e o seu próprio `aria-invalid`. Um componente do app como filho direto (por exemplo um editor) recebe as mesmas 3 props, e passa as props para o controle dele.
+2. Quando o controle está dentro de outro elemento, escreva o mesmo id no Field e no controle: `<Field id="amount" label="Amount"><div>R$ <TextInput id="amount" /></div></Field>`. Field procura dentro dos elementos nativos o elemento com esse id, e dá `aria-describedby` e `aria-invalid` a ele. O elemento em volta do controle não recebe nada. Desde a versão 0.3.1; antes dela, o `<div>` também recebia o id, e um clique no label não chegava ao controle.
+3. Ou dê uma função. Ela recebe as 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`. Use a função quando o controle não tem id próprio, ou quando ele está dentro de um componente em que Field não consegue procurar.
+4. O id da dica é o id do controle seguido de `-hint`, e o id da mensagem de erro é o id seguido de `-error`.
+
+Qual filho é "o controle": um componente, ou um dos elementos nativos `<input>`, `<select>`, `<textarea>`, `<button>`, `<meter>`, `<output>` e `<progress>`. Qualquer outro elemento nativo (`<div>`, `<span>`), um fragmento e um texto são "um elemento em volta do controle". Quando nenhum elemento dentro dele tem o id do Field, nada é ligado: o label então não aponta para nenhum elemento.
 
 - As partes e as aparências delas são as do Field do app Intraweb. O uso do Intraweb, `<Field id="name" label="Nome"><TextInput id="name" /></Field>`, funciona sem mudança. Duas coisas são diferentes: o texto da marca é em inglês, a não ser que o app dê `optionalText`, e Field agora escreve `aria-describedby` e `aria-invalid` no controle, o que as telas do Intraweb escreviam à mão.
 - Elemento nativo principal: o `<div>` mais externo. `className`, todas as outras props e `ref` vão para ele. `id` é a exceção: é o id do controle. As partes internas têm o atributo `data-slot` com os valores `label`, `optional`, `hint`, `error` e `error-icon`.
@@ -281,7 +284,7 @@ import { Field, TextInput } from "@toraline.tech/ui";
 | `disabled` | O atributo HTML | O campo não pode receber o foco e não pode ser alterado. Ele tem um fundo discreto e um texto discreto |
 
 - Os tamanhos e as aparências são os do `TextInput` do app Intraweb. A aparência do foco é a do Intraweb: a borda na cor do foco e um anel de 3 pixels, sem outline. Um celular aumenta a página quando um campo com texto menor que 16 pixels recebe o foco, e é por isso que `md` tem texto de 16 pixels em uma tela pequena.
-- Elemento nativo principal: o `<input>`. `className`, todas as outras props (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `required`, `readOnly`) e `ref` vão para ele. Com um ícone, o `<input>` fica dentro de um `<div data-slot="wrapper">` com a largura do seu contêiner, e `className` continua indo para o `<input>`, como no Intraweb.
+- Elemento nativo principal: o `<input>`. `className`, todas as outras props (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `required`, `readOnly`) e `ref` vão para ele. Com um ícone, o `<input>` fica dentro de um `<div data-slot="wrapper">` com a largura do seu contêiner, e `className` continua indo para o `<input>`, como no Intraweb. Uma classe de largura do app (`w-24`, `w-auto`) substitui a largura total do `<input>`.
 - Leitor de tela: dentro de Field, o label, a dica e a mensagem de erro são ligados a ele. Sozinho, ele precisa de `aria-label`.
 - Um campo somente leitura (`readOnly`) não tem aparência própria.
 - A lista `controlSizes` e os tipos `TextInputProps` e `ControlSize` são exportados. Todo controle de formulário da biblioteca tem esses tamanhos.
@@ -500,6 +503,7 @@ Os tamanhos têm os nomes e as alturas do Intraweb. Um botão (Button, ButtonLin
 2. Uma prop tem o nome que o HTML ou o React já usa, quando existe um: `disabled`, `checked`, `href`, `onChange`.
 3. Um ícone é a prop `icon`, do tipo `IconComponent` (`src/shared/icon.ts`): um componente que o app dá, nunca um elemento e nunca um conjunto de ícones da biblioteca. Veja [Ícones](#ícones).
 4. `className` é juntada depois das classes da biblioteca com o helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` de `src/shared/class-names.ts`, e vai no elemento mais externo. Uma exceção: a `className` de TextInput vai para o `<input>` dele, também quando um ícone coloca o `<input>` dentro de um wrapper. O helper remove uma classe da biblioteca quando uma classe posterior define a mesma propriedade CSS.
+   - A largura de um controle de formulário é um exemplo. TextInput, DecimalInput, Select e Textarea têm a largura do contêiner deles (`w-full`). Uma classe de largura do app vence: `<Select className="w-24" />` tem 96 pixels de largura, e `<TextInput className="w-auto" />` tem a largura que o navegador dá a um campo sem largura. Para manter a largura total, não dê nenhuma classe de largura. Isso é diferente do Intraweb antes da biblioteca, de propósito: lá a largura total do controle sempre vencia, e uma classe de largura não fazia nada (o Intraweb escrevia `w-auto!` para uma classe vencer). Um app que sai dos componentes próprios do Intraweb remove as classes de largura que não faziam nada, ou os campos mudam de largura. A decisão: entrada do TOR-1223 de [`docs/decisions.md`](../../docs/decisions.md), item 12.
 5. Todas as outras props vão para o elemento nativo principal: o `<button>`, o `<input>`. A seção do componente neste arquivo diz qual é esse elemento.
 6. `ref` é uma prop normal, como o React 19 permite, e aponta para o elemento nativo principal. Nenhum componente usa `forwardRef`.
 7. Um import relativo escreve o nome do arquivo com `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. Os arquivos de tipos gerados mantêm o import como foi escrito, e o TypeScript em um app que usa as regras de módulos do Node precisa do nome completo do arquivo. `make check` falha quando um arquivo de tipos gerado tem um import relativo sem `.js`.
@@ -522,7 +526,7 @@ Os tamanhos têm os nomes e as alturas do Intraweb. Um botão (Button, ButtonLin
 2. Um nome de classe é escrito por inteiro, como um único texto: `"bg-primary"`. O Tailwind lê os arquivos como texto, e por isso não encontra um nome que o código monta a partir de partes (`"bg-" + color`).
 3. Uma cor é sempre uma classe de token do seu grupo: um fundo é `bg-<name>` (`bg-primary`, `bg-surface`), uma cor de texto é `text-<name>` (`text-primary`, `text-tertiary`), uma cor de borda é `border-<name>` (`border-default`), o outline do foco é `outline-focus`, e a cor de um ícone é `text-icon`, `text-icon-strong` ou `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` e `bg-transparent` são permitidas. Uma cor de nível 1 (`bg-brand-700`), uma cor padrão do Tailwind (`bg-red-500`) e uma cor bruta (`bg-[#f00]`) nunca são usadas.
    - Quando o app Intraweb tem o mesmo componente, cada parte tem o token que o componente do Intraweb usa. As escolhas para os 6 primeiros componentes estão na entrada de TOR-1131 de [`docs/decisions.md`](../../docs/decisions.md).
-4. Um tamanho de fonte é `text-xs`, `text-sm`, `text-base` ou `text-lg` (e `text-2xl` e `text-3xl` para o número grande de StatCard), escrito com a altura da linha: `text-xs/4` (uma linha de 16 pixels), `text-sm/5` (uma linha de 20 pixels, a altura de linha que o `text-sm` do Intraweb tem), `text-base/6` (24 pixels) ou `text-base/normal`. Uma fonte é `font-body` (texto normal), `font-heading` (um título, um botão, uma aba) ou `font-mono`. `font-heading` é a Poppins, que os apps carregam nos pesos 400, 500 e 600, e por isso o peso dela é `font-normal`, `font-medium` ou `font-semibold`, nunca `font-bold`. O texto de um botão, de uma aba e de um link com a aparência de um deles é `font-heading text-sm/5 font-medium`: os valores do estilo de texto `label` do Intraweb. O raio é `rounded-md` para um botão ou um campo e `rounded-lg` para um menu; `rounded-xl` e `rounded-2xl` são para um card e um drawer. Dois formatos não são tokens: um círculo completo ou uma pílula (`rounded-full`), e o trilho da aparência segmentada (`rounded-[10px]`, o valor do Intraweb). A sombra é uma entre `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` e `shadow-2xl`; um menu tem `shadow-lg`.
+4. Um tamanho de fonte é `text-xs`, `text-sm`, `text-base` ou `text-lg` (e `text-2xl` e `text-3xl` para o número grande de StatCard), escrito como o Intraweb escreve. Onde o Intraweb escreve só o tamanho, a classe é só o tamanho: `text-xs`, `text-sm`, `text-base`, `text-lg`. A altura de linha dela é então uma proporção do tamanho da fonte (16, 20, 24 e 28 pixels com o tamanho de texto em 100%), que o preset dos tokens escreve na classe. Onde o Intraweb usa um estilo de texto, que tem a altura de linha como um comprimento, a classe tem a altura de linha como um passo do espaçamento: `text-xs/4` (16 pixels, o estilo de texto `label-sm`), `text-sm/5` (20 pixels, `label`), `text-base/6` (24 pixels, `heading-card`), `text-lg/7` (28 pixels, `heading-section`). As duas formas dão a mesma linha com o tamanho de texto em 100% e diferem por uma parte de um pixel em 90%, 115% e 130%, então um componente usa a forma que o componente do Intraweb tem (entrada do TOR-1223 de [`docs/decisions.md`](../../docs/decisions.md), item 5). Uma fonte é `font-body` (texto normal), `font-heading` (um título, um botão, uma aba) ou `font-mono`. `font-heading` é a Poppins, que os apps carregam nos pesos 400, 500 e 600, e por isso o peso dela é `font-normal`, `font-medium` ou `font-semibold`, nunca `font-bold`. O texto de uma aba e de um link com a aparência de uma é `font-heading text-sm/5 font-medium`: os valores do estilo de texto `label` do Intraweb. O texto de um botão é `font-heading font-medium` com `text-sm` ou `text-base`, como no Button do Intraweb. O raio é `rounded-md` para um botão ou um campo e `rounded-lg` para um menu; `rounded-xl` e `rounded-2xl` são para um card e um drawer. Dois formatos não são tokens: um círculo completo ou uma pílula (`rounded-full`), e o trilho da aparência segmentada (`rounded-[10px]`, o valor do Intraweb). A sombra é uma entre `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` e `shadow-2xl`; um menu tem `shadow-lg`.
 5. Um padding, uma margem e um gap são uma classe padrão de espaçamento do Tailwind (`px-4`, `gap-2`), que é um múltiplo do token `--spacing`.
 6. Estes são escritos como valores simples, porque não mudam com o tema: a largura de uma borda ou de um outline (`border`, `border-2`, `outline-2`), um peso de fonte (`font-bold`), uma largura em pixels que não é um passo da escala de espaçamento (`border-[1.5px]`), um tamanho em `em` ou `%`, uma duração, e um `z-index` (`z-10`). Um comprimento em `rem` nunca é usado.
 7. Quando duas classes de um elemento definem a mesma propriedade em estados diferentes, o estado que precisa vencer tem a variante do Tailwind que o Tailwind escreve depois no CSS. A ordem que o Tailwind usa: sem variante do Tailwind, `hover:`, `focus:`, `focus-visible:`, `disabled:`, depois `aria-*:`, depois um breakpoint (`md:`, `lg:`). Quando essa ordem não é a necessária, a classe escreve as duas condições: `disabled:hover:border-default`.
@@ -606,7 +610,7 @@ import { Field, Textarea } from "@toraline.tech/ui";
 | `disabled` | O atributo HTML | O textarea não pode receber o foco e não pode ser alterado. Ele tem um fundo discreto e um texto discreto |
 
 - É um `<textarea>` nativo com a caixa e as aparências de foco, de desabilitado e de não válido do TextInput, como no Intraweb. Ele tem um tamanho só e nenhuma prop `size`: texto de 16 pixels em uma tela pequena e de 14 pixels a partir do breakpoint `lg`.
-- Elemento nativo principal: o `<textarea>`. `className`, todas as outras props (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) e `ref` vão para ele.
+- Elemento nativo principal: o `<textarea>`. `className`, todas as outras props (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) e `ref` vão para ele. Uma classe de largura do app (`w-40`) substitui a largura total.
 - A pessoa pode mudar o tamanho dele com o canto que o navegador mostra. `className="resize-none"` remove esse canto.
 - Leitor de tela: dentro do Field, o label, a dica e a mensagem de erro ficam ligados a ele. Sozinho, ele precisa de `aria-label`.
 - O tipo `TextareaProps` é exportado. Ele não tem `"use client"`.
@@ -641,7 +645,7 @@ const priceError = price !== null && Number.isNaN(price) ? "Type a number, for e
 - `parseDecimalInput(text)` lê o texto como um número, do jeito que o Intraweb faz. Com uma vírgula no texto, a vírgula é o separador decimal e todo ponto é um separador de milhar: `"1.234,5"` é `1234.5`. Sem vírgula, um ponto é o separador decimal: `"2.5"` é `2.5`. Um texto vazio é `null`. Um texto que não é um número é `NaN`.
 - `decimalToInput(value)` escreve um número como o texto do campo, com vírgula: `0.4` é `"0,4"`. `null` e `undefined` são o texto vazio.
 - As duas funções seguem o jeito de escrever um número no Brasil, o idioma do Intraweb. Um número em inglês com vírgula entre os milhares (`"1,234.5"`) não é lido corretamente.
-- Elemento nativo principal: o `<input>`. `className`, todas as outras props e `ref` vão para ele, como no TextInput.
+- Elemento nativo principal: o `<input>`. `className`, todas as outras props e `ref` vão para ele, como no TextInput. Uma classe de largura do app (`w-24`) substitui a largura total.
 - O tipo `DecimalInputProps` é exportado. Ele não tem `"use client"`.
 
 ### `Checkbox` e `CheckboxControl`
@@ -892,7 +896,7 @@ export function ColumnFilter() {
 | `gap` | Um número de pixels. Quando falta: 4 | O espaço entre o botão e o painel |
 | `strategy` | `"fixed"` (padrão), `"absolute"` | `fixed`: o painel tem `position: fixed`, para um painel renderizado em `<body>` com `createPortal`. `absolute`: o painel tem `position: absolute` dentro de um elemento posicionado |
 
-Ele retorna `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (para o botão), `panelRef` e `panelStyle` (para o painel), `placed` (`false` até o painel ser medido: esconda o painel com a classe `invisible` até lá), `side` (o lado em que o painel está) e `handleEscape` (para o `onKeyDown` do painel).
+Ele retorna `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (para o botão), `panelRef` e `panelStyle` (para o painel), `placed` (`false` até o painel ser medido: esconda o painel com a classe `invisible` até lá, ou com `opacity-0` quando um elemento dentro do painel tem `autoFocus`, porque um elemento que está `invisible` não pode receber o foco), `side` (o lado em que o painel está) e `handleEscape` (para o `onKeyDown` do painel).
 
 - O painel abre no lado pedido. Quando ele não cabe ali, ele abre no outro lado, a não ser que esse lado tenha menos espaço.
 - O painel mantém 8 pixels até as bordas esquerda e direita da janela.
@@ -1164,6 +1168,7 @@ Um botão com um painel flutuante abaixo dele, por exemplo a lista de colunas de
 - O botão é um Button secundário no tamanho `md`.
 - Ponteiro: um clique no botão abre o painel, e um segundo clique o fecha. Um clique fora do botão e do painel fecha o painel.
 - Teclado: Enter e Espaço no botão abrem e fecham o painel. O painel vem logo depois do botão na página, então Tab vai do botão para dentro dele. Escape, com o foco no botão ou dentro do painel, fecha o painel e dá o foco ao botão. Escape não chega a um Modal ou a um Drawer em que o Popover está.
+- Foco quando o painel abre: um elemento dentro do painel com `autoFocus` recebe o foco, por exemplo um campo de busca: `<Popover label="Choose an item"><TextInput autoFocus aria-label="Search" /></Popover>`. Sem um elemento assim, o foco fica no botão. Desde a versão 0.3.1; antes dela, `autoFocus` dentro do painel não fazia nada.
 - O painel abre 8 pixels abaixo do botão. Ele abre acima quando não há espaço abaixo, e mantém 8 pixels até as bordas esquerda e direita da janela.
 - Leitor de tela: o botão tem `aria-expanded`, e `aria-controls` com o id do painel enquanto ele está aberto.
 - Elemento nativo principal: o `<button>`. Todas as outras props e `ref` vão para ele. `className` vai para o elemento mais externo, um `<div>` que contém o botão e o painel. As partes têm `data-slot`: `trigger`, `panel`.
@@ -1351,11 +1356,26 @@ Uma coluna (`DataGridColumn<Row>`):
 
 Os textos (`labels`), com seus padrões: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `editTable` (`"Edit table"`), `noChanges` (`"No changes"`), `changedRows(count)` (`"2 rows changed"`), `cancelEditing` (`"Cancel"`), `saveChanges(count)` (`"Save changes (2)"`), `savingChanges` (`"Saving…"`), `rowError(rowLabel, errorMessage)` (`"Coffee: The price is not valid."`), `showSubRows(subRowsLabel, rowLabel, count)` (`"Show options of Milk (3)"`), `hideSubRows(subRowsLabel, rowLabel, count)` (`"Hide options of Milk (3)"`), `subRowsCaption(subRowsLabel, rowLabel)` (`"options of Milk"`), `noSubRows` (`"No items."`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
+Três deles, `selectedCount`, `pageRange` e `pageOf`, podem retornar elementos no lugar de um texto (desde a versão 0.3.1). Um navegador desenha um texto e o mesmo texto dado em pedaços com uma diferença de menos de 0,1 pixel na largura, o que muda as bordas de algumas letras. O Intraweb escreve esses 3 textos em pedaços. Um app que precisa ficar exatamente como o Intraweb era dá os mesmos pedaços:
+
+```tsx
+const labels = {
+  selectedCount: (count: number) => <>{count} {count === 1 ? "selecionado" : "selecionados"}</>,
+  pageRange: (firstRow: number, lastRow: number, rowCount: number) => (
+    <>
+      Mostrando {firstRow}–{lastRow} de{" "}
+      {rowCount}
+    </>
+  ),
+  pageOf: (page: number, pageCount: number) => <>{page} de {pageCount}</>,
+};
+```
+
 - As classes são as do DataGrid do app Intraweb (`components/ui/data-grid/`). A tabela, o cabeçalho com uma ordenação, as páginas e a barra das linhas selecionadas foram comparados com os do Intraweb nos dois temas.
 - A tabela é uma [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) com `stackOnMobile`: em uma tela com menos de 768 pixels de largura, cada linha é um bloco. Uma tabela mais larga que a sua caixa rola para os lados.
 - Teclado: todo controle é um elemento nativo. Tab passa pelo campo de busca, pelos botões de ordenação, pelos checkboxes, pelos botões das linhas e pelos controles de página; Enter e Espaço pressionam um botão; Espaço marca um checkbox.
 - Leitor de tela: a célula de cabeçalho de uma coluna com `sortValue` tem `aria-sort` (`none`, `ascending`, `descending`). A barra das linhas selecionadas é uma região com o nome de `labels.bulkActions`, e a contagem dela é um status. Os controles de página são uma região de navegação. O checkbox do cabeçalho fica "misto" enquanto só uma parte das linhas está selecionada.
-- `checkboxComponent` recebe `checked`, `disabled`, `onChange`, `aria-label` e `ref` (tipo `DataGridCheckboxProps`). Ele deve passar `ref` para o seu `<input>`. `selectComponent` recebe `size="sm"`, `className="w-20"`, `value`, `onChange` e filhos `<option>` (tipo `DataGridSelectProps`). Quando eles faltam, o grid usa o `CheckboxControl` e o `Select` da biblioteca.
+- `checkboxComponent` recebe `checked`, `disabled`, `onChange`, `aria-label` e `ref` (tipo `DataGridCheckboxProps`). Ele deve passar `ref` para o seu `<input>`. `selectComponent` recebe `size="sm"`, `className="w-full"`, `value`, `onChange` e filhos `<option>` (tipo `DataGridSelectProps`). A classe deixa o campo com a largura do conteúdo dele: cerca de 74 pixels com os tamanhos 10, 25, 50 e 100, a largura que o Intraweb mostra (desde a versão 0.3.1; antes dela a classe era `w-20`, 80 pixels). Quando eles faltam, o grid usa o `CheckboxControl` e o `Select` da biblioteca.
 - Não está na biblioteca, e ainda só no Intraweb: uma célula editada com várias escolhas (o editor `multiselect`). Nenhuma tela do Intraweb o usa.
 - A lista `dataGridPageSizes` e os tipos `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridRowChanges`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` e `DataGridSelectProps` são exportados.
 - É um Client Component, porque guarda estado. As colunas dele têm funções, então o arquivo do app que o usa também é um Client Component. Uma página que é Server Component entrega os registros para esse arquivo.
@@ -1649,6 +1669,7 @@ const columns: DataGridColumn<Category>[] = [
 - A seta é um botão com `aria-expanded`, e `aria-controls` enquanto os itens são mostrados. O nome dela é `labels.showSubRows` ou `labels.hideSubRows`, com o número de itens. Enter e Espaço a pressionam, e ela mantém o foco.
 - Várias linhas podem estar abertas ao mesmo tempo. O grid guarda quais linhas estão abertas.
 - A tabela interna tem o nome de `labels.subRowsCaption`. Quando ela é mais larga que a sua caixa, ela rola para os lados, e a caixa pode receber o foco do teclado.
+- Em uma tela com menos de 768 pixels de largura cada item é um bloco e cada célula dele mostra só o seu valor, sem o nome da coluna, como no Intraweb. O cabeçalho da tabela interna fica então escondido dos olhos; um leitor de tela ainda lê o cabeçalho. (A versão 0.3.0 mostrava o nome da coluna antes de cada valor.)
 - Os itens não têm busca, nem ordenação, nem filtro, nem menu das colunas.
 - O tipo genérico do grid tem uma segunda parte para os itens: `DataGridProps<Row, SubRow>`. O TypeScript a lê de `subRows`.
 
@@ -1953,3 +1974,7 @@ import { Button, DetailPanel } from "@toraline.tech/ui";
 - As partes internas têm `data-slot`: `header`, `title`, `body`, `fields`, `footer`.
 - Os tipos `DetailPanelProps` e `DetailField` são exportados.
 - Ele não tem `"use client"`: também renderiza em um Server Component. Um painel com `onClose` precisa de um Client Component em volta dele, porque uma função não pode ir de um Server Component para o navegador.
+
+## Licença
+
+MIT. O texto está no arquivo [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

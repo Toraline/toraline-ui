@@ -26,7 +26,7 @@ const panelClass = "w-full max-w-sm rounded-xl bg-surface p-6 shadow-2xl focus:o
 /** The title has the values of Intraweb's text style "heading-section". */
 const titleClass = "font-heading text-lg/7 font-medium text-primary";
 
-const descriptionClass = "mt-2 text-sm/5 text-secondary";
+const descriptionClass = "mt-2 text-sm text-secondary";
 
 /** On a narrow screen the buttons are one above the other, with "keep editing" first. */
 const buttonsClass = "mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end";

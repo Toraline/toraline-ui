@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test } from "vitest";
+import { darkTheme, lightTheme } from "@toraline.tech/tokens";
 import { StatusBadge, statusBadgeVariants } from "./index";
 
 afterEach(cleanup);
@@ -35,7 +36,7 @@ describe("StatusBadge", () => {
   });
 
   test.each([
-    ["neutral", "bg-muted", "text-secondary", "bg-current"],
+    ["neutral", "bg-muted", "text-secondary", "bg-data-neutral"],
     ["success", "bg-success", "text-success", "bg-data-success"],
     ["warning", "bg-warning", "text-warning", "bg-data-warning"],
     ["error", "bg-error", "text-error", "bg-data-danger"],
@@ -47,6 +48,15 @@ describe("StatusBadge", () => {
     expect(badge.className.split(" ")).toEqual(expect.arrayContaining([background, text]));
     const dot = badge.querySelector('[data-slot="dot"]') as HTMLElement;
     expect(dot.className.split(" ")).toEqual(expect.arrayContaining(["size-1.5", "rounded-full", dotColor]));
+  });
+
+  test("the neutral dot has the grey of Intraweb's dot, a token with the same value in both themes", () => {
+    render(<StatusBadge label="Draft" dot />);
+    const dot = screen.getByText("Draft").querySelector('[data-slot="dot"]') as HTMLElement;
+    // Before version 0.3.1 the dot had the text color "text-muted", which is darker in the dark theme.
+    expect(dot.className.split(" ")).not.toContain("text-muted");
+    expect(lightTheme.tokens["data-neutral"]).toBe("var(--color-slate-400)");
+    expect(darkTheme.tokens["data-neutral"]).toBe(lightTheme.tokens["data-neutral"]);
   });
 
   test("dot: the dot is before the text, and a screen reader skips it", () => {

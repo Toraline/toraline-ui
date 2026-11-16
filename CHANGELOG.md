@@ -4,7 +4,41 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
-## 0.3.0 (2026-11-16)
+The date of a version is the date in the local time of the person who started the release. The releases so far were started from Brasília (UTC-3). The time that npm records for a version is in UTC, and can be the next day.
+
+## 0.3.1 (not published yet)
+
+Fixes found when the app Intraweb installed version 0.3.0 and compared 279 screenshots taken before and after (TOR-1223). After this version Intraweb needs no workaround, and the differences that version 0.3.0 recorded as known are gone. Nothing breaks: an app written for 0.3.0 builds unchanged. Two changes can be seen in an app that is not Intraweb; they are first in the list.
+
+### Changed: what an app can see
+
+- DataGrid, rows inside a row (`subRows`): on a screen less than 768 pixels wide, a cell of an item shows only its value, as in Intraweb. Version 0.3.0 showed the name of the column before each value.
+- Dark theme, three colors are now Intraweb's, the same as in the light theme: the small bar at the top of a Modal shown as a sheet (`#d0d5dd`, was `#414651`), the dot of a neutral StatusBadge (`#98a2b3`, was `#61646c`) and the ring of a CheckboxControl with `changed` (`#fedf89`, was `#93370d`).
+
+### Fixed
+
+- Field: the space before the mark of an optional field is inside the mark, so the mark is where Intraweb draws it (it was about 0.3 pixels to the right).
+- Field: a child that is not the control, for example a `<div>` around the control and a button, no longer receives `id`, `aria-describedby` and `aria-invalid`. Before, the `<div>` got the id of the control too, and a click on the label did not move the focus to the field. Field now finds the control inside by its id (`<Field id="x"><div><TextInput id="x" /></div></Field>`) and links the hint and the error message to it. A function as `children` still works.
+- Popover: an element inside the panel with `autoFocus` gets the focus when the panel opens. Before, the focus stayed on the button.
+- DataGrid: the field that chooses the number of rows of a page is as wide as its content (74 pixels with the sizes 10, 25, 50 and 100), as in Intraweb. It was 80 pixels. `selectComponent` now receives `className="w-full"` in the place of `"w-20"`.
+- DataGrid: the row above the table always has its right part, also when it is empty, as in Intraweb. On a narrow screen the search field above a view (`renderView`) was 8 pixels wider.
+- Text size of the page other than 100% (Intraweb offers 90%, 115% and 130%): a line of text has the height it has in Intraweb. Before, a line of `text-sm` was 23 pixels at 115% where Intraweb's is 22.98, and some lines moved by 1 pixel. The components now write a font size the way Intraweb does: alone (`text-sm`) where Intraweb writes it alone, and with a line height (`text-sm/5`) only where Intraweb uses a text style.
+
+### New
+
+- `@toraline.tech/tokens`: 3 level 2 color tokens with the same value in the light and the dark theme: `--bg-handle` (class `bg-handle`), `--data-neutral` (`bg-data-neutral` and the other classes of the data group) and `--border-changed-ring`. They are the 3 colors of the dark theme listed above. A theme of an app can change them. There are now 62 color tokens.
+- `@toraline.tech/tokens`: the Tailwind preset writes the line height of `text-xs`, `text-sm`, `text-base` and `text-lg` into the class, as a ratio of the font size (Tailwind's own values). The computed line height of these classes in an app does not change. An app that sets `--text-sm--line-height` in its own `@theme` after the preset still wins.
+- DataGrid: the labels `selectedCount`, `pageRange` and `pageOf` can return elements, not only a text. An app that writes them in the pieces Intraweb used gets the exact letters of Intraweb (the README of `@toraline.tech/ui` has the code).
+
+### License
+
+- The library is released under the MIT license (TOR-1200). Both packages have `"license": "MIT"` and the file `LICENSE`. The versions 0.1.0, 0.2.0 and 0.3.0 were published with no license file.
+
+### Documentation
+
+- A width class of the app (`w-24`, `w-auto`) on TextInput, DecimalInput, Select and Textarea wins over the full width of the control. It was already so; the README now states it with an example. In Intraweb before the library the full width won, so an app that moves from Intraweb's own components removes the width classes that did nothing.
+
+## 0.3.0 (2026-11-15)
 
 The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-1209). Nothing breaks: a grid written for 0.2.0 works unchanged.
 

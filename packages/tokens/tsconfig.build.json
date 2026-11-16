@@ -4,6 +4,7 @@
     "src"
   ],
   "exclude": [
+    "src/intraweb-fixtures",
     "src/**/*.test.ts",
     "src/**/*.test.tsx"
   ]

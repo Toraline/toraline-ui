@@ -21,6 +21,14 @@ const rootClass = "relative";
 /** The panel: above the page content, 8 pixels from the button. */
 const panelClass = "absolute z-30 rounded-lg border border-subtle bg-surface p-4 shadow-lg";
 
+/**
+ * The panel before it is measured and placed. It cannot be seen, and it can
+ * still get the focus: an element inside it with "autoFocus" gets the focus
+ * when the panel opens, as in Intraweb. With "invisible" (the CSS
+ * "visibility: hidden") the browser refuses the focus, so "autoFocus" did nothing.
+ */
+const unplacedClass = "opacity-0";
+
 /** The space between the button and the panel, in pixels: the "mt-2" of Intraweb. */
 const PANEL_GAP = 8;
 
@@ -46,6 +54,8 @@ export type PopoverProps = Omit<ComponentProps<"button">, "children"> & {
  * - Escape, with the focus on the button or inside the panel, closes the panel
  *   and gives the focus to the button. It does not reach a dialog under it.
  * - A press outside the button and the panel closes the panel.
+ * - An element inside the panel with "autoFocus" (a search field) gets the
+ *   focus when the panel opens. Without one, the focus stays on the button.
  * - The panel opens under the button, above it when there is no room below,
  *   and stays inside the window.
  * - "aria-label" is the name of the button when "label" is not plain text.
@@ -91,7 +101,7 @@ export function Popover({
           ref={panelRef}
           id={panelId}
           style={panelStyle}
-          className={classNames(panelClass, !placed && "invisible", panelClassName)}
+          className={classNames(panelClass, !placed && unplacedClass, panelClassName)}
           data-slot="panel"
           data-side={side}
         >

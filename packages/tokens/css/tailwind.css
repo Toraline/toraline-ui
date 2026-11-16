@@ -12,7 +12,7 @@
  *    --data-1          -> bg-data-1, text-data-1, fill-data-1 and the others
  *    --font-body       -> font-body and font-sans
  *    --font-heading    -> font-heading
- *    --text-sm         -> text-sm (the font size)
+ *    --text-sm         -> text-sm (the font size; its line height is a ratio, see below)
  *    --spacing         -> the unit of p-4, gap-2 and every other spacing class
  *    --radius-md       -> rounded-md
  *    --shadow-card     -> shadow-card
@@ -116,6 +116,7 @@
   --background-color-highlight: var(--bg-highlight);
   --background-color-info: var(--bg-info);
   --background-color-tooltip: var(--bg-tooltip);
+  --background-color-handle: var(--bg-handle);
 
   --text-color-primary: var(--text-primary);
   --text-color-strong: var(--text-strong);
@@ -150,6 +151,7 @@
   --border-color-success: var(--border-success);
   --border-color-info: var(--border-info);
   --border-color-warning: var(--border-warning);
+  --border-color-changed-ring: var(--border-changed-ring);
 
   --outline-color-focus: var(--border-focus);
   --ring-color-info: var(--border-info);
@@ -161,6 +163,7 @@
   --color-data-warning: var(--data-warning);
   --color-data-danger: var(--data-danger);
   --color-data-track: var(--data-track);
+  --color-data-neutral: var(--data-neutral);
 }
 
 /*
@@ -217,6 +220,29 @@
  */
 @theme inline {
   --font-sans: var(--font-body);
+}
+
+/*
+ * The line height of the 4 font size classes that the components use alone:
+ * "text-xs", "text-sm", "text-base" and "text-lg". Each one is a ratio of the
+ * font size, with no unit: the value Tailwind gives the class, and the value
+ * Intraweb's screens have. "inline" writes the ratio itself into the class
+ * ("line-height: calc(1.25 / 0.875)"). Without this block the class reads
+ * Tailwind's own variable "--text-sm--line-height", which is not a token.
+ *
+ * Why a ratio and not a length ("text-sm/5", 1.25rem): the two are the same
+ * line at a text size of 100%, and not at 90%, 115% or 130%, where a browser
+ * rounds them in different ways (22.984 pixels and 23 pixels at 115%). A text
+ * inside an element with a ratio also gets the ratio for its own font size.
+ *
+ * "text-2xl" and "text-3xl" are not here: their font sizes are not Tailwind's,
+ * and the components write them with a line height ("text-2xl/8").
+ */
+@theme inline {
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg--line-height: calc(1.75 / 1.125);
 }
 
 /*

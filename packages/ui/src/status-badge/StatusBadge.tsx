@@ -27,12 +27,11 @@ const dotBaseClass = "size-1.5 rounded-full";
 
 /**
  * The color of the dot of each variant: the stronger color of the same
- * meaning, from the colors of charts. The neutral dot has the color of the
- * text token "text-muted" ("bg-current" paints with the text color), because
- * no background token has that grey.
+ * meaning, from the colors of charts. The neutral dot is the grey of
+ * Intraweb's dot, the same in the light and the dark theme.
  */
 const dotVariantClass: Record<StatusBadgeVariant, string> = {
-  neutral: "bg-current text-muted",
+  neutral: "bg-data-neutral",
   success: "bg-data-success",
   warning: "bg-data-warning",
   error: "bg-data-danger",

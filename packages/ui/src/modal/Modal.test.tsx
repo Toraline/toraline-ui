@@ -5,6 +5,7 @@ import { createRef, useState } from "react";
 import type { ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { darkTheme, lightTheme } from "@toraline.tech/tokens";
 import { Modal, modalSizes } from "./index";
 import type { ModalProps } from "./index";
 
@@ -269,6 +270,15 @@ describe("Modal", () => {
     );
     expect(slots).toEqual(["handle", "header", "title", "actions", "body"]);
     expect(getDialog().querySelector('[data-slot="handle"]')?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  test("the small bar of the sheet has the grey of Intraweb's bar, a token with the same value in both themes", async () => {
+    render(<Page />);
+    await openModal();
+    const handle = getDialog().querySelector('[data-slot="handle"]') as HTMLElement;
+    expect(handle.className.split(" ")).toContain("bg-handle");
+    expect(lightTheme.tokens["bg-handle"]).toBe("var(--color-slate-300)");
+    expect(darkTheme.tokens["bg-handle"]).toBe(lightTheme.tokens["bg-handle"]);
   });
 
   test("puts the app's className on the dialog, after the library's classes", async () => {

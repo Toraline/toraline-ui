@@ -196,14 +196,39 @@ for (const { folder, manifest } of manifests) {
   }
   // README.pt-BR.md is the Portuguese version of the README. npm puts every file whose name
   // starts with "README" in a package by itself, so "files" of package.json does not name it.
-  for (const needed of ["package.json", "README.md", "README.pt-BR.md"]) {
+  // LICENSE is the MIT license. npm puts a file with that name in a package by itself.
+  for (const needed of ["package.json", "README.md", "README.pt-BR.md", "LICENSE"]) {
     if (!packedFiles.includes(needed)) {
       fail(`${manifest.name}: ${needed} is missing from the package.`);
     }
   }
 }
 
-// 8. Only for "npm publish": the person asked for this version, on the release branch, with nothing uncommitted.
+// 8. The license. The library is released under the MIT license (docs/decisions.md, TOR-1200).
+//    The text is the file LICENSE at the repository root. npm puts in a package only the files
+//    of the package's own folder, so each package folder has a copy, which must stay equal.
+{
+  const licensePath = join(root, "LICENSE");
+  const licenseText = existsSync(licensePath) ? readFileSync(licensePath, "utf8") : undefined;
+  if (licenseText === undefined) {
+    fail("The file LICENSE is missing at the repository root.");
+  } else if (!licenseText.startsWith("MIT License\n")) {
+    fail('The file LICENSE must start with the line "MIT License".');
+  }
+  for (const { folder, manifest } of manifests) {
+    if (manifest.license !== "MIT") {
+      fail(`${folder}/package.json must have "license": "MIT".`);
+    }
+    const copyPath = join(root, folder, "LICENSE");
+    if (!existsSync(copyPath)) {
+      fail(`${folder}/LICENSE is missing. Copy the file LICENSE of the repository root into ${folder}.`);
+    } else if (licenseText !== undefined && readFileSync(copyPath, "utf8") !== licenseText) {
+      fail(`${folder}/LICENSE differs from the file LICENSE of the repository root. Copy the root file into ${folder}.`);
+    }
+  }
+}
+
+// 9. Only for "npm publish": the person asked for this version, on the release branch, with nothing uncommitted.
 if (isPublish) {
   const asked = process.env.TORALINE_RELEASE;
   if (asked !== version) {

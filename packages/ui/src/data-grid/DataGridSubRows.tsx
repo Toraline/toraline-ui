@@ -99,13 +99,13 @@ export function DataGridSubRowsTable<Row, SubRow>({
   return (
     <div id={id} className="space-y-2" data-slot="sub-rows">
       {items.length === 0 ? (
-        <p className="text-sm/5 text-secondary">{subRows.emptyMessage ?? labels.noSubRows}</p>
+        <p className="text-sm text-secondary">{subRows.emptyMessage ?? labels.noSubRows}</p>
       ) : (
         <ScrollBox
           aria-label={caption}
           className="relative overflow-x-auto rounded-lg border border-default bg-surface"
         >
-          <table className="w-full text-left text-sm/5">
+          <table className="w-full text-left text-sm">
             <caption className="sr-only">{caption}</caption>
             <thead>
               <tr>
@@ -121,7 +121,8 @@ export function DataGridSubRowsTable<Row, SubRow>({
               {items.map((item) => (
                 <Tr key={subRows.getRowKey(item)} hoverable>
                   {subRows.columns.map((column) => (
-                    <Td key={column.id} data-label={column.header} align={column.align}>
+                    // No "data-label": on a narrow screen a cell of an item shows only its value, as in Intraweb.
+                    <Td key={column.id} align={column.align}>
                       {renderCell(item, column)}
                     </Td>
                   ))}

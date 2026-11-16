@@ -26,12 +26,13 @@ const baseClass = classNames(
 /**
  * The smallest height, the space between the icon and the text, the padding and
  * the font size of each size. The heights are 32, 40 and 48 pixels.
- * "/5" and "/6" are the line heights: 20 and 24 pixels.
+ * The font size classes are Intraweb's: a line of 20 pixels ("text-sm") and of
+ * 24 pixels ("text-base") at a text size of 100%, as a ratio of the font size.
  */
 const sizeClass: Record<ButtonSize, string> = {
-  sm: "min-h-8 gap-1.5 px-3 py-1 text-sm/5",
-  md: "min-h-10 gap-2 px-4 py-2 text-sm/5",
-  lg: "min-h-12 gap-2 px-5 py-2.5 text-base/6",
+  sm: "min-h-8 gap-1.5 px-3 py-1 text-sm",
+  md: "min-h-10 gap-2 px-4 py-2 text-sm",
+  lg: "min-h-12 gap-2 px-5 py-2.5 text-base",
 };
 
 /** The colors of each variant. */

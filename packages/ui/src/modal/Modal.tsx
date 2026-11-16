@@ -40,8 +40,8 @@ const sizeClass: Record<ModalSize, string> = {
   full: "max-w-6xl",
 };
 
-/** The small bar at the top of the sheet on a narrow screen. Its color is the token of a strong border. */
-const handleClass = "mx-auto mt-2 h-1 w-10 rounded-full bg-(--border-strong) md:hidden";
+/** The small bar at the top of the sheet on a narrow screen. Its grey is Intraweb's, the same in the light and the dark theme. */
+const handleClass = "mx-auto mt-2 h-1 w-10 rounded-full bg-handle md:hidden";
 
 const bodyClass = "p-4 md:p-6";
 

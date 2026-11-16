@@ -669,7 +669,7 @@ export function DataGrid<Row, SubRow = never>({
       ) : null,
       rowError === undefined ? null : (
         <tr key={`${key}-error`} data-slot="row-error">
-          <Td colSpan={columnCount} className="bg-error text-sm/5 text-danger">
+          <Td colSpan={columnCount} className="bg-error text-sm text-danger">
             <span role="alert">{labels.rowError(rowLabel, rowError)}</span>
           </Td>
         </tr>
@@ -775,52 +775,55 @@ export function DataGrid<Row, SubRow = never>({
               </Button>
             ) : null}
           </div>
-          {hasColumnsMenu || hasEditTable ? (
-            <div className="flex flex-wrap items-center gap-2">
-              {hasColumnsMenu ? (
-                <DataGridColumnsMenu
-                  columns={allColumns}
-                  hiddenColumnIds={hiddenColumnIds}
-                  isDefault={areColumnsDefault}
-                  onToggle={toggleColumn}
-                  onReset={resetColumns}
-                  labels={labels}
-                />
-              ) : null}
-              {hasEditTable && !isEditingTable ? (
+          {/*
+            The right part is always here, also when it is empty (a view, or no menu "Columns"), as
+            in Intraweb. An empty part still takes the gap of 8 pixels of the row: on a narrow
+            screen the search field, which fills the left part, is then 8 pixels narrower.
+          */}
+          <div className="flex flex-wrap items-center gap-2">
+            {hasColumnsMenu ? (
+              <DataGridColumnsMenu
+                columns={allColumns}
+                hiddenColumnIds={hiddenColumnIds}
+                isDefault={areColumnsDefault}
+                onToggle={toggleColumn}
+                onReset={resetColumns}
+                labels={labels}
+              />
+            ) : null}
+            {hasEditTable && !isEditingTable ? (
+              <Button
+                variant="secondary"
+                disabled={rows.length === 0}
+                onClick={startEditingTable}
+                data-slot="edit-table"
+              >
+                {labels.editTable}
+              </Button>
+            ) : null}
+            {hasEditTable && isEditingTable ? (
+              <>
+                <span className="text-sm text-secondary" role="status">
+                  {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
+                </span>
                 <Button
-                  variant="secondary"
-                  disabled={rows.length === 0}
-                  onClick={startEditingTable}
-                  data-slot="edit-table"
+                  variant="ghost"
+                  disabled={isSavingRows}
+                  onClick={stopEditingTable}
+                  data-slot="cancel-editing"
                 >
-                  {labels.editTable}
+                  {labels.cancelEditing}
                 </Button>
-              ) : null}
-              {hasEditTable && isEditingTable ? (
-                <>
-                  <span className="text-sm/5 text-secondary" role="status">
-                    {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    disabled={isSavingRows}
-                    onClick={stopEditingTable}
-                    data-slot="cancel-editing"
-                  >
-                    {labels.cancelEditing}
-                  </Button>
-                  <Button
-                    disabled={isSavingRows || changedRowList.length === 0}
-                    onClick={() => void saveChangedRows()}
-                    data-slot="save-changes"
-                  >
-                    {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
-                  </Button>
-                </>
-              ) : null}
-            </div>
-          ) : null}
+                <Button
+                  disabled={isSavingRows || changedRowList.length === 0}
+                  onClick={() => void saveChangedRows()}
+                  data-slot="save-changes"
+                >
+                  {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
+                </Button>
+              </>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
@@ -894,7 +897,7 @@ export function DataGrid<Row, SubRow = never>({
       {isPaginated && !hasView && !loading && foundRows.length > 0 ? (
         <nav
           aria-label={labels.pagination}
-          className="flex flex-wrap items-center justify-between gap-3 text-sm/5 text-secondary"
+          className="flex flex-wrap items-center justify-between gap-3 text-sm text-secondary"
           data-slot="pagination"
         >
           <span>
@@ -907,9 +910,14 @@ export function DataGrid<Row, SubRow = never>({
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 whitespace-nowrap">
               {labels.rowsPerPage}
+              {/*
+                The field is as wide as its content (about 74 pixels with the sizes 10, 25, 50 and
+                100), as in Intraweb: "w-full" inside a label that is as wide as its content. Intraweb
+                writes "w-20" (80 pixels) here, and that class loses to the "w-full" of its Select.
+              */}
               <Select
                 size="sm"
-                className="w-20"
+                className="w-full"
                 value={state.pageSize}
                 onChange={(event) => update({ pageSize: Number(event.target.value), page: 1 })}
               >

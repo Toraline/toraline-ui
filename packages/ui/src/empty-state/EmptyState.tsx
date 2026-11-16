@@ -19,7 +19,7 @@ const iconClass = "size-6 text-icon-brand";
 const titleClass = "mt-4 font-heading text-base/6 font-medium text-primary";
 
 /** The text under the title. It is at most 448 pixels wide, so its lines stay short. */
-const descriptionClass = "mt-1 max-w-md text-sm/5 text-secondary";
+const descriptionClass = "mt-1 max-w-md text-sm text-secondary";
 
 const actionClass = "mt-5";
 

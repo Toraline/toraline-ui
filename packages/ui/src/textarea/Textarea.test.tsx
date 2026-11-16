@@ -31,8 +31,8 @@ describe("Textarea", () => {
         "bg-surface",
         "px-3",
         "py-2.5",
-        "text-base/6",
-        "lg:text-sm/5",
+        "text-base",
+        "lg:text-sm",
         "text-primary",
       ]),
     );
@@ -103,6 +103,13 @@ describe("Textarea", () => {
     expect(classes.slice(-2)).toEqual(["flex-1", "rounded-xl"]);
     expect(classes).not.toContain("rounded-md");
     expect(classes).toContain("bg-surface");
+  });
+
+  test("a width class of the app replaces the full width, the documented rule for every form control", () => {
+    render(<Textarea aria-label="Notes" className="w-40" />);
+    const classes = screen.getByRole("textbox").className.split(" ");
+    expect(classes).toContain("w-40");
+    expect(classes).not.toContain("w-full");
   });
 
   test("passes other attributes to the <textarea>, and ref points to it", () => {

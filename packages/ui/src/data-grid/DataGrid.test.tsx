@@ -213,6 +213,17 @@ describe("DataGrid: the search", () => {
     expect(firstCells()).toHaveLength(3);
   });
 
+  test("the row above the table always has its 2 parts, as in Intraweb: the right part is there when it is empty", () => {
+    // With no menu "Columns" and no button "Edit table" the right part has nothing in it. It still
+    // takes the gap of the row, so the search field has the width it has in Intraweb on a narrow screen.
+    renderGrid({ search: { placeholder: "Search" } });
+    const toolbar = document.querySelector('[data-slot="toolbar"]') as HTMLElement;
+    expect(toolbar.children).toHaveLength(2);
+    expect(within(toolbar.children[0] as HTMLElement).getByRole("searchbox")).toBeDefined();
+    expect(toolbar.children[1]?.childNodes).toHaveLength(0);
+    expect(toolbar.children[1]?.className).toBe("flex flex-wrap items-center gap-2");
+  });
+
   test("the toolbar of the app is shown after the search field", () => {
     renderGrid({ search: { placeholder: "Search" }, toolbar: <button type="button">New product</button> });
     const toolbar = document.querySelector('[data-slot="toolbar"]') as HTMLElement;
@@ -314,6 +325,47 @@ describe("DataGrid: the pages", () => {
     expect(within(navigation).getByRole("button", { name: "Próxima página" })).toBeDefined();
   });
 
+  test("the texts of the pages and of the selected rows can be elements: a text in pieces, as Intraweb writes it", async () => {
+    const user = userEvent.setup();
+    renderGrid({
+      rows: manyProducts,
+      pageSize: 10,
+      selection: { actions: () => null },
+      labels: {
+        selectedCount: (count) => (
+          <>
+            {count} {count === 1 ? "selecionado" : "selecionados"}
+          </>
+        ),
+        pageRange: (firstRow, lastRow, rowCount) => (
+          <>
+            Mostrando {firstRow}–{lastRow} de{" "}
+            {rowCount}
+          </>
+        ),
+        pageOf: (page, pageCount) => (
+          <>
+            {page} de {pageCount}
+          </>
+        ),
+      },
+    });
+    const range = screen.getByText("Mostrando 1–10 de 23");
+    // The pieces of Intraweb: "Mostrando ", "1", "–", "10", " de", " ", "23".
+    expect(range.childNodes).toHaveLength(7);
+    expect(screen.getByText("1 de 3").childNodes).toHaveLength(3);
+    await user.click(screen.getAllByRole("checkbox")[1] as HTMLElement);
+    expect(screen.getByRole("status").textContent).toBe("1 selecionado");
+    expect(screen.getByRole("status").childNodes).toHaveLength(3);
+  });
+
+  test("the field of the page size has the full width of the library's Select, with no fixed width", () => {
+    renderGrid({ rows: manyProducts, pageSize: 10 });
+    const classes = screen.getByRole("combobox", { name: "Per page" }).className.split(" ");
+    expect(classes).toContain("w-full");
+    expect(classes).not.toContain("w-20");
+  });
+
   test("the app gives its own select component, which receives the size and the class", async () => {
     const user = userEvent.setup();
     function AppSelect({ size, ...selectProps }: DataGridSelectProps) {
@@ -322,7 +374,8 @@ describe("DataGrid: the pages", () => {
     renderGrid({ rows: manyProducts, pageSize: 10, selectComponent: AppSelect });
     const select = screen.getByTestId("app-select");
     expect(select.getAttribute("data-app-size")).toBe("sm");
-    expect(select.className).toBe("w-20");
+    // "w-full": the field is as wide as its content, as in Intraweb (74 pixels), not 80 pixels ("w-20").
+    expect(select.className).toBe("w-full");
     await user.selectOptions(select, "50");
     expect(firstCells()).toHaveLength(23);
   });

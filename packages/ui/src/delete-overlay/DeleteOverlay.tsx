@@ -11,7 +11,7 @@ import { OVERLAY_AUTOFOCUS_ATTRIBUTE } from "../shared/overlay/use-overlay-layer
  * (components/ui/delete-overlay.tsx).
  */
 
-const contentClass = "space-y-4 text-sm/5";
+const contentClass = "space-y-4 text-sm";
 const questionClass = "text-body";
 const consequenceClass = "text-tertiary";
 const errorClass = "text-danger";

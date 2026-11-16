@@ -34,10 +34,11 @@ const restClass = "border-strong";
 
 /**
  * The border and the ring of a box whose value was changed and is not saved
- * yet. The ring has the color of the token --border-warning. No ring class
- * reads that token, so the class names the token itself.
+ * yet. The ring has the color of the token --border-changed-ring: the light
+ * orange of Intraweb's ring, the same in the light and the dark theme. No ring
+ * class reads that token, so the class names the token itself.
  */
-const changedClass = "border-changed ring-3 ring-(color:--border-warning)";
+const changedClass = "border-changed ring-3 ring-(color:--border-changed-ring)";
 
 /** The check mark: in the middle of the box, hidden until the box is checked. A press on it goes to the box. */
 const checkClass =

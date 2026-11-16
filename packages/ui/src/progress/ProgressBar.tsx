@@ -10,7 +10,7 @@ import type { ProgressTone } from "./progress-value.js";
  */
 const rootClass = "space-y-1.5";
 
-const headerClass = "flex items-center justify-between gap-3 text-sm/5";
+const headerClass = "flex items-center justify-between gap-3 text-sm";
 
 const labelClass = "text-secondary";
 

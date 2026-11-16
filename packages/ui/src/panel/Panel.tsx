@@ -18,7 +18,7 @@ const titlesClass = "space-y-0.5";
 /** The title: 18 pixels in the medium weight of the heading font, the values of Intraweb's text style "heading-section". */
 const titleClass = "font-heading text-lg/7 font-medium text-primary";
 
-const subtitleClass = "text-sm/5 text-tertiary";
+const subtitleClass = "text-sm text-tertiary";
 
 const actionsClass = "flex flex-wrap items-center gap-2";
 

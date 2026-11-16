@@ -27,7 +27,7 @@ Faça o guia 1 primeiro. Os guias 2 e 3 precisam dele.
 
 **Resultado:** uma página do app mostra um Button estilizado.
 
-Os pacotes estão no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
+Os pacotes estão no npm. A versão atual é a `0.3.0`, publicada em 2026-11-15. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 Para testar uma mudança da biblioteca que ainda não foi publicada, gere os dois arquivos de pacote neste repositório e instale os dois no app:
 

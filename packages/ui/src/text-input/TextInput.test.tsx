@@ -37,7 +37,7 @@ describe("TextInput", () => {
   test('the size "md" is 48 pixels high, and 40 pixels from the breakpoint "lg"', () => {
     render(<TextInput aria-label="Order number" />);
     const classes = screen.getByRole("textbox").className.split(" ");
-    expect(classes).toEqual(expect.arrayContaining(["min-h-12", "text-base/6", "lg:min-h-10", "lg:text-sm/5"]));
+    expect(classes).toEqual(expect.arrayContaining(["min-h-12", "text-base", "lg:min-h-10", "lg:text-sm"]));
   });
 
   test('the size "sm" is 32 pixels high', () => {
@@ -45,7 +45,7 @@ describe("TextInput", () => {
     const field = screen.getByRole("textbox");
     expect(field.getAttribute("data-size")).toBe("sm");
     const classes = field.className.split(" ");
-    expect(classes).toEqual(expect.arrayContaining(["min-h-8", "text-sm/5"]));
+    expect(classes).toEqual(expect.arrayContaining(["min-h-8", "text-sm"]));
     expect(classes).not.toContain("min-h-12");
   });
 

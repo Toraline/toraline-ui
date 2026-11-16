@@ -124,11 +124,11 @@ export function ListItem({
         </span>
       ) : null}
       <span className="min-w-0 flex-1" data-slot="text">
-        <span className="block truncate text-sm/5 font-medium text-primary" data-slot="title">
+        <span className="block truncate text-sm font-medium text-primary" data-slot="title">
           {title}
         </span>
         {meta ? (
-          <span className="block truncate text-sm/5 text-tertiary" data-slot="meta">
+          <span className="block truncate text-sm text-tertiary" data-slot="meta">
             {meta}
           </span>
         ) : null}
@@ -136,7 +136,7 @@ export function ListItem({
       {hasValue || hasStatus ? (
         <span className="flex shrink-0 flex-col items-end gap-1" data-slot="end">
           {hasValue ? (
-            <span className="text-sm/5 font-medium text-primary tabular-nums" data-slot="value">
+            <span className="text-sm font-medium text-primary tabular-nums" data-slot="value">
               {value}
             </span>
           ) : null}

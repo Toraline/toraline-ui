@@ -1,6 +1,7 @@
 {
   "name": "toraline-ui-monorepo",
   "private": true,
+  "license": "MIT",
   "description": "Monorepo of the Toraline component library: tokens, styled components, catalog.",
   "type": "module",
   "workspaces": [

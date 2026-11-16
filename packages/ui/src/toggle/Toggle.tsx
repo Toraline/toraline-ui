@@ -20,7 +20,7 @@ import { classNames } from "../shared/class-names.js";
  */
 
 const rootClass =
-  "group/toggle relative inline-flex cursor-pointer items-center gap-2 font-body text-sm/5 text-body has-disabled:cursor-not-allowed";
+  "group/toggle relative inline-flex cursor-pointer items-center gap-2 font-body text-sm text-body has-disabled:cursor-not-allowed";
 
 /** The checkbox is not shown, but it stays on the page: it gets the focus and the keys. */
 const inputClass = "peer absolute m-0 size-px opacity-0";
