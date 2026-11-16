@@ -7,6 +7,10 @@ on:
   push:
     branches: [main]
 
+# What the token of the run may do: read the files of the repository. Nothing is written.
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest

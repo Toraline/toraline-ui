@@ -7,6 +7,11 @@ on:
   release:
     types: [created]
 
+# What the token of the run may do: read the files of the repository. The publish
+# itself uses the npm token, not this one.
+permissions:
+  contents: read
+
 # On the branch main the old library lives in legacy/. This workflow still releases
 # the old package @toraline/toraline-ui, so every step runs inside that folder.
 defaults:
