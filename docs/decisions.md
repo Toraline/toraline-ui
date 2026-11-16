@@ -28,6 +28,9 @@ Format of one entry:
   - Why not a new prop (`initialFocus`): `autoFocus` is what Intraweb's screens already write, and it is the HTML way. A prop would be a second way to say the same thing.
   - Not changed: ActionMenu and the filter panel of the DataGrid keep `invisible`. They move the focus themselves after the panel is placed.
   - Checked in the temporary page: after a press on the button the focus is on the field, in Intraweb before the library and in the library. The story "Focus On Open" checks it in Chromium in both themes; with `invisible` put back, that story test fails.
+- Item 4, DataGrid, the field that chooses the number of rows of a page. The library drew it 80 pixels wide (`w-20`). Intraweb writes `w-20` too, but in Intraweb that class loses to the `w-full` of its Select (item 12), so its field is as wide as its content: 74 pixels with the sizes 10, 25, 50 and 100. Intraweb works around it with a `selectComponent` that adds `w-full`.
+  - Decision: the grid gives the field the class `w-full` in the place of `w-20`. `selectComponent` now receives `className="w-full"`.
+  - Checked in the temporary page: the field is 74 pixels wide and at the same place as Intraweb's, at 1280 and 390 pixels, in both themes.
 - Decided by: agent, to be confirmed in review.
 
 ## 2026-11-15 - `homepage` of the two packages is the online catalog (TOR-1196)

@@ -907,9 +907,14 @@ export function DataGrid<Row, SubRow = never>({
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 whitespace-nowrap">
               {labels.rowsPerPage}
+              {/*
+                The field is as wide as its content (about 74 pixels with the sizes 10, 25, 50 and
+                100), as in Intraweb: "w-full" inside a label that is as wide as its content. Intraweb
+                writes "w-20" (80 pixels) here, and that class loses to the "w-full" of its Select.
+              */}
               <Select
                 size="sm"
-                className="w-20"
+                className="w-full"
                 value={state.pageSize}
                 onChange={(event) => update({ pageSize: Number(event.target.value), page: 1 })}
               >

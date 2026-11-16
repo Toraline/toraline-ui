@@ -314,6 +314,13 @@ describe("DataGrid: the pages", () => {
     expect(within(navigation).getByRole("button", { name: "Próxima página" })).toBeDefined();
   });
 
+  test("the field of the page size has the full width of the library's Select, with no fixed width", () => {
+    renderGrid({ rows: manyProducts, pageSize: 10 });
+    const classes = screen.getByRole("combobox", { name: "Per page" }).className.split(" ");
+    expect(classes).toContain("w-full");
+    expect(classes).not.toContain("w-20");
+  });
+
   test("the app gives its own select component, which receives the size and the class", async () => {
     const user = userEvent.setup();
     function AppSelect({ size, ...selectProps }: DataGridSelectProps) {
@@ -322,7 +329,8 @@ describe("DataGrid: the pages", () => {
     renderGrid({ rows: manyProducts, pageSize: 10, selectComponent: AppSelect });
     const select = screen.getByTestId("app-select");
     expect(select.getAttribute("data-app-size")).toBe("sm");
-    expect(select.className).toBe("w-20");
+    // "w-full": the field is as wide as its content, as in Intraweb (74 pixels), not 80 pixels ("w-20").
+    expect(select.className).toBe("w-full");
     await user.selectOptions(select, "50");
     expect(firstCells()).toHaveLength(23);
   });
