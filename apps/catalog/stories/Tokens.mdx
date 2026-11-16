@@ -1,7 +1,13 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import { InLanguage } from "./shared/InLanguage";
 import * as TokenStories from "./Tokens.stories";
 
 <Meta of={TokenStories} />
+
+{/* The page is written once for each language. The control "Language" of the toolbar chooses which one is shown. */}
+{/* A change in one language is made in the other too: the same sections, in the same order. */}
+
+<InLanguage language="en" of={TokenStories.Backgrounds}>
 
 # Tokens
 
@@ -96,3 +102,103 @@ A text style is one class of the Tailwind preset that sets the font, the size, t
 These are the raw values. They are the same in every theme.
 
 <Canvas of={TokenStories.Level1} sourceState="none" />
+
+</InLanguage>
+
+<InLanguage language="pt-BR" of={TokenStories.Backgrounds}>
+
+# Tokens
+
+Esta página mostra todos os design tokens da biblioteca. As tabelas leem os valores do pacote `@toraline.tech/tokens`, então eles são sempre os valores atuais.
+
+## Palavras que esta página usa
+
+- **Design token**: um valor do design que tem nome, por exemplo uma cor ou uma fonte. Ele é guardado como uma variável CSS.
+- **Token de nível 1**: um valor bruto. O nome diz o que o valor é. Exemplo: `--color-brand-700` é `#42637c`.
+- **Token de nível 2**: um significado. O nome diz para que o valor serve. Exemplo: `--bg-primary` é o fundo da ação principal. Os componentes usam só tokens de nível 2.
+- **Intraweb**: um app da Toraline. As cores padrão da biblioteca são as cores do design system dele, com os mesmos nomes.
+- **Tema**: um conjunto de valores para os tokens de nível 2. A biblioteca tem os temas `light` e `dark`.
+
+## Como ler uma tabela
+
+Cada linha é um token de nível 2. Cada tema tem uma coluna. Uma célula mostra, nesta ordem:
+
+1. Uma amostra desenhada com o valor.
+2. O token de nível 1 para o qual o valor aponta, quando existe um.
+3. O valor bruto.
+
+Uma célula sempre tem as cores do seu próprio tema. O controle **Theme** na barra de ferramentas muda a página em volta das tabelas, não as células.
+
+## Cores
+
+A primeira parte do nome de um token de cor é o grupo dele. Ela diz onde a cor é usada: `--bg-*` um fundo, `--text-*` um texto, `--border-*` uma borda, `--icon-*` um ícone, `--data-*` um gráfico ou uma barra de progresso.
+
+Com o preset do Tailwind cada token é uma classe só do grupo dele. `--bg-primary` é a classe `bg-primary`, `--text-primary` é `text-primary`, `--border-default` é `border-default`, `--icon-default` é `text-icon`, e `--data-1` é `bg-data-1`, `text-data-1` e as classes das outras propriedades.
+
+### Cores de fundo
+
+<Canvas of={TokenStories.Backgrounds} sourceState="none" />
+
+### Cores de texto
+
+<Canvas of={TokenStories.TextColors} sourceState="none" />
+
+### Cores de borda
+
+<Canvas of={TokenStories.Borders} sourceState="none" />
+
+### Cores de ícone
+
+<Canvas of={TokenStories.Icons} sourceState="none" />
+
+### Cores de gráficos e barras de progresso
+
+<Canvas of={TokenStories.DataColors} sourceState="none" />
+
+## Fontes
+
+As fontes padrão são a Inter para o texto normal e a Poppins para títulos e botões, as fontes do Intraweb. A biblioteca dá o nome das duas fontes e não baixa nenhum arquivo de fonte: o app carrega as duas. Quando o app não carrega nenhuma fonte, o navegador usa uma fonte do dispositivo. A página **Guide** mostra como um app carrega as duas fontes, e como ele define outras fontes com a função `createTheme`.
+
+Este catálogo carrega a Inter e a Poppins de arquivos de fonte, então as amostras abaixo mostram as duas.
+
+<Canvas of={TokenStories.Fonts} sourceState="none" />
+
+## Tamanhos de texto
+
+<Canvas of={TokenStories.TextSizes} sourceState="none" />
+
+## Espaçamento
+
+`--spacing` é a unidade de espaçamento. Um componente escreve todo padding e todo gap como um múltiplo dela, por exemplo `calc(var(--spacing) * 4)`. As barras da amostra têm 1, 2, 4 e 8 unidades de largura.
+
+<Canvas of={TokenStories.Spacing} sourceState="none" />
+
+## Raio
+
+Há 4 tamanhos de raio. Com o preset do Tailwind eles são as classes `rounded-md` (um botão, um campo), `rounded-lg` (um menu, um popover), `rounded-xl` (um card, uma tabela, um diálogo) e `rounded-2xl` (um drawer).
+
+<Canvas of={TokenStories.Radius} sourceState="none" />
+
+## Sombras
+
+Há 5 sombras. Com o preset do Tailwind elas são as classes `shadow-sm`, `shadow-card` (um card, uma tabela), `shadow-lg` (um menu, um popover), `shadow-xl` e `shadow-2xl` (um diálogo, um drawer). Os dois temas da biblioteca têm as mesmas sombras. Um tema de um app pode mudar as sombras.
+
+<Canvas of={TokenStories.Shadows} sourceState="none" />
+
+## Estilos de texto
+
+Um estilo de texto é uma classe do preset do Tailwind que define a fonte, o tamanho, a altura da linha e o peso de um texto juntos. Exemplo: `<h1 className="heading-page">`. Os tamanhos estão em `rem`, um comprimento que acompanha o tamanho de fonte da página (`1rem` são 16 pixels quando a pessoa não mudou esse tamanho). Um estilo de texto é o mesmo em todo tema; a fonte dele é o token `--font-heading`.
+
+<Canvas of={TokenStories.TextStyles} sourceState="none" />
+
+## Outros tokens
+
+<Canvas of={TokenStories.OtherTokens} sourceState="none" />
+
+## Tokens de nível 1
+
+Estes são os valores brutos. Eles são os mesmos em todo tema.
+
+<Canvas of={TokenStories.Level1} sourceState="none" />
+
+</InLanguage>

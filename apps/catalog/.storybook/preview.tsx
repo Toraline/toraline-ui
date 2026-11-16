@@ -9,6 +9,8 @@ import { ThemeProvider, useTheme } from "@toraline.tech/ui/theme";
 // and the classes of the components), and the CSS of the catalog itself.
 import "./preview.css";
 
+import { StoryLanguageContext } from "../stories/shared/language";
+import { catalogLanguages, defaultCatalogLanguage, resolveCatalogLanguage } from "./languages";
 import { catalogThemes, defaultCatalogTheme } from "./themes";
 
 /**
@@ -74,7 +76,18 @@ const withTheme: Decorator = (Story, context) => {
   );
 };
 
-/** The configuration of every story: the theme control of the toolbar, and the decorator. */
+/**
+ * Gives every story the language of the toolbar. Only the stories of the
+ * documentation pages read it (the tables of the tokens page). A component
+ * story is in English in every language.
+ */
+const withLanguage: Decorator = (Story, context) => (
+  <StoryLanguageContext value={resolveCatalogLanguage(context.globals.language)}>
+    <Story />
+  </StoryLanguageContext>
+);
+
+/** The configuration of every story: the two controls of the toolbar, and the decorators. */
 const preview: Preview = {
   // A global is a value that every story shares. "theme" is the name of the current theme.
   globalTypes: {
@@ -87,11 +100,22 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    // "language" is the language of the documentation pages: the guide and the tokens page.
+    language: {
+      description: "The language of the guide and of the tokens page",
+      toolbar: {
+        title: "Language",
+        icon: "globe",
+        items: catalogLanguages.map(({ value, title }) => ({ value, title })),
+        dynamicTitle: true,
+      },
+    },
   },
   initialGlobals: {
     theme: defaultCatalogTheme,
+    language: defaultCatalogLanguage,
   },
-  decorators: [withTheme],
+  decorators: [withLanguage, withTheme],
   // Every component gets a documentation page, built from its stories and its props.
   tags: ["autodocs"],
   parameters: {

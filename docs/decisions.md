@@ -12,6 +12,18 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The catalog: the guide and the tokens page in two languages (TOR-1183)
+- Decision: the toolbar of the catalog has the control **Language** (`English`, `Português`). It is a global of Storybook named `language`, with the values `en` and `pt-BR`, next to the global `theme`. The default is `en`.
+- Decision (what changes): the guide page, the tokens page, and the captions and column headers of the token tables. The component pages, the names in the sidebar (`Guide`, `Foundations`) and the texts inside a story stay in English: the library is in English only, and Storybook has one sidebar for every value of a global.
+- Decision (the guide): the page shows `docs/guide.md` or `docs/guide.pt-BR.md`. Line 3 of each file, the link to the other language, is left out in the catalog, which cannot open a file.
+- Decision (the tokens page): `Tokens.mdx` has the text once for each language, each inside `<InLanguage>`. The texts of the tables are in `stories/tokens/token-table-texts.ts`; a type makes the build fail when one language misses a text.
+- How the language is read: a story gets it from a decorator, through a React context. The text of an MDX page is outside every story, so `<InLanguage>` reads the globals of one story of the page from the docs context of Storybook and listens to the event `globalsUpdated`. This is what Storybook's own block `Controls` does. The event name comes from `storybook/internal/core-events`, an internal entry of Storybook 10.6.7 that a later version may move.
+- The story tests run in English, the default. No project was added for Portuguese: it would run every story 2 more times, and only the token tables differ.
+- Checked on 2026-11-15 in the built catalog, in Chromium: the tokens page and the guide page opened with `globals=language:pt-BR` show the Portuguese headings and table captions; the control in the toolbar changes the open page to English and back with no reload; the console has no error.
+- Not verified: a screen reader; the Portuguese pages under the accessibility check (axe-core runs on stories, in English).
+- Alternatives: two entries in the sidebar for each page (`Guia`, `Guide`), which doubles the sidebar; a Vitest project for each language; one MDX file for each language, which Storybook would list as separate pages.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The Portuguese README of each package is inside the published package (TOR-1182)
 - Context: the page of a package on npmjs.com shows only `README.md`. The question was where a person finds `README.pt-BR.md`.
 - Decision: `README.pt-BR.md` is in the tarball of each package, and line 3 of the English `README.md` links to the Portuguese file on GitHub with its full address. So a person on npmjs.com reaches it with one press, and a person with no network reads it in `node_modules`.
