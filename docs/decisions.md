@@ -12,6 +12,12 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-16 - Fixes found when Intraweb installed the library, version 0.3.1 (TOR-1223)
+- Context: the app Intraweb installed version 0.3.0 (pull request 108 of `prontera-e-juno`) and compared 279 screenshots taken before and after. The rule of the project: Intraweb looks and behaves the same with the library, except an accessibility fix made on purpose. The comparison found bugs that Intraweb works around, and visible differences that earlier entries of this file record as known. Each item below is one of them.
+- How each item was checked: a temporary page outside both repositories rendered Intraweb's own component files of before the library (`apps/intraweb/src/components/ui/`, branch `staging` of `prontera-e-juno`, with its `globals.css`, its theme files and its Inter and Poppins files) next to a second page with the source of `packages/ui` and `packages/tokens` of this branch. A Playwright script (Chromium with no window) read the measures and the computed styles of both pages, in the light and the dark theme, at 1280 and 390 pixels wide, and with the text sizes 90%, 100%, 115% and 130%. The page and the script are not committed.
+- Item 1, Field, the mark of an optional field. The space before the mark was outside the mark's `<span>`, so it had the weight of the label (500), which is wider than the weight of the mark (400): the text "(opcional)" was about 0.3 pixels to the right of where Intraweb draws it. Decision: the space is inside the `<span data-slot="optional">`, and a mark that is a text is one piece of text with its space (`" (opcional)"`), which is Intraweb's markup. Checked: the position and the width of the mark are equal to Intraweb's at every width, theme and text size. The name a screen reader gets is unchanged: Chromium computes "Nome (opcional)" for both.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - `homepage` of the two packages is the online catalog (TOR-1196)
 - Context: the catalog is online at https://toraline-ui.vercel.app/. `homepage` of `packages/ui/package.json` and `packages/tokens/package.json` was the folder of each package on GitHub.
 - Decision: `homepage` of both packages is `https://toraline-ui.vercel.app/`. The address is also in the root `README.md` and in the README of each package, in both languages.

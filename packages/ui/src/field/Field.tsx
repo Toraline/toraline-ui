@@ -12,7 +12,7 @@ const rootClass = "space-y-1.5 font-body";
 
 const labelClass = "block text-sm/5 font-medium text-strong";
 
-/** The mark of a field that a person may leave empty, after the label. */
+/** The mark of a field that a person may leave empty, after the label. The space before its text is inside it. */
 const optionalClass = "font-normal text-tertiary";
 
 /** The hint: a small quiet text under the control. "/4" is a line of 16 pixels. */
@@ -132,6 +132,11 @@ export function Field({
     "aria-invalid": hasError ? true : ownControlProps?.["aria-invalid"],
   };
 
+  // As in Intraweb, the space before the mark is inside the mark, in the weight of the mark, and a
+  // text is one piece with its space ("Name" + " (optional)"). A space outside the mark has the
+  // weight of the label, which is wider, and moves the mark by a part of a pixel.
+  const optionalMark = typeof optionalText === "string" ? ` ${optionalText}` : <>{" "}{optionalText}</>;
+
   let control: ReactNode;
   if (typeof children === "function") {
     control = children(controlProps);
@@ -146,12 +151,9 @@ export function Field({
       <label className={labelClass} data-slot="label" htmlFor={controlId}>
         {label}
         {optional ? (
-          <>
-            {" "}
-            <span className={optionalClass} data-slot="optional">
-              {optionalText}
-            </span>
-          </>
+          <span className={optionalClass} data-slot="optional">
+            {optionalMark}
+          </span>
         ) : null}
       </label>
       {control}

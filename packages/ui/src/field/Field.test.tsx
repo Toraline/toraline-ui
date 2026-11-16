@@ -113,7 +113,9 @@ describe("Field", () => {
     );
     const mark = screen.getByText("(optional)");
     expect(mark.getAttribute("data-slot")).toBe("optional");
-    expect(screen.getByRole("textbox", { name: "Notes (optional)" })).toBeDefined();
+    // The name is read from the text of the label. (The name that this test library computes drops
+    // a space at the start of an inner element, which a browser keeps, so the role query is not used.)
+    expect(screen.getByLabelText("Notes (optional)")).toBe(screen.getByRole("textbox"));
   });
 
   test("optionalText: the app gives the text of the mark", () => {
@@ -122,7 +124,30 @@ describe("Field", () => {
         <input />
       </Field>,
     );
-    expect(screen.getByRole("textbox", { name: "Notas (opcional)" })).toBeDefined();
+    expect(screen.getByLabelText("Notas (opcional)")).toBe(screen.getByRole("textbox"));
+  });
+
+  test("optional: the space before the mark is inside the mark, as one text with it, as in Intraweb", () => {
+    render(
+      <Field label="Notas" optional optionalText="(opcional)">
+        <input />
+      </Field>,
+    );
+    const label = screen.getByText("Notas");
+    const mark = label.querySelector('[data-slot="optional"]');
+    // The label has 2 nodes: its text and the mark. No space is between them, in the weight of the label.
+    expect([...label.childNodes].map((node) => node.textContent)).toEqual(["Notas", " (opcional)"]);
+    expect(mark?.childNodes).toHaveLength(1);
+  });
+
+  test("optionalText as elements: the space is still inside the mark", () => {
+    render(
+      <Field label="Notes" optional optionalText={<em>optional</em>}>
+        <input />
+      </Field>,
+    );
+    const label = screen.getByText("Notes");
+    expect([...label.childNodes].map((node) => node.textContent)).toEqual(["Notes", " optional"]);
   });
 
   test("a field that is not optional has no mark", () => {
