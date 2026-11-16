@@ -22,7 +22,7 @@ A theme is a set of colors, fonts, corner sizes and shadows. The page selects a 
 
 ## Installation
 
-The package is on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
+The package is on npm. The current version is `0.3.0`, published on 2026-11-15. The first version, `0.1.0`, was published on 2026-11-15.
 
 ```bash
 npm install @toraline.tech/ui @toraline.tech/tokens

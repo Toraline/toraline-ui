@@ -4,6 +4,8 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
+The date of a version is the date in the local time of the person who started the release. The releases so far were started from Brasília (UTC-3). The time that npm records for a version is in UTC, and can be the next day.
+
 ## 0.3.1 (not published yet)
 
 Fixes found when the app Intraweb installed version 0.3.0 and compared 279 screenshots taken before and after (TOR-1223). After this version Intraweb needs no workaround, and the differences that version 0.3.0 recorded as known are gone. Nothing breaks: an app written for 0.3.0 builds unchanged. Two changes can be seen in an app that is not Intraweb; they are first in the list.
@@ -32,7 +34,7 @@ Fixes found when the app Intraweb installed version 0.3.0 and compared 279 scree
 
 - A width class of the app (`w-24`, `w-auto`) on TextInput, DecimalInput, Select and Textarea wins over the full width of the control. It was already so; the README now states it with an example. In Intraweb before the library the full width won, so an app that moves from Intraweb's own components removes the width classes that did nothing.
 
-## 0.3.0 (2026-11-16)
+## 0.3.0 (2026-11-15)
 
 The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-1209). Nothing breaks: a grid written for 0.2.0 works unchanged.
 

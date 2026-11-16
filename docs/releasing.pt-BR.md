@@ -64,7 +64,7 @@ Os exemplos usam `0.1.1` como a versão nova.
    - `@toraline.tech/tokens`: <the same for the tokens>.
    ```
 
-   Escreva o que muda para um app, não os nomes dos commits. Coloque primeiro uma mudança que quebra um app, com o que o app precisa mudar. O título da seção tem a data do release.
+   Escreva o que muda para um app, não os nomes dos commits. Coloque primeiro uma mudança que quebra um app, com o que o app precisa mudar. O título da seção tem a data do release, no seu horário local: a data do seu calendário quando você inicia o release. Uma pessoa em Brasília (UTC-3) que faz o release às 22:24 de 2026-11-15 escreve `2026-11-15`, também quando o npm registra `2026-11-16T01:24Z`. Todo horário que uma máquina escreve (npm, GitHub, um log) é em UTC, e não é copiado para o título.
 
 5. **Verifique, depois olhe dentro dos tarballs.**
 
@@ -179,7 +179,7 @@ Encontrado em 2026-11-15, não mudado: o npm tem `@toraline/toraline-ui` 1.1.5, 
 - O build dos pacotes gera tarballs que um app Next.js 16.4.6 novo instala e renderiza (verificado em 2026-11-15, veja `docs/decisions.md`).
 - `make pack`, `make version`, a proteção em `npm publish`, o arquivo do workflow, `CHANGELOG.md` com a seção `0.1.0`.
 
-- A versão `0.1.0` dos dois pacotes está no npm, publicada pelo workflow "Release" em 2026-11-15. A versão `0.2.0` veio em seguida em 2026-11-15 e a versão `0.3.0` em 2026-11-16.
+- A versão `0.1.0` dos dois pacotes está no npm, publicada pelo workflow "Release" em 2026-11-15. A versão `0.2.0` veio em seguida em 2026-11-15 e a versão `0.3.0` em 2026-11-15 (as datas são no horário local de Brasília, de onde os releases foram iniciados; o npm registra a `0.3.0` em 2026-11-16 01:24 UTC).
 
 **Não feito**
 - Os pacotes não têm licença.

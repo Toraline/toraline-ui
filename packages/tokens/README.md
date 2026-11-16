@@ -8,7 +8,7 @@ The catalog is online: https://toraline-ui.vercel.app/ Its page **Foundations > 
 
 ## Installation
 
-The package is on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
+The package is on npm. The current version is `0.3.0`, published on 2026-11-15. The first version, `0.1.0`, was published on 2026-11-15.
 
 ```bash
 npm install @toraline.tech/tokens

@@ -27,7 +27,7 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-The packages are on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
+The packages are on npm. The current version is `0.3.0`, published on 2026-11-15. The first version, `0.1.0`, was published on 2026-11-15.
 
 To try a change of the library that is not released yet, build the two package files in this repository and install them in the app:
 

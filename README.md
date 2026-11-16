@@ -10,7 +10,7 @@ The default look is the look of the app Intraweb, an app of Toraline: the same c
 
 **The catalog is online: https://toraline-ui.vercel.app/** It shows every component in every theme, the guide, and every token. The control **Language** in its toolbar shows the guide and the tokens page in English or in Portuguese.
 
-**The packages are on npm.** `@toraline.tech/ui` and `@toraline.tech/tokens`, version `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15. Versions that start with `0` are a pre-release: tested in Toraline's own apps, and props and tokens may still change. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
+**The packages are on npm.** `@toraline.tech/ui` and `@toraline.tech/tokens`, version `0.3.0`, published on 2026-11-15. The first version, `0.1.0`, was published on 2026-11-15. Versions that start with `0` are a pre-release: tested in Toraline's own apps, and props and tokens may still change. How a version is published: [docs/releasing.md](docs/releasing.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 **This is the branch `main`**, the new library (version 2). Until 2026-11-15 it was named `v2`. The old library is unchanged in [`legacy/`](legacy/), and on the branch `old-package`, which was named `main` until that day. Its package is `@toraline/toraline-ui`.
 
@@ -26,7 +26,7 @@ The default look is the look of the app Intraweb, an app of Toraline: the same c
 | `docs/guide.md` | The guide for a person who uses the library in an app: install, build a theme, style on top. The catalog shows the same file as its first page | Written in phase 4 |
 | `docs/releasing.md` | The steps to publish a version of the two packages to npm, and how to undo a wrong release | Written in phase 5 |
 | `CHANGELOG.md` | What changed in each version of the two packages | |
-| `.github/workflows/release.yml` | The workflow that publishes the two packages. It runs only when a person starts it by hand | Published `0.1.0` and `0.2.0` on 2026-11-15, and `0.3.0` on 2026-11-16 |
+| `.github/workflows/release.yml` | The workflow that publishes the two packages. It runs only when a person starts it by hand | Published `0.1.0`, `0.2.0` and `0.3.0` on 2026-11-15 |
 | `docs/decisions.md` | Technical decisions, newest first | |
 | `AGENTS.md`, `agent/` | How AI agents work in this repository | |
 

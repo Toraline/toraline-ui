@@ -22,7 +22,7 @@ Um tema é um conjunto de cores, fontes, tamanhos de canto e sombras. A página 
 
 ## Instalação
 
-O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
+O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-15. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 ```bash
 npm install @toraline.tech/ui @toraline.tech/tokens

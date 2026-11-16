@@ -10,7 +10,7 @@ A aparência padrão é a aparência do app Intraweb, um app da Toraline: as mes
 
 **O catálogo está online: https://toraline-ui.vercel.app/** Ele mostra todo componente em todo tema, o guia, e todos os tokens. O controle **Language** na barra de ferramentas dele mostra o guia e a página de tokens em inglês ou em português.
 
-**Os pacotes estão no npm.** `@toraline.tech/ui` e `@toraline.tech/tokens`, versão `0.3.0`, publicada em 2026-11-16. A primeira versão, `0.1.0`, foi publicada em 2026-11-15. Versões que começam com `0` são um pré-release: testadas nos apps da própria Toraline, e props e tokens ainda podem mudar. Como uma versão é publicada: [docs/releasing.pt-BR.md](docs/releasing.pt-BR.md). O que mudou em cada versão: [CHANGELOG.md](CHANGELOG.md).
+**Os pacotes estão no npm.** `@toraline.tech/ui` e `@toraline.tech/tokens`, versão `0.3.0`, publicada em 2026-11-15. A primeira versão, `0.1.0`, foi publicada em 2026-11-15. Versões que começam com `0` são um pré-release: testadas nos apps da própria Toraline, e props e tokens ainda podem mudar. Como uma versão é publicada: [docs/releasing.pt-BR.md](docs/releasing.pt-BR.md). O que mudou em cada versão: [CHANGELOG.md](CHANGELOG.md).
 
 **Este é o branch `main`**, a biblioteca nova (versão 2). Até 2026-11-15 ele se chamava `v2`. A biblioteca antiga está sem mudanças em [`legacy/`](legacy/), e no branch `old-package`, que se chamava `main` até esse dia. O pacote dela é `@toraline/toraline-ui`.
 
@@ -26,7 +26,7 @@ A aparência padrão é a aparência do app Intraweb, um app da Toraline: as mes
 | `docs/guide.pt-BR.md` | O guia para uma pessoa que usa a biblioteca em um app: instalar, montar um tema, estilizar por cima. O catálogo mostra o mesmo arquivo como primeira página | Escrito na fase 4 |
 | `docs/releasing.pt-BR.md` | Os passos para publicar uma versão dos dois pacotes no npm, e como desfazer um release errado | Escrito na fase 5 |
 | `CHANGELOG.md` | O que mudou em cada versão dos dois pacotes | |
-| `.github/workflows/release.yml` | O workflow que publica os dois pacotes. Ele roda só quando uma pessoa o inicia à mão | Publicou a `0.1.0` e a `0.2.0` em 2026-11-15, e a `0.3.0` em 2026-11-16 |
+| `.github/workflows/release.yml` | O workflow que publica os dois pacotes. Ele roda só quando uma pessoa o inicia à mão | Publicou a `0.1.0`, a `0.2.0` e a `0.3.0` em 2026-11-15 |
 | `docs/decisions.md` | Decisões técnicas, a mais nova primeiro | |
 | `AGENTS.md`, `agent/` | Como agentes de IA trabalham neste repositório | |
 

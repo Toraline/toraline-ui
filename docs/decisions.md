@@ -12,6 +12,14 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-16 - The date of a release in the change list is the releaser's local date (TOR-1223)
+- Rule: use the person's local date when it is known; when one fixed base is needed, use UTC.
+- Decision: in `CHANGELOG.md` the date in the heading of a version is the date in the local time of the person who started the release. A time that a machine writes (npm, GitHub, a log) is in UTC and is not copied into the heading. The rule is in step 4 of `docs/releasing.md` and `docs/releasing.pt-BR.md`, and in the first lines of `CHANGELOG.md`.
+- Why: the heading answers "on which day did we release this" for the people who did it. A UTC date is the next day for a release made in the evening in Brasília (UTC-3), which is when Juliana releases.
+- Applied to the 3 published versions, with the times of `npm view @toraline.tech/ui time --json`: `0.1.0` at 2026-11-15 21:55 UTC is 2026-11-15 18:55 in Brasília (heading unchanged); `0.2.0` at 2026-11-16 00:12 UTC is 2026-11-15 21:12 (unchanged); `0.3.0` at 2026-11-16 01:24 UTC is 2026-11-15 22:24, so its heading changed from `2026-11-16` to `2026-11-15`. The sentences that give the date of `0.3.0` in the READMEs, the guide and the release steps changed with it, in both languages.
+- Alternatives: the UTC date of npm in every heading, which is one base for everybody and a day off for the person who released; no date in the heading.
+- Decided by: Juliana, 2026-11-16.
+
 ## 2026-11-16 - Fixes found when Intraweb installed the library, version 0.3.1 (TOR-1223)
 - Context: the app Intraweb installed version 0.3.0 (pull request 108 of `prontera-e-juno`) and compared 279 screenshots taken before and after. The rule of the project: Intraweb looks and behaves the same with the library, except an accessibility fix made on purpose. The comparison found bugs that Intraweb works around, and visible differences that earlier entries of this file record as known. Each item below is one of them.
 - How each item was checked: a temporary page outside both repositories rendered Intraweb's own component files of before the library (`apps/intraweb/src/components/ui/`, branch `staging` of `prontera-e-juno`, with its `globals.css`, its theme files and its Inter and Poppins files) next to a second page with the source of `packages/ui` and `packages/tokens` of this branch. A Playwright script (Chromium with no window) read the measures and the computed styles of both pages, in the light and the dark theme, at 1280 and 390 pixels wide, and with the text sizes 90%, 100%, 115% and 130%. The page and the script are not committed.
