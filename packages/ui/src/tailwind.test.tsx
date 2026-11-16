@@ -228,12 +228,34 @@ function GridPartsExamples() {
       columnsMenu
       hiddenColumns={["price"]}
       onSaveCell={() => Promise.reject(new Error("Not saved"))}
+      subRows={{
+        label: "sizes",
+        getRows: (row) => (row.id === 1 ? [{ id: 1, name: "Small" }] : []),
+        columns: [
+          {
+            id: "name",
+            header: "Size",
+            align: "right",
+            cell: (size: { id: number; name: string }) => size.name,
+          },
+        ],
+        getRowKey: (size) => size.id,
+        getRowLabel: (size) => size.name,
+        rowActions: () => <button type="button">Remove</button>,
+        footer: () => <button type="button">Add a size</button>,
+      }}
     />
   );
 }
 
 /** The buttons that open a part of the DataGrid of TOR-1209, in the order they are pressed. */
-const gridPartsButtonNames = ["Filter Product", "Filter Number", "Columns"];
+const gridPartsButtonNames = [
+  "Filter Product",
+  "Filter Number",
+  "Columns",
+  "Show sizes of Coffee (1)",
+  "Show sizes of Cheese bread (0)",
+];
 
 /** The floating panels of phase 9: each one opens with a press on its button. */
 const floatingButtonNames = [

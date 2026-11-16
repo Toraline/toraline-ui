@@ -15,4 +15,5 @@ export type {
   DataGridSelectProps,
   DataGridSort,
   DataGridState,
+  DataGridSubRows,
 } from "./data-grid-options.js";

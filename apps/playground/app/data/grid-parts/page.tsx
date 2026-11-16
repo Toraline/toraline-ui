@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
+import { ComplementGroupsGrid } from "./ComplementGroupsGrid";
+import type { ComplementGroup } from "./ComplementGroupsGrid";
 import { EditableProductsGrid } from "./EditableProductsGrid";
 import { SavedColumnsGrid } from "./SavedColumnsGrid";
 import { products } from "./products";
@@ -10,6 +12,19 @@ import { products } from "./products";
  * gives the records, which are plain data, to the Client Components that hold
  * the grids.
  */
+
+const complementGroups: ComplementGroup[] = [
+  {
+    id: 1,
+    name: "Milk",
+    options: [
+      { id: 11, name: "Whole milk", extraPrice: 0 },
+      { id: 12, name: "Oat milk", extraPrice: 2 },
+    ],
+  },
+  { id: 2, name: "Syrup", options: [{ id: 21, name: "Vanilla", extraPrice: 3 }] },
+  { id: 3, name: "Toppings", options: [] },
+];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -46,6 +61,13 @@ export default function GridPartsPage() {
           not a number is refused: the field stays open with the error text of the app.
         </p>
         <EditableProductsGrid products={products.slice(0, 6)} />
+      </Section>
+
+      <Section title="Rows inside a row">
+        <p className="text-sm/5 text-secondary">
+          The arrow of a group shows its options in a small table. A cell of an option is edited in place.
+        </p>
+        <ComplementGroupsGrid groups={complementGroups} />
       </Section>
     </main>
   );

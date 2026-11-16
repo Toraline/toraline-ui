@@ -1315,6 +1315,7 @@ const columns: DataGridColumn<Product>[] = [
 | `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
 | `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
 | `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
+| `subRows` | An object | The items inside each row, shown by an arrow. See [Rows inside a row](#rows-inside-a-row) |
 | `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no filter, no selection and no pages |
 | `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
 | `loading` | `true`, `false` (default) | `true` while the records load: the table has `aria-busy="true"` and shows the text of `labels.loading` in the place of the rows |
@@ -1344,15 +1345,15 @@ A column (`DataGridColumn<Row>`):
 | `canEdit` | A function | `false` for a record whose cell cannot be edited, for example an archived record |
 | `filter` | `{ type: "options", options, value, defaultValues }` or `{ type: "text", value }` | Turns on the filter of this column. See [The filter of a column](#the-filter-of-a-column) |
 
-The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `showSubRows(subRowsLabel, rowLabel, count)` (`"Show options of Milk (3)"`), `hideSubRows(subRowsLabel, rowLabel, count)` (`"Hide options of Milk (3)"`), `subRowsCaption(subRowsLabel, rowLabel)` (`"options of Milk"`), `noSubRows` (`"No items."`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
-- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- Not in the library yet, and still only in Intraweb: another view in the place of the table. It is the next ticket of TOR-1209.
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
 
 #### The filter of a column
@@ -1559,6 +1560,49 @@ const columns: DataGridColumn<Product>[] = [
 - `editOnClick` is a true or false value, so an app gives the permission of the person there (`editOnClick: canEdit`). `canEdit(row)` refuses single records.
 - A select whose record has a value that is not one of the choices shows the text of `labels.selectPlaceholder`, so the first choice does not look like the value.
 - Not built: a field with several choices (Intraweb's `multiselect`, which no screen of Intraweb uses) and the mode that edits the whole table and saves the changed rows with one button (Intraweb's `onSaveRow`, used by one screen).
+
+#### Rows inside a row
+
+`subRows` gives each row an arrow before its first cell. A press shows the items of the record in a small table, in a row of its own right under the row.
+
+```tsx
+<DataGrid
+  caption="Groups of complements"
+  columns={groupColumns}
+  rows={groups}
+  getRowKey={(group) => group.id}
+  getRowLabel={(group) => group.name}
+  subRows={{
+    label: "options",
+    getRows: (group) => group.options,
+    columns: optionColumns,
+    getRowKey: (option) => option.id,
+    getRowLabel: (option) => option.name,
+    onSaveCell: (group, option, columnId, value) => api.updateOption(group.id, option.id, { [columnId]: value }),
+    rowActions: (group, option) => <IconButton icon={Trash2} size="sm" aria-label={`Remove ${option.name}`} />,
+    footer: (group) => <AddOptionForm group={group} />,
+    emptyMessage: "No option in this group.",
+  }}
+/>
+```
+
+| Field of `subRows` | Values | Meaning |
+|---|---|---|
+| `label` | Text. Required | The name of the items in the plural, for example `"options"`. It is in the name of the arrow and of the inner table |
+| `getRows` | A function. Required | The items of a record |
+| `columns` | A list of columns. Required | The columns of the inner table. Of a column, `id`, `header`, `cell`, `align`, `editor`, `editOnClick` and `canEdit` are used |
+| `getRowKey` | A function. Required | A value no other item of the record has |
+| `getRowLabel` | A function. Required | The name of the item for a screen reader |
+| `onSaveCell` | A function `(row, subRow, columnId, value) => Promise` | Saves one cell of an item. It works as [the editing of a cell](#editing-a-cell-in-place), with the same states and the same error text |
+| `rowActions` | A function `(row, subRow) => elements` | The buttons of the last column of an item |
+| `footer` | A function `(row) => elements` | Content under the items, for example a field that adds an item |
+| `emptyMessage` | Text or elements. Default `labels.noSubRows` | The message of a record with no item |
+
+- The arrow is a button with `aria-expanded`, and `aria-controls` while the items are shown. Its name is `labels.showSubRows` or `labels.hideSubRows`, with the number of items. Enter and Space press it, and it keeps the focus.
+- Several rows can be open at the same time. The grid keeps which rows are open.
+- The inner table is named by `labels.subRowsCaption`. When it is wider than its box it scrolls sideways, and the box can get the keyboard focus.
+- The items have no search, no sort, no filter and no menu of the columns.
+- The generic type of the grid has a second part for the items: `DataGridProps<Row, SubRow>`. TypeScript reads it from `subRows`.
 
 ### `ListItem`
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, ElementType, ReactNode } from "react";
 import { Button } from "../button/index.js";
 import { CheckboxControl } from "../checkbox/index.js";
@@ -21,6 +21,7 @@ import {
 import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
 import { DataGridColumnsMenu } from "./DataGridColumnsMenu.js";
 import { DataGridEditableCell } from "./DataGridEditableCell.js";
+import { DataGridSubRowsTable, DataGridSubRowsToggle } from "./DataGridSubRows.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
 import type {
   DataGridCellValue,
@@ -31,6 +32,7 @@ import type {
   DataGridLabels,
   DataGridSelectProps,
   DataGridState,
+  DataGridSubRows,
 } from "./data-grid-options.js";
 import { nextSort, searchAndSortRows, withFilterValue } from "./data-grid-rows.js";
 
@@ -67,6 +69,10 @@ const defaultLabels: DataGridLabels = {
   saving: "Saving…",
   saveFailed: "Could not save.",
   selectPlaceholder: "Select…",
+  showSubRows: (subRowsLabel, rowLabel, count) => `Show ${subRowsLabel} of ${rowLabel} (${count})`,
+  hideSubRows: (subRowsLabel, rowLabel, count) => `Hide ${subRowsLabel} of ${rowLabel} (${count})`,
+  subRowsCaption: (subRowsLabel, rowLabel) => `${subRowsLabel} of ${rowLabel}`,
+  noSubRows: "No items.",
   columns: "Columns",
   visibleColumns: "Visible columns",
   resetColumns: "Back to default",
@@ -105,7 +111,7 @@ function DefaultSelect(props: DataGridSelectProps) {
   return <SelectControl {...props} />;
 }
 
-export type DataGridProps<Row> = {
+export type DataGridProps<Row, SubRow = never> = {
   /** The name of the table. A screen reader says it; it is not shown. */
   caption: string;
   /** The columns, in the order they are shown. */
@@ -130,6 +136,12 @@ export type DataGridProps<Row> = {
   rowProps?: (row: Row) => ComponentProps<"tr">;
   /** Content shown in a row of its own under the row of a record. null or undefined: no extra row. */
   renderExpanded?: (row: Row) => ReactNode;
+  /**
+   * The items inside each row, for example the options of a group. A row gets
+   * an arrow before its first cell, which shows the items in a small table
+   * right under the row.
+   */
+  subRows?: DataGridSubRows<Row, SubRow>;
   /** The filters and the buttons of the screen, shown above the table, after the search field. */
   toolbar?: ReactNode;
   /** Turns on the search field, which looks in the columns with "searchValue". */
@@ -205,7 +217,7 @@ export type DataGridProps<Row> = {
  *   "aria-sort". The bar of the selected rows and the page controls are named
  *   regions. The row of the open record has aria-current="true".
  */
-export function DataGrid<Row>({
+export function DataGrid<Row, SubRow = never>({
   caption,
   columns: allColumns,
   rows,
@@ -216,6 +228,7 @@ export function DataGrid<Row>({
   rowActions,
   rowProps,
   renderExpanded,
+  subRows,
   toolbar,
   search,
   selection,
@@ -235,7 +248,7 @@ export function DataGrid<Row>({
   checkboxComponent: Checkbox = DefaultCheckbox,
   selectComponent: Select = DefaultSelect,
   className,
-}: DataGridProps<Row>) {
+}: DataGridProps<Row, SubRow>) {
   const labels = { ...defaultLabels, ...givenLabels };
   const [state, setState] = useState<DataGridState>(() => ({
     search: defaultState?.search ?? "",
@@ -247,7 +260,10 @@ export function DataGrid<Row>({
   const [checkedKeys, setCheckedKeys] = useState<Set<RowKey>>(new Set());
   // null: a person did not change the columns, so they are the ones the columns ask for.
   const [ownHiddenColumns, setOwnHiddenColumns] = useState<readonly string[] | null>(null);
+  // The rows whose items are shown.
+  const [openRowKeys, setOpenRowKeys] = useState<Set<RowKey>>(new Set());
   const selectAllRef = useRef<HTMLInputElement>(null);
+  const gridId = useId();
 
   const defaultHiddenColumnIds = allColumns
     .filter((column) => column.defaultHidden && !column.required)
@@ -332,6 +348,18 @@ export function DataGrid<Row>({
 
   function clearSelection() {
     setCheckedKeys(new Set());
+  }
+
+  function toggleSubRows(key: RowKey) {
+    setOpenRowKeys((currentKeys) => {
+      const nextKeys = new Set(currentKeys);
+      if (nextKeys.has(key)) {
+        nextKeys.delete(key);
+      } else {
+        nextKeys.add(key);
+      }
+      return nextKeys;
+    });
   }
 
   function toggleRow(row: Row) {
@@ -420,6 +448,9 @@ export function DataGrid<Row>({
     const key = getRowKey(row);
     const expanded = renderExpanded?.(row);
     const isChecked = isSelectable && checkedKeys.has(key);
+    const subRowsId = `${gridId}-${key}-sub-rows`;
+    const areSubRowsOpen = subRows !== undefined && openRowKeys.has(key);
+    const rowLabel = getRowLabel(row);
     const { className: rowClassName, ...otherRowProps } = rowProps?.(row) ?? {};
     return [
       <Tr
@@ -441,11 +472,41 @@ export function DataGrid<Row>({
         ) : null}
         {columns.map((column) => (
           <Td key={column.id} data-label={column.header} align={column.align}>
-            {renderCell(row, column)}
+            {subRows && column.id === firstColumnId ? (
+              <div className="flex items-start gap-1">
+                <DataGridSubRowsToggle
+                  aria-label={(areSubRowsOpen ? labels.hideSubRows : labels.showSubRows)(
+                    subRows.label,
+                    rowLabel,
+                    subRows.getRows(row).length,
+                  )}
+                  open={areSubRowsOpen}
+                  controls={subRowsId}
+                  onToggle={() => toggleSubRows(key)}
+                />
+                <div className="min-w-0">{renderCell(row, column)}</div>
+              </div>
+            ) : (
+              renderCell(row, column)
+            )}
           </Td>
         ))}
         {hasActions ? <Td className="w-12 text-right whitespace-nowrap">{rowActions(row)}</Td> : null}
       </Tr>,
+      areSubRowsOpen && subRows ? (
+        <tr key={`${key}-sub-rows`} data-slot="sub-rows-row">
+          <Td colSpan={columnCount} className="bg-subtle py-3 pl-12">
+            <DataGridSubRowsTable
+              id={subRowsId}
+              parent={row}
+              parentLabel={rowLabel}
+              subRows={subRows}
+              getSaveErrorMessage={saveErrorMessage}
+              labels={labels}
+            />
+          </Td>
+        </tr>
+      ) : null,
       expanded !== null && expanded !== undefined && expanded !== false ? (
         <tr key={`${key}-expanded`} data-slot="expanded-row">
           <Td colSpan={columnCount} className="bg-subtle">

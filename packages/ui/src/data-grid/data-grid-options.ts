@@ -99,6 +99,36 @@ export type DataGridColumn<Row> = {
   filter?: DataGridColumnFilter<Row>;
 };
 
+/**
+ * The items inside each row, for example the options of a group. The row gets
+ * an arrow that shows, right under it, a small table with its own columns.
+ * "SubRow" is the type of one item.
+ *
+ * Of a column of the items, these fields are used: "id", "header", "cell",
+ * "align", "editor", "editOnClick" and "canEdit". The items have no search,
+ * no sort, no filter and no menu of the columns.
+ */
+export type DataGridSubRows<Row, SubRow> = {
+  /** The name of the items in the plural, for the name of the arrow and of the inner table, for example "options". */
+  label: string;
+  /** The items of a record, in the order they are shown. */
+  getRows: (row: Row) => readonly SubRow[];
+  /** The columns of the inner table. */
+  columns: readonly DataGridColumn<SubRow>[];
+  /** A value no other item of the same record has, for example its id. */
+  getRowKey: (subRow: SubRow) => string | number;
+  /** The name of the item for a screen reader, for example in the name of a cell that is edited. */
+  getRowLabel: (subRow: SubRow) => string;
+  /** Saves one cell of an item, of a column with "editOnClick". It works as "onSaveCell" of the grid, and also receives the record. */
+  onSaveCell?: (row: Row, subRow: SubRow, columnId: string, value: DataGridCellValue) => Promise<void>;
+  /** The buttons of the last column of an item. */
+  rowActions?: (row: Row, subRow: SubRow) => ReactNode;
+  /** Content under the items of a record, for example a field that adds an item. */
+  footer?: (row: Row) => ReactNode;
+  /** The message of a record with no item. When missing: "labels.noSubRows". */
+  emptyMessage?: ReactNode;
+};
+
 /** A block of rows with its own header row, for example the products of one category. */
 export type DataGridGroup<Row> = {
   /** A name no other group has. */
@@ -195,6 +225,14 @@ export type DataGridLabels = {
   saveFailed: string;
   /** The choice a select shows when the record has a value that is not one of its choices. */
   selectPlaceholder: string;
+  /** The name of the arrow of a row whose items are hidden. It receives "subRows.label", the label of the record and the number of its items. */
+  showSubRows: (subRowsLabel: string, rowLabel: string, count: number) => string;
+  /** The name of the arrow of a row whose items are shown. */
+  hideSubRows: (subRowsLabel: string, rowLabel: string, count: number) => string;
+  /** The name of the inner table with the items of a record, for a screen reader. It receives "subRows.label" and the label of the record. */
+  subRowsCaption: (subRowsLabel: string, rowLabel: string) => string;
+  /** The message of a record with no item, when "subRows.emptyMessage" is missing. */
+  noSubRows: string;
   /** The text of the button that opens the menu of the columns. */
   columns: string;
   /** The title of the list of columns in that menu. */

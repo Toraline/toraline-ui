@@ -724,3 +724,166 @@ export const EditingWithASelect: Story = {
     await expect(canvas.getByRole("combobox", { name: "Category — Orange juice" })).toHaveFocus();
   },
 };
+
+type ComplementOption = { id: number; name: string; extraPrice: number; active: boolean };
+type ComplementGroup = { id: number; name: string; choices: string; options: ComplementOption[] };
+
+const complementGroups: ComplementGroup[] = [
+  {
+    id: 1,
+    name: "Milk",
+    choices: "Choose 1",
+    options: [
+      { id: 11, name: "Whole milk", extraPrice: 0, active: true },
+      { id: 12, name: "Oat milk", extraPrice: 2, active: true },
+      { id: 13, name: "Lactose-free milk", extraPrice: 1.5, active: false },
+    ],
+  },
+  {
+    id: 2,
+    name: "Syrup",
+    choices: "Up to 2",
+    options: [
+      { id: 21, name: "Vanilla", extraPrice: 3, active: true },
+      { id: 22, name: "Caramel", extraPrice: 3, active: true },
+    ],
+  },
+  { id: 3, name: "Toppings", choices: "Up to 3", options: [] },
+];
+
+const complementGroupColumns: DataGridColumn<ComplementGroup>[] = [
+  {
+    id: "name",
+    header: "Group",
+    cell: (group) => <span className="font-medium text-primary">{group.name}</span>,
+    sortValue: (group) => group.name,
+  },
+  { id: "choices", header: "Choices", cell: (group) => group.choices },
+  { id: "options", header: "Options", align: "right", cell: (group) => group.options.length },
+];
+
+const complementOptionColumns: DataGridColumn<ComplementOption>[] = [
+  {
+    id: "name",
+    header: "Option",
+    cell: (option) => <span className="font-medium text-primary">{option.name}</span>,
+    editor: { type: "text", value: (option) => option.name },
+    editOnClick: true,
+  },
+  {
+    id: "extraPrice",
+    header: "Extra price",
+    align: "right",
+    cell: (option) => money.format(option.extraPrice),
+    editor: { type: "number", value: (option) => option.extraPrice.toFixed(2) },
+    editOnClick: true,
+  },
+  {
+    id: "active",
+    header: "Active",
+    cell: (option) => (option.active ? "Yes" : "No"),
+    editor: { type: "checkbox", value: (option) => option.active },
+    editOnClick: true,
+  },
+];
+
+function ComplementGroupsGrid() {
+  const [groups, setGroups] = useState(complementGroups);
+  return (
+    <DataGrid
+      caption="Groups of complements"
+      columns={complementGroupColumns}
+      rows={groups}
+      getRowKey={(group) => group.id}
+      getRowLabel={(group) => group.name}
+      locale="en"
+      subRows={{
+        label: "options",
+        getRows: (group) => group.options,
+        columns: complementOptionColumns,
+        getRowKey: (option) => option.id,
+        getRowLabel: (option) => option.name,
+        emptyMessage: "No option in this group.",
+        rowActions: (group, option) => (
+          <IconButton icon={Archive} size="sm" aria-label={`Archive ${option.name} of ${group.name}`} />
+        ),
+        footer: (group) => (
+          <Button size="sm" variant="secondary" icon={Plus}>
+            Add an option to {group.name}
+          </Button>
+        ),
+        onSaveCell: async (group, option, columnId, value) => {
+          const savedValue = columnId === "extraPrice" ? Number(String(value).replace(",", ".")) : value;
+          if (typeof savedValue === "number" && Number.isNaN(savedValue)) {
+            throw new Error("The price must be a number, for example 2.50.");
+          }
+          setGroups((currentGroups) =>
+            currentGroups.map((currentGroup) =>
+              currentGroup.id === group.id
+                ? {
+                    ...currentGroup,
+                    options: currentGroup.options.map((currentOption) =>
+                      currentOption.id === option.id ? { ...currentOption, [columnId]: savedValue } : currentOption,
+                    ),
+                  }
+                : currentGroup,
+            ),
+          );
+        },
+      }}
+    />
+  );
+}
+
+/**
+ * "subRows" gives each row an arrow before its first cell. The arrow is a
+ * button with aria-expanded; its name has the items, the record and the number
+ * of items. In this story every row is closed.
+ */
+export const RowsInsideARow: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Show options of Milk (3)" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  },
+};
+
+/**
+ * A row open: its items are a small table with its own columns, in a row of
+ * its own with a quiet background, with the buttons of each item and the
+ * content of "footer" under it. The third row has no item and shows the message.
+ */
+export const RowsInsideARowOpen: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Show options of Milk (3)" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Show options of Toppings (0)" }));
+    await expect(canvas.getByRole("button", { name: "Hide options of Milk (3)" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    await expect(canvas.getByRole("table", { name: "options of Milk" })).toBeVisible();
+    await expect(canvas.getByText("No option in this group.")).toBeVisible();
+  },
+};
+
+/** The keyboard: Enter on the arrow shows the items, and a cell of an item is edited in place: Enter opens the field and Enter saves. */
+export const RowsInsideARowKeyboard: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole("button", { name: "Show options of Syrup (2)" }).focus();
+    await userEvent.keyboard("{Enter}");
+    canvas.getByRole("button", { name: /Edit Extra price — Vanilla/ }).focus();
+    await userEvent.keyboard("{Enter}");
+    const field = canvas.getByRole("textbox", { name: "Extra price — Vanilla" });
+    await userEvent.clear(field);
+    await userEvent.type(field, "4.50{Enter}");
+    const cell = await canvas.findByRole("button", { name: "Edit Extra price — Vanilla: R$4.50" });
+    await waitFor(() => expect(cell).toHaveFocus());
+  },
+};

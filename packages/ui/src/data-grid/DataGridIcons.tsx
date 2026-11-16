@@ -64,7 +64,7 @@ export function ChevronLeftIcon(props: IconProps) {
   );
 }
 
-/** "chevron-right": the page after. */
+/** "chevron-right": the page after, and the rows inside a row that are hidden. */
 export function ChevronRightIcon(props: IconProps) {
   return (
     <Icon {...props}>
@@ -79,6 +79,15 @@ export function SearchIcon(props: IconProps) {
     <Icon {...props}>
       <path d="m21 21-4.34-4.34" />
       <circle cx="11" cy="11" r="8" />
+    </Icon>
+  );
+}
+
+/** "chevron-down": the rows inside a row are shown. */
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m6 9 6 6 6-6" />
     </Icon>
   );
 }
