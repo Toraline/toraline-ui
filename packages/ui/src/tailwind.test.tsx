@@ -588,6 +588,25 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
+  // TOR-1216: the mode "Edit table", with a changed row, and then with a row that the app refused.
+  const { unmount: unmountEditTable } = render(
+    <DataGrid
+      caption="Products to edit"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+      onSaveRow={() => Promise.reject(new Error("Not saved"))}
+    />,
+  );
+  collect();
+  await user.click(screen.getByRole("button", { name: "Edit table" }));
+  await user.type(screen.getByLabelText("Product — Coffee"), "!");
+  collect();
+  await user.click(screen.getByRole("button", { name: "Save changes (1)" }));
+  await screen.findByRole("alert");
+  collect();
+  unmountEditTable();
   // TOR-1214: the labelled buttons of the filters above a view.
   const { unmount: unmountGridView } = render(<GridViewExample />);
   collect();

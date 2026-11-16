@@ -6,6 +6,7 @@ import type { ComplementGroup } from "./ComplementGroupsGrid";
 import { EditableProductsGrid } from "./EditableProductsGrid";
 import { ProductViewsGrid } from "./ProductViewsGrid";
 import { SavedColumnsGrid } from "./SavedColumnsGrid";
+import { TableEditGrid } from "./TableEditGrid";
 import { products } from "./products";
 
 /**
@@ -62,6 +63,15 @@ export default function GridPartsPage() {
           not a number is refused: the field stays open with the error text of the app.
         </p>
         <EditableProductsGrid products={products.slice(0, 6)} />
+      </Section>
+
+      <Section title="The mode that edits the table">
+        <p className="text-sm/5 text-secondary">
+          &quot;Edit table&quot; turns the cells into fields. Change 2 cells of a row and press &quot;Save
+          changes&quot;: the row is saved as one. A row with a price that is not a number is refused, and its error is
+          shown under it.
+        </p>
+        <TableEditGrid products={products.slice(0, 6)} />
       </Section>
 
       <Section title="Rows inside a row">

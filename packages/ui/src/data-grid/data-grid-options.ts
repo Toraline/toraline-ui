@@ -46,6 +46,9 @@ export type DataGridColumnFilter<Row> =
 /** The value of a cell that is edited: a text (also for a number and for a select), or true or false for a checkbox. */
 export type DataGridCellValue = string | boolean;
 
+/** The changed cells of one row in the mode "Edit table": the new value of each changed cell, by the "id" of its column. */
+export type DataGridRowChanges = Record<string, DataGridCellValue>;
+
 /**
  * The field that takes the place of a cell while it is edited. "value" reads
  * the value of the record that the field starts with.
@@ -85,7 +88,11 @@ export type DataGridColumn<Row> = {
   required?: boolean;
   /** true: the column is hidden until a person turns it on in the menu "Columns". */
   defaultHidden?: boolean;
-  /** The field that edits a cell of this column. It is used when "editOnClick" is true and the grid has "onSaveCell". */
+  /**
+   * The field that edits a cell of this column. It is used in the mode "Edit
+   * table" (the grid has "onSaveRow"), and for a cell edited by a press
+   * ("editOnClick" is true and the grid has "onSaveCell").
+   */
   editor?: DataGridColumnEditor<Row>;
   /**
    * true: a press on a cell of this column edits it in place, and the grid
@@ -225,6 +232,20 @@ export type DataGridLabels = {
   saveFailed: string;
   /** The choice a select shows when the record has a value that is not one of its choices. */
   selectPlaceholder: string;
+  /** The button that turns on the mode "Edit table", where every cell with an editor is a field. */
+  editTable: string;
+  /** The status of the mode "Edit table" while no row is changed. */
+  noChanges: string;
+  /** The status of the mode "Edit table": how many rows are changed. */
+  changedRows: (count: number) => string;
+  /** The button that leaves the mode "Edit table" and gives up every change. */
+  cancelEditing: string;
+  /** The button that saves the changed rows. It receives how many rows are changed. */
+  saveChanges: (count: number) => string;
+  /** The text of that button while the app saves the rows. */
+  savingChanges: string;
+  /** The error of a row that the app refused, shown under the row. It receives the label of the record and the error text. */
+  rowError: (rowLabel: string, errorMessage: string) => string;
   /** The name of the arrow of a row whose items are hidden. It receives "subRows.label", the label of the record and the number of its items. */
   showSubRows: (subRowsLabel: string, rowLabel: string, count: number) => string;
   /** The name of the arrow of a row whose items are shown. */

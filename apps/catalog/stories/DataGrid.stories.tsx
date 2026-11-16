@@ -3,7 +3,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Archive, Pencil, Plus } from "lucide-react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Button, DataGrid, IconButton } from "@toraline.tech/ui";
-import type { DataGridCellValue, DataGridColumn, DataGridProps, DataGridState } from "@toraline.tech/ui";
+import type {
+  DataGridCellValue,
+  DataGridColumn,
+  DataGridProps,
+  DataGridRowChanges,
+  DataGridState,
+} from "@toraline.tech/ui";
 
 type Product = {
   id: number;
@@ -968,5 +974,119 @@ export const AnotherViewWithAFilterOpen: Story = {
     const panel = await page.findByRole("dialog", { name: "Filter Category" });
     await userEvent.click(within(panel).getByRole("checkbox", { name: "Bakery" }));
     await expect(canvas.getByRole("button", { name: "Filter Category (filter on)" })).toBeVisible();
+  },
+};
+
+/** The columns of the stories of the mode "Edit table": the same editors as the cells edited by a press, with no "editOnClick". */
+const tableEditColumns: DataGridColumn<Product>[] = editableColumns.map((column) => ({ ...column, editOnClick: false }));
+
+/** The record with the changed cells of a row, as the API of an app would return it. A price that is not a number is refused. */
+function withRowChanges(product: Product, changes: DataGridRowChanges): Product {
+  return Object.entries(changes).reduce((changedProduct, [columnId, value]) => {
+    if (columnId === "price" && Number.isNaN(Number(String(value).replace(",", ".")))) {
+      throw new Error("The price must be a number, for example 12.50.");
+    }
+    return withCellValue(changedProduct, columnId, value);
+  }, product);
+}
+
+function TableEditGrid({ rows: firstRows, ...args }: DataGridProps<Product>) {
+  const [rows, setRows] = useState(firstRows);
+  return (
+    <DataGrid
+      {...args}
+      rows={rows}
+      onSaveRow={async (row, changes) => {
+        const savedRow = withRowChanges(row, changes);
+        setRows((currentRows) => currentRows.map((product) => (product.id === row.id ? savedRow : product)));
+      }}
+    />
+  );
+}
+
+/**
+ * "onSaveRow" adds the button "Edit table" at the right of the toolbar. The
+ * table looks as always until a person presses it.
+ */
+export const EditTable: Story = {
+  args: {
+    columns: tableEditColumns,
+    rows: products.slice(0, 5),
+    columnsMenu: true,
+    rowActions: (product) => <IconButton icon={Pencil} size="sm" aria-label={`Edit ${product.name}`} />,
+  },
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByRole("button", { name: "Edit table" })).toBeVisible();
+  },
+};
+
+/**
+ * The mode on. Every cell of a column with "editor" is a field; the buttons of
+ * the rows and the menu of the columns are hidden. The story changes 2 cells of
+ * one row and 1 cell of another: each changed field has the orange border, each
+ * changed row the quiet orange background, and the toolbar counts the rows.
+ */
+export const EditTableWithChanges: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Product — Pão de queijo" })).toHaveFocus());
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Espresso coffee" }), " double");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "12.50");
+    await userEvent.click(canvas.getByRole("checkbox", { name: "Active — Orange juice" }));
+    await expect(canvas.getByRole("status")).toHaveTextContent("2 rows changed");
+    await expect(canvas.getByRole("button", { name: "Save changes (2)" })).toBeEnabled();
+  },
+};
+
+/**
+ * Two cells of one row are changed and the row is saved as one: "onSaveRow"
+ * receives the record and its 2 changed cells. After every row is saved, the
+ * mode ends, the table shows the new values and the focus is on "Edit table".
+ */
+export const EditTableSaved: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Espresso coffee" }), " double");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "12.50");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes (1)" }));
+    const editButton = await canvas.findByRole("button", { name: "Edit table" });
+    await expect(canvas.getByText("Espresso coffee double")).toBeVisible();
+    await expect(canvas.getByText("R$12.50")).toBeVisible();
+    await waitFor(() => expect(editButton).toHaveFocus());
+  },
+};
+
+/**
+ * The app refuses one of 2 changed rows. The saved row is no longer changed.
+ * The refused row keeps its values, and the error text of the app is in a row
+ * of its own under it. The button counts 1 row and has the focus.
+ */
+export const EditTableSaveError: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Pão de queijo" }), " large");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "twelve");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes (2)" }));
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Espresso coffee: The price must be a number, for example 12.50.",
+    );
+    const saveButton = canvas.getByRole("button", { name: "Save changes (1)" });
+    await waitFor(() => expect(saveButton).toHaveFocus());
   },
 };

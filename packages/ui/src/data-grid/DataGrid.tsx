@@ -20,6 +20,7 @@ import {
 } from "./DataGridIcons.js";
 import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
 import { DataGridColumnsMenu } from "./DataGridColumnsMenu.js";
+import { DataGridCellEditor } from "./DataGridCellEditor.js";
 import { DataGridEditableCell } from "./DataGridEditableCell.js";
 import { DataGridSubRowsTable, DataGridSubRowsToggle } from "./DataGridSubRows.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
@@ -30,6 +31,7 @@ import type {
   DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridRowChanges,
   DataGridSelectProps,
   DataGridState,
   DataGridSubRows,
@@ -69,6 +71,13 @@ const defaultLabels: DataGridLabels = {
   saving: "Saving…",
   saveFailed: "Could not save.",
   selectPlaceholder: "Select…",
+  editTable: "Edit table",
+  noChanges: "No changes",
+  changedRows: (count) => `${count} ${count === 1 ? "row changed" : "rows changed"}`,
+  cancelEditing: "Cancel",
+  saveChanges: (count) => `Save changes (${count})`,
+  savingChanges: "Saving…",
+  rowError: (rowLabel, errorMessage) => `${rowLabel}: ${errorMessage}`,
   showSubRows: (subRowsLabel, rowLabel, count) => `Show ${subRowsLabel} of ${rowLabel} (${count})`,
   hideSubRows: (subRowsLabel, rowLabel, count) => `Hide ${subRowsLabel} of ${rowLabel} (${count})`,
   subRowsCaption: (subRowsLabel, rowLabel) => `${subRowsLabel} of ${rowLabel}`,
@@ -95,6 +104,9 @@ const sortIconClass =
 
 /** The text style "label" of Intraweb, written as the classes of its values. */
 const labelTextClass = "font-heading text-sm/5 font-medium";
+
+/** A row with a changed cell in the mode "Edit table" has the background of a warning. The row of the open record keeps its own. */
+const changedRowClass = "bg-warning";
 
 /** A row whose checkbox is checked has the background of a selected part, also under the pointer. */
 const checkedRowClass = "data-checked:bg-selected";
@@ -168,7 +180,15 @@ export type DataGridProps<Row, SubRow = never> = {
    */
   onSaveCell?: (row: Row, columnId: string, value: DataGridCellValue) => Promise<void>;
   /**
-   * The text for an error that "onSaveCell" was rejected with, for example the
+   * Turns on the mode "Edit table": a button above the table turns every cell
+   * of a column with "editor" into a field, and another button saves the
+   * changed rows. It is called once for each changed row, with the record and
+   * only its changed cells. A row whose promise is rejected stays changed,
+   * with the error text under it.
+   */
+  onSaveRow?: (row: Row, changes: DataGridRowChanges) => Promise<void>;
+  /**
+   * The text for an error that "onSaveCell" or "onSaveRow" was rejected with, for example the
    * message of the API of the app. When missing: the message of an Error, or
    * "labels.saveFailed".
    */
@@ -242,6 +262,7 @@ export function DataGrid<Row, SubRow = never>({
   search,
   selection,
   onSaveCell,
+  onSaveRow,
   getSaveErrorMessage,
   columnsMenu = false,
   hiddenColumns,
@@ -271,7 +292,15 @@ export function DataGrid<Row, SubRow = never>({
   const [ownHiddenColumns, setOwnHiddenColumns] = useState<readonly string[] | null>(null);
   // The rows whose items are shown.
   const [openRowKeys, setOpenRowKeys] = useState<Set<RowKey>>(new Set());
+  // The mode "Edit table": on or off, the changed cells of each row, the error of each refused row, and whether the app saves now.
+  const [isEditingTable, setIsEditingTable] = useState(false);
+  const [rowDrafts, setRowDrafts] = useState<Map<RowKey, DataGridRowChanges>>(new Map());
+  const [rowErrors, setRowErrors] = useState<Map<RowKey, string>>(new Map());
+  const [isSavingRows, setIsSavingRows] = useState(false);
   const selectAllRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Which part of the mode "Edit table" gets the focus after the next render.
+  const focusAfterRenderRef = useRef<"first-field" | "edit-button" | "save-button" | null>(null);
   const gridId = useId();
 
   const defaultHiddenColumnIds = allColumns
@@ -303,7 +332,7 @@ export function DataGrid<Row, SubRow = never>({
   const hasFilters = isFlat && (searchText !== "" || hasChangedFilters);
 
   const hasView = isFlat && renderView !== undefined;
-  const isSelectable = isFlat && selection !== undefined && !loading && !hasView;
+  const isSelectable = isFlat && selection !== undefined && !loading && !hasView && !isEditingTable;
   const selectedRows = isSelectable ? foundRows.filter((row) => checkedKeys.has(getRowKey(row))) : [];
   const areAllSelected = foundRows.length > 0 && selectedRows.length === foundRows.length;
   const areSomeSelected = selectedRows.length > 0 && !areAllSelected;
@@ -314,7 +343,39 @@ export function DataGrid<Row, SubRow = never>({
     }
   }, [areSomeSelected]);
 
-  const hasActions = rowActions !== undefined;
+  // The buttons of a row are hidden in the mode "Edit table".
+  const hasActions = rowActions !== undefined && !isEditingTable;
+  const changedRowList = rows.filter((row) => rowDrafts.has(getRowKey(row)));
+
+  /**
+   * The mode "Edit table" removes the button that had the focus (the button
+   * that turns it on, or the buttons that leave it) and disables the button
+   * that saves. After the render, the focus goes to the part that took its place.
+   */
+  useEffect(() => {
+    const target = focusAfterRenderRef.current;
+    const root = rootRef.current;
+    if (target === null || root === null || isSavingRows) {
+      return;
+    }
+    focusAfterRenderRef.current = null;
+    // The focus moves only when it was lost. When a person already moved it to another element, it stays there.
+    const active = document.activeElement;
+    const isLost = active === null || active === document.body || active.matches(":disabled");
+    if (!isLost) {
+      return;
+    }
+    // The first field of the table, or the button "Cancel" when no cell of the page can be edited.
+    const firstField =
+      root.querySelector<HTMLElement>("tbody input:not([disabled]), tbody select:not([disabled])") ??
+      root.querySelector<HTMLElement>("[data-slot=cancel-editing]");
+    const elements = {
+      "first-field": firstField,
+      "edit-button": root.querySelector<HTMLElement>("[data-slot=edit-table]"),
+      "save-button": root.querySelector<HTMLElement>("[data-slot=save-changes]"),
+    };
+    elements[target]?.focus();
+  });
   const hasFooter = columns.some((column) => column.footer);
   const columnCount = columns.length + (hasActions ? 1 : 0) + (isSelectable ? 1 : 0);
   const firstColumnId = columns[0]?.id;
@@ -385,6 +446,63 @@ export function DataGrid<Row, SubRow = never>({
     });
   }
 
+  function setRowDraft(row: Row, column: DataGridColumn<Row>, value: DataGridCellValue) {
+    const key = getRowKey(row);
+    setRowDrafts((currentDrafts) => {
+      const nextDrafts = new Map(currentDrafts);
+      const otherChanges = Object.fromEntries(
+        Object.entries(nextDrafts.get(key) ?? {}).filter(([columnId]) => columnId !== column.id),
+      );
+      // A value that is the saved one again is not a change.
+      const changes = value === column.editor?.value(row) ? otherChanges : { ...otherChanges, [column.id]: value };
+      if (Object.keys(changes).length === 0) {
+        nextDrafts.delete(key);
+      } else {
+        nextDrafts.set(key, changes);
+      }
+      return nextDrafts;
+    });
+  }
+
+  function startEditingTable() {
+    focusAfterRenderRef.current = "first-field";
+    setIsEditingTable(true);
+  }
+
+  function stopEditingTable() {
+    focusAfterRenderRef.current = "edit-button";
+    setIsEditingTable(false);
+    setRowDrafts(new Map());
+    setRowErrors(new Map());
+  }
+
+  async function saveChangedRows() {
+    if (!onSaveRow || isSavingRows) {
+      return;
+    }
+    setIsSavingRows(true);
+    const remainingDrafts = new Map(rowDrafts);
+    const nextErrors = new Map<RowKey, string>();
+    // One row after the other, so the app's API gets one request at a time, as in Intraweb.
+    for (const row of changedRowList) {
+      const key = getRowKey(row);
+      try {
+        await onSaveRow(row, rowDrafts.get(key) ?? {});
+        remainingDrafts.delete(key);
+      } catch (error) {
+        nextErrors.set(key, saveErrorMessage(error));
+      }
+    }
+    setIsSavingRows(false);
+    if (remainingDrafts.size === 0) {
+      stopEditingTable();
+    } else {
+      focusAfterRenderRef.current = "save-button";
+      setRowDrafts(remainingDrafts);
+      setRowErrors(nextErrors);
+    }
+  }
+
   function saveErrorMessage(error: unknown): string {
     if (getSaveErrorMessage) {
       return getSaveErrorMessage(error);
@@ -394,7 +512,26 @@ export function DataGrid<Row, SubRow = never>({
 
   function renderCell(row: Row, column: DataGridColumn<Row>) {
     const editor = column.editor;
-    const isEditable = column.editOnClick === true && (column.canEdit?.(row) ?? true);
+    const canEditRow = column.canEdit?.(row) ?? true;
+    if (isEditingTable) {
+      if (editor === undefined || !canEditRow) {
+        return column.cell(row);
+      }
+      const changes = rowDrafts.get(getRowKey(row));
+      const isChanged = changes !== undefined && column.id in changes;
+      return (
+        <DataGridCellEditor
+          label={labels.cellLabel(column.header, getRowLabel(row))}
+          editor={editor}
+          value={changes?.[column.id] ?? editor.value(row)}
+          changed={isChanged}
+          disabled={isSavingRows}
+          selectPlaceholder={labels.selectPlaceholder}
+          onChange={(value) => setRowDraft(row, column, value)}
+        />
+      );
+    }
+    const isEditable = column.editOnClick === true && canEditRow;
     if (!isEditable || editor === undefined || onSaveCell === undefined) {
       return column.cell(row);
     }
@@ -456,20 +593,26 @@ export function DataGrid<Row, SubRow = never>({
 
   function renderRow(row: Row) {
     const key = getRowKey(row);
-    const expanded = renderExpanded?.(row);
+    // In the mode "Edit table" a row has no extra content, no items and no props of the app (a drag).
+    const expanded = isEditingTable ? null : renderExpanded?.(row);
     const isChecked = isSelectable && checkedKeys.has(key);
     const subRowsId = `${gridId}-${key}-sub-rows`;
-    const areSubRowsOpen = subRows !== undefined && openRowKeys.has(key);
+    const hasSubRows = subRows !== undefined && !isEditingTable;
+    const areSubRowsOpen = hasSubRows && openRowKeys.has(key);
     const rowLabel = getRowLabel(row);
-    const { className: rowClassName, ...otherRowProps } = rowProps?.(row) ?? {};
+    const { className: rowClassName, ...otherRowProps } = (isEditingTable ? undefined : rowProps?.(row)) ?? {};
+    const isOpenRecord = isRowSelected?.(row) ?? false;
+    const hasChanges = rowDrafts.has(key);
+    const rowError = rowErrors.get(key);
     return [
       <Tr
         key={key}
         {...otherRowProps}
-        hoverable
-        selected={isRowSelected?.(row) ?? false}
+        hoverable={!hasChanges}
+        selected={isOpenRecord}
         data-checked={isChecked ? "" : undefined}
-        className={classNames(checkedRowClass, rowClassName)}
+        data-changed={hasChanges ? "true" : undefined}
+        className={classNames(checkedRowClass, hasChanges && !isOpenRecord && changedRowClass, rowClassName)}
       >
         {isSelectable ? (
           <Td className="w-10 pr-0">
@@ -482,7 +625,7 @@ export function DataGrid<Row, SubRow = never>({
         ) : null}
         {columns.map((column) => (
           <Td key={column.id} data-label={column.header} align={column.align}>
-            {subRows && column.id === firstColumnId ? (
+            {hasSubRows && subRows && column.id === firstColumnId ? (
               <div className="flex items-start gap-1">
                 <DataGridSubRowsToggle
                   aria-label={(areSubRowsOpen ? labels.hideSubRows : labels.showSubRows)(
@@ -524,13 +667,21 @@ export function DataGrid<Row, SubRow = never>({
           </Td>
         </tr>
       ) : null,
+      rowError === undefined ? null : (
+        <tr key={`${key}-error`} data-slot="row-error">
+          <Td colSpan={columnCount} className="bg-error text-sm/5 text-danger">
+            <span role="alert">{labels.rowError(rowLabel, rowError)}</span>
+          </Td>
+        </tr>
+      ),
     ];
   }
 
   function renderGroup(group: DataGridGroup<Row>) {
     const { className: headerClassName, ...otherHeaderProps } = group.headerProps ?? {};
+    const headerRowProps = isEditingTable ? {} : otherHeaderProps;
     return [
-      <tr key={`group-${group.key}`} {...otherHeaderProps} className={headerClassName} data-slot="group-header">
+      <tr key={`group-${group.key}`} {...headerRowProps} className={headerClassName} data-slot="group-header">
         <th
           scope="colgroup"
           colSpan={columnCount}
@@ -541,7 +692,7 @@ export function DataGrid<Row, SubRow = never>({
               {group.title}{" "}
               <span className="font-body font-normal text-tertiary">({group.rows.length})</span>
             </span>
-            {group.actions ? <div className="flex gap-1 font-normal">{group.actions}</div> : null}
+            {group.actions && !isEditingTable ? <div className="flex gap-1 font-normal">{group.actions}</div> : null}
           </div>
         </th>
       </tr>,
@@ -576,7 +727,9 @@ export function DataGrid<Row, SubRow = never>({
   }
 
   const hasSearchField = isFlat && search !== undefined;
-  const hasColumnsMenu = columnsMenu && !hasView && allColumns.some((column) => !column.required);
+  const hasColumnsMenu =
+    columnsMenu && !hasView && !isEditingTable && allColumns.some((column) => !column.required);
+  const hasEditTable = onSaveRow !== undefined && !hasView && allColumns.some((column) => column.editor !== undefined);
   // A view has no header cells, so the filters of the columns are in the toolbar.
   const viewFilterColumns = hasView ? columns.filter((column) => column.filter !== undefined) : [];
   const hasToolbar =
@@ -584,10 +737,11 @@ export function DataGrid<Row, SubRow = never>({
     (toolbar !== undefined && toolbar !== null) ||
     hasFilters ||
     hasColumnsMenu ||
+    hasEditTable ||
     viewFilterColumns.length > 0;
 
   return (
-    <div className={classNames("space-y-3", className)} data-slot="data-grid">
+    <div ref={rootRef} className={classNames("space-y-3", className)} data-slot="data-grid">
       {hasToolbar ? (
         <div className="flex flex-wrap items-center justify-between gap-2" data-slot="toolbar">
           <div className="flex flex-1 flex-wrap items-center gap-2">
@@ -621,16 +775,50 @@ export function DataGrid<Row, SubRow = never>({
               </Button>
             ) : null}
           </div>
-          {hasColumnsMenu ? (
+          {hasColumnsMenu || hasEditTable ? (
             <div className="flex flex-wrap items-center gap-2">
-              <DataGridColumnsMenu
-                columns={allColumns}
-                hiddenColumnIds={hiddenColumnIds}
-                isDefault={areColumnsDefault}
-                onToggle={toggleColumn}
-                onReset={resetColumns}
-                labels={labels}
-              />
+              {hasColumnsMenu ? (
+                <DataGridColumnsMenu
+                  columns={allColumns}
+                  hiddenColumnIds={hiddenColumnIds}
+                  isDefault={areColumnsDefault}
+                  onToggle={toggleColumn}
+                  onReset={resetColumns}
+                  labels={labels}
+                />
+              ) : null}
+              {hasEditTable && !isEditingTable ? (
+                <Button
+                  variant="secondary"
+                  disabled={rows.length === 0}
+                  onClick={startEditingTable}
+                  data-slot="edit-table"
+                >
+                  {labels.editTable}
+                </Button>
+              ) : null}
+              {hasEditTable && isEditingTable ? (
+                <>
+                  <span className="text-sm/5 text-secondary" role="status">
+                    {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    disabled={isSavingRows}
+                    onClick={stopEditingTable}
+                    data-slot="cancel-editing"
+                  >
+                    {labels.cancelEditing}
+                  </Button>
+                  <Button
+                    disabled={isSavingRows || changedRowList.length === 0}
+                    onClick={() => void saveChangedRows()}
+                    data-slot="save-changes"
+                  >
+                    {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
+                  </Button>
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -658,7 +846,7 @@ export function DataGrid<Row, SubRow = never>({
       {hasView ? <div data-slot="view">{renderView(foundRows)}</div> : null}
 
       {hasView ? null : (
-        <DataTable caption={caption} stackOnMobile aria-busy={loading ? "true" : undefined}>
+        <DataTable caption={caption} stackOnMobile aria-busy={loading || isSavingRows ? "true" : undefined}>
           <thead>
             <tr>
               {isSelectable ? (

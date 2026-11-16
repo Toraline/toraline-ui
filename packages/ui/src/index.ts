@@ -165,6 +165,7 @@ export type {
   DataGridGroup,
   DataGridLabels,
   DataGridOption,
+  DataGridRowChanges,
   DataGridProps,
   DataGridSelectProps,
   DataGridSort,

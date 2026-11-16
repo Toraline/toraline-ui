@@ -320,6 +320,9 @@ test.each([lightTheme, darkTheme])(
       ["text-secondary", "bg-selected"],
       // The text a person types in a field with a changed value.
       ["text-primary", "bg-warning"],
+      // The mode "Edit table": the cells of a changed row, and the error of a refused row.
+      ["text-body", "bg-warning"],
+      ["text-danger", "bg-error"],
       // The content of a cell that can be edited, under the pointer.
       ["text-body", "bg-muted"],
       ["text-primary", "bg-muted"],
