@@ -148,9 +148,12 @@ describe("css/tailwind.css, the Tailwind preset", () => {
       "shadow-lg",
       "shadow-xl",
       "shadow-2xl",
+      "text-xs",
       "text-sm",
       "text-base",
       "text-lg",
+      "text-2xl",
+      "text-3xl",
       "p-4",
     ]);
 
@@ -170,7 +173,7 @@ describe("css/tailwind.css, the Tailwind preset", () => {
         new RegExp(`\\.shadow-${shadowName} \\{ --tw-shadow: var\\(--shadow-${shadowName}\\); box-shadow:`),
       );
     }
-    for (const sizeName of ["sm", "base", "lg"]) {
+    for (const sizeName of ["xs", "sm", "base", "lg", "2xl", "3xl"]) {
       expect(css).toContain(`.text-${sizeName} { font-size: var(--text-${sizeName});`);
     }
     expect(css).toContain(".p-4 { padding: calc(var(--spacing) * 4); }");

@@ -10,13 +10,69 @@ import { themeTokenNames } from "@toraline.tech/tokens";
 import {
   BreadCrumbs,
   Button,
-  Input,
+  ButtonLink,
+  Field,
+  IconButton,
   SplitButton,
+  TabNav,
   Tabs,
+  TextInput,
   Toggle,
   buttonSizes,
+  controlSizes,
   buttonVariants,
+  iconButtonSizes,
+  iconButtonVariants,
   splitButtonMenuPlacements,
+  tabNavVariants,
+} from "./index";
+// Phase 8: forms and feedback.
+import {
+  Checkbox,
+  CheckboxControl,
+  CountBadge,
+  DecimalInput,
+  EmptyState,
+  Panel,
+  ProgressBar,
+  ProgressRing,
+  Select,
+  StatCard,
+  StatusBadge,
+  Textarea,
+  countBadgeVariants,
+  progressRingSizes,
+  progressTones,
+  statCardTones,
+  statusBadgeVariants,
+} from "./index";
+// Phase 9: overlays
+import {
+  ActionMenu,
+  CloseButton,
+  DeleteOverlay,
+  DiscardConfirmation,
+  Drawer,
+  Modal,
+  Popover,
+  Tooltip,
+  actionMenuTriggers,
+  modalSizes,
+  popoverAligns,
+  tooltipSides,
+} from "./index";
+// Phase 10: data
+import {
+  ActionsTh,
+  DataGrid,
+  DataTable,
+  DataTableMessage,
+  DetailPanel,
+  ListItem,
+  Td,
+  Th,
+  Tr,
+  tableCellAlignments,
 } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
@@ -72,7 +128,121 @@ const crumbs = [
   { label: "No link" },
   { label: "Fernando Dias", href: "/clients/12" },
 ];
+/** A small icon component, with the props an icon of "lucide-react" accepts. */
+function PlusIcon(props: { className?: string; "aria-hidden"?: boolean | "true" | "false" }) {
+  return (
+    <svg {...props} viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5v14" />
+    </svg>
+  );
+}
+
+// Phase 10: data
+type GridRow = { id: number; name: string; price: number };
+const gridRows: GridRow[] = [
+  { id: 1, name: "Coffee", price: 7 },
+  { id: 2, name: "Cheese bread", price: 9.5 },
+];
+const gridColumns = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (row: GridRow) => row.name,
+    sortValue: (row: GridRow) => row.name,
+    searchValue: (row: GridRow) => row.name,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right" as const,
+    cell: (row: GridRow) => row.price,
+    sortValue: (row: GridRow) => row.price,
+    footer: (rows: GridRow[]) => rows.length,
+  },
+];
+
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** The floating panels of phase 9: each one opens with a press on its button. */
+const floatingButtonNames = [
+  ...actionMenuTriggers.map((trigger) => `Actions, ${trigger}`),
+  ...popoverAligns.map((align) => `Columns, ${align}`),
+];
+
+function FloatingExamples() {
+  return (
+    <>
+      {actionMenuTriggers.map((trigger) => (
+        <ActionMenu
+          key={trigger}
+          trigger={trigger}
+          aria-label={`Actions, ${trigger}`}
+          items={[
+            { key: "edit", label: "Edit", icon: PlusIcon, onSelect: () => undefined },
+            { key: "delete", label: "Delete", onSelect: () => undefined, disabled: true, hint: "In use" },
+          ]}
+        >
+          Actions
+        </ActionMenu>
+      ))}
+      {popoverAligns.map((align) => (
+        <Popover key={align} label={`Columns, ${align}`} align={align}>
+          The content
+        </Popover>
+      ))}
+      {tooltipSides.map((side) => (
+        <Tooltip key={side} label={`A tooltip, ${side}`} side={side}>
+          <button>Help, {side}</button>
+        </Tooltip>
+      ))}
+    </>
+  );
+}
+
+/** The overlays of phase 9, open. An overlay is rendered in <body>, outside the element that holds the other components. */
+function OverlayExamples() {
+  return (
+    <>
+      <CloseButton />
+      {modalSizes.map((size) => (
+        <Modal key={size} title={`A dialog, ${size}`} size={size} onClose={() => undefined}>
+          The content
+        </Modal>
+      ))}
+      {[false, true].map((wide) => (
+        <Drawer
+          key={String(wide)}
+          title={`A side panel, wide: ${wide}`}
+          wide={wide}
+          footer="The footer"
+          onClose={() => undefined}
+        >
+          The content
+        </Drawer>
+      ))}
+      <DeleteOverlay
+        title="Delete"
+        cancelLabel="Cancel"
+        deleteLabel="Delete"
+        closeLabel="Close"
+        consequence="Its prices are deleted too."
+        error="It could not be deleted."
+        onDelete={() => undefined}
+        onClose={() => undefined}
+      >
+        Delete the product?
+      </DeleteOverlay>
+      <DiscardConfirmation
+        title="Discard the changes?"
+        description="What you typed is lost."
+        discardLabel="Discard"
+        keepEditingLabel="Keep editing"
+        onDiscard={() => undefined}
+        onKeepEditing={() => undefined}
+      />
+    </>
+  );
+}
 
 /** Renders every component in every variant, size and state, and returns every class on the page. */
 async function renderEveryComponent(): Promise<string[]> {
@@ -81,7 +251,7 @@ async function renderEveryComponent(): Promise<string[]> {
     <ThemeProvider>
       {buttonVariants.map((variant) =>
         buttonSizes.map((size) => (
-          <Button key={`${variant}-${size}`} variant={variant} size={size}>
+          <Button key={`${variant}-${size}`} variant={variant} size={size} icon={PlusIcon}>
             Save
           </Button>
         )),
@@ -91,8 +261,44 @@ async function renderEveryComponent(): Promise<string[]> {
           Save
         </Button>
       ))}
-      <Input label="Title" error="The title is required." />
+      {buttonVariants.map((variant) => (
+        <ButtonLink key={variant} variant={variant} href="/orders" icon={PlusIcon}>
+          Orders
+        </ButtonLink>
+      ))}
+      {iconButtonVariants.map((variant) =>
+        iconButtonSizes.map((size) => (
+          <IconButton
+            key={`${variant}-${size}`}
+            variant={variant}
+            size={size}
+            icon={PlusIcon}
+            aria-label={`Add, ${variant}, ${size}`}
+          />
+        )),
+      )}
+      <Field label="Name" optional hint="As it is written on the invoice.">
+        <TextInput />
+      </Field>
+      <Field label="Name" error="The name is required.">
+        <TextInput />
+      </Field>
+      {controlSizes.map((size) => (
+        <TextInput key={size} size={size} icon={PlusIcon} aria-label={`Search, ${size}`} />
+      ))}
       <Toggle label="Send e-mails" />
+      {tabNavVariants.map((variant) => (
+        <TabNav
+          key={variant}
+          variant={variant}
+          items={[
+            { href: "/orders", label: "Orders" },
+            { href: "/clients", label: "Clients" },
+          ]}
+          currentPath="/orders"
+          aria-label={`Sales, ${variant}`}
+        />
+      ))}
       <Tabs tabs={tabs} />
       <BreadCrumbs crumbs={crumbs} />
       {splitButtonMenuPlacements.map((menuPlacement) => (
@@ -113,12 +319,139 @@ async function renderEveryComponent(): Promise<string[]> {
           </Example>
         )),
       )}
+      {/* Phase 8: forms and feedback. */}
+      {controlSizes.map((size) => (
+        <Select key={size} size={size} aria-label={`Kind of contract, ${size}`}>
+          <option>Monthly</option>
+        </Select>
+      ))}
+      <Textarea aria-label="Notes" />
+      {controlSizes.map((size) => (
+        <DecimalInput key={size} size={size} icon={PlusIcon} aria-label={`Price, ${size}`} />
+      ))}
+      <Checkbox label="Send the invoice by e-mail" />
+      <CheckboxControl aria-label="Paid" />
+      <CheckboxControl aria-label="Paid, changed" changed />
+      {statusBadgeVariants.map((variant) => (
+        <StatusBadge key={variant} variant={variant} label="State" dot />
+      ))}
+      {countBadgeVariants.map((variant) => (
+        <CountBadge key={variant} variant={variant} count={3} label="3 pending orders" />
+      ))}
+      <Panel title="Contract" subtitle="Signed in March" actions={<Button size="sm">Edit</Button>}>
+        Content
+      </Panel>
+      <EmptyState title="No order yet" action={<Button>New order</Button>}>
+        The orders are shown here.
+      </EmptyState>
+      <EmptyState title="No client yet" icon={PlusIcon} />
+      {statCardTones.map((tone) => (
+        <StatCard
+          key={tone}
+          tone={tone}
+          label="Sales"
+          value="R$ 1.200"
+          icon={PlusIcon}
+          trend={{ direction: "up", value: "12%", comparison: "vs. last month" }}
+        />
+      ))}
+      <StatCard label="Costs" value="R$ 300" trend={{ direction: "up", value: "5%", upIsGood: false }} />
+      <StatCard label="Hours" value="30 h" progress={{ value: 30, max: 40, label: "Goal of the month" }} />
+      {progressTones.map((tone) => (
+        <ProgressBar key={tone} tone={tone} label={`Goal, ${tone}`} value={30} max={40} />
+      ))}
+      {progressTones.map((tone) =>
+        progressRingSizes.map((size) => (
+          <ProgressRing key={`${tone}-${size}`} tone={tone} size={size} label={`Stock, ${tone}, ${size}`} value={1} max={4} />
+        )),
+      )}
+      {/* Phase 10: data */}
+      {[false, true].map((stackOnMobile) => (
+        <DataTable key={String(stackOnMobile)} caption="Orders" stackOnMobile={stackOnMobile}>
+          <thead>
+            <tr>
+              {tableCellAlignments.map((align) => (
+                <Th key={align} align={align}>
+                  Client
+                </Th>
+              ))}
+              <ActionsTh />
+            </tr>
+          </thead>
+          <tbody>
+            <Tr hoverable selected>
+              {tableCellAlignments.map((align) => (
+                <Td key={align} align={align} data-label="Client">
+                  Fernando Dias
+                </Td>
+              ))}
+              <Td />
+            </Tr>
+            <DataTableMessage colSpan={4}>No orders yet.</DataTableMessage>
+          </tbody>
+        </DataTable>
+      ))}
+      {/* A grid with every feature, then a grid with groups, an empty grid and a loading grid. */}
+      <DataGrid
+        caption="Products"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        isRowSelected={(row) => row.id === 2}
+        rowActions={() => <button type="button">Edit</button>}
+        renderExpanded={(row) => (row.id === 1 ? "More about the product" : null)}
+        toolbar={<button type="button">New product</button>}
+        search={{ placeholder: "Search the products" }}
+        selection={{ actions: () => <button type="button">Archive</button> }}
+        pageSize={10}
+        defaultState={{ sort: { columnId: "name", descending: false } }}
+      />
+      <DataGrid
+        caption="Products by category"
+        columns={gridColumns}
+        rows={gridRows}
+        groups={[{ key: "drinks", title: "Drinks", actions: <button type="button">Rename</button>, rows: gridRows }]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+      />
+      <DataGrid
+        caption="Products that match"
+        columns={gridColumns}
+        rows={gridRows}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        search={{ placeholder: "Search" }}
+        defaultState={{ search: "no product has this text" }}
+      />
+      <DataGrid
+        caption="Products that load"
+        columns={gridColumns}
+        rows={[]}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.name}
+        loading
+      />
+      <ListItem title="Day off request" meta="12/10" value="8 h" status={<span>Open</span>} icon={PlusIcon} href="/requests/1" selected />
+      <ListItem title="Ana" onClick={() => undefined} />
+      <ListItem title="No action" />
+      <DetailPanel
+        title="Request #12"
+        status={<span>Open</span>}
+        onClose={() => undefined}
+        fields={[{ label: "Type", value: "Vacation" }]}
+        footer={<button type="button">Approve</button>}
+      >
+        A note of the manager.
+      </DetailPanel>
     </ThemeProvider>,
   );
 
   const classNames = new Set<string>();
   const collect = () => {
-    for (const element of container.querySelectorAll("[class]")) {
+    // The whole <body>: the components are in "container", and an overlay is next to it.
+    expect(document.body.contains(container)).toBe(true);
+    for (const element of document.body.querySelectorAll("[class]")) {
       for (const className of (element.getAttribute("class") ?? "").split(/\s+/)) {
         if (className !== "") {
           classNames.add(className);
@@ -127,11 +460,23 @@ async function renderEveryComponent(): Promise<string[]> {
     }
   };
   collect();
+  // Phase 10: the bar of the selected rows is on the page only while a row is selected.
+  await user.click(screen.getByRole("checkbox", { name: "Select all" }));
+  collect();
   // An open menu is on the page only while it is open.
   for (const menuPlacement of splitButtonMenuPlacements) {
     await user.click(screen.getByRole("button", { name: `More options, ${menuPlacement}` }));
     collect();
   }
+  // Phase 9: the floating panels, each one open.
+  render(<FloatingExamples />);
+  for (const buttonName of floatingButtonNames) {
+    await user.click(screen.getByRole("button", { name: buttonName }));
+    collect();
+  }
+  // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
+  render(<OverlayExamples />);
+  collect();
   return [...classNames];
 }
 
@@ -198,6 +543,7 @@ describe("the classes of the components use only tokens", () => {
     expect(variableNames).toContain("icon-default");
     expect(variableNames).toContain("font-body");
     expect(variableNames).toContain("text-base");
+    expect(variableNames).toContain("text-xs");
     expect(variableNames).toContain("spacing");
     expect(variableNames).toContain("radius-md");
     expect(variableNames).toContain("radius-lg");
@@ -214,7 +560,16 @@ describe("the classes of the components use only tokens", () => {
   });
 
   test("no length is written in rem", () => {
-    expect(utilitiesLayer(cssOfClasses)).not.toMatch(/\d(\.\d+)?rem\b/);
+    // A breakpoint of Tailwind ("lg:") is a media query with a width in rem. It
+    // is Tailwind's own value for the width of the screen, not a length of a
+    // component, so the width of a media query is left out of this check.
+    // "max-md:" (phase 10, a table shown as blocks) is the same breakpoint, as "width < 48rem".
+    const withoutBreakpoints = utilitiesLayer(cssOfClasses).replace(
+      /@media \(width (>=|<) \d+(\.\d+)?rem\)/g,
+      "@media (breakpoint)",
+    );
+    expect(withoutBreakpoints).toContain("@media (breakpoint)");
+    expect(withoutBreakpoints).not.toMatch(/\d(\.\d+)?rem\b/);
   });
 });
 
@@ -222,35 +577,89 @@ describe("the class of the state that must win comes later in the built CSS", ()
   // Each pair: [the class that loses, the class that wins]. Both set the same
   // property and can match one element at the same time.
   test.each([
-    // Button, and the two buttons of SplitButton: disabled wins over the pointer over it.
-    ["hover:bg-primary-hover", "disabled:bg-subtle"],
-    ["hover:bg-subtle", "disabled:bg-subtle"],
-    ["hover:bg-danger-subtle", "disabled:bg-subtle"],
-    ["hover:border-hover", "disabled:border-default"],
-    ["border-danger", "disabled:border-default"],
-    ["text-danger", "disabled:text-tertiary"],
+    // Button, ButtonLink, IconButton and the two buttons of SplitButton: the pointer over it wins over the look at rest.
     ["bg-primary", "hover:bg-primary-hover"],
     ["bg-surface", "hover:bg-subtle"],
-    // Input: the focus wins over the pointer, and disabled wins over both.
+    ["bg-surface", "hover:bg-danger-subtle"],
     ["border-default", "hover:border-hover"],
-    ["hover:border-hover", "focus-visible:border-focus"],
-    ["focus-visible:border-focus", "disabled:border-default"],
+    ["bg-primary-subtle", "hover:bg-primary-muted"],
+    ["text-body", "hover:text-primary"],
+    ["text-icon", "hover:text-icon-strong"],
+    // TextInput: the focus wins over the pointer, a field that is not valid wins over
+    // both, and the pointer over a disabled field changes nothing.
+    ["hover:border-hover", "focus:border-focus"],
+    ["focus:border-focus", "aria-invalid:border-invalid"],
+    ["hover:border-hover", "disabled:hover:border-default"],
+    ["bg-surface", "disabled:bg-subtle"],
     ["text-primary", "disabled:text-tertiary"],
-    // Toggle: on wins over off, and disabled wins over on.
+    // TextInput, size "md": the classes of a wide screen win over the classes of a small one.
+    ["min-h-12", "lg:min-h-10"],
+    ["py-2.5", "lg:py-2"],
+    ["text-base/6", "lg:text-sm/5"],
+    // Toggle: on wins over off.
     ["bg-surface", "peer-checked:bg-primary"],
     ["border-strong", "peer-checked:border-brand"],
-    ["peer-checked:bg-primary", "peer-disabled:bg-subtle"],
-    ["peer-checked:border-brand", "peer-disabled:border-default"],
     ["bg-current", "group-has-checked/toggle:bg-surface"],
-    ["group-has-checked/toggle:bg-surface", "group-has-disabled/toggle:bg-current"],
-    ["text-icon", "group-has-disabled/toggle:text-muted"],
-    ["text-brand", "group-has-disabled/toggle:text-inverse"],
-    ["text-body", "has-disabled:text-tertiary"],
+    // TabNav: the current tab wins over the look at rest and over the pointer over it.
+    ["hover:text-primary", "aria-[current=page]:text-brand"],
+    ["hover:text-primary", "aria-[current=page]:text-primary"],
+    ["border-transparent", "aria-[current=page]:border-brand"],
+    // TabNav: the classes of a wide screen win over the classes of a narrow one.
+    ["overflow-x-auto", "md:overflow-visible"],
     // Tabs: the selected tab wins over the pointer over it.
-    ["hover:text-primary", "aria-selected:text-brand"],
-    ["border-b-transparent", "aria-selected:border-b-brand"],
-    // SplitButton: the keyboard focus ring wins over the plain focus.
+    ["text-secondary", "aria-selected:text-primary"],
+    ["hover:text-primary", "aria-selected:text-primary"],
+    // SplitButton: the open trigger wins over the look at rest, and the keyboard focus ring wins over the plain focus.
+    ["bg-primary", "enabled:aria-expanded:bg-primary-hover"],
     ["focus:bg-subtle", "focus-visible:outline-2"],
+    // Phase 8: forms and feedback.
+    // Checkbox: checked wins over the look at rest and over the border of a changed value. The pointer over
+    // it wins over checked for the border, as in Intraweb, and a checked box has its own darker background.
+    ["border-strong", "checked:border-brand"],
+    ["border-changed", "checked:border-brand"],
+    ["bg-surface", "checked:bg-primary"],
+    ["checked:border-brand", "hover:border-hover"],
+    ["checked:bg-primary", "checked:hover:bg-primary-hover"],
+    // Panel: the classes of a wide screen win over the classes of a narrow one.
+    ["rounded-lg", "md:rounded-xl"],
+    ["p-4", "md:p-6"],
+    // EmptyState: the padding of a wide screen wins.
+    ["px-4", "md:px-8"],
+    // StatCard: the padding and the size of the number of a wide screen win.
+    ["p-4", "md:p-5"],
+    ["text-2xl/8", "md:text-3xl/10"],
+    // Phase 9, Modal: the classes of a wide screen win over the classes of a narrow one.
+    ["items-end", "md:items-start"],
+    ["max-h-[92dvh]", "md:max-h-none"],
+    ["overflow-y-auto", "md:overflow-visible"],
+    ["rounded-t-2xl", "md:rounded-xl"],
+    ["pl-4", "md:pl-6"],
+    ["p-4", "md:p-6"],
+    // Phase 9, Drawer: the same, for the footer and the width.
+    ["px-4", "md:px-6"],
+    ["w-full", "md:max-w-lg"],
+    // Phase 9, DiscardConfirmation: the buttons are in a row on a wide screen.
+    ["flex-col-reverse", "sm:flex-row"],
+    // Phase 9, the menu of SplitButton and ActionMenu: the pointer over an action that cannot be chosen changes nothing.
+    ["hover:bg-subtle", "aria-disabled:hover:bg-transparent"],
+    // Phase 9, Tooltip: shown (the pointer over it, or the keyboard focus inside) wins over hidden.
+    ["invisible", "group-hover/tooltip:visible"],
+    ["opacity-0", "group-hover/tooltip:opacity-100"],
+    ["invisible", "group-has-focus-visible/tooltip:visible"],
+    ["opacity-0", "group-has-focus-visible/tooltip:opacity-100"],
+    // Phase 10: data
+    // Tr: the row of the open record wins over the row under the pointer.
+    ["hover:bg-subtle", "aria-[current=true]:bg-selected"],
+    // DataTable with stackOnMobile: the classes of a narrow screen win over the classes of a cell.
+    ["border-b", "max-md:[&_td]:[border:0]"],
+    ["py-2.5", "max-md:[&_td]:py-1.5"],
+    // DataGrid: a row whose checkbox is checked wins over the row under the pointer,
+    // and the header of the sorted column wins over the look at rest.
+    ["hover:bg-subtle", "data-checked:bg-selected"],
+    ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
+    ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
+    // DetailPanel: the width of a wide screen wins over the full width.
+    ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
     const losingIndex = cssFromSource.indexOf(`${selectorOf(losingClass)}`);
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
@@ -258,10 +667,8 @@ describe("the class of the state that must win comes later in the built CSS", ()
     expect(winningIndex).toBeGreaterThan(losingIndex);
   });
 
-  test("the error border of Input applies only to a field that is not disabled", () => {
-    expect(cssFromSource).toContain(
-      `${selectorOf("aria-invalid:enabled:border-invalid")}[aria-invalid="true"]:enabled`,
-    );
+  test("the border of a field that is not valid is selected by aria-invalid", () => {
+    expect(cssFromSource).toContain(`${selectorOf("aria-invalid:border-invalid")}[aria-invalid="true"]`);
   });
 
   test("a movement or a transition is only for a person who did not ask for less motion", () => {

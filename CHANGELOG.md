@@ -4,6 +4,76 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
+## 0.2.0 (not published yet)
+
+The components get the shape of the same components of the app Intraweb: variants, sizes, props, measures and states (phase 7, TOR-1123). After this version a screen of Intraweb can import these components from the library and look the same.
+
+### Breaking changes, with what an app must change
+
+- **`Input` is removed. `Field` and `TextInput` replace it.** `Input` was a text field with its own label and error message. Now `Field` has the label, the hint and the error message, and `TextInput` is only the text field, as in Intraweb. To move an app:
+
+  | Before | After |
+  |---|---|
+  | `import { Input } from "@toraline.tech/ui"` | `import { Field, TextInput } from "@toraline.tech/ui"` |
+  | `<Input label="Title" name="title" error={titleError} />` | `<Field label="Title" error={titleError}><TextInput name="title" /></Field>` |
+  | `<Input aria-label="Search" name="search" />` (no visible label) | `<TextInput aria-label="Search" name="search" />` |
+  | `id="title"` on `Input` | `id="title"` on `Field` or on `TextInput`; one is enough |
+  | `className` on `Input` (it went to the element around the label, the field and the message) | `className` on `Field` for that element; `className` on `TextInput` for the `<input>` |
+  | `ref`, `name`, `value`, `onChange`, `placeholder`, `disabled`, `type` on `Input` | The same props on `TextInput` |
+  | CSS of the app that selects `[data-slot="field"]` | Select the `<input>` with a class the app gives to `TextInput` |
+  | The type `InputProps` | `TextInputProps` and `FieldProps` |
+
+  What looks different: the field is 48 pixels high on a small screen and 40 pixels on a screen 1024 pixels wide or more (it was about 50 pixels everywhere). With the focus it shows a border and a ring (it showed an outline). The error icon is a triangle (it was a circle with a cross). A field with an error keeps its red border while it is disabled.
+
+- **Tabs: the props of the selected tab have new names.** `selectedId` is now `value`, `onSelectedIdChange` is now `onChange`, and `defaultSelectedId` is now `defaultValue`. The app renames the 3 props. The behaviour is the same.
+- **Tabs: the look is the segmented control of Intraweb.** The row is a quiet rounded track, and the selected tab is a raised white piece. It was a row with a line under the selected tab; that look is now the variant `primary` of TabNav, for tabs that are links to routes. The font size of a tab is 14 pixels (it was 16).
+- **Toggle: the size is fixed, and the label is smaller.** The switch is 36 pixels wide and 20 pixels high, and its label has 14 pixels. Before, the switch had its size in `em`: a font size class on Toggle (`className="text-lg"`) made the switch larger. Now such a class changes only the label. A disabled switch has half of its opacity (it was grey).
+- **BreadCrumbs: smaller text.** The text has 14 pixels in the weight 500 (it was 16 pixels, bold), and the current page has the same size as the links (it was larger). The app changes nothing.
+- **SplitButton: the sizes of Button.** The two buttons are 40 pixels high with text of 14 pixels, as the primary Button in the size `md`. Disabled buttons have half of their opacity (they were grey). The arrow is a thin line. The actions of the menu have the weight 400 (they were bold) and less padding, as the menu of actions of Intraweb. The app changes nothing.
+- **ThemeToggle: the look of the secondary Button in the size `md`.** 40 pixels high, text of 14 pixels, no pointer cursor.
+- **Button: new sizes.** The heights are now 32 pixels (`sm`), 40 (`md`) and 48 (`lg`), with the paddings of Intraweb. The font size is 14 pixels for `sm` and `md` (it was 16 for `md`) and 16 for `lg` (it was 18). The app changes nothing; a layout that depended on the old heights must be looked at.
+- **Button: a disabled button has half of its opacity**, in the colors of its variant, as in Intraweb. It was grey for every variant. An app that gave `disabled:` color classes to a Button can remove them.
+- **Button: no pointer cursor.** The pointer over a button is the normal arrow, as in Intraweb and as Tailwind CSS 4 sets it. An app that wants the hand gives `className="cursor-pointer"`.
+
+### New
+
+- Button: the variants `soft` (a quiet background in the brand color) and `ghost` (no background and no border). The list `buttonVariants` now has 5 values: `primary`, `secondary`, `soft`, `danger`, `ghost`.
+- Button: the prop `icon`, an icon component shown before the text: `<Button icon={Plus}>`. An icon of the package `lucide-react` works as it is. The library does not depend on `lucide-react`. The type is `IconComponent`.
+- Button has no `"use client"` any more, so a Server Component can give it an icon component. Only its `<button>` runs in the browser.
+- ButtonLink: a link that looks like a Button, with the same variants, sizes and icon. It renders an `<a>`, or the link component the app gives in `linkComponent`, for example the `Link` of `next/link`. The library does not import Next.js.
+- IconButton: a button that shows only an icon, with the variants `ghost`, `secondary`, `soft` and `primary` and the sizes `sm`, `md` and `lg` (32, 40 and 48 pixels). The types require `aria-label`.
+- Field: wraps any form control with a label, a hint, an error message with its icon, and the mark of an optional field. It links them to the control for a screen reader: `id`, `aria-describedby` and `aria-invalid`.
+- TextInput: a text field with the sizes `md` and `sm`, an icon on the left (`icon`), and the focus, disabled and not valid looks of Intraweb's text field. The list `controlSizes` and the type `ControlSize` are the sizes of every form control.
+- TabNav: tabs where each tab is a link to a route, in two looks: `primary` (a line under the current tab) and `secondary` (the segmented control). The app gives the current path (`currentPath`) and its link component (`linkComponent`). The current tab has `aria-current="page"`.
+- Tabs: `content` of a tab is optional. An app that shows the content itself gives no content and reads the selected tab from `value`. The type of `value` is the ids of the tabs when they are written as fixed texts.
+- `@toraline.tech/tokens`: the token `--text-xs` (the class `text-xs`, 12 pixels), the font size of the hint of Field. `createTheme` accepts `textSizes.xs`. There are now 76 level 2 tokens. A theme that an app built with `createTheme` gets the token by itself.
+- Select (phase 8, TOR-1124): a native `<select>` with the box, the sizes `md` and `sm` and the focus, disabled and not valid looks of TextInput, and the arrow of Intraweb's select. It goes inside Field.
+- Textarea (phase 8): a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput. It goes inside Field.
+- DecimalInput (phase 8): a TextInput for a number with decimals, with the decimal keyboard of a phone. The functions `parseDecimalInput` (the typed text as a number, with a comma or a point as the decimal mark) and `decimalToInput` (a number as the text of the field) come with it.
+- Checkbox and CheckboxControl (phase 8): a checkbox with its label, and only the box (20 pixels) for a list or a table. The box is a real `<input type="checkbox">`. `changed` on CheckboxControl marks a value that is not saved yet.
+- StatusBadge (phase 8): a badge with the state of a thing, in the variants `neutral`, `success`, `warning`, `error` and `info`, with an optional dot.
+- CountBadge (phase 8): a small pill with a number, in the variants `warning` and `brand`. `label` says what the number means to a screen reader.
+- Panel (phase 8): the card that groups content, with an optional title, subtitle and actions.
+- EmptyState (phase 8): what a list or a page shows when it has nothing to show: an icon, a title, a text and one action.
+- ProgressBar and ProgressRing (phase 8): how much of a whole is done, as a line or as a circle, in the tones `brand`, `success`, `warning` and `danger`. The ring has the sizes `md` and `sm`. A screen reader says the label and the value. StatCard gets the prop `progress`, a progress bar at the bottom of the card.
+- StatCard (phase 8): a card with one number, its label, an icon and how the number changed, in the tones `default` and `tinted`.
+- `@toraline.tech/tokens` (phase 8): the tokens `--text-2xl` (the class `text-2xl`, 24 pixels) and `--text-3xl` (the class `text-3xl`, 32 pixels), the font sizes of the number of StatCard. `createTheme` accepts `textSizes["2xl"]` and `textSizes["3xl"]`. There are now 78 level 2 tokens. With the preset, the class `text-3xl` is 32 pixels; with Tailwind CSS alone it is 30 pixels. An app that uses `text-3xl` with the preset gets text 2 pixels larger.
+- Overlays (phase 9, TOR-1125). An overlay is a part of the screen that opens above the page. They are written by hand, from the overlays of Intraweb, and an app sets up nothing for them.
+- `useAnchoredPanel`: a hook that places a floating panel (a menu, a popover, a filter) next to the button that opened it, on the other side when there is no room, and inside the window. `computeAnchoredPosition` is the same rule as a plain function.
+- CloseButton: the button with a cross that closes a dialog or a side panel. Its name for a screen reader is `"Close"` unless the app gives `aria-label`.
+- Modal: a dialog above the page, in the sizes `md`, `lg`, `xl` and `full`. The focus goes into it, Tab stays inside, Escape closes only the newest overlay, and the focus goes back to the element that opened it.
+- Drawer: a panel on the right side of the screen with a footer that stays at the bottom. It leaves the page next to it usable. It has the same 3 focus rules as Modal. While it is open, `<body>` has the attribute `data-drawer-open`.
+- DiscardConfirmation: the question before something a person typed is lost. Modal and Drawer show it by themselves when they get the prop `discardConfirmation` with its 4 texts.
+- DeleteOverlay: the dialog that asks before something is deleted, with the states `pending`, `error` and `blocked`. Every text of the 2 confirmation dialogs is a prop of the app.
+- ActionMenu: a button (3 dots, or a text with an arrow) that opens a menu of actions next to it. The menu and the menu of SplitButton are the same code.
+- SplitButton: Escape in its menu no longer reaches a Modal or a Drawer that the SplitButton is in, so the key closes only the menu. Nothing else changed.
+- Popover: a button with a floating panel under it. Escape and a press outside close it. It opens above when there is no room below, and stays inside the window.
+- Tooltip: a small label next to an element, shown on hover and on keyboard focus. A screen reader says its text as the description of the element. Escape hides it.
+- DataTable, with the parts `Tr`, `Th`, `Td`, `ActionsTh` and `DataTableMessage`: a real `<table>` inside a card, with the look of Intraweb's DataTable. The table needs a name (`caption`, `aria-label` or `aria-labelledby`). `Th` and `Td` have `align`; `Tr` has `selected` (the row of the open record, `aria-current="true"`) and `hoverable`; `ActionsTh` is the header of the column of the buttons of each row; `DataTableMessage` is the row of an empty or a loading table. A table wider than its box scrolls sideways and can then be scrolled with the keyboard. `stackOnMobile` shows each row as a block on a screen less than 768 pixels wide (phase 10, TOR-1126).
+- DataGrid: a table of records with a search field, a sort by column (`aria-sort`), pages, a selection with a bar of actions, a footer row with totals, groups of rows, a row of extra content, and the states empty, no result and loading. It has the look of Intraweb's DataGrid. The app gives every record; the grid loads no data. Its texts are the prop `labels`, with English defaults. `defaultState` and `onStateChange` let an app keep the search, the sort and the page in the address of the page. `checkboxComponent` and `selectComponent` take the app's checkbox and select; the defaults are the ones of the browser. Not moved from Intraweb yet: the filter of a column, the choice of columns, the editing of cells and the rows inside a row (phase 10, TOR-1126).
+- ListItem: one row of a list of records, with an icon, a title, a second line, a value and a status. With `href` it is a link (the app gives its link component in `linkComponent`), with only `onClick` a button, with neither a row that cannot be pressed. The selected item has `aria-current="true"`. It has the look of Intraweb's ListItem (phase 10, TOR-1126).
+- DetailPanel: the detail of the selected record, shown next to a list: an `<aside>` named by its title, with a status, a close button (`onClose`, `closeLabel`), the fields of the record as a list of names and values, more content and a footer for the actions. It is 360 pixels wide from a screen 1280 pixels wide. It has the look of Intraweb's DetailPanel (phase 10, TOR-1126).
+
 ## 0.1.0 (2026-11-15)
 
 The first version of the new library. Inside Toraline it is called "V2". It is a pre-release: tested in Toraline's own apps, not used for real yet. Version `1.0.0` comes after the full rebrand. It replaces `@toraline/toraline-ui`, and nothing of the old package works unchanged with it.

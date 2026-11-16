@@ -93,6 +93,11 @@ test.each([lightTheme, darkTheme])(
       // The primary button, at rest and with the pointer over it.
       ["text-inverse", "bg-primary"],
       ["text-inverse", "bg-primary-hover"],
+      // The soft button, at rest and with the pointer over it.
+      ["text-brand", "bg-primary-subtle"],
+      ["text-brand", "bg-primary-muted"],
+      // The ghost button with the pointer over it.
+      ["text-primary", "bg-muted"],
       // The danger button and the error message of a field.
       ["text-danger", "bg-page"],
       ["text-danger", "bg-surface"],
@@ -103,6 +108,15 @@ test.each([lightTheme, darkTheme])(
       // A placeholder, and the text of a disabled button or field.
       ["text-tertiary", "bg-surface"],
       ["text-tertiary", "bg-subtle"],
+      // Phase 9: the text of a tooltip.
+      ["text-inverse", "bg-tooltip"],
+      // Phase 10: data. The selected row of a table and the selected item of a list.
+      ["text-primary", "bg-subtle"],
+      ["text-primary", "bg-selected"],
+      ["text-body", "bg-selected"],
+      ["text-tertiary", "bg-selected"],
+      ["text-secondary", "bg-selected"],
+      ["text-secondary", "bg-subtle"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
@@ -129,6 +143,18 @@ test.each([lightTheme, darkTheme])(
       ["border-brand", "bg-surface"],
       // The thumb of a switch that is off.
       ["icon-default", "bg-surface"],
+      // The icon of an icon button: ghost, secondary and soft, at rest and with the pointer over it.
+      ["icon-default", "bg-page"],
+      ["icon-strong", "bg-muted"],
+      ["icon-strong", "bg-surface"],
+      ["icon-strong", "bg-subtle"],
+      ["icon-brand", "bg-primary-subtle"],
+      ["icon-brand", "bg-primary-muted"],
+      // Phase 10: data. The line on the left of the selected row and of the selected item.
+      ["border-brand", "bg-selected"],
+      ["bg-primary", "bg-selected"],
+      ["icon-default", "bg-subtle"],
+      ["icon-default", "bg-selected"],
     ];
     for (const [foreground, background] of pairs) {
       expect(
@@ -179,3 +205,93 @@ test("packages/tokens/README.md documents every level 2 token", () => {
     expect(readme).toContain(`\`--${name}\``);
   }
 });
+
+/*
+ * Phase 8 (TOR-1124): the pairs of the form controls and the feedback
+ * components. The pairs of each later component are added at the end of these lists.
+ */
+
+test.each([lightTheme, darkTheme])(
+  "phase 8, in the $name theme: the text of a badge, a card and a progress bar can be read on its background (contrast of 4.5 or more)",
+  (theme) => {
+    const pairs: [ThemeTokenName, ThemeTokenName][] = [
+      // StatusBadge: the text of each variant on its own background.
+      ["text-secondary", "bg-muted"],
+      ["text-success", "bg-success"],
+      ["text-warning", "bg-warning"],
+      ["text-error", "bg-error"],
+      ["text-info", "bg-info"],
+      // StatCard in the tone "tinted": the label, the number, the change and what it is compared with.
+      ["text-secondary", "bg-primary-subtle"],
+      ["text-primary", "bg-primary-subtle"],
+      ["text-success", "bg-primary-subtle"],
+      ["text-danger", "bg-primary-subtle"],
+      ["text-tertiary", "bg-primary-subtle"],
+      // StatCard in the tone "default": a change that is good.
+      ["text-success", "bg-surface"],
+    ];
+    for (const [foreground, background] of pairs) {
+      expect(
+        contrastRatio(theme, foreground, background),
+        `${foreground} on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  },
+);
+
+test.each([lightTheme, darkTheme])(
+  "phase 8, in the $name theme: the filled part of a progress bar can be seen on its track and on a card (contrast of 3 or more)",
+  (theme) => {
+    const pairs: [ThemeTokenName, ThemeTokenName][] = [
+      // ProgressBar and ProgressRing: the tones "brand" and "danger".
+      ["data-1", "data-track"],
+      ["data-1", "bg-surface"],
+      ["data-danger", "data-track"],
+      ["data-danger", "bg-surface"],
+    ];
+    for (const [foreground, background] of pairs) {
+      expect(
+        contrastRatio(theme, foreground, background),
+        `${foreground} on ${background}`,
+      ).toBeGreaterThanOrEqual(3);
+    }
+  },
+);
+
+/**
+ * Phase 8: the pairs of Intraweb's values that are below the limit of 3 for a
+ * part of a graphic. The values are not changed in the library: they are
+ * Intraweb's. In the dark theme the same pairs are 3 or more. A progress bar
+ * also says its value as text, so the color is not the only way to read it.
+ * The list is also in docs/decisions.md (TOR-1124).
+ */
+test.each<[themeName: "light" | "dark", foreground: ThemeTokenName, background: ThemeTokenName, limit: number, contrast: number]>([
+  // ProgressBar and ProgressRing: the tones "success" and "warning" in the light theme.
+  ["light", "data-success", "data-track", 3, 2.23],
+  ["light", "data-success", "bg-surface", 3, 2.76],
+  ["light", "data-warning", "data-track", 3, 1.48],
+  ["light", "data-warning", "bg-surface", 3, 1.84],
+  // The track, the empty part of the bar, on a card.
+  ["light", "data-track", "bg-surface", 3, 1.24],
+  ["dark", "data-track", "bg-surface", 3, 1.45],
+])(
+  "phase 8, known, in the %s theme: %s on %s is below %s (contrast %s)",
+  (themeName, foreground, background, limit, contrast) => {
+    const theme = themeName === "light" ? lightTheme : darkTheme;
+    const ratio = contrastRatio(theme, foreground, background);
+    expect(ratio).toBeLessThan(limit);
+    expect(Number(ratio.toFixed(2))).toBe(contrast);
+  },
+);
+
+test.each([
+  ["data-success", "data-track"],
+  ["data-success", "bg-surface"],
+  ["data-warning", "data-track"],
+  ["data-warning", "bg-surface"],
+] as [ThemeTokenName, ThemeTokenName][])(
+  "phase 8, in the dark theme: %s on %s can be seen (contrast of 3 or more)",
+  (foreground, background) => {
+    expect(contrastRatio(darkTheme, foreground, background)).toBeGreaterThanOrEqual(3);
+  },
+);

@@ -139,8 +139,8 @@ for (const { folder, manifest } of manifests) {
     ].join("\n");
     const built = await postcss([tailwind()]).process(appCss, { from: join(root, folder, "app.css") });
     // One class of a Client Component (Button), one of a component that also renders
-    // on the server (Input), and one of the entry "@toraline.tech/ui/theme" (ThemeToggle).
-    const expectedSelectors = [".bg-primary", ".aria-invalid\\:enabled\\:border-invalid", ".hover\\:bg-danger-subtle"];
+    // on the server (TextInput), and one of the entry "@toraline.tech/ui/theme" (ThemeToggle).
+    const expectedSelectors = [".bg-primary", ".aria-invalid\\:border-invalid", ".hover\\:bg-danger-subtle"];
     for (const selector of expectedSelectors) {
       if (!built.css.includes(selector)) {
         fail(`Tailwind did not build the class ${selector} from ${folder}/css/tailwind.css. An app would show the components with no style. Run: npm run build`);

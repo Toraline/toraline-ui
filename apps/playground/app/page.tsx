@@ -19,6 +19,26 @@ export default function Page() {
           The components of the library
         </a>
       </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/tab-nav">
+          TabNav: tabs that are links to routes
+        </a>
+      </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/forms-feedback">
+          Forms and feedback: the form controls and the feedback components
+        </a>
+      </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/overlays">
+          Overlays: dialogs, side panels, menus, popovers and tooltips
+        </a>
+      </p>
+      <p className="mt-2">
+        <a className="text-brand underline" href="/data">
+          The data components: DataTable, DataGrid, ListItem, DetailPanel
+        </a>
+      </p>
 
       <section className="mt-6 rounded-xl border border-default bg-surface p-4 shadow-card">
         <h2 className="font-heading text-xl font-bold">A card</h2>

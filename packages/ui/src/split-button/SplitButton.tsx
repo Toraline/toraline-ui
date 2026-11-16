@@ -4,6 +4,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, FocusEvent, KeyboardEvent, ReactNode } from "react";
 import { classNames } from "../shared/class-names.js";
 import { focusRingClass } from "../shared/focus-ring.js";
+import { Menu, menuFocusTargetOfKey } from "../shared/menu/Menu.js";
+import type { MenuFocusTarget } from "../shared/menu/Menu.js";
+import type { SplitButtonMenuPlacement } from "./split-button-options.js";
 
 /*
  * The classes of SplitButton: the main button, the button that opens the menu
@@ -16,25 +19,29 @@ import { focusRingClass } from "../shared/focus-ring.js";
 
 const rootClass = "group/split-button relative inline-flex gap-1 font-body";
 
-/** What the main button and the trigger share. */
+/**
+ * What the main button and the trigger share: the look of the primary Button
+ * in the size "md" (40 pixels high, the font of headings in the medium weight,
+ * half of the opacity when disabled).
+ */
 const buttonClass = classNames(
-  "inline-flex cursor-pointer items-center justify-center border border-transparent bg-primary font-heading text-base/normal font-medium text-inverse",
+  "inline-flex min-h-10 shrink-0 items-center justify-center bg-primary py-2 font-heading text-sm/5 font-medium text-inverse",
   "hover:bg-primary-hover",
-  "disabled:cursor-not-allowed disabled:border-default disabled:bg-subtle disabled:text-tertiary",
-  "motion-safe:transition-[background-color] motion-safe:ease-[ease]",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+  "motion-safe:transition-colors",
   focusRingClass,
 );
 
-const mainClass = classNames(buttonClass, "rounded-l-md rounded-r-none px-4 py-2");
+const mainClass = classNames(buttonClass, "rounded-l-md rounded-r-none px-4");
 
 const triggerClass = classNames(
   buttonClass,
-  "group/trigger rounded-l-none rounded-r-md px-3 py-2 enabled:aria-expanded:bg-primary-hover",
+  "group/trigger rounded-l-none rounded-r-md px-3 enabled:aria-expanded:bg-primary-hover",
 );
 
-/** The arrow points to where the menu opens, and turns over while the menu is open. */
+/** The arrow points to where the menu opens, and turns over while the menu is open. It has the size of the icon of a Button. */
 const arrowClass = classNames(
-  "size-[0.875em]",
+  "size-4",
   "group-data-[placement=top]/split-button:rotate-180",
   "group-data-[placement=bottom]/split-button:group-aria-expanded/trigger:rotate-180",
   "group-data-[placement=top]/split-button:group-aria-expanded/trigger:rotate-none",
@@ -43,22 +50,17 @@ const arrowClass = classNames(
 
 /**
  * The menu sits above the page and does not move the content around it.
- * Its colors, and the colors of an action, are the ones of the menu of actions of the app Intraweb.
+ * Its look, the look of an action and its keyboard are in the menu that
+ * SplitButton and ActionMenu share (shared/menu/Menu.tsx). These classes place
+ * it: under the buttons, or above them. The text of an action stays on one line.
  */
-const menuClass = classNames(
-  "absolute top-full left-0 z-10 mx-0 my-2 box-border flex min-w-full flex-col rounded-lg border border-subtle bg-surface p-1 shadow-lg",
+const menuPlaceClass = classNames(
+  "absolute top-full left-0 z-10 mx-0 my-1 box-border flex min-w-full flex-col whitespace-nowrap",
   "group-data-[placement=top]/split-button:top-auto group-data-[placement=top]/split-button:bottom-full",
 );
 
-/** One action. The action under the pointer and the action that has the keyboard focus have a quiet background. */
-const itemClass = classNames(
-  "flex cursor-pointer items-center gap-3 rounded-md border-0 bg-transparent px-4 py-3 text-start font-body text-sm/normal font-bold whitespace-nowrap text-body",
-  "hover:bg-subtle focus:bg-subtle",
-  focusRingClass,
-);
-
-const itemIconClass = "inline-flex size-[1em] flex-none";
-import type { SplitButtonMenuPlacement } from "./split-button-options.js";
+/** The icon of an action: 16 pixels, in the color of an icon. */
+const itemIconClass = "inline-flex size-4 flex-none items-center justify-center text-icon";
 
 /** One action of the menu. */
 export type SplitButtonItem = {
@@ -113,21 +115,11 @@ export function SplitButton({
   const [isOpen, setIsOpen] = useState(false);
   const rootElement = useRef<HTMLDivElement>(null);
   const triggerElement = useRef<HTMLButtonElement>(null);
-  const itemElements = useRef<(HTMLButtonElement | null)[]>([]);
   // Which action gets the focus when the menu opens.
-  const focusOnOpen = useRef<"first" | "last">("first");
+  const [focusOnOpen, setFocusOnOpen] = useState<MenuFocusTarget>("first");
 
-  const focusItem = (index: number) => {
-    const count = items.length;
-    if (count === 0) {
-      return;
-    }
-    // The index goes around: after the last action comes the first.
-    itemElements.current[(index + count) % count]?.focus();
-  };
-
-  const openMenu = (focusTarget: "first" | "last") => {
-    focusOnOpen.current = focusTarget;
+  const openMenu = (focusTarget: MenuFocusTarget) => {
+    setFocusOnOpen(focusTarget);
     setIsOpen(true);
   };
 
@@ -137,14 +129,6 @@ export function SplitButton({
     }
     setIsOpen(false);
   };
-
-  // After the menu is on the page, move the focus into it.
-  useEffect(() => {
-    if (isOpen) {
-      focusItem(focusOnOpen.current === "first" ? 0 : -1);
-    }
-    // Runs only when the menu opens or closes.
-  }, [isOpen]);
 
   // While the menu is open, a press anywhere outside the component closes it.
   useEffect(() => {
@@ -161,46 +145,10 @@ export function SplitButton({
   }, [isOpen]);
 
   const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    const focusTarget = menuFocusTargetOfKey(event.key);
+    if (focusTarget !== undefined) {
       event.preventDefault();
-      openMenu(event.key === "ArrowDown" ? "first" : "last");
-    }
-  };
-
-  const handleMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const currentIndex = itemElements.current.findIndex(
-      (element) => element === document.activeElement,
-    );
-    const targets: Record<string, number> = {
-      ArrowDown: currentIndex + 1,
-      ArrowUp: currentIndex - 1,
-      Home: 0,
-      End: -1,
-    };
-    const targetIndex = targets[event.key];
-
-    if (targetIndex !== undefined) {
-      event.preventDefault();
-      focusItem(targetIndex);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu(true);
-    } else if (event.key === "Tab") {
-      // The focus goes back to the button first. The browser then moves it
-      // to the element after or before that button.
-      closeMenu(true);
-    } else if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey) {
-      // A letter: go to the next action whose text starts with it.
-      const letter = event.key.toLowerCase();
-      const count = items.length;
-      for (let step = 1; step <= count; step += 1) {
-        const index = (currentIndex + step) % count;
-        const text = itemElements.current[index]?.textContent ?? "";
-        if (text.trim().toLowerCase().startsWith(letter)) {
-          focusItem(index);
-          break;
-        }
-      }
+      openMenu(focusTarget);
     }
   };
 
@@ -210,11 +158,6 @@ export function SplitButton({
     if (isOpen && nextElement instanceof Node && !event.currentTarget.contains(nextElement)) {
       setIsOpen(false);
     }
-  };
-
-  const handleSelect = (item: SplitButtonItem) => {
-    closeMenu(true);
-    item.onSelect();
   };
 
   return (
@@ -247,47 +190,40 @@ export function SplitButton({
         onClick={() => (isOpen ? closeMenu(false) : openMenu("first"))}
         onKeyDown={handleTriggerKeyDown}
       >
+        {/* The shape is the icon "chevron-down" of Lucide (https://lucide.dev, ISC license), the arrow Intraweb shows on a button that opens a menu. */}
         <svg
           className={arrowClass}
           data-slot="arrow"
-          viewBox="0 0 20 13"
-          fill="currentColor"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M10 8.273 17.778 0 20 2.363 10 13 0 2.363 2.222 0 10 8.273Z" />
+          <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
       {isOpen ? (
-        <div
-          role="menu"
+        <Menu
           id={menuId}
-          className={menuClass}
-          data-slot="menu"
+          className={menuPlaceClass}
           aria-labelledby={triggerId}
-          onKeyDown={handleMenuKeyDown}
-        >
-          {items.map((item, index) => (
-            <button
-              key={index}
-              ref={(element) => {
-                itemElements.current[index] = element;
-              }}
-              type="button"
-              role="menuitem"
-              tabIndex={-1}
-              className={itemClass}
-              data-slot="item"
-              onClick={() => handleSelect(item)}
-            >
-              {item.icon === undefined ? null : (
+          focusOnOpen={focusOnOpen}
+          onClose={({ restoreFocus }) => closeMenu(restoreFocus)}
+          entries={items.map((item, index) => ({
+            key: index,
+            label: item.label,
+            onSelect: item.onSelect,
+            icon:
+              item.icon === undefined ? undefined : (
                 <span className={itemIconClass} data-slot="item-icon" aria-hidden="true">
                   {item.icon}
                 </span>
-              )}
-              {item.label}
-            </button>
-          ))}
-        </div>
+              ),
+          }))}
+        />
       ) : null}
     </div>
   );

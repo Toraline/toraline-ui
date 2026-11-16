@@ -456,7 +456,7 @@ The theme function and the components do not need Next.js. They need Tailwind CS
 
 ## Guide 3: style on top of a component
 
-**Result:** one Button has fully round corners and the color the app added, and one field has round corners too. Nothing in the library changes.
+**Result:** one Button has fully round corners and the color the app added, and the label of one field is in capital letters. Nothing in the library changes.
 
 Every component accepts `className`. The classes go on the outermost element of the component.
 
@@ -472,7 +472,7 @@ Every component accepts `className`. The classes go on the outermost element of 
    <Button className="bg-promo text-on-promo hover:bg-primary-hover">Save</Button>
    ```
 
-   A class replaces only a class for the same CSS property, with the same Tailwind variant. `bg-promo` replaces the library's `bg-primary`, and `text-on-promo` replaces the library's `text-inverse`. They do not replace `hover:bg-primary-hover` or `disabled:bg-subtle`. So give one class for each state you want to change: `hover:` for the pointer over the element, `disabled:` for a disabled element, `focus-visible:` for the keyboard focus. A state you give no class for keeps the look of the library.
+   A class replaces only a class for the same CSS property, with the same Tailwind variant. `bg-promo` replaces the library's `bg-primary`, and `text-on-promo` replaces the library's `text-inverse`. They do not replace `hover:bg-primary-hover` or `disabled:opacity-50`. So give one class for each state you want to change: `hover:` for the pointer over the element, `disabled:` for a disabled element, `focus-visible:` for the keyboard focus. A state you give no class for keeps the look of the library.
 
 3. **With your own CSS:** write a class in the CSS file of the app, in no cascade layer, and give it to the component.
 
@@ -486,16 +486,18 @@ Every component accepts `className`. The classes go on the outermost element of 
    <Button className="round">Save</Button>
    ```
 
-4. **An inner part of a component:** a component with more than one element gives each inner element the attribute `data-slot`, with the name of the part. Use it after your own class. This rule makes the field of one Input round:
+4. **An inner part of a component:** a component with more than one element gives each inner element the attribute `data-slot`, with the name of the part. Use it after your own class. This rule writes the label of one Field in capital letters:
 
    ```css
-   .search [data-slot="field"] {
-     border-radius: 9999px;
+   .search [data-slot="label"] {
+     text-transform: uppercase;
    }
    ```
 
    ```tsx
-   <Input className="search" label="Search" name="search" />
+   <Field className="search" label="Search">
+     <TextInput name="search" />
+   </Field>
    ```
 
 5. **With the colors of the theme in your own CSS:** use the tokens, so the style follows the theme.

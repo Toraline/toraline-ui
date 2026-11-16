@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createTheme } from "@toraline.tech/tokens";
 import type { ThemeInput } from "@toraline.tech/tokens";
-import { Button, Input } from "@toraline.tech/ui";
+import { Button, Field, TextInput } from "@toraline.tech/ui";
 import { ThemeToggle, useTheme } from "@toraline.tech/ui/theme";
 import "./guide-examples.css";
 
@@ -78,7 +78,7 @@ export function ThemedApp() {
 /**
  * The result of guide 3: a Tailwind class of the app on a Button, a class of
  * the app's own CSS on a Button, and a rule of the app's own CSS on the inner
- * field of an Input.
+ * label of a Field.
  */
 export function StyledOnTop() {
   return (
@@ -86,7 +86,9 @@ export function StyledOnTop() {
       <Button>Save, as the library styles it</Button>
       <Button className="rounded-full">Save, with a Tailwind class of the app</Button>
       <Button className="guide-round">Save, with a class of the app's own CSS</Button>
-      <Input className="guide-search" label="Search" name="search" />
+      <Field className="guide-search" label="Search">
+        <TextInput name="search" />
+      </Field>
     </div>
   );
 }
