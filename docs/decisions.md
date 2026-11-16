@@ -12,6 +12,17 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - DataGrid: another view in the place of the table (TOR-1214)
+- Design source: Intraweb's `components/ui/data-grid/data-grid.tsx` (the prop `renderView`, commit `f8ad4c2` of `prontera-e-juno`), the one screen that uses it (`events-list-page.tsx`, a calendar), and the text of the ticket. Figma was not read: this session had no access to it.
+- Decision: the prop is `renderView(rows)`, with the name and the rules of Intraweb. The app keeps which view is shown and gives `renderView` or `undefined`, as Intraweb's screen does. The grid keeps the search and the filters, so they stay when the view changes.
+- Kept from Intraweb: the view receives the rows after the search, the filters and the sort of the state, for every page; the filter of each column that is shown moves to the toolbar as a button with a border and the name of the column (`labeled`); with a view there is no selection, no pages and no menu of the columns; a grid with `groups` ignores `renderView`.
+- Decision: the view is inside a `<div data-slot="view">` with no class, so an app can select it. Intraweb renders the view with no element around it. The space above and under it is the same.
+- Decision: `loading` and `emptyMessage` do nothing with a view. They are a row of the table. The view receives an empty list and shows its own text.
+- Not built: a list of views with a switch drawn by the grid. Intraweb's screen draws its own switch in `toolbar`.
+- States of the list "States to check": rest (story "Another View"); hover and keyboard focus of a labelled filter button: compared with Intraweb (entry of TOR-1209); open (story "Another View With A Filter Open"); selected: a filter that is on (story "Another View", the button "Status"); empty: the view's own text (story helper `ProductCards`); loading, error, disabled, read-only, pressed: do not apply; long content: the buttons of the toolbar go to the next line; right-to-left: considered, as the toolbar; both themes: every story test; reduced motion: no animation of its own.
+- Alternatives: `views` (a list of `{ id, label, render }`) with a switch of the library; a prop `view` with a name and children.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DataGrid: rows inside a row (TOR-1213)
 - Design source: Intraweb's `components/ui/data-grid/sub-rows.tsx` (commit `f8ad4c2` of `prontera-e-juno`), the one screen of Intraweb that uses it (`complements-page.tsx`), and the text of the ticket. Figma was not read: this session had no access to it.
 - Decision: the prop `subRows` has the fields of Intraweb's `DataGridSubRows`, with the same names: `label`, `getRows`, `columns`, `getRowKey`, `getRowLabel`, `onSaveCell`, `rowActions`, `footer`, `emptyMessage`. The object of Intraweb's screen works unchanged. `emptyMessage` also accepts elements.

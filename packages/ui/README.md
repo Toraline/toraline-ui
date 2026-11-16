@@ -1315,6 +1315,7 @@ const columns: DataGridColumn<Product>[] = [
 | `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
 | `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
 | `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
+| `renderView` | A function `(rows) => elements` | Shows another view in the place of the table. See [Another view in the place of the table](#another-view-in-the-place-of-the-table) |
 | `subRows` | An object | The items inside each row, shown by an arrow. See [Rows inside a row](#rows-inside-a-row) |
 | `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no filter, no selection and no pages |
 | `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
@@ -1352,7 +1353,7 @@ The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilter
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: another view in the place of the table. It is the next ticket of TOR-1209.
+- Not in the library, and still only in Intraweb: the mode that edits the whole table and saves the changed rows with one button (`onSaveRow`), and a cell edited with several choices (`multiselect`). No ticket asks for them yet.
 - The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
 
@@ -1603,6 +1604,27 @@ const columns: DataGridColumn<Product>[] = [
 - The inner table is named by `labels.subRowsCaption`. When it is wider than its box it scrolls sideways, and the box can get the keyboard focus.
 - The items have no search, no sort, no filter and no menu of the columns.
 - The generic type of the grid has a second part for the items: `DataGridProps<Row, SubRow>`. TypeScript reads it from `subRows`.
+
+#### Another view in the place of the table
+
+`renderView` shows what the app returns in the place of the table, for example a calendar or cards. It receives the rows after the search, the filters and the sort, for every page.
+
+```tsx
+const [view, setView] = useState<"list" | "calendar">("list");
+
+<DataGrid
+  /* caption, columns, rows, getRowKey, getRowLabel */
+  search={{ placeholder: "Search the events" }}
+  toolbar={<ViewSwitch value={view} onChange={setView} />}
+  renderView={view === "calendar" ? (events) => <EventCalendar events={events} /> : undefined}
+/>
+```
+
+- The app keeps which view is shown: it gives `renderView` for the other view, and `undefined` for the table. The grid keeps the search and the filters, so they stay when the view changes, and they apply to both.
+- The search field, the `toolbar` and "Clear filters" stay above the view.
+- A view has no header cells. So the filter of each column that is shown moves to the toolbar, as a button 32 pixels high with the filter icon and the name of the column. Its panel, its keyboard and its name are the ones of [the filter of a column](#the-filter-of-a-column).
+- With a view there is no selection, no pages and no menu of the columns. `loading` and `emptyMessage` belong to the table: the view shows its own text for no rows.
+- The view is inside an element with `data-slot="view"`.
 
 ### `ListItem`
 

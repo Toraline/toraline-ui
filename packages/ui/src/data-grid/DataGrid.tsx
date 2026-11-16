@@ -142,6 +142,14 @@ export type DataGridProps<Row, SubRow = never> = {
    * right under the row.
    */
   subRows?: DataGridSubRows<Row, SubRow>;
+  /**
+   * Shows another view in the place of the table, for example a calendar. It
+   * receives the rows after the search and the filters. The search field and
+   * the toolbar stay above it, and the filters of the columns move to the
+   * toolbar, as buttons with the name of their column. With a view there is no
+   * selection, no pages and no menu of the columns. Give undefined to show the table.
+   */
+  renderView?: (rows: Row[]) => ReactNode;
   /** The filters and the buttons of the screen, shown above the table, after the search field. */
   toolbar?: ReactNode;
   /** Turns on the search field, which looks in the columns with "searchValue". */
@@ -229,6 +237,7 @@ export function DataGrid<Row, SubRow = never>({
   rowProps,
   renderExpanded,
   subRows,
+  renderView,
   toolbar,
   search,
   selection,
@@ -293,7 +302,8 @@ export function DataGrid<Row, SubRow = never>({
   const hasChangedFilters = columns.some((column) => column.filter !== undefined && column.id in state.filters);
   const hasFilters = isFlat && (searchText !== "" || hasChangedFilters);
 
-  const isSelectable = isFlat && selection !== undefined && !loading;
+  const hasView = isFlat && renderView !== undefined;
+  const isSelectable = isFlat && selection !== undefined && !loading && !hasView;
   const selectedRows = isSelectable ? foundRows.filter((row) => checkedKeys.has(getRowKey(row))) : [];
   const areAllSelected = foundRows.length > 0 && selectedRows.length === foundRows.length;
   const areSomeSelected = selectedRows.length > 0 && !areAllSelected;
@@ -566,9 +576,15 @@ export function DataGrid<Row, SubRow = never>({
   }
 
   const hasSearchField = isFlat && search !== undefined;
-  const hasColumnsMenu = columnsMenu && allColumns.some((column) => !column.required);
+  const hasColumnsMenu = columnsMenu && !hasView && allColumns.some((column) => !column.required);
+  // A view has no header cells, so the filters of the columns are in the toolbar.
+  const viewFilterColumns = hasView ? columns.filter((column) => column.filter !== undefined) : [];
   const hasToolbar =
-    hasSearchField || (toolbar !== undefined && toolbar !== null) || hasFilters || hasColumnsMenu;
+    hasSearchField ||
+    (toolbar !== undefined && toolbar !== null) ||
+    hasFilters ||
+    hasColumnsMenu ||
+    viewFilterColumns.length > 0;
 
   return (
     <div className={classNames("space-y-3", className)} data-slot="data-grid">
@@ -589,6 +605,16 @@ export function DataGrid<Row, SubRow = never>({
               </div>
             ) : null}
             {toolbar}
+            {viewFilterColumns.map((column) => (
+              <DataGridColumnFilter
+                key={column.id}
+                column={column}
+                filters={state.filters}
+                onChange={(value) => setFilter(column, value)}
+                labels={labels}
+                labeled
+              />
+            ))}
             {hasFilters ? (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
                 {labels.clearFilters}
@@ -629,51 +655,55 @@ export function DataGrid<Row, SubRow = never>({
         </div>
       ) : null}
 
-      <DataTable caption={caption} stackOnMobile aria-busy={loading ? "true" : undefined}>
-        <thead>
-          <tr>
-            {isSelectable ? (
-              <Th className="w-10 pr-0">
-                <Checkbox
-                  ref={selectAllRef}
-                  aria-label={labels.selectAll}
-                  checked={areAllSelected}
-                  disabled={foundRows.length === 0}
-                  onChange={() =>
-                    setCheckedKeys(areAllSelected ? new Set() : new Set(foundRows.map(getRowKey)))
-                  }
-                />
-              </Th>
-            ) : null}
-            {columns.map(renderHeader)}
-            {hasActions ? <ActionsTh label={labels.actions} /> : null}
-          </tr>
-        </thead>
-        <tbody>{renderBody()}</tbody>
-        {hasFooter && !loading && foundRows.length > 0 ? (
-          <tfoot>
-            <tr className="bg-subtle font-medium text-strong">
-              {isSelectable ? <Td className="border-t" /> : null}
-              {columns.map((column) => {
-                const firstCellText = column.id === firstColumnId ? labels.total : null;
-                return (
-                  <Td
-                    key={column.id}
-                    data-label={column.footer ? column.header : undefined}
-                    align={column.align}
-                    className="border-t text-strong"
-                  >
-                    {column.footer ? column.footer(foundRows) : firstCellText}
-                  </Td>
-                );
-              })}
-              {hasActions ? <Td className="border-t" /> : null}
-            </tr>
-          </tfoot>
-        ) : null}
-      </DataTable>
+      {hasView ? <div data-slot="view">{renderView(foundRows)}</div> : null}
 
-      {isPaginated && !loading && foundRows.length > 0 ? (
+      {hasView ? null : (
+        <DataTable caption={caption} stackOnMobile aria-busy={loading ? "true" : undefined}>
+          <thead>
+            <tr>
+              {isSelectable ? (
+                <Th className="w-10 pr-0">
+                  <Checkbox
+                    ref={selectAllRef}
+                    aria-label={labels.selectAll}
+                    checked={areAllSelected}
+                    disabled={foundRows.length === 0}
+                    onChange={() =>
+                      setCheckedKeys(areAllSelected ? new Set() : new Set(foundRows.map(getRowKey)))
+                    }
+                  />
+                </Th>
+              ) : null}
+              {columns.map(renderHeader)}
+              {hasActions ? <ActionsTh label={labels.actions} /> : null}
+            </tr>
+          </thead>
+          <tbody>{renderBody()}</tbody>
+          {hasFooter && !loading && foundRows.length > 0 ? (
+            <tfoot>
+              <tr className="bg-subtle font-medium text-strong">
+                {isSelectable ? <Td className="border-t" /> : null}
+                {columns.map((column) => {
+                  const firstCellText = column.id === firstColumnId ? labels.total : null;
+                  return (
+                    <Td
+                      key={column.id}
+                      data-label={column.footer ? column.header : undefined}
+                      align={column.align}
+                      className="border-t text-strong"
+                    >
+                      {column.footer ? column.footer(foundRows) : firstCellText}
+                    </Td>
+                  );
+                })}
+                {hasActions ? <Td className="border-t" /> : null}
+              </tr>
+            </tfoot>
+          ) : null}
+        </DataTable>
+      )}
+
+      {isPaginated && !hasView && !loading && foundRows.length > 0 ? (
         <nav
           aria-label={labels.pagination}
           className="flex flex-wrap items-center justify-between gap-3 text-sm/5 text-secondary"

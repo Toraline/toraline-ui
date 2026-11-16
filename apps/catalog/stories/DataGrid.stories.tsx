@@ -887,3 +887,86 @@ export const RowsInsideARowKeyboard: StoryObj = {
     await waitFor(() => expect(cell).toHaveFocus());
   },
 };
+
+/** The view of the stories: the products as cards, one for each row the grid gives. */
+function ProductCards({ rows }: { rows: Product[] }) {
+  if (rows.length === 0) {
+    return <p className="py-8 text-center text-sm/5 text-secondary">No product with these filters.</p>;
+  }
+  return (
+    <ul aria-label="Products as cards" className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {rows.map((product) => (
+        <li key={product.id} className="rounded-lg border border-default bg-surface p-3">
+          <p className="font-heading text-sm/5 font-medium text-primary">{product.name}</p>
+          <p className="text-sm/5 text-secondary">{product.category}</p>
+          <p className="mt-2 text-sm/5 text-body tabular-nums">{money.format(product.price)}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function GridWithViews({ startWithCards, ...args }: DataGridProps<Product> & { startWithCards: boolean }) {
+  const [showsCards, setShowsCards] = useState(startWithCards);
+  return (
+    <DataGrid
+      {...args}
+      toolbar={
+        <div role="group" aria-label="View" className="flex gap-1">
+          <Button size="sm" variant={showsCards ? "ghost" : "soft"} aria-pressed={!showsCards} onClick={() => setShowsCards(false)}>
+            Table
+          </Button>
+          <Button size="sm" variant={showsCards ? "soft" : "ghost"} aria-pressed={showsCards} onClick={() => setShowsCards(true)}>
+            Cards
+          </Button>
+        </div>
+      }
+      renderView={showsCards ? (rows) => <ProductCards rows={rows} /> : undefined}
+    />
+  );
+}
+
+/**
+ * "renderView" shows another view in the place of the table: here cards, in
+ * an app for example a calendar. The search field and the toolbar stay, and
+ * the filters of the columns are buttons with the name of their column in the
+ * toolbar. The view receives the rows after the search and the filters. The
+ * story searches "juice".
+ */
+export const AnotherView: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 12),
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  render: (args) => <GridWithViews {...args} startWithCards />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole("table")).toBeNull();
+    await expect(canvas.getByRole("button", { name: "Filter Status (filter on)" })).toHaveTextContent("Status");
+    await userEvent.type(canvas.getByRole("searchbox", { name: "Search the products" }), "juice");
+    await expect(within(canvas.getByRole("list", { name: "Products as cards" })).getAllByRole("listitem")).toHaveLength(1);
+  },
+};
+
+/**
+ * The panel of a filter open above the view. The story checks "Bakery", and
+ * then goes to the table: the same filter is still on, now in the header of its column.
+ */
+export const AnotherViewWithAFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 12),
+    search: { placeholder: "Search the products" },
+  },
+  render: (args) => <GridWithViews {...args} startWithCards />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Category" }));
+    const panel = await page.findByRole("dialog", { name: "Filter Category" });
+    await userEvent.click(within(panel).getByRole("checkbox", { name: "Bakery" }));
+    await expect(canvas.getByRole("button", { name: "Filter Category (filter on)" })).toBeVisible();
+  },
+};

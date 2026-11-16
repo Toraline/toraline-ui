@@ -248,6 +248,20 @@ function GridPartsExamples() {
   );
 }
 
+/** TOR-1214: a grid that shows a view, so its filters are labelled buttons in the toolbar. */
+function GridViewExample() {
+  return (
+    <DataGrid
+      caption="Products as a list"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+      renderView={(rows) => <p>{rows.length} products</p>}
+    />
+  );
+}
+
 /** The buttons that open a part of the DataGrid of TOR-1209, in the order they are pressed. */
 const gridPartsButtonNames = [
   "Filter Product",
@@ -574,6 +588,10 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
+  // TOR-1214: the labelled buttons of the filters above a view.
+  const { unmount: unmountGridView } = render(<GridViewExample />);
+  collect();
+  unmountGridView();
   // TOR-1212: a text field, a number field and a select, each one open; the number with a changed value and an error.
   await user.click(screen.getByRole("button", { name: /Edit Product — Coffee/ }));
   collect();

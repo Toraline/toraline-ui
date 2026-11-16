@@ -4,6 +4,7 @@ import { ThemeToggle } from "@toraline.tech/ui/theme";
 import { ComplementGroupsGrid } from "./ComplementGroupsGrid";
 import type { ComplementGroup } from "./ComplementGroupsGrid";
 import { EditableProductsGrid } from "./EditableProductsGrid";
+import { ProductViewsGrid } from "./ProductViewsGrid";
 import { SavedColumnsGrid } from "./SavedColumnsGrid";
 import { products } from "./products";
 
@@ -68,6 +69,14 @@ export default function GridPartsPage() {
           The arrow of a group shows its options in a small table. A cell of an option is edited in place.
         </p>
         <ComplementGroupsGrid groups={complementGroups} />
+      </Section>
+
+      <Section title="Another view in the place of the table">
+        <p className="text-sm/5 text-secondary">
+          The buttons &quot;Table&quot; and &quot;Cards&quot; change the view. The search and the filters stay, and
+          apply to both.
+        </p>
+        <ProductViewsGrid products={products} />
       </Section>
     </main>
   );
