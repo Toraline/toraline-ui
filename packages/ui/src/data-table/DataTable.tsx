@@ -26,7 +26,7 @@ export type TableCellAlignment = (typeof tableCellAlignments)[number];
  */
 const boxClass = classNames("relative overflow-x-auto rounded-xl bg-surface shadow-card", focusRingClass);
 
-const tableClass = "w-full text-left font-body text-sm/5";
+const tableClass = "w-full text-left font-body text-sm";
 
 /**
  * Below the breakpoint "md" of Tailwind CSS (a screen less than 768 pixels
@@ -44,7 +44,7 @@ const stackClass = classNames(
 );
 
 const headerCellClass =
-  "border-b border-default bg-subtle px-3 py-2.5 text-xs/4 font-medium whitespace-nowrap text-tertiary";
+  "border-b border-default bg-subtle px-3 py-2.5 text-xs font-medium whitespace-nowrap text-tertiary";
 
 const cellClass = "border-b border-subtle px-3 py-2.5 text-body";
 

@@ -743,7 +743,7 @@ describe("the class of the state that must win comes later in the built CSS", ()
     // TextInput, size "md": the classes of a wide screen win over the classes of a small one.
     ["min-h-12", "lg:min-h-10"],
     ["py-2.5", "lg:py-2"],
-    ["text-base/6", "lg:text-sm/5"],
+    ["text-base", "lg:text-sm"],
     // Toggle: on wins over off.
     ["bg-surface", "peer-checked:bg-primary"],
     ["border-strong", "peer-checked:border-brand"],

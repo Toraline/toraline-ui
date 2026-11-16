@@ -6,7 +6,7 @@ import { focusRingClass } from "../shared/focus-ring.js";
  * The text has the small size and the medium weight of the labels of the app
  * Intraweb, which has no breadcrumbs of its own.
  */
-const rootClass = "font-body text-sm/5 font-medium text-secondary";
+const rootClass = "font-body text-sm font-medium text-secondary";
 
 const listClass = "m-0 flex list-none flex-wrap items-baseline gap-2 p-0";
 

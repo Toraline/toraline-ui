@@ -35,7 +35,7 @@ const iconBoxToneClass: Record<StatCardTone, string> = {
 const iconClass = "size-5 text-icon-brand";
 
 /** The label is a heading, and a heading of Intraweb has the heading font. */
-const labelClass = "font-heading text-sm/5 font-medium text-secondary";
+const labelClass = "font-heading text-sm font-medium text-secondary";
 
 /**
  * The number: 24 pixels, and 32 pixels from the breakpoint "md" of Tailwind
@@ -44,7 +44,7 @@ const labelClass = "font-heading text-sm/5 font-medium text-secondary";
  */
 const valueClass = "font-heading text-2xl/8 font-semibold text-primary tabular-nums md:text-3xl/10";
 
-const trendClass = "flex flex-wrap items-center gap-1 text-sm/5";
+const trendClass = "flex flex-wrap items-center gap-1 text-sm";
 
 const trendValueClass = "inline-flex items-center gap-1 font-medium";
 

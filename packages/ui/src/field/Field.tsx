@@ -10,15 +10,15 @@ import { classNames } from "../shared/class-names.js";
 
 const rootClass = "space-y-1.5 font-body";
 
-const labelClass = "block text-sm/5 font-medium text-strong";
+const labelClass = "block text-sm font-medium text-strong";
 
 /** The mark of a field that a person may leave empty, after the label. The space before its text is inside it. */
 const optionalClass = "font-normal text-tertiary";
 
-/** The hint: a small quiet text under the control. "/4" is a line of 16 pixels. */
-const hintClass = "text-xs/4 text-tertiary";
+/** The hint: a small quiet text under the control. */
+const hintClass = "text-xs text-tertiary";
 
-const errorClass = "flex items-start gap-1.5 text-sm/5 text-danger";
+const errorClass = "flex items-start gap-1.5 text-sm text-danger";
 
 const errorIconClass = "mt-0.5 size-4 shrink-0";
 

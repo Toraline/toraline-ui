@@ -28,7 +28,7 @@ export const menuClass = "rounded-lg border border-subtle bg-surface py-1 shadow
  * chosen (aria-disabled) has half of its opacity and no background.
  */
 const itemClass = classNames(
-  "flex w-full items-center gap-2 px-3 py-2 text-start font-body text-sm/5 text-body",
+  "flex w-full items-center gap-2 px-3 py-2 text-start font-body text-sm text-body",
   "hover:bg-subtle focus:bg-subtle",
   focusRingClass,
   "focus-visible:-outline-offset-2",

@@ -35,7 +35,7 @@ const triggerClass = classNames(
 const iconTriggerClass = "size-6";
 
 /** In the toolbar, where there is no header: 32 pixels high, with a border and the name of the column. */
-const labeledTriggerClass = "h-8 gap-1.5 border px-2.5 text-sm/5";
+const labeledTriggerClass = "h-8 gap-1.5 border px-2.5 text-sm";
 
 /**
  * The panel is rendered in <body> with a fixed position, so the box of the
@@ -43,7 +43,7 @@ const labeledTriggerClass = "h-8 gap-1.5 border px-2.5 text-sm/5";
  * header cell.
  */
 const panelClass =
-  "fixed z-50 w-64 rounded-lg border border-subtle bg-surface p-3 text-left font-body text-sm/5 font-normal normal-case shadow-lg";
+  "fixed z-50 w-64 rounded-lg border border-subtle bg-surface p-3 text-left font-body text-sm font-normal normal-case shadow-lg";
 
 /** The two small buttons above the choices. */
 const quickButtonClass = classNames("font-medium hover:underline", focusRingClass);
@@ -159,7 +159,7 @@ export function DataGridColumnFilter<Row>({
               ) : (
                 <fieldset className="space-y-2">
                   <legend className="sr-only">{labels.filterChoices(column.header)}</legend>
-                  <div className="flex justify-between gap-2 pb-1 text-xs/4">
+                  <div className="flex justify-between gap-2 pb-1 text-xs">
                     <button
                       type="button"
                       className={classNames(quickButtonClass, "text-brand")}

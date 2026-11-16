@@ -669,7 +669,7 @@ export function DataGrid<Row, SubRow = never>({
       ) : null,
       rowError === undefined ? null : (
         <tr key={`${key}-error`} data-slot="row-error">
-          <Td colSpan={columnCount} className="bg-error text-sm/5 text-danger">
+          <Td colSpan={columnCount} className="bg-error text-sm text-danger">
             <span role="alert">{labels.rowError(rowLabel, rowError)}</span>
           </Td>
         </tr>
@@ -799,7 +799,7 @@ export function DataGrid<Row, SubRow = never>({
               ) : null}
               {hasEditTable && isEditingTable ? (
                 <>
-                  <span className="text-sm/5 text-secondary" role="status">
+                  <span className="text-sm text-secondary" role="status">
                     {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
                   </span>
                   <Button
@@ -894,7 +894,7 @@ export function DataGrid<Row, SubRow = never>({
       {isPaginated && !hasView && !loading && foundRows.length > 0 ? (
         <nav
           aria-label={labels.pagination}
-          className="flex flex-wrap items-center justify-between gap-3 text-sm/5 text-secondary"
+          className="flex flex-wrap items-center justify-between gap-3 text-sm text-secondary"
           data-slot="pagination"
         >
           <span>

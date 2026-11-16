@@ -31,8 +31,8 @@ describe("Textarea", () => {
         "bg-surface",
         "px-3",
         "py-2.5",
-        "text-base/6",
-        "lg:text-sm/5",
+        "text-base",
+        "lg:text-sm",
         "text-primary",
       ]),
     );

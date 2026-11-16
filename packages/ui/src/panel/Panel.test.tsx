@@ -57,7 +57,7 @@ describe("Panel", () => {
     const subtitle = screen.getByText("Signed in March");
     expect(subtitle.tagName).toBe("P");
     expect(subtitle.getAttribute("data-slot")).toBe("subtitle");
-    expect(subtitle.className.split(" ")).toEqual(expect.arrayContaining(["text-sm/5", "text-tertiary"]));
+    expect(subtitle.className.split(" ")).toEqual(expect.arrayContaining(["text-sm", "text-tertiary"]));
     expect(subtitle.previousElementSibling).toBe(screen.getByRole("heading", { name: "Contract" }));
   });
 

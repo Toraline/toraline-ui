@@ -202,7 +202,7 @@ describe("Checkbox", () => {
     expect(box.getAttribute("name")).toBe("send");
     expect(root.querySelector('[data-slot="label"]')?.textContent).toBe("Send the invoice by e-mail");
     expect(root.className.split(" ")).toEqual(
-      expect.arrayContaining(["flex", "items-center", "gap-2", "text-sm/5", "text-body"]),
+      expect.arrayContaining(["flex", "items-center", "gap-2", "text-sm", "text-body"]),
     );
   });
 

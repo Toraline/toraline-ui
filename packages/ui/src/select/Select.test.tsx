@@ -61,10 +61,10 @@ describe("Select", () => {
     );
     const mediumClasses = screen.getByRole("combobox", { name: "Medium" }).className.split(" ");
     expect(mediumClasses).toEqual(
-      expect.arrayContaining(["min-h-12", "text-base/6", "lg:min-h-10", "lg:text-sm/5"]),
+      expect.arrayContaining(["min-h-12", "text-base", "lg:min-h-10", "lg:text-sm"]),
     );
     const smallClasses = screen.getByRole("combobox", { name: "Small" }).className.split(" ");
-    expect(smallClasses).toEqual(expect.arrayContaining(["min-h-8", "text-sm/5"]));
+    expect(smallClasses).toEqual(expect.arrayContaining(["min-h-8", "text-sm"]));
     expect(smallClasses).not.toContain("min-h-12");
   });
 

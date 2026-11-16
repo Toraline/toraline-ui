@@ -116,8 +116,8 @@ export function DetailPanel({
           <dl className="space-y-3" data-slot="fields">
             {fields.map((field) => (
               <div key={field.label} className="space-y-0.5">
-                <dt className="text-xs/4 font-medium text-tertiary">{field.label}</dt>
-                <dd className="text-sm/5 text-primary">{field.value}</dd>
+                <dt className="text-xs font-medium text-tertiary">{field.label}</dt>
+                <dd className="text-sm text-primary">{field.value}</dd>
               </div>
             ))}
           </dl>

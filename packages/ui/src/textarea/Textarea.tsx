@@ -7,7 +7,7 @@ import { controlBoxClassNames } from "../shared/control.js";
  * when a field with smaller text gets the focus) and 14 pixels from the
  * breakpoint "lg". The height comes from the number of rows.
  */
-const textareaClass = "py-2.5 text-base/6 lg:text-sm/5";
+const textareaClass = "py-2.5 text-base lg:text-sm";
 
 export type TextareaProps = ComponentProps<"textarea">;
 

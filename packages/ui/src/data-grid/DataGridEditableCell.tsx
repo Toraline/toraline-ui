@@ -177,7 +177,7 @@ export function DataGridEditableCell<Row>({
 
   const errorMessage =
     error === undefined ? null : (
-      <p id={errorId} role="alert" className="text-xs/4 text-danger" data-slot="cell-error">
+      <p id={errorId} role="alert" className="text-xs text-danger" data-slot="cell-error">
         {error}
       </p>
     );
@@ -243,7 +243,7 @@ export function DataGridEditableCell<Row>({
         onBlur={handleBlur}
       />
       {isSaving ? (
-        <p role="status" className="text-xs/4 text-secondary" data-slot="cell-saving">
+        <p role="status" className="text-xs text-secondary" data-slot="cell-saving">
           {labels.saving}
         </p>
       ) : null}

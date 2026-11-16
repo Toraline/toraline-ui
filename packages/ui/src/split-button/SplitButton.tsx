@@ -25,7 +25,7 @@ const rootClass = "group/split-button relative inline-flex gap-1 font-body";
  * half of the opacity when disabled).
  */
 const buttonClass = classNames(
-  "inline-flex min-h-10 shrink-0 items-center justify-center bg-primary py-2 font-heading text-sm/5 font-medium text-inverse",
+  "inline-flex min-h-10 shrink-0 items-center justify-center bg-primary py-2 font-heading text-sm font-medium text-inverse",
   "hover:bg-primary-hover",
   "disabled:cursor-not-allowed disabled:opacity-50",
   "motion-safe:transition-colors",

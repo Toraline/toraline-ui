@@ -29,7 +29,7 @@ const rootClass = "group/tooltip relative inline-flex";
  * and the tooltip, so the pointer can move onto the tooltip without leaving.
  */
 const tooltipClass = classNames(
-  "absolute z-50 rounded-md bg-tooltip px-2 py-1 font-body text-xs/4 font-medium whitespace-nowrap text-inverse shadow-lg",
+  "absolute z-50 rounded-md bg-tooltip px-2 py-1 font-body text-xs font-medium whitespace-nowrap text-inverse shadow-lg",
   "invisible opacity-0",
   "before:absolute before:content-['']",
   "motion-safe:transition-[opacity,visibility]",

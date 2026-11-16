@@ -44,8 +44,8 @@ const controlBaseClass = classNames(
  * gets the focus. So "md" has text of 16 pixels below the breakpoint "lg".
  */
 const controlSizeClass: Record<ControlSize, string> = {
-  md: "min-h-12 py-2.5 text-base/6 lg:min-h-10 lg:py-2 lg:text-sm/5",
-  sm: "min-h-8 py-1 text-sm/5",
+  md: "min-h-12 py-2.5 text-base lg:min-h-10 lg:py-2 lg:text-sm",
+  sm: "min-h-8 py-1 text-sm",
 };
 
 /**

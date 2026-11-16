@@ -68,7 +68,7 @@ describe("EmptyState", () => {
     const description = screen.getByText("The orders of the client are shown here.");
     expect(description.getAttribute("data-slot")).toBe("description");
     expect(description.className.split(" ")).toEqual(
-      expect.arrayContaining(["mt-1", "max-w-md", "text-sm/5", "text-secondary"]),
+      expect.arrayContaining(["mt-1", "max-w-md", "text-sm", "text-secondary"]),
     );
     expect(description.previousElementSibling).toBe(screen.getByRole("heading"));
   });

@@ -3,7 +3,7 @@ import { classNames } from "../shared/class-names.js";
 import { CheckboxControl } from "./CheckboxControl.js";
 
 /** The label: the box, a space of 8 pixels, and the text in the small size. As the Checkbox of the app Intraweb. */
-const rootClass = "flex items-center gap-2 font-body text-sm/5 text-body";
+const rootClass = "flex items-center gap-2 font-body text-sm text-body";
 
 export type CheckboxProps = Omit<ComponentProps<"input">, "type"> & {
   /** The visible name of the checkbox, shown after the box. A press on it changes the box. */
