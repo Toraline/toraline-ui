@@ -237,7 +237,7 @@ import { Field, TextInput } from "@toraline.tech/ui";
 | Prop | Valores | Significado |
 |---|---|---|
 | `label` | Texto ou elementos. Obrigatória | O nome visível do campo, mostrado acima do controle. Um clique nele move o foco para o controle |
-| `children` | Um elemento, ou uma função. Obrigatória | O controle: `<TextInput />`, um `<select>` nativo, um `<textarea>`. Veja "Como um controle é ligado" abaixo |
+| `children` | Um elemento, ou uma função. Obrigatória | O controle: `<TextInput />`, um `<select>` nativo, um `<textarea>`, ou um elemento com o controle dentro dele. Veja "Como um controle é ligado" abaixo |
 | `hint` | Texto ou elementos | Um texto curto de ajuda, mostrado abaixo do controle enquanto o campo não tem erro |
 | `error` | Texto ou elementos | A mensagem de erro, mostrada abaixo do controle com um ícone, no lugar da dica |
 | `optional` | `true`, `false` (padrão) | `true` para um campo que uma pessoa pode deixar vazio. O label então mostra uma marca |
@@ -246,9 +246,12 @@ import { Field, TextInput } from "@toraline.tech/ui";
 
 Como um controle é ligado:
 
-1. Quando o controle é o filho direto, Field dá a ele 3 props: `id`, `aria-describedby` e `aria-invalid`. Todo controle da biblioteca e todo controle nativo aceita essas props. O controle mantém o seu próprio `aria-describedby` (Field acrescenta a ele) e o seu próprio `aria-invalid`.
-2. Quando o controle não é o filho direto, dê uma função. Ela recebe as 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`.
-3. O id da dica é o id do controle seguido de `-hint`, e o id da mensagem de erro é o id seguido de `-error`.
+1. Quando o controle é o filho direto, Field dá a ele 3 props: `id`, `aria-describedby` e `aria-invalid`. Todo controle da biblioteca e todo controle nativo aceita essas props. O controle mantém o seu próprio `aria-describedby` (Field acrescenta a ele) e o seu próprio `aria-invalid`. Um componente do app como filho direto (por exemplo um editor) recebe as mesmas 3 props, e passa as props para o controle dele.
+2. Quando o controle está dentro de outro elemento, escreva o mesmo id no Field e no controle: `<Field id="amount" label="Amount"><div>R$ <TextInput id="amount" /></div></Field>`. Field procura dentro dos elementos nativos o elemento com esse id, e dá `aria-describedby` e `aria-invalid` a ele. O elemento em volta do controle não recebe nada. Desde a versão 0.3.1; antes dela, o `<div>` também recebia o id, e um clique no label não chegava ao controle.
+3. Ou dê uma função. Ela recebe as 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`. Use a função quando o controle não tem id próprio, ou quando ele está dentro de um componente em que Field não consegue procurar.
+4. O id da dica é o id do controle seguido de `-hint`, e o id da mensagem de erro é o id seguido de `-error`.
+
+Qual filho é "o controle": um componente, ou um dos elementos nativos `<input>`, `<select>`, `<textarea>`, `<button>`, `<meter>`, `<output>` e `<progress>`. Qualquer outro elemento nativo (`<div>`, `<span>`), um fragmento e um texto são "um elemento em volta do controle". Quando nenhum elemento dentro dele tem o id do Field, nada é ligado: o label então não aponta para nenhum elemento.
 
 - As partes e as aparências delas são as do Field do app Intraweb. O uso do Intraweb, `<Field id="name" label="Nome"><TextInput id="name" /></Field>`, funciona sem mudança. Duas coisas são diferentes: o texto da marca é em inglês, a não ser que o app dê `optionalText`, e Field agora escreve `aria-describedby` e `aria-invalid` no controle, o que as telas do Intraweb escreviam à mão.
 - Elemento nativo principal: o `<div>` mais externo. `className`, todas as outras props e `ref` vão para ele. `id` é a exceção: é o id do controle. As partes internas têm o atributo `data-slot` com os valores `label`, `optional`, `hint`, `error` e `error-icon`.

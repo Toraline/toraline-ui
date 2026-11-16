@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Field, TextInput } from "@toraline.tech/ui";
+import { expect, userEvent, within } from "storybook/test";
+import { Button, Field, TextInput } from "@toraline.tech/ui";
 
 /** The classes of the native controls of the story "With Other Controls". */
 const plainControlClass =
@@ -84,6 +85,31 @@ export const WithOtherControls: Story = {
       </Field>
     </div>
   ),
+};
+
+/**
+ * The control is inside another element: a <div> with the control and a
+ * button. The control has the id of Field, so Field finds it: the label, the
+ * hint and the error message are linked to the control, and the <div> gets
+ * nothing. The test presses the label and checks that the field has the focus.
+ */
+export const ControlInsideAnElement: Story = {
+  render: () => (
+    <Field id="category" label="Category" hint="Choose a category, or add a new one.">
+      <div className="flex gap-2">
+        <TextInput id="category" name="category" />
+        <Button variant="secondary">Add</Button>
+      </div>
+    </Field>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole("textbox", { name: "Category" });
+    await expect(canvasElement.querySelectorAll('[id="category"]')).toHaveLength(1);
+    await expect(control).toHaveAccessibleDescription("Choose a category, or add a new one.");
+    await userEvent.click(canvas.getByText("Category"));
+    await expect(control).toHaveFocus();
+  },
 };
 
 /** A long label, a long hint and a long error message go to the next line. */

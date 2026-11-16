@@ -237,7 +237,7 @@ import { Field, TextInput } from "@toraline.tech/ui";
 | Prop | Values | Meaning |
 |---|---|---|
 | `label` | Text or elements. Required | The visible name of the field, shown above the control. A click on it moves the focus to the control |
-| `children` | One element, or a function. Required | The control: `<TextInput />`, a native `<select>`, a `<textarea>`. See "How a control gets linked" below |
+| `children` | One element, or a function. Required | The control: `<TextInput />`, a native `<select>`, a `<textarea>`, or an element with the control inside it. See "How a control gets linked" below |
 | `hint` | Text or elements | A short help text, shown under the control while the field has no error |
 | `error` | Text or elements | The error message, shown under the control with an icon, in the place of the hint |
 | `optional` | `true`, `false` (default) | `true` for a field that a person may leave empty. The label then shows a mark |
@@ -246,9 +246,12 @@ import { Field, TextInput } from "@toraline.tech/ui";
 
 How a control gets linked:
 
-1. When the control is the direct child, Field gives it 3 props: `id`, `aria-describedby` and `aria-invalid`. Every control of the library and every native control accepts them. The control keeps its own `aria-describedby` (Field adds to it) and its own `aria-invalid`.
-2. When the control is not the direct child, give a function. It receives the 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`.
-3. The id of the hint is the id of the control followed by `-hint`, and the id of the error message is the id followed by `-error`.
+1. When the control is the direct child, Field gives it 3 props: `id`, `aria-describedby` and `aria-invalid`. Every control of the library and every native control accepts them. The control keeps its own `aria-describedby` (Field adds to it) and its own `aria-invalid`. A component of the app as the direct child (for example an editor) receives the same 3 props, and gives them to its control.
+2. When the control is inside another element, write the same id on Field and on the control: `<Field id="amount" label="Amount"><div>R$ <TextInput id="amount" /></div></Field>`. Field looks inside the native elements for the element with that id, and gives `aria-describedby` and `aria-invalid` to it. The element around the control gets nothing. Since version 0.3.1; before it, the `<div>` got the id too, and a click on the label did not reach the control.
+3. Or give a function. It receives the 3 props: `<Field label="Amount">{(controlProps) => <div>R$ <TextInput {...controlProps} /></div>}</Field>`. Use it when the control has no id of its own, or when it is inside a component that Field cannot look into.
+4. The id of the hint is the id of the control followed by `-hint`, and the id of the error message is the id followed by `-error`.
+
+Which child is "the control": a component, or one of the native elements `<input>`, `<select>`, `<textarea>`, `<button>`, `<meter>`, `<output>` and `<progress>`. Any other native element (`<div>`, `<span>`), a fragment and a text are "an element around the control". When no element inside has the id of Field, nothing is linked: the label then points to no element.
 
 - The parts and their looks are the ones of the Field of the app Intraweb. Intraweb's usage, `<Field id="name" label="Nome"><TextInput id="name" /></Field>`, works unchanged. Two things differ: the text of the mark is English unless the app gives `optionalText`, and Field now writes `aria-describedby` and `aria-invalid` on the control, which Intraweb's screens wrote by hand.
 - Main native element: the outermost `<div>`. `className`, every other prop and `ref` go to it. `id` is the exception: it is the id of the control. The inner parts have the attribute `data-slot` with the values `label`, `optional`, `hint`, `error` and `error-icon`.

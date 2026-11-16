@@ -176,6 +176,108 @@ describe("Field", () => {
     expect(control.getAttribute("aria-describedby")).toBe("amount-error");
   });
 
+  test("a control inside a <div>, with the id of Field: the <div> gets nothing, and the control is linked", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Field id="category" label="Category" hint="Choose one, or add one.">
+        <div data-testid="around">
+          <input id="category" />
+          <button type="button">Add</button>
+        </div>
+      </Field>,
+    );
+    // One element has the id: the control. Before version 0.3.1 the <div> had it too.
+    expect(container.querySelectorAll('[id="category"]')).toHaveLength(1);
+    const around = screen.getByTestId("around");
+    expect(around.hasAttribute("id")).toBe(false);
+    expect(around.hasAttribute("aria-describedby")).toBe(false);
+    expect(around.hasAttribute("aria-invalid")).toBe(false);
+    const control = screen.getByRole("textbox", { name: "Category", description: "Choose one, or add one." });
+    expect(control.getAttribute("aria-describedby")).toBe("category-hint");
+    expect(screen.getByRole("button", { name: "Add" }).hasAttribute("aria-describedby")).toBe(false);
+    await user.click(screen.getByText("Category"));
+    expect(document.activeElement).toBe(control);
+  });
+
+  test("a control inside a <div>: an error marks the control, and its own aria-describedby stays", () => {
+    render(
+      <Field id="price" label="Price" error="The price is required.">
+        <div>
+          <span>R$</span>
+          <span>
+            <input id="price" aria-describedby="price-unit" />
+          </span>
+        </div>
+      </Field>,
+    );
+    const control = screen.getByRole("textbox", { name: "Price" });
+    expect(control.getAttribute("aria-invalid")).toBe("true");
+    expect(control.getAttribute("aria-describedby")).toBe("price-unit price-error");
+  });
+
+  test("a <div> with no element that has the id of Field stays as the app wrote it", () => {
+    const { container } = render(
+      <Field id="notes" label="Notes" error="Too long.">
+        <div data-testid="around" className="editor">
+          <textarea />
+        </div>
+      </Field>,
+    );
+    expect(container.querySelector('[id="notes"]')).toBeNull();
+    const around = screen.getByTestId("around");
+    expect(around.getAttribute("class")).toBe("editor");
+    expect(around.hasAttribute("aria-invalid")).toBe(false);
+    expect(screen.getByRole("textbox").hasAttribute("aria-invalid")).toBe(false);
+  });
+
+  test("a <div> that is the control (it has the id of Field) gets the links", () => {
+    render(
+      <Field id="text" label="Text" hint="Markdown is accepted.">
+        <div id="text" role="textbox" contentEditable aria-labelledby="text-label" />
+      </Field>,
+    );
+    expect(screen.getByRole("textbox").getAttribute("aria-describedby")).toBe("text-hint");
+  });
+
+  test("a fragment and several children: the control with the id of Field is linked", () => {
+    render(
+      <>
+        <Field id="first" label="First" hint="Hint of the first.">
+          <>
+            <input id="first" />
+            <span>after</span>
+          </>
+        </Field>
+        <Field id="second" label="Second" error="Error of the second.">
+          <span>before</span>
+          <input id="second" />
+        </Field>
+      </>,
+    );
+    expect(screen.getByRole("textbox", { name: "First" }).getAttribute("aria-describedby")).toBe("first-hint");
+    expect(screen.getByRole("textbox", { name: "Second" }).getAttribute("aria-invalid")).toBe("true");
+  });
+
+  test("a component of the app as the child receives the 3 props, as the controls of the library do", () => {
+    // A component of an app that has its control inside other elements, as the Markdown editor of Intraweb.
+    function Editor({ id, ...controlProps }: { id: string; "aria-describedby"?: string; "aria-invalid"?: boolean }) {
+      return (
+        <div>
+          <textarea id={id} {...controlProps} />
+        </div>
+      );
+    }
+    const { container } = render(
+      <Field id="body" label="Body" error="The body is required.">
+        <Editor id="body" />
+      </Field>,
+    );
+    expect(container.querySelectorAll('[id="body"]')).toHaveLength(1);
+    const control = screen.getByRole("textbox", { name: "Body" });
+    expect(control.getAttribute("aria-invalid")).toBe("true");
+    expect(control.getAttribute("aria-describedby")).toBe("body-error");
+  });
+
   test("works with a native <select> and a <textarea>", () => {
     render(
       <>
