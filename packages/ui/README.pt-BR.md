@@ -895,7 +895,7 @@ export function ColumnFilter() {
 | `gap` | Um número de pixels. Quando falta: 4 | O espaço entre o botão e o painel |
 | `strategy` | `"fixed"` (padrão), `"absolute"` | `fixed`: o painel tem `position: fixed`, para um painel renderizado em `<body>` com `createPortal`. `absolute`: o painel tem `position: absolute` dentro de um elemento posicionado |
 
-Ele retorna `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (para o botão), `panelRef` e `panelStyle` (para o painel), `placed` (`false` até o painel ser medido: esconda o painel com a classe `invisible` até lá), `side` (o lado em que o painel está) e `handleEscape` (para o `onKeyDown` do painel).
+Ele retorna `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (para o botão), `panelRef` e `panelStyle` (para o painel), `placed` (`false` até o painel ser medido: esconda o painel com a classe `invisible` até lá, ou com `opacity-0` quando um elemento dentro do painel tem `autoFocus`, porque um elemento que está `invisible` não pode receber o foco), `side` (o lado em que o painel está) e `handleEscape` (para o `onKeyDown` do painel).
 
 - O painel abre no lado pedido. Quando ele não cabe ali, ele abre no outro lado, a não ser que esse lado tenha menos espaço.
 - O painel mantém 8 pixels até as bordas esquerda e direita da janela.
@@ -1167,6 +1167,7 @@ Um botão com um painel flutuante abaixo dele, por exemplo a lista de colunas de
 - O botão é um Button secundário no tamanho `md`.
 - Ponteiro: um clique no botão abre o painel, e um segundo clique o fecha. Um clique fora do botão e do painel fecha o painel.
 - Teclado: Enter e Espaço no botão abrem e fecham o painel. O painel vem logo depois do botão na página, então Tab vai do botão para dentro dele. Escape, com o foco no botão ou dentro do painel, fecha o painel e dá o foco ao botão. Escape não chega a um Modal ou a um Drawer em que o Popover está.
+- Foco quando o painel abre: um elemento dentro do painel com `autoFocus` recebe o foco, por exemplo um campo de busca: `<Popover label="Choose an item"><TextInput autoFocus aria-label="Search" /></Popover>`. Sem um elemento assim, o foco fica no botão. Desde a versão 0.3.1; antes dela, `autoFocus` dentro do painel não fazia nada.
 - O painel abre 8 pixels abaixo do botão. Ele abre acima quando não há espaço abaixo, e mantém 8 pixels até as bordas esquerda e direita da janela.
 - Leitor de tela: o botão tem `aria-expanded`, e `aria-controls` com o id do painel enquanto ele está aberto.
 - Elemento nativo principal: o `<button>`. Todas as outras props e `ref` vão para ele. `className` vai para o elemento mais externo, um `<div>` que contém o botão e o painel. As partes têm `data-slot`: `trigger`, `panel`.

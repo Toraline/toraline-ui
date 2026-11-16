@@ -36,7 +36,11 @@ export type AnchoredPanel<TriggerElement extends HTMLElement, PanelElement exten
   panelRef: RefObject<PanelElement | null>;
   /** The CSS position of the panel. Before the panel is measured, it is the top left corner. */
   panelStyle: AnchoredStyle;
-  /** false until the panel is measured and placed. Hide the panel (the class "invisible") while it is false. */
+  /**
+   * false until the panel is measured and placed. Hide the panel while it is
+   * false: with the class "invisible", or with "opacity-0" when an element
+   * inside the panel has "autoFocus" (an element that is "invisible" cannot get the focus).
+   */
   placed: boolean;
   /** The side the panel is on, after it is placed. */
   side: AnchoredSide;

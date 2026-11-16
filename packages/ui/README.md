@@ -895,7 +895,7 @@ export function ColumnFilter() {
 | `gap` | A number of pixels. When missing: 4 | The space between the button and the panel |
 | `strategy` | `"fixed"` (default), `"absolute"` | `fixed`: the panel has `position: fixed`, for a panel rendered in `<body>` with `createPortal`. `absolute`: the panel has `position: absolute` inside a positioned element |
 
-It returns `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (for the button), `panelRef` and `panelStyle` (for the panel), `placed` (`false` until the panel is measured: hide the panel with the class `invisible` until then), `side` (the side the panel is on) and `handleEscape` (for `onKeyDown` of the panel).
+It returns `open`, `toggle`, `show`, `close({ restoreFocus })`, `triggerRef` (for the button), `panelRef` and `panelStyle` (for the panel), `placed` (`false` until the panel is measured: hide the panel with the class `invisible` until then, or with `opacity-0` when an element inside the panel has `autoFocus`, because an element that is `invisible` cannot get the focus), `side` (the side the panel is on) and `handleEscape` (for `onKeyDown` of the panel).
 
 - The panel opens on the side asked for. When it does not fit there, it opens on the other side, unless that side has less room.
 - The panel keeps 8 pixels to the left and right edges of the window.
@@ -1167,6 +1167,7 @@ A button with a floating panel under it, for example the list of columns of a ta
 - The button is a secondary Button in the size `md`.
 - Pointer: a press on the button opens the panel, and a second press closes it. A press outside the button and the panel closes it.
 - Keyboard: Enter and Space on the button open and close the panel. The panel comes right after the button in the page, so Tab goes from the button into it. Escape, with the focus on the button or inside the panel, closes the panel and gives the focus to the button. Escape does not reach a Modal or a Drawer that the Popover is in.
+- Focus when the panel opens: an element inside the panel with `autoFocus` gets the focus, for example a search field: `<Popover label="Choose an item"><TextInput autoFocus aria-label="Search" /></Popover>`. Without one, the focus stays on the button. Since version 0.3.1; before it, `autoFocus` inside the panel did nothing.
 - The panel opens 8 pixels under the button. It opens above when there is no room below, and keeps 8 pixels to the left and right edges of the window.
 - Screen reader: the button has `aria-expanded`, and `aria-controls` with the id of the panel while it is open.
 - Main native element: the `<button>`. Every other prop and `ref` go to it. `className` goes to the outermost element, a `<div>` that holds the button and the panel. The parts have `data-slot`: `trigger`, `panel`.
