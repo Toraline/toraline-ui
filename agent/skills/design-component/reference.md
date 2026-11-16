@@ -151,6 +151,8 @@ Used by `review-component` and `sync-tokens-figma`.
 | 1 | <for example: height of size md> | 40px | 40px | 44px | <blocks / should fix / note> | <code / Figma / brief> |
 ```
 
+For tokens (`sync-tokens-figma`) the column "Brief" is left out: tokens have no brief.
+
 - **blocks**: the component looks or behaves differently for a person, or fails accessibility.
 - **should fix**: a naming or structure difference that will cause a mistake later.
 - **note**: a difference that changes nothing a person can see.
