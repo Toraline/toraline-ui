@@ -284,7 +284,7 @@ import { Field, TextInput } from "@toraline.tech/ui";
 | `disabled` | The HTML attribute | The field cannot get focus and cannot be changed. It has a quiet background and a quiet text |
 
 - The sizes and the looks are the ones of the `TextInput` of the app Intraweb. The focus look is Intraweb's: the border in the focus color and a ring of 3 pixels, with no outline. A phone makes the page larger when a field with text smaller than 16 pixels gets the focus, which is why `md` has text of 16 pixels on a small screen.
-- Main native element: the `<input>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `required`, `readOnly`) and `ref` go to it. With an icon, the `<input>` is inside a `<div data-slot="wrapper">` as wide as its container, and `className` still goes to the `<input>`, as in Intraweb.
+- Main native element: the `<input>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `required`, `readOnly`) and `ref` go to it. With an icon, the `<input>` is inside a `<div data-slot="wrapper">` as wide as its container, and `className` still goes to the `<input>`, as in Intraweb. A width class of the app (`w-24`, `w-auto`) replaces the full width of the `<input>`.
 - Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
 - A read-only field (`readOnly`) has no look of its own.
 - The list `controlSizes` and the types `TextInputProps` and `ControlSize` are exported. Every form control of the library has these sizes.
@@ -503,6 +503,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 2. A prop has the name HTML or React already uses when one exists: `disabled`, `checked`, `href`, `onChange`.
 3. An icon is the prop `icon`, of the type `IconComponent` (`src/shared/icon.ts`): a component the app gives, never an element and never an icon set of the library. See [Icons](#icons).
 4. `className` is joined after the library's classes with the helper `classNames(baseClass, sizeClass[size], variantClass[variant], className)` from `src/shared/class-names.ts`, and goes on the outermost element. One exception: the `className` of TextInput goes to its `<input>`, also when an icon puts the `<input>` inside a wrapper. The helper removes a class of the library when a later class sets the same CSS property.
+   - The width of a form control is an example. TextInput, DecimalInput, Select and Textarea are as wide as their container (`w-full`). A width class of the app wins: `<Select className="w-24" />` is 96 pixels wide, and `<TextInput className="w-auto" />` is as wide as the browser makes a field with no width. To keep the full width, give no width class. This differs from Intraweb before the library, on purpose: there the full width of the control always won, and a width class did nothing (Intraweb wrote `w-auto!` to make one win). An app that moves from Intraweb's own components removes the width classes that did nothing, or the fields change their width. The decision: entry of TOR-1223 of [`docs/decisions.md`](../../docs/decisions.md), item 12.
 5. Every other prop goes to the main native element: the `<button>`, the `<input>`. The component's section in this file names that element.
 6. `ref` is a normal prop, as React 19 allows, and points to the main native element. No component uses `forwardRef`.
 7. A relative import names the file with `.js`: `import { classNames } from "../shared/class-names.js"`, `export { Button } from "./button/index.js"`. The built type files keep the import as written, and TypeScript in an app that uses the Node module rules needs the full file name. `make check` fails when a built type file has a relative import without `.js`.
@@ -609,7 +610,7 @@ import { Field, Textarea } from "@toraline.tech/ui";
 | `disabled` | The HTML attribute | The textarea cannot get the focus and cannot be changed. It has a quiet background and a quiet text |
 
 - It is a native `<textarea>` with the box and the focus, disabled and not valid looks of TextInput, as in Intraweb. It has one size and no prop `size`: text of 16 pixels on a small screen and 14 pixels from the breakpoint `lg`.
-- Main native element: the `<textarea>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) and `ref` go to it.
+- Main native element: the `<textarea>`. `className`, every other prop (`name`, `value`, `defaultValue`, `onChange`, `placeholder`, `maxLength`, `readOnly`) and `ref` go to it. A width class of the app (`w-40`) replaces the full width.
 - A person can change its size with the corner the browser shows. `className="resize-none"` removes it.
 - Screen reader: inside Field, the label, the hint and the error message are linked to it. Alone, it needs `aria-label`.
 - The type `TextareaProps` is exported. It has no `"use client"`.
@@ -644,7 +645,7 @@ const priceError = price !== null && Number.isNaN(price) ? "Type a number, for e
 - `parseDecimalInput(text)` reads the text as a number, the way Intraweb does. With a comma in the text, the comma is the decimal mark and every point is a mark between thousands: `"1.234,5"` is `1234.5`. With no comma, a point is the decimal mark: `"2.5"` is `2.5`. An empty text is `null`. A text that is not a number is `NaN`.
 - `decimalToInput(value)` writes a number as the text of the field, with a comma: `0.4` is `"0,4"`. `null` and `undefined` are the empty text.
 - The two functions follow the way a number is written in Brazil, the language of Intraweb. An English number with a comma between thousands (`"1,234.5"`) is not read correctly.
-- Main native element: the `<input>`. `className`, every other prop and `ref` go to it, as in TextInput.
+- Main native element: the `<input>`. `className`, every other prop and `ref` go to it, as in TextInput. A width class of the app (`w-24`) replaces the full width.
 - The type `DecimalInputProps` is exported. It has no `"use client"`.
 
 ### `Checkbox` and `CheckboxControl`

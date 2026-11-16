@@ -105,6 +105,13 @@ describe("Textarea", () => {
     expect(classes).toContain("bg-surface");
   });
 
+  test("a width class of the app replaces the full width, the documented rule for every form control", () => {
+    render(<Textarea aria-label="Notes" className="w-40" />);
+    const classes = screen.getByRole("textbox").className.split(" ");
+    expect(classes).toContain("w-40");
+    expect(classes).not.toContain("w-full");
+  });
+
   test("passes other attributes to the <textarea>, and ref points to it", () => {
     const ref = createRef<HTMLTextAreaElement>();
     render(<Textarea ref={ref} aria-label="Notes" maxLength={200} required />);
