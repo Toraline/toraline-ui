@@ -1,6 +1,6 @@
 {
   "name": "@toraline.tech/tokens",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Design tokens and themes of the Toraline component library.",
   "keywords": [
     "toraline",
