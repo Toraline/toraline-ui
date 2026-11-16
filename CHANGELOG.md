@@ -11,10 +11,12 @@ The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-
 ### New
 
 - DataGrid: the filter of a column (TOR-1210). A column with `filter` has a small button in its header that opens a panel with a list of choices (`type: "options"`, with `defaultValues`) or a text field (`type: "text"`). The state of the grid (`DataGridState`, `defaultState`, `onStateChange`) has the new field `filters`. "Clear filters" puts every filter back to its default. New labels: `filterColumn`, `filterChoices`, `filterSelectAll`, `filterClear`, `filterContains`. New types: `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`.
+- DataGrid: the menu "Columns" (TOR-1211). `columnsMenu` adds a button at the right of the toolbar that opens a list with a checkbox for each column. A column can be `required` (always shown, not in the menu) or `defaultHidden` (hidden until a person turns it on). The app can keep the choice: `hiddenColumns` gives the hidden columns and `onHiddenColumnsChange` reports each change. The README and the playground (`/data/grid-parts`) have an example that saves the choice in `localStorage`. New labels: `columns`, `visibleColumns`, `resetColumns`.
 
 ### Changed
 
 - The type `DataGridState` has the new field `filters`. An app that builds a full `DataGridState` object itself must add `filters: {}`. An app that only reads the state of `onStateChange`, or gives a part of it to `defaultState`, changes nothing.
+- DataGrid: the row above the table has 2 groups, as in Intraweb: the search field, the toolbar of the screen and "Clear filters" on the left, and the menu "Columns" on the right. The element with `data-slot="toolbar"` is still the outermost one. Without the menu nothing looks different.
 
 ## 0.2.0 (2026-11-15)
 

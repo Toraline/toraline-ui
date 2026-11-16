@@ -1306,6 +1306,9 @@ const columns: DataGridColumn<Product>[] = [
 | `pageSize` | A number | Turns on the pages: the number of rows of a page until the person chooses another |
 | `pageSizeOptions` | A list of numbers. Default `10, 25, 50, 100` | The numbers a person can choose. `pageSize` is added when it is not in the list |
 | `selection` | `{ actions: (rows, clear) => elements }` | Turns on a checkbox in each row and one in the header, which selects every row the search found. While a row is selected, a bar shows the number of selected rows and what `actions` returns. `clear()` clears the selection |
+| `columnsMenu` | `true`, `false` (default) | Turns on the menu "Columns", where a person hides and shows the columns. See [The menu of the columns](#the-menu-of-the-columns) |
+| `hiddenColumns` | A list of column ids | The hidden columns, when the app keeps the choice. When missing: the grid keeps it, and starts with the columns that have `defaultHidden` hidden |
+| `onHiddenColumnsChange` | A function | Called with the list of the hidden column ids after a person changes the columns in the menu |
 | `rowActions` | A function | The buttons of the last column of a row |
 | `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
 | `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
@@ -1332,16 +1335,18 @@ A column (`DataGridColumn<Row>`):
 | `sortValue` | A function that returns a text, a number or `null` | Turns on the sort by this column. A press on the header sorts ascending, a second press descending, a third press removes the sort. A record with `null` is always at the end. A text with a number is ordered by the number (`P9` before `P10`) |
 | `searchValue` | A function that returns a text | The text of this column that the search looks in |
 | `footer` | A function that receives the rows after the search and the filters | The content of the footer cell. The footer row is shown when a column has `footer` |
+| `required` | `true`, `false` (default) | `true`: the column is always shown, and it is not in the menu "Columns" |
+| `defaultHidden` | `true`, `false` (default) | `true`: the column is hidden until a person turns it on in the menu "Columns" |
 | `filter` | `{ type: "options", options, value, defaultValues }` or `{ type: "text", value }` | Turns on the filter of this column. See [The filter of a column](#the-filter-of-a-column) |
 
-The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`).
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: the menu that chooses the columns, the editing of cells, the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
+- Not in the library yet, and still only in Intraweb: the editing of cells, the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
 - The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
 
@@ -1391,6 +1396,95 @@ const columns: DataGridColumn<Product>[] = [
 - Screen reader: the button has `aria-haspopup="dialog"` and `aria-expanded`. The panel is a dialog named "Filter" and the header of the column. It does not block the page.
 - The panel is rendered in `<body>` with [`useAnchoredPanel`](#useanchoredpanel), as the menu of ActionMenu is: the box of the table scrolls and would cut a panel inside it. Its choices are the library's `Checkbox` and its text field is `TextInput`.
 - A grid with `groups` shows no filter.
+
+#### The menu of the columns
+
+`columnsMenu` adds the button "Columns" at the right of the toolbar. It opens a list with a checkbox for each column that is not `required`. A column with `defaultHidden` starts hidden.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  { id: "name", header: "Product", required: true, cell: (product) => product.name },
+  { id: "category", header: "Category", cell: (product) => product.category },
+  { id: "supplier", header: "Supplier", defaultHidden: true, cell: (product) => product.supplier },
+];
+
+<DataGrid columnsMenu columns={columns} /* ... */ />
+```
+
+- The menu is the library's [`Popover`](#popover) with a `Checkbox` for each column. Keyboard: Enter or Space on the button opens it, Tab goes to the checkboxes, Space changes one, Escape closes it and gives the focus back to the button.
+- The button "Back to default" is shown after a change. It goes back to the columns the screen starts with, and the focus goes to the first checkbox.
+- A hidden column has no header, no cell and no footer cell. Its filter and its sort do not apply while it is hidden: a person could not see them or turn them off.
+- With no column to choose (every column `required`), the button is not shown.
+- Without `columnsMenu`, `defaultHidden` and `hiddenColumns` still hide columns; an app can then show its own control.
+
+The grid does not save the choice. An app that wants to remember it gives `hiddenColumns` and saves what `onHiddenColumnsChange` gives. This example keeps it in the storage of the browser (`localStorage`). It is the file `apps/playground/app/data/grid-parts/SavedColumnsGrid.tsx` of this repository:
+
+```tsx
+"use client";
+
+import { useMemo, useSyncExternalStore } from "react";
+import { DataGrid } from "@toraline.tech/ui";
+
+const CHANGE_EVENT = "my-app:hidden-columns-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(CHANGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(CHANGE_EVENT, onChange);
+  };
+}
+
+function readHiddenColumns(saved: string | null): string[] | undefined {
+  if (saved === null) {
+    return undefined;
+  }
+  try {
+    const parsed: unknown = JSON.parse(saved);
+    const isListOfTexts = Array.isArray(parsed) && parsed.every((item) => typeof item === "string");
+    return isListOfTexts ? (parsed as string[]) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function useSavedHiddenColumns(storageKey: string, defaultHiddenColumns: readonly string[]) {
+  // On the server and until the browser takes over the page: null, so the grid shows its default columns.
+  const saved = useSyncExternalStore(
+    subscribe,
+    () => window.localStorage.getItem(storageKey),
+    () => null,
+  );
+  const hiddenColumns = useMemo(() => readHiddenColumns(saved), [saved]);
+
+  function saveHiddenColumns(nextHiddenColumns: string[]) {
+    // Back to the default: nothing is kept, so a column added later follows its "defaultHidden".
+    if (nextHiddenColumns.join("\n") === defaultHiddenColumns.join("\n")) {
+      window.localStorage.removeItem(storageKey);
+    } else {
+      window.localStorage.setItem(storageKey, JSON.stringify(nextHiddenColumns));
+    }
+    window.dispatchEvent(new Event(CHANGE_EVENT));
+  }
+
+  return [hiddenColumns, saveHiddenColumns] as const;
+}
+
+const defaultHiddenColumns = columns.filter((column) => column.defaultHidden).map((column) => column.id);
+
+export function ProductsGrid({ products }: { products: Product[] }) {
+  const [hiddenColumns, saveHiddenColumns] = useSavedHiddenColumns("my-app:columns:products", defaultHiddenColumns);
+  return (
+    <DataGrid
+      /* caption, columns, rows, getRowKey, getRowLabel */
+      columnsMenu
+      hiddenColumns={hiddenColumns}
+      onHiddenColumnsChange={saveHiddenColumns}
+    />
+  );
+}
+```
 
 ### `ListItem`
 

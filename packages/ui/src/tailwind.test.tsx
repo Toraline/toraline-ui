@@ -187,6 +187,16 @@ const gridPartsColumns: DataGridColumn<GridRow>[] = [
       defaultValues: ["cheap"],
     },
   },
+  {
+    id: "id",
+    header: "Number",
+    cell: (row) => row.id,
+    filter: {
+      type: "options",
+      options: [{ value: "1", label: "One" }],
+      value: (row) => String(row.id),
+    },
+  },
 ];
 
 function GridPartsExamples() {
@@ -197,12 +207,14 @@ function GridPartsExamples() {
       rows={gridRows}
       getRowKey={(row) => row.id}
       getRowLabel={(row) => row.name}
+      columnsMenu
+      hiddenColumns={["price"]}
     />
   );
 }
 
 /** The buttons that open a part of the DataGrid of TOR-1209, in the order they are pressed. */
-const gridPartsButtonNames = ["Filter Product", "Filter Price (filter on)"];
+const gridPartsButtonNames = ["Filter Product", "Filter Number", "Columns"];
 
 /** The floating panels of phase 9: each one opens with a press on its button. */
 const floatingButtonNames = [

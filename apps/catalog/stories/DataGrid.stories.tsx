@@ -481,3 +481,82 @@ export const ColumnFilterKeyboard: Story = {
     await expect(canvas.getByRole("button", { name: "Filter Supplier (filter on)" })).toHaveFocus();
   },
 };
+
+/** The columns of the stories of the menu "Columns": "Product" is required, and "Supplier" starts hidden. */
+const menuColumns: DataGridColumn<Product>[] = columns.map((column): DataGridColumn<Product> => {
+  if (column.id === "name") {
+    return { ...column, required: true };
+  }
+  if (column.id === "supplier") {
+    return { ...column, defaultHidden: true };
+  }
+  return column;
+});
+
+/**
+ * "columnsMenu" adds the button "Columns" at the right of the toolbar. A
+ * column with "required" is always shown and is not in the menu. A column with
+ * "defaultHidden" is hidden until a person checks it: here "Supplier".
+ */
+export const ColumnsMenu: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Columns" })).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.queryByRole("columnheader", { name: "Supplier" })).toBeNull();
+  },
+};
+
+/**
+ * The menu open. The story hides "Category" and shows "Supplier": the table
+ * changes at once, and the button "Back to default" is shown.
+ */
+export const ColumnsMenuOpen: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    search: { placeholder: "Search the products" },
+    rows: products.slice(0, 8),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Columns" }));
+    const list = canvas.getByRole("group", { name: "Visible columns" });
+    await userEvent.click(within(list).getByRole("checkbox", { name: "Category" }));
+    await userEvent.click(within(list).getByRole("checkbox", { name: "Supplier" }));
+    await expect(canvas.queryByRole("columnheader", { name: "Category" })).toBeNull();
+    await expect(canvas.getByRole("columnheader", { name: "Supplier" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Back to default" })).toBeVisible();
+  },
+};
+
+function GridWithHiddenColumns(args: DataGridProps<Product>) {
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>(["stock", "price"]);
+  return (
+    <div className="grid gap-4">
+      <DataGrid {...args} hiddenColumns={hiddenColumns} onHiddenColumnsChange={setHiddenColumns} />
+      <p className="text-sm/5 text-secondary">
+        The hidden columns the app keeps: {hiddenColumns.length > 0 ? hiddenColumns.join(", ") : "none"}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The app keeps the hidden columns: it gives them in "hiddenColumns" and
+ * receives each change in "onHiddenColumnsChange". An app saves them where it
+ * wants, for example in the storage of the browser; the playground has that example.
+ */
+export const HiddenColumnsKeptByTheApp: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    rows: products.slice(0, 6),
+  },
+  render: (args) => <GridWithHiddenColumns {...args} />,
+};

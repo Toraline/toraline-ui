@@ -62,6 +62,10 @@ export type DataGridColumn<Row> = {
   searchValue?: (row: Row) => string;
   /** The content of the footer cell, computed from the rows after the search and the filters (every page). */
   footer?: (rows: Row[]) => ReactNode;
+  /** true: the column is always shown, and it is not in the menu "Columns". */
+  required?: boolean;
+  /** true: the column is hidden until a person turns it on in the menu "Columns". */
+  defaultHidden?: boolean;
   /** Turns on the filter of this column: a small button in its header opens a panel with the choices or a text field. */
   filter?: DataGridColumnFilter<Row>;
 };
@@ -152,6 +156,12 @@ export type DataGridLabels = {
   filterClear: string;
   /** The placeholder of the text field of a text filter. */
   filterContains: string;
+  /** The text of the button that opens the menu of the columns. */
+  columns: string;
+  /** The title of the list of columns in that menu. */
+  visibleColumns: string;
+  /** The button of that menu that goes back to the columns the screen starts with. */
+  resetColumns: string;
 };
 
 /**

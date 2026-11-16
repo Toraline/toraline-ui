@@ -55,6 +55,11 @@ export default function DataPage() {
           Back to the first page
         </Link>
       </p>
+      <p className="mt-2">
+        <Link className="text-brand underline" href="/data/grid-parts">
+          The parts of the DataGrid: the filter, the menu of the columns, cell editing, rows inside a row, another view
+        </Link>
+      </p>
       <ThemeToggle className="mt-4" />
 
       <Section title="DataTable">

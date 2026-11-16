@@ -19,6 +19,7 @@ import {
   SearchIcon,
 } from "./DataGridIcons.js";
 import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
+import { DataGridColumnsMenu } from "./DataGridColumnsMenu.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
 import type {
   DataGridCheckboxProps,
@@ -59,6 +60,9 @@ const defaultLabels: DataGridLabels = {
   filterSelectAll: "Select all",
   filterClear: "Clear",
   filterContains: "Contains…",
+  columns: "Columns",
+  visibleColumns: "Visible columns",
+  resetColumns: "Back to default",
 };
 
 /**
@@ -129,6 +133,19 @@ export type DataGridProps<Row> = {
    * returns. "clear" clears the selection, for example after an action ran.
    */
   selection?: { actions: (rows: Row[], clear: () => void) => ReactNode };
+  /**
+   * Turns on the menu "Columns", where a person hides and shows the columns
+   * that are not "required". A column with "defaultHidden" starts hidden.
+   */
+  columnsMenu?: boolean;
+  /**
+   * The "id" of each hidden column, when the app keeps the choice, for example
+   * in the storage of the browser. When missing: the grid keeps the choice
+   * itself, and starts with the columns that have "defaultHidden" hidden.
+   */
+  hiddenColumns?: readonly string[];
+  /** Called with the "id" of each hidden column after a person changes the columns in the menu. */
+  onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
   /** Turns on the pages. The number of rows of a page, until the person chooses another. */
   pageSize?: number;
   /** The numbers of rows a person can choose for a page. When missing: 10, 25, 50 and 100. */
@@ -170,7 +187,7 @@ export type DataGridProps<Row> = {
  */
 export function DataGrid<Row>({
   caption,
-  columns,
+  columns: allColumns,
   rows,
   groups,
   getRowKey,
@@ -182,6 +199,9 @@ export function DataGrid<Row>({
   toolbar,
   search,
   selection,
+  columnsMenu = false,
+  hiddenColumns,
+  onHiddenColumnsChange,
   pageSize,
   pageSizeOptions = dataGridPageSizes,
   emptyMessage = "No records.",
@@ -203,7 +223,21 @@ export function DataGrid<Row>({
     pageSize: defaultState?.pageSize ?? pageSize ?? dataGridPageSizes[1],
   }));
   const [checkedKeys, setCheckedKeys] = useState<Set<RowKey>>(new Set());
+  // null: a person did not change the columns, so they are the ones the columns ask for.
+  const [ownHiddenColumns, setOwnHiddenColumns] = useState<readonly string[] | null>(null);
   const selectAllRef = useRef<HTMLInputElement>(null);
+
+  const defaultHiddenColumnIds = allColumns
+    .filter((column) => column.defaultHidden && !column.required)
+    .map((column) => column.id);
+  // A required column is never hidden, and the "id" of a column that no longer exists is left out.
+  const hiddenColumnIds = allColumns
+    .filter((column) => !column.required)
+    .map((column) => column.id)
+    .filter((columnId) => (hiddenColumns ?? ownHiddenColumns ?? defaultHiddenColumnIds).includes(columnId));
+  const areColumnsDefault = hiddenColumnIds.join("\n") === defaultHiddenColumnIds.join("\n");
+  // From here on, "columns" is only the columns that are shown. A hidden column does not filter and does not sort.
+  const columns = allColumns.filter((column) => !hiddenColumnIds.includes(column.id));
 
   const isFlat = groups === undefined;
   // Without the prop "search" there is no field to empty, so a search text of defaultState does nothing.
@@ -248,6 +282,26 @@ export function DataGrid<Row>({
 
   function clearFilters() {
     update({ search: "", filters: {}, page: 1 });
+  }
+
+  function setHiddenColumns(nextHiddenColumnIds: string[]) {
+    setOwnHiddenColumns(nextHiddenColumnIds);
+    onHiddenColumnsChange?.(nextHiddenColumnIds);
+  }
+
+  function toggleColumn(columnId: string) {
+    const isHidden = hiddenColumnIds.includes(columnId);
+    // The list keeps the order of the columns.
+    setHiddenColumns(
+      allColumns
+        .map((column) => column.id)
+        .filter((id) => (id === columnId ? !isHidden : hiddenColumnIds.includes(id))),
+    );
+  }
+
+  function resetColumns() {
+    setOwnHiddenColumns(null);
+    onHiddenColumnsChange?.(defaultHiddenColumnIds);
   }
 
   function setFilter(column: DataGridColumn<Row>, value: DataGridFilterValue) {
@@ -403,30 +457,46 @@ export function DataGrid<Row>({
   }
 
   const hasSearchField = isFlat && search !== undefined;
-  const hasToolbar = hasSearchField || (toolbar !== undefined && toolbar !== null) || hasFilters;
+  const hasColumnsMenu = columnsMenu && allColumns.some((column) => !column.required);
+  const hasToolbar =
+    hasSearchField || (toolbar !== undefined && toolbar !== null) || hasFilters || hasColumnsMenu;
 
   return (
     <div className={classNames("space-y-3", className)} data-slot="data-grid">
       {hasToolbar ? (
-        <div className="flex flex-wrap items-center gap-2" data-slot="toolbar">
-          {hasSearchField ? (
-            <div className="w-full sm:w-80">
-              <TextInput
-                type="search"
-                icon={SearchIcon}
-                size="sm"
-                aria-label={search.placeholder}
-                placeholder={search.placeholder}
-                value={state.search}
-                onChange={(event) => update({ search: event.target.value, page: 1 })}
+        <div className="flex flex-wrap items-center justify-between gap-2" data-slot="toolbar">
+          <div className="flex flex-1 flex-wrap items-center gap-2">
+            {hasSearchField ? (
+              <div className="w-full sm:w-80">
+                <TextInput
+                  type="search"
+                  icon={SearchIcon}
+                  size="sm"
+                  aria-label={search.placeholder}
+                  placeholder={search.placeholder}
+                  value={state.search}
+                  onChange={(event) => update({ search: event.target.value, page: 1 })}
+                />
+              </div>
+            ) : null}
+            {toolbar}
+            {hasFilters ? (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                {labels.clearFilters}
+              </Button>
+            ) : null}
+          </div>
+          {hasColumnsMenu ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <DataGridColumnsMenu
+                columns={allColumns}
+                hiddenColumnIds={hiddenColumnIds}
+                isDefault={areColumnsDefault}
+                onToggle={toggleColumn}
+                onReset={resetColumns}
+                labels={labels}
               />
             </div>
-          ) : null}
-          {toolbar}
-          {hasFilters ? (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              {labels.clearFilters}
-            </Button>
           ) : null}
         </div>
       ) : null}
