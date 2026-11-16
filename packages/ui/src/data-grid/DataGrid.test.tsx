@@ -213,6 +213,17 @@ describe("DataGrid: the search", () => {
     expect(firstCells()).toHaveLength(3);
   });
 
+  test("the row above the table always has its 2 parts, as in Intraweb: the right part is there when it is empty", () => {
+    // With no menu "Columns" and no button "Edit table" the right part has nothing in it. It still
+    // takes the gap of the row, so the search field has the width it has in Intraweb on a narrow screen.
+    renderGrid({ search: { placeholder: "Search" } });
+    const toolbar = document.querySelector('[data-slot="toolbar"]') as HTMLElement;
+    expect(toolbar.children).toHaveLength(2);
+    expect(within(toolbar.children[0] as HTMLElement).getByRole("searchbox")).toBeDefined();
+    expect(toolbar.children[1]?.childNodes).toHaveLength(0);
+    expect(toolbar.children[1]?.className).toBe("flex flex-wrap items-center gap-2");
+  });
+
   test("the toolbar of the app is shown after the search field", () => {
     renderGrid({ search: { placeholder: "Search" }, toolbar: <button type="button">New product</button> });
     const toolbar = document.querySelector('[data-slot="toolbar"]') as HTMLElement;

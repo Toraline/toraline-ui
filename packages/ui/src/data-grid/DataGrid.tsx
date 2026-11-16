@@ -775,52 +775,55 @@ export function DataGrid<Row, SubRow = never>({
               </Button>
             ) : null}
           </div>
-          {hasColumnsMenu || hasEditTable ? (
-            <div className="flex flex-wrap items-center gap-2">
-              {hasColumnsMenu ? (
-                <DataGridColumnsMenu
-                  columns={allColumns}
-                  hiddenColumnIds={hiddenColumnIds}
-                  isDefault={areColumnsDefault}
-                  onToggle={toggleColumn}
-                  onReset={resetColumns}
-                  labels={labels}
-                />
-              ) : null}
-              {hasEditTable && !isEditingTable ? (
+          {/*
+            The right part is always here, also when it is empty (a view, or no menu "Columns"), as
+            in Intraweb. An empty part still takes the gap of 8 pixels of the row: on a narrow
+            screen the search field, which fills the left part, is then 8 pixels narrower.
+          */}
+          <div className="flex flex-wrap items-center gap-2">
+            {hasColumnsMenu ? (
+              <DataGridColumnsMenu
+                columns={allColumns}
+                hiddenColumnIds={hiddenColumnIds}
+                isDefault={areColumnsDefault}
+                onToggle={toggleColumn}
+                onReset={resetColumns}
+                labels={labels}
+              />
+            ) : null}
+            {hasEditTable && !isEditingTable ? (
+              <Button
+                variant="secondary"
+                disabled={rows.length === 0}
+                onClick={startEditingTable}
+                data-slot="edit-table"
+              >
+                {labels.editTable}
+              </Button>
+            ) : null}
+            {hasEditTable && isEditingTable ? (
+              <>
+                <span className="text-sm text-secondary" role="status">
+                  {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
+                </span>
                 <Button
-                  variant="secondary"
-                  disabled={rows.length === 0}
-                  onClick={startEditingTable}
-                  data-slot="edit-table"
+                  variant="ghost"
+                  disabled={isSavingRows}
+                  onClick={stopEditingTable}
+                  data-slot="cancel-editing"
                 >
-                  {labels.editTable}
+                  {labels.cancelEditing}
                 </Button>
-              ) : null}
-              {hasEditTable && isEditingTable ? (
-                <>
-                  <span className="text-sm text-secondary" role="status">
-                    {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    disabled={isSavingRows}
-                    onClick={stopEditingTable}
-                    data-slot="cancel-editing"
-                  >
-                    {labels.cancelEditing}
-                  </Button>
-                  <Button
-                    disabled={isSavingRows || changedRowList.length === 0}
-                    onClick={() => void saveChangedRows()}
-                    data-slot="save-changes"
-                  >
-                    {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
-                  </Button>
-                </>
-              ) : null}
-            </div>
-          ) : null}
+                <Button
+                  disabled={isSavingRows || changedRowList.length === 0}
+                  onClick={() => void saveChangedRows()}
+                  data-slot="save-changes"
+                >
+                  {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
+                </Button>
+              </>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
