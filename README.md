@@ -1,5 +1,7 @@
 # toraline-ui
 
+**English** | [Português](README.pt-BR.md)
+
 The component library of Toraline: styled React components, with configurable themes and fonts. Each Toraline app installs it.
 
 The default look is the look of the app Intraweb, an app of Toraline: the same colors, fonts, radius sizes and shadows, with the same token names and the same Tailwind class names (phase 6, TOR-1122).

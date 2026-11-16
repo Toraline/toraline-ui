@@ -194,7 +194,9 @@ for (const { folder, manifest } of manifests) {
   if (unwanted.length > 0) {
     fail(`${manifest.name}: these files must not be in the package: ${unwanted.join(", ")}`);
   }
-  for (const needed of ["package.json", "README.md"]) {
+  // README.pt-BR.md is the Portuguese version of the README. npm puts every file whose name
+  // starts with "README" in a package by itself, so "files" of package.json does not name it.
+  for (const needed of ["package.json", "README.md", "README.pt-BR.md"]) {
     if (!packedFiles.includes(needed)) {
       fail(`${manifest.name}: ${needed} is missing from the package.`);
     }

@@ -1,5 +1,7 @@
 # @toraline.tech/tokens
 
+**English** | [Português](https://github.com/Toraline/toraline-ui/blob/main/packages/tokens/README.pt-BR.md)
+
 The design tokens and the themes of the Toraline component library. A design token is a named value of the design, for example a color or a font, stored as a CSS variable. This package has no React code.
 
 ## Installation

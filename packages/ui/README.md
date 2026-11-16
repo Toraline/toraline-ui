@@ -1,5 +1,7 @@
 # @toraline.tech/ui
 
+**English** | [Português](https://github.com/Toraline/toraline-ui/blob/main/packages/ui/README.pt-BR.md)
+
 The styled React components of the Toraline component library.
 
 | What | Import from | State |

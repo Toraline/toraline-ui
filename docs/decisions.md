@@ -12,6 +12,14 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The Portuguese README of each package is inside the published package (TOR-1182)
+- Context: the page of a package on npmjs.com shows only `README.md`. The question was where a person finds `README.pt-BR.md`.
+- Decision: `README.pt-BR.md` is in the tarball of each package, and line 3 of the English `README.md` links to the Portuguese file on GitHub with its full address. So a person on npmjs.com reaches it with one press, and a person with no network reads it in `node_modules`.
+- Why it is cheap and safe: npm puts every file whose name starts with `README` in a package by itself (checked with `npm pack --dry-run`, npm 11.12.1). `files` of the two `package.json` files did not change. `scripts/check-packages.mjs` now fails when `README.pt-BR.md` is missing from a tarball, as it already did for `README.md`.
+- Cost: the tarballs grow by the size of one more README. The sizes before and after are in the pull request of TOR-1129.
+- Alternatives: keep the Portuguese file out of the package (a `.npmignore` file or a negated entry in `files`) and only link to GitHub, which saves the size and needs a rule against npm's own default; a README with both languages, which doubles the page on npmjs.com.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The documentation in two languages: how the files are stored (TOR-1179)
 - Context: the library is in English only (names, props, built-in texts). Its documentation exists in English and in Brazilian Portuguese (decision of Juliana, TOR-1129).
 - Decision (the file pattern): the Portuguese version of `<name>.md` is `<name>.pt-BR.md`, in the same folder. Example: `docs/guide.pt-BR.md` next to `docs/guide.md`. `pt-BR` is the language tag of Brazilian Portuguese.

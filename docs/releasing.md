@@ -1,5 +1,7 @@
 # How to release the library
 
+**English** | [Português](releasing.pt-BR.md)
+
 The steps to publish a new version of `@toraline.tech/ui` and `@toraline.tech/tokens` to npm. A person does them. An agent may do steps 1 to 6 when asked. An agent never does step 7 or step 9, and never handles an npm token or a login.
 
 ## Context you need before reading
