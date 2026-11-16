@@ -20,6 +20,13 @@ import type { DataGridCellValue, DataGridColumnEditor } from "./data-grid-option
  */
 const changedClass = "border-changed! bg-warning!";
 
+/**
+ * A number field is as wide as its cell, with the digits on the right. This is
+ * what Intraweb draws. Its source also asks for a width of 96 pixels ("w-24"),
+ * but the full width of every field ("w-full") is on the same element and wins.
+ */
+const numberFieldClass = "text-right";
+
 export type DataGridCellEditorProps<Row> = {
   /** The name of the field for a screen reader: the column and the record. */
   label: string;
@@ -113,7 +120,7 @@ export function DataGridCellEditor<Row>({
       size="sm"
       value={String(value)}
       onChange={(event) => onChange(event.target.value)}
-      className={classNames(editor.type === "number" ? "w-24 text-right" : "min-w-40", changed && changedClass)}
+      className={classNames(editor.type === "number" ? numberFieldClass : "min-w-40", changed && changedClass)}
       data-changed={changed ? "true" : undefined}
     />
   );

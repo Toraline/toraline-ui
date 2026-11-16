@@ -46,7 +46,7 @@ const panelClass =
   "fixed z-50 w-64 rounded-lg border border-subtle bg-surface p-3 text-left font-body text-sm/5 font-normal normal-case shadow-lg";
 
 /** The two small buttons above the choices. */
-const quickButtonClass = classNames("rounded-[4px] font-medium hover:underline", focusRingClass);
+const quickButtonClass = classNames("font-medium hover:underline", focusRingClass);
 
 export type DataGridColumnFilterProps<Row> = {
   column: DataGridColumn<Row>;

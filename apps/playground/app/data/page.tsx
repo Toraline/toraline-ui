@@ -60,6 +60,11 @@ export default function DataPage() {
           The parts of the DataGrid: the filter, the menu of the columns, cell editing, rows inside a row, another view
         </Link>
       </p>
+      <p className="mt-2">
+        <Link className="text-brand underline" href="/data/address">
+          The state of a DataGrid kept in the address of the page
+        </Link>
+      </p>
       <ThemeToggle className="mt-4" />
 
       <Section title="DataTable">

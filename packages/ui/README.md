@@ -1626,6 +1626,200 @@ const [view, setView] = useState<"list" | "calendar">("list");
 - With a view there is no selection, no pages and no menu of the columns. `loading` and `emptyMessage` belong to the table: the view shows its own text for no rows.
 - The view is inside an element with `data-slot="view"`.
 
+#### Keeping the state in the address of the page
+
+The grid does not read or write the address of the page, and the library does not import Next.js. The app does it with 2 props: `defaultState` is what the grid starts with, and `onStateChange` is called with the full state after each change. The adapter below keeps the search, the sort, the filters, the page and the page size in the query parameters of the address, with the navigation of Next.js. After a reload, or when a person opens a saved link, the grid is the same.
+
+The example is the route `/data/address` of the playground of this repository (`apps/playground/app/data/address/`). The parameter names are the ones of the app Intraweb, so its saved addresses keep working:
+
+| Parameter | Example | Meaning |
+|---|---|---|
+| `busca` | `busca=cake` | The text of the search field |
+| `ordem` | `ordem=name`, `ordem=-name` | The `id` of the sorted column. `-` in front means descending |
+| `f-<column id>` | `f-status=active,paused` | The checked choices of the filter of that column, with commas; or the text of a text filter |
+| `f-<column id>` | `f-status=` | Empty: a person unchecked the default choices of the column |
+| `pagina` | `pagina=3` | The page. Not written for the first page |
+| `por-pagina` | `por-pagina=50` | The rows of a page. Not written for the page size of the screen |
+
+A value that is the default is not written, so the address of a grid that nobody changed has no parameter.
+
+File 1, `grid-address.ts`: the state as query parameters, and back. It knows no router, so it also works with another router.
+
+```ts
+const SEARCH = "busca";
+const SORT = "ordem";
+const FILTER_PREFIX = "f-";
+const PAGE = "pagina";
+const PAGE_SIZE = "por-pagina";
+
+/** What reads one query parameter: URLSearchParams, and the result of useSearchParams of Next.js. */
+type QueryReader = { get: (name: string) => string | null };
+
+function readSort(text: string | null): DataGridSort {
+  if (text === null || text === "") {
+    return null;
+  }
+  return text.startsWith("-") ? { columnId: text.slice(1), descending: true } : { columnId: text, descending: false };
+}
+
+/** The filters of the address. Only a column that has a filter is read. */
+function readFilters<Row>(query: QueryReader, columns: readonly DataGridColumn<Row>[]): DataGridFilters {
+  const filters: DataGridFilters = {};
+  for (const column of columns) {
+    const text = query.get(`${FILTER_PREFIX}${column.id}`);
+    if (column.filter === undefined || text === null) {
+      continue;
+    }
+    if (column.filter.type === "options") {
+      // An empty text is an empty list: every default choice unchecked.
+      filters[column.id] = text === "" ? [] : text.split(",");
+    } else if (text !== "") {
+      filters[column.id] = text;
+    }
+  }
+  return filters;
+}
+
+/**
+ * The state that the grid starts with, read from the address: give it to
+ * "defaultState". A page size that is not one of "pageSizes" is ignored.
+ */
+export function readGridState<Row>(
+  query: QueryReader,
+  columns: readonly DataGridColumn<Row>[],
+  pageSizes: readonly number[],
+): Partial<DataGridState> {
+  const pageSize = Number(query.get(PAGE_SIZE));
+  return {
+    search: query.get(SEARCH) ?? "",
+    sort: readSort(query.get(SORT)),
+    filters: readFilters(query, columns),
+    page: Math.max(1, Math.floor(Number(query.get(PAGE))) || 1),
+    ...(pageSizes.includes(pageSize) ? { pageSize } : {}),
+  };
+}
+
+/**
+ * The query parameters of a state of the grid: what "onStateChange" writes in
+ * the address. null means "take this parameter out of the address". A value
+ * that is the default (no search, no sort, the first page, the page size of
+ * the screen, the default of a filter) is taken out, so the address stays short.
+ */
+export function gridStateToQuery<Row>(
+  state: DataGridState,
+  columns: readonly DataGridColumn<Row>[],
+  defaultPageSize: number,
+): Record<string, string | null> {
+  const sortPrefix = state.sort?.descending ? "-" : "";
+  const query: Record<string, string | null> = {
+    [SEARCH]: state.search === "" ? null : state.search,
+    [SORT]: state.sort === null ? null : `${sortPrefix}${state.sort.columnId}`,
+    [PAGE]: state.page > 1 ? String(state.page) : null,
+    [PAGE_SIZE]: state.pageSize === defaultPageSize ? null : String(state.pageSize),
+  };
+  for (const column of columns) {
+    if (column.filter === undefined) {
+      continue;
+    }
+    const value = state.filters[column.id];
+    const text = typeof value === "string" ? value : value?.join(",");
+    query[`${FILTER_PREFIX}${column.id}`] = text ?? null;
+  }
+  return query;
+}
+```
+
+The file starts with `import type { DataGridColumn, DataGridFilters, DataGridSort, DataGridState } from "@toraline.tech/ui";`.
+
+File 2, `use-grid-address.ts`: the navigation of Next.js.
+
+```ts
+"use client";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { dataGridPageSizes } from "@toraline.tech/ui";
+import type { DataGridColumn, DataGridState } from "@toraline.tech/ui";
+import { gridStateToQuery, readGridState } from "./grid-address";
+
+/** URLSearchParams writes "," ":" "(" ")" and "!" as codes. They are allowed as they are, and the address is easier to read. */
+const READABLE: Record<string, string> = { "%2C": ",", "%3A": ":", "%28": "(", "%29": ")", "%21": "!" };
+
+function readableQuery(params: URLSearchParams): string {
+  return params.toString().replace(/%2C|%3A|%28|%29|%21/g, (code) => READABLE[code] ?? code);
+}
+
+/**
+ * Keeps the search, the sort, the filters and the page of a DataGrid in the
+ * address of the page, with the navigation of Next.js. It is the adapter
+ * between the grid and the router: the library does not import Next.js.
+ *
+ * - The address is read once, when the grid is first shown: "defaultState".
+ * - Each change of the grid replaces the address ("onStateChange"). It adds no
+ *   step to the history of the browser, and it does not scroll the page.
+ * - The other query parameters of the page are kept.
+ * - One grid for each page: the names have no prefix.
+ *
+ * The component that calls it must be inside <Suspense>, because it reads the
+ * query parameters (a rule of useSearchParams in Next.js).
+ */
+export function useGridAddress<Row>(columns: readonly DataGridColumn<Row>[], defaultPageSize: number) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [defaultState] = useState(() => readGridState(searchParams, columns, dataGridPageSizes));
+
+  function onStateChange(state: DataGridState) {
+    const params = new URLSearchParams(searchParams.toString());
+    for (const [name, value] of Object.entries(gridStateToQuery(state, columns, defaultPageSize))) {
+      if (value === null) {
+        params.delete(name);
+      } else {
+        params.set(name, value);
+      }
+    }
+    const query = readableQuery(params);
+    router.replace(query === "" ? pathname : `${pathname}?${query}`, { scroll: false });
+  }
+
+  return { defaultState, onStateChange };
+}
+```
+
+The screen:
+
+```tsx
+"use client";
+
+const PAGE_SIZE = 25;
+
+export function ProductsGrid({ products }: { products: Product[] }) {
+  const { defaultState, onStateChange } = useGridAddress(columns, PAGE_SIZE);
+  return (
+    <DataGrid
+      /* caption, columns, rows, getRowKey, getRowLabel */
+      search={{ placeholder: "Search the products" }}
+      pageSize={PAGE_SIZE}
+      defaultState={defaultState}
+      onStateChange={onStateChange}
+    />
+  );
+}
+```
+
+```tsx
+// The page, a Server Component. useSearchParams needs <Suspense> around the component that calls it.
+<Suspense fallback={<p>Loading…</p>}>
+  <ProductsGrid products={products} />
+</Suspense>
+```
+
+- The address is read once, when the grid is first shown. After that the grid keeps its own state and answers at once; the address follows it.
+- Each change replaces the address (`router.replace`), so the "back" button of the browser leaves the page in one step.
+- The other query parameters of the page are kept, for example the one that opens a side panel.
+- One grid for each page: the names have no prefix.
+- The hidden columns are not in the address. They are a choice of the person, not of the link: see [The menu of the columns](#the-menu-of-the-columns).
+
 ### `ListItem`
 
 One row of a list of records: an icon, a title and a second line, and a value and a status on the right.
