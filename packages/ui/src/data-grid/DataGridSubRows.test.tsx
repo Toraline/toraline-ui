@@ -108,6 +108,8 @@ describe("DataGrid: rows inside a row", () => {
       "Extra price",
     ]);
     expect(within(inner).getAllByRole("row")).toHaveLength(3);
+    // A cell of an item has no "data-label": on a narrow screen it shows only its value, as in Intraweb.
+    expect(inner.querySelectorAll("td[data-label]")).toHaveLength(0);
     // The inner table is in a row of its own, right after the row of the record, as wide as the table.
     const innerRow = inner.closest("[data-slot=sub-rows-row]") as HTMLElement;
     expect(innerRow.previousElementSibling?.textContent).toContain("Milk");

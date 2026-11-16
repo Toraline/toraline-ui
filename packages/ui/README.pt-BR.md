@@ -1668,6 +1668,7 @@ const columns: DataGridColumn<Category>[] = [
 - A seta é um botão com `aria-expanded`, e `aria-controls` enquanto os itens são mostrados. O nome dela é `labels.showSubRows` ou `labels.hideSubRows`, com o número de itens. Enter e Espaço a pressionam, e ela mantém o foco.
 - Várias linhas podem estar abertas ao mesmo tempo. O grid guarda quais linhas estão abertas.
 - A tabela interna tem o nome de `labels.subRowsCaption`. Quando ela é mais larga que a sua caixa, ela rola para os lados, e a caixa pode receber o foco do teclado.
+- Em uma tela com menos de 768 pixels de largura cada item é um bloco e cada célula dele mostra só o seu valor, sem o nome da coluna, como no Intraweb. O cabeçalho da tabela interna fica então escondido dos olhos; um leitor de tela ainda lê o cabeçalho. (A versão 0.3.0 mostrava o nome da coluna antes de cada valor.)
 - Os itens não têm busca, nem ordenação, nem filtro, nem menu das colunas.
 - O tipo genérico do grid tem uma segunda parte para os itens: `DataGridProps<Row, SubRow>`. O TypeScript a lê de `subRows`.
 

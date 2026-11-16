@@ -1668,6 +1668,7 @@ const columns: DataGridColumn<Category>[] = [
 - The arrow is a button with `aria-expanded`, and `aria-controls` while the items are shown. Its name is `labels.showSubRows` or `labels.hideSubRows`, with the number of items. Enter and Space press it, and it keeps the focus.
 - Several rows can be open at the same time. The grid keeps which rows are open.
 - The inner table is named by `labels.subRowsCaption`. When it is wider than its box it scrolls sideways, and the box can get the keyboard focus.
+- On a screen less than 768 pixels wide each item is a block and each of its cells shows only its value, with no name of its column, as in Intraweb. The header of the inner table is then hidden from the eye; a screen reader still reads it. (Version 0.3.0 showed the name of the column before each value.)
 - The items have no search, no sort, no filter and no menu of the columns.
 - The generic type of the grid has a second part for the items: `DataGridProps<Row, SubRow>`. TypeScript reads it from `subRows`.
 

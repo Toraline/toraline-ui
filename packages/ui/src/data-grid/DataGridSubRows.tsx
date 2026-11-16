@@ -121,7 +121,8 @@ export function DataGridSubRowsTable<Row, SubRow>({
               {items.map((item) => (
                 <Tr key={subRows.getRowKey(item)} hoverable>
                   {subRows.columns.map((column) => (
-                    <Td key={column.id} data-label={column.header} align={column.align}>
+                    // No "data-label": on a narrow screen a cell of an item shows only its value, as in Intraweb.
+                    <Td key={column.id} align={column.align}>
                       {renderCell(item, column)}
                     </Td>
                   ))}
