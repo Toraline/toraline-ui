@@ -501,3 +501,7 @@ Com o preset do Tailwind cada uma também é uma cor do Tailwind: `--color-brand
 Os arquivos CSS e os arquivos TypeScript guardam os mesmos valores. `src/tokens.test.ts` falha quando eles diferem, ou quando este README não nomeia um token de nível 2.
 
 As cores são do Intraweb. `src/intraweb.test.ts` falha quando uma cor de nível 1, um token de cor do tema claro ou do tema escuro, ou a classe do Tailwind de um token de cor difere das cópias dos arquivos do Intraweb em `src/intraweb-fixtures/`. Para pegar um valor novo do Intraweb: copie o arquivo de novo, mude a data no primeiro comentário dele, e mude o token no arquivo CSS e no arquivo TypeScript.
+
+## Licença
+
+MIT. O texto está no arquivo [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

@@ -501,3 +501,7 @@ With the Tailwind preset each one is also a Tailwind color: `--color-brand-700` 
 The CSS files and the TypeScript files hold the same values. `src/tokens.test.ts` fails when they differ, or when this README does not name a level 2 token.
 
 The colors are Intraweb's. `src/intraweb.test.ts` fails when a level 1 color, a color token of the light or the dark theme, or the Tailwind class of a color token differs from the copies of Intraweb's files in `src/intraweb-fixtures/`. To take a new value of Intraweb: copy the file again, change the date in its first comment, and change the token in the CSS file and in the TypeScript file.
+
+## License
+
+MIT. The text is in the file [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

@@ -1974,3 +1974,7 @@ import { Button, DetailPanel } from "@toraline.tech/ui";
 - The inner parts have `data-slot`: `header`, `title`, `body`, `fields`, `footer`.
 - The types `DetailPanelProps` and `DetailField` are exported.
 - It has no `"use client"`: it also renders in a Server Component. A panel with `onClose` needs a Client Component around it, because a function cannot go from a Server Component to the browser.
+
+## License
+
+MIT. The text is in the file [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

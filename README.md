@@ -46,3 +46,7 @@ make doctor      # check the machine and the project
 ```
 
 The old library has its own commands inside `legacy/`: `npm install`, `npm run build`, `npm run storybook`.
+
+## License
+
+MIT. The text is in the file [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

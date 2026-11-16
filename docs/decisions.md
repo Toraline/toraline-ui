@@ -12,6 +12,16 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-16 - The library is released under the MIT license (TOR-1200)
+- Decision: toraline-ui is open source under the MIT license. The copyright line is `Copyright (c) 2023-2026 Toraline`; 2023 is the year of the first code of the repository.
+- Why MIT: it is the most common license for component libraries, it is short, and it is permissive: an app may use, change and sell the code, and must keep the copyright notice and the license text.
+- Trade-off: MIT has no patent grant. The Apache License 2.0 has one, and is longer and asks a notice of changes.
+- How it is in the packages: the file `LICENSE` is at the repository root. `packages/ui/` and `packages/tokens/` each have a copy, because npm puts in a package only files of the package's own folder; npm adds a file named `LICENSE` by itself, so `files` of `package.json` does not name it. The 2 published `package.json` files and the root one have `"license": "MIT"`.
+- How it is kept true: `scripts/check-packages.mjs` (part of `make check`, and the guard of `npm publish`) fails when the root file is missing or is not the MIT text, when a package has another `license` value, when a copy is missing or differs from the root file, and when the list of files npm would pack has no `LICENSE`. Checked on 2026-11-16: `make pack` lists `LICENSE` (1.1 kB) in both tarballs of `0.3.1`; with a copy removed, and with a copy changed, the check fails.
+- Not changed: `legacy/`, the old package, and its `package.json`. The versions `0.1.0`, `0.2.0` and `0.3.0` on npm have no license file; the first version with it is `0.3.1`.
+- Alternatives: a copy step in the build of each package, which leaves no copy in git and makes a tarball built by hand depend on the build; Apache License 2.0; no license.
+- Decided by: Juliana, 2026-11-16.
+
 ## 2026-11-16 - The date of a release in the change list is the releaser's local date (TOR-1223)
 - Rule: use the person's local date when it is known; when one fixed base is needed, use UTC.
 - Decision: in `CHANGELOG.md` the date in the heading of a version is the date in the local time of the person who started the release. A time that a machine writes (npm, GitHub, a log) is in UTC and is not copied into the heading. The rule is in step 4 of `docs/releasing.md` and `docs/releasing.pt-BR.md`, and in the first lines of `CHANGELOG.md`.

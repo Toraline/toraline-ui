@@ -77,9 +77,9 @@ Os exemplos usam `0.1.1` como a versão nova.
 
    `make pack` imprime os arquivos de cada pacote e escreve os tarballs em `.pack/tarballs/`. Leia as duas listas:
 
-   - Cada uma tem `package.json`, `README.md`, `README.pt-BR.md`, uma pasta `css/` e uma pasta `dist/`.
+   - Cada uma tem `package.json`, `README.md`, `README.pt-BR.md`, `LICENSE`, uma pasta `css/` e uma pasta `dist/`.
    - Nenhum nome de arquivo tem `.test.`, `template` ou `.map`.
-   - Os números são próximos destes: `@toraline.tech/tokens` 17 arquivos, 36 kB; `@toraline.tech/ui` 177 arquivos, 149 kB (versão `0.3.0`, com os dois arquivos README). Um componente novo adiciona cerca de 4 arquivos.
+   - Os números são próximos destes: `@toraline.tech/tokens` 18 arquivos, 38 kB; `@toraline.tech/ui` 178 arquivos, 154 kB (versão `0.3.1`, com os dois arquivos README e o `LICENSE`). Um componente novo adiciona cerca de 4 arquivos.
 
 6. **Faça o commit, abra o pull request para `main`, e faça o merge** depois que `Check` passar no GitHub. Daqui em diante o branch `main` tem a versão.
 
@@ -181,9 +181,10 @@ Encontrado em 2026-11-15, não mudado: o npm tem `@toraline/toraline-ui` 1.1.5, 
 
 - A versão `0.1.0` dos dois pacotes está no npm, publicada pelo workflow "Release" em 2026-11-15. A versão `0.2.0` veio em seguida em 2026-11-15 e a versão `0.3.0` em 2026-11-15 (as datas são no horário local de Brasília, de onde os releases foram iniciados; o npm registra a `0.3.0` em 2026-11-16 01:24 UTC).
 
+- A biblioteca é distribuída sob a licença MIT (decidido em 2026-11-16, `docs/decisions.md`, TOR-1200). O arquivo `LICENSE` está na raiz do repositório, e a pasta de cada pacote tem uma cópia, que o npm coloca no tarball. `make check` falha quando uma cópia está faltando, é diferente do arquivo da raiz, ou não está em um tarball. A primeira versão com a licença é a `0.3.1`; as versões `0.1.0`, `0.2.0` e `0.3.0` no npm não têm arquivo de licença.
+
 **Não feito**
-- Os pacotes não têm licença.
 - O Trusted Publishing não está configurado. O workflow ainda usa o secret `NPM_PUBLISH_TOKEN`.
 
 **O que você precisa fazer**
-1. Escolha uma licença, ou decida continuar publicando sem nenhuma.
+1. Nada para a licença: ela está escolhida. Quando o texto do arquivo `LICENSE` da raiz do repositório mudar (por exemplo os anos), copie o arquivo para `packages/ui/` e `packages/tokens/`.

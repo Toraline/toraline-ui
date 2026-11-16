@@ -30,6 +30,10 @@ Fixes found when the app Intraweb installed version 0.3.0 and compared 279 scree
 - `@toraline.tech/tokens`: the Tailwind preset writes the line height of `text-xs`, `text-sm`, `text-base` and `text-lg` into the class, as a ratio of the font size (Tailwind's own values). The computed line height of these classes in an app does not change. An app that sets `--text-sm--line-height` in its own `@theme` after the preset still wins.
 - DataGrid: the labels `selectedCount`, `pageRange` and `pageOf` can return elements, not only a text. An app that writes them in the pieces Intraweb used gets the exact letters of Intraweb (the README of `@toraline.tech/ui` has the code).
 
+### License
+
+- The library is released under the MIT license (TOR-1200). Both packages have `"license": "MIT"` and the file `LICENSE`. The versions 0.1.0, 0.2.0 and 0.3.0 were published with no license file.
+
 ### Documentation
 
 - A width class of the app (`w-24`, `w-auto`) on TextInput, DecimalInput, Select and Textarea wins over the full width of the control. It was already so; the README now states it with an example. In Intraweb before the library the full width won, so an app that moves from Intraweb's own components removes the width classes that did nothing.

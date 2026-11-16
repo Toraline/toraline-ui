@@ -1974,3 +1974,7 @@ import { Button, DetailPanel } from "@toraline.tech/ui";
 - As partes internas têm `data-slot`: `header`, `title`, `body`, `fields`, `footer`.
 - Os tipos `DetailPanelProps` e `DetailField` são exportados.
 - Ele não tem `"use client"`: também renderiza em um Server Component. Um painel com `onClose` precisa de um Client Component em volta dele, porque uma função não pode ir de um Server Component para o navegador.
+
+## Licença
+
+MIT. O texto está no arquivo [`LICENSE`](LICENSE). Copyright (c) 2023-2026 Toraline.

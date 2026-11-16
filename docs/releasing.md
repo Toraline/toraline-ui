@@ -77,9 +77,9 @@ The examples use `0.1.1` as the new version.
 
    `make pack` prints the files of each package and writes the tarballs into `.pack/tarballs/`. Read the two lists:
 
-   - Each has `package.json`, `README.md`, `README.pt-BR.md`, a folder `css/` and a folder `dist/`.
+   - Each has `package.json`, `README.md`, `README.pt-BR.md`, `LICENSE`, a folder `css/` and a folder `dist/`.
    - No file name has `.test.`, `template` or `.map`.
-   - The numbers are close to these: `@toraline.tech/tokens` 17 files, 36 kB; `@toraline.tech/ui` 177 files, 149 kB (version `0.3.0`, with the two README files). A new component adds about 4 files.
+   - The numbers are close to these: `@toraline.tech/tokens` 18 files, 38 kB; `@toraline.tech/ui` 178 files, 154 kB (version `0.3.1`, with the two README files and `LICENSE`). A new component adds about 4 files.
 
 6. **Commit, open the pull request to `main`, and merge it** after `Check` passes on GitHub. From here on the branch `main` has the version.
 
@@ -181,9 +181,10 @@ Found on 2026-11-15, not changed: npm has `@toraline/toraline-ui` 1.1.5, publish
 
 - Version `0.1.0` of both packages is on npm, published by the workflow "Release" on 2026-11-15. Version `0.2.0` followed on 2026-11-15 and version `0.3.0` on 2026-11-15 (the dates are in the local time of Brasília, where the releases were started; npm records `0.3.0` at 2026-11-16 01:24 UTC).
 
+- The library is released under the MIT license (decided on 2026-11-16, `docs/decisions.md`, TOR-1200). The file `LICENSE` is at the repository root, and each package folder has a copy, which npm puts in the tarball. `make check` fails when a copy is missing, differs from the root file, or is not in a tarball. The first version with the license is `0.3.1`; the versions `0.1.0`, `0.2.0` and `0.3.0` on npm have no license file.
+
 **Not done**
-- The packages have no license.
 - Trusted Publishing is not set up. The workflow still uses the secret `NPM_PUBLISH_TOKEN`.
 
 **What you must do**
-1. Choose a license, or decide to keep publishing with none.
+1. Nothing for the license: it is chosen. When the text of the file `LICENSE` at the repository root changes (for example the years), copy the file into `packages/ui/` and `packages/tokens/`.
