@@ -12,6 +12,15 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - The check that the documentation exists in both languages (TOR-1184)
+- Decision: `make check` runs `make docs-check` (`scripts/check-docs-languages.mjs`). For each covered file of TOR-1179 it fails when one version is missing, and when the two versions do not have the same number of headings of each level.
+- Decision (2 checks more than the ticket asked for): it also fails when line 3 of a version does not link to the other version, and when the code blocks of the two versions are not the same, byte for byte. Both are rules of TOR-1179, and both are cheap to check.
+- Decision (the catalog): the check also compares the headings of the two languages inside `apps/catalog/stories/Guide.mdx` and `Tokens.mdx`.
+- What the check cannot see: a sentence that changed in one language only. That is the rule in `AGENTS.md`: a change in one language is made in the other in the same commit.
+- The test is `scripts/check-docs-languages.test.mjs`. The unit project of Vitest now also reads `scripts/**/*.test.mjs`.
+- Alternatives: compare the number of paragraphs or of lines, which fails on a harmless difference of wording; a translation tool that marks out-of-date paragraphs, which is a new tool.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - The catalog: the guide and the tokens page in two languages (TOR-1183)
 - Decision: the toolbar of the catalog has the control **Language** (`English`, `Português`). It is a global of Storybook named `language`, with the values `en` and `pt-BR`, next to the global `theme`. The default is `en`.
 - Decision (what changes): the guide page, the tokens page, and the captions and column headers of the token tables. The component pages, the names in the sidebar (`Guide`, `Foundations`) and the texts inside a story stay in English: the library is in English only, and Storybook has one sidebar for every value of a global.
