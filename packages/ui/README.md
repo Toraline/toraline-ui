@@ -1306,6 +1306,8 @@ const columns: DataGridColumn<Product>[] = [
 | `pageSize` | A number | Turns on the pages: the number of rows of a page until the person chooses another |
 | `pageSizeOptions` | A list of numbers. Default `10, 25, 50, 100` | The numbers a person can choose. `pageSize` is added when it is not in the list |
 | `selection` | `{ actions: (rows, clear) => elements }` | Turns on a checkbox in each row and one in the header, which selects every row the search found. While a row is selected, a bar shows the number of selected rows and what `actions` returns. `clear()` clears the selection |
+| `onSaveCell` | A function `(row, columnId, value) => Promise` | Saves one cell of a column with `editOnClick`. See [Editing a cell in place](#editing-a-cell-in-place) |
+| `getSaveErrorMessage` | A function `(error) => text` | The text for an error that `onSaveCell` was rejected with. When missing: the message of an `Error`, or `labels.saveFailed` |
 | `columnsMenu` | `true`, `false` (default) | Turns on the menu "Columns", where a person hides and shows the columns. See [The menu of the columns](#the-menu-of-the-columns) |
 | `hiddenColumns` | A list of column ids | The hidden columns, when the app keeps the choice. When missing: the grid keeps it, and starts with the columns that have `defaultHidden` hidden |
 | `onHiddenColumnsChange` | A function | Called with the list of the hidden column ids after a person changes the columns in the menu |
@@ -1337,17 +1339,20 @@ A column (`DataGridColumn<Row>`):
 | `footer` | A function that receives the rows after the search and the filters | The content of the footer cell. The footer row is shown when a column has `footer` |
 | `required` | `true`, `false` (default) | `true`: the column is always shown, and it is not in the menu "Columns" |
 | `defaultHidden` | `true`, `false` (default) | `true`: the column is hidden until a person turns it on in the menu "Columns" |
+| `editor` | `{ type, value }`, and `options` for a select | The field that edits a cell of this column: `"text"`, `"number"`, `"select"` or `"checkbox"` |
+| `editOnClick` | `true`, `false` (default) | `true`: a press on a cell of this column edits it in place. It needs `editor` and the prop `onSaveCell` of the grid |
+| `canEdit` | A function | `false` for a record whose cell cannot be edited, for example an archived record |
 | `filter` | `{ type: "options", options, value, defaultValues }` or `{ type: "text", value }` | Turns on the filter of this column. See [The filter of a column](#the-filter-of-a-column) |
 
-The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: the editing of cells, the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
-- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- Not in the library yet, and still only in Intraweb: the rows inside a row, and another view in the place of the table. They are the next tickets of TOR-1209.
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
 
 #### The filter of a column
@@ -1485,6 +1490,75 @@ export function ProductsGrid({ products }: { products: Product[] }) {
   );
 }
 ```
+
+#### Editing a cell in place
+
+A column with `editor` and `editOnClick` is edited in the grid. The grid shows the field and the states; the app saves the value in `onSaveCell`.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    editor: { type: "text", value: (product) => product.name },
+    editOnClick: canEdit,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (product) => formatMoney(product.price),
+    // The value is the text a person typed. The app reads the number when it saves.
+    editor: { type: "number", value: (product) => decimalToInput(product.price) },
+    editOnClick: canEdit,
+    canEdit: (product) => !product.archived,
+  },
+  {
+    id: "status",
+    header: "Status",
+    cell: (product) => (product.active ? "Active" : "Inactive"),
+    editor: {
+      type: "select",
+      value: (product) => (product.active ? "active" : "inactive"),
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ],
+    },
+    editOnClick: canEdit,
+  },
+];
+
+<DataGrid
+  /* caption, columns, rows, getRowKey, getRowLabel */
+  onSaveCell={async (product, columnId, value) => {
+    // A promise that is rejected leaves the field open with the error text.
+    await api.updateProduct(product.id, { [columnId]: value });
+  }}
+  getSaveErrorMessage={(error) => apiErrorText(error)}
+/>
+```
+
+| `editor.type` | The field | The value given to `onSaveCell` |
+|---|---|---|
+| `"text"` | [`TextInput`](#textinput), size `sm` | The text |
+| `"number"` | [`DecimalInput`](#decimalinput), size `sm`, aligned to the right | The text a person typed, with a comma or a point. The app reads the number, for example with `parseDecimalInput` |
+| `"select"` | [`Select`](#select), size `sm`, with the choices of `options` | The `value` of the choice |
+| `"checkbox"` | [`CheckboxControl`](#checkbox-and-checkboxcontrol) | `true` or `false` |
+
+- At rest the cell is a button with the content of the cell. The pointer over it, or the keyboard focus, shows a quiet background and a pencil. A press, Enter or Space shows the field, with the focus.
+- A text and a number are saved with Enter, and when the focus leaves the field. A select is saved when a choice is made. A checkbox is always shown and is saved when it is changed.
+- Escape gives up the change and gives the focus back to the cell. It does not reach a Modal or a Drawer under the grid.
+- A value that did not change is not saved.
+- A field whose value differs from the saved one has an orange border and a quiet orange background, and `data-changed="true"`.
+- Pending: while the promise of `onSaveCell` is not settled, the field is disabled, the cell has `aria-busy="true"`, and the text of `labels.saving` is shown under the field as a status.
+- Saved: the field closes. After Enter, the focus goes back to the button of the cell. The app gives the new records in `rows`, so the cell shows the new value.
+- Error: when the promise is rejected, the field stays open with the value a person typed. The error text is under it, as an alert, and is the description of the field (`aria-describedby`, with `aria-invalid="true"`). After Enter, the field has the focus again. The text is what `getSaveErrorMessage(error)` returns; without that prop it is the message of the `Error`, or `labels.saveFailed`.
+- Screen reader: the button of a cell is named "Edit", the column, the record and the content of the cell (`labels.editCell`, `labels.cellLabel`). The field is named by the column and the record.
+- `editOnClick` is a true or false value, so an app gives the permission of the person there (`editOnClick: canEdit`). `canEdit(row)` refuses single records.
+- A select whose record has a value that is not one of the choices shows the text of `labels.selectPlaceholder`, so the first choice does not look like the value.
+- Not built: a field with several choices (Intraweb's `multiselect`, which no screen of Intraweb uses) and the mode that edits the whole table and saves the changed rows with one button (Intraweb's `onSaveRow`, used by one screen).
 
 ### `ListItem`
 

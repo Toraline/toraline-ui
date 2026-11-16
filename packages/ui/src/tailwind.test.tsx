@@ -170,7 +170,23 @@ const gridPartsColumns: DataGridColumn<GridRow>[] = [
     id: "name",
     header: "Product",
     cell: (row) => row.name,
+    editor: { type: "text", value: (row) => row.name },
+    editOnClick: true,
     filter: { type: "text", value: (row) => row.name },
+  },
+  {
+    id: "size",
+    header: "Size",
+    cell: () => "Small",
+    editor: { type: "select", value: () => "", options: [{ value: "small", label: "Small" }] },
+    editOnClick: true,
+  },
+  {
+    id: "listed",
+    header: "Listed",
+    cell: () => "Yes",
+    editor: { type: "checkbox", value: () => true },
+    editOnClick: true,
   },
   {
     id: "price",
@@ -191,6 +207,8 @@ const gridPartsColumns: DataGridColumn<GridRow>[] = [
     id: "id",
     header: "Number",
     cell: (row) => row.id,
+    editor: { type: "number", value: (row) => String(row.id) },
+    editOnClick: true,
     filter: {
       type: "options",
       options: [{ value: "1", label: "One" }],
@@ -209,6 +227,7 @@ function GridPartsExamples() {
       getRowLabel={(row) => row.name}
       columnsMenu
       hiddenColumns={["price"]}
+      onSaveCell={() => Promise.reject(new Error("Not saved"))}
     />
   );
 }
@@ -533,6 +552,17 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
+  // TOR-1212: a text field, a number field and a select, each one open; the number with a changed value and an error.
+  await user.click(screen.getByRole("button", { name: /Edit Product — Coffee/ }));
+  collect();
+  await user.click(screen.getByRole("button", { name: /Edit Size — Coffee/ }));
+  collect();
+  await user.click(screen.getByRole("button", { name: /Edit Number — Coffee/ }));
+  await user.keyboard("5");
+  collect();
+  await user.keyboard("{Enter}");
+  await screen.findByRole("alert");
+  collect();
   // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
   render(<OverlayExamples />);
   collect();
@@ -724,6 +754,9 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["hover:bg-muted", "data-active:bg-primary-subtle"],
     ["data-active:bg-primary-subtle", "data-active:hover:bg-primary-muted"],
     ["border-default", "data-active:border-brand"],
+    // TOR-1212, a cell that is edited: the pencil is shown under the pointer and with the keyboard focus.
+    ["opacity-0", "group-hover/editable-cell:opacity-100"],
+    ["opacity-0", "group-focus-visible/editable-cell:opacity-100"],
     // DetailPanel: the width of a wide screen wins over the full width.
     ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
@@ -731,6 +764,15 @@ describe("the class of the state that must win comes later in the built CSS", ()
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
     expect(losingIndex).toBeGreaterThan(-1);
     expect(winningIndex).toBeGreaterThan(losingIndex);
+  });
+
+  test("TOR-1212: the border and the background of a changed cell win over the pointer, the focus and a value that is not valid", () => {
+    // "!" at the end of a class makes its declaration "!important", which no other class of the field has.
+    for (const className of ["border-changed!", "bg-warning!"]) {
+      const start = cssFromSource.indexOf(selectorOf(className));
+      expect(start).toBeGreaterThan(-1);
+      expect(cssFromSource.slice(start, cssFromSource.indexOf("}", start))).toContain("!important");
+    }
   });
 
   test("the border of a field that is not valid is selected by aria-invalid", () => {

@@ -20,8 +20,10 @@ import {
 } from "./DataGridIcons.js";
 import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
 import { DataGridColumnsMenu } from "./DataGridColumnsMenu.js";
+import { DataGridEditableCell } from "./DataGridEditableCell.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
 import type {
+  DataGridCellValue,
   DataGridCheckboxProps,
   DataGridColumn,
   DataGridFilterValue,
@@ -60,6 +62,11 @@ const defaultLabels: DataGridLabels = {
   filterSelectAll: "Select all",
   filterClear: "Clear",
   filterContains: "Contains…",
+  cellLabel: (columnHeader, rowLabel) => `${columnHeader} — ${rowLabel}`,
+  editCell: (cellLabel) => `Edit ${cellLabel}:`,
+  saving: "Saving…",
+  saveFailed: "Could not save.",
+  selectPlaceholder: "Select…",
   columns: "Columns",
   visibleColumns: "Visible columns",
   resetColumns: "Back to default",
@@ -134,6 +141,19 @@ export type DataGridProps<Row> = {
    */
   selection?: { actions: (rows: Row[], clear: () => void) => ReactNode };
   /**
+   * Saves one cell of a column with "editOnClick". It receives the record, the
+   * "id" of the column and the new value. While the promise is pending, the
+   * cell shows "labels.saving". When it is rejected, the field stays open with
+   * the error text.
+   */
+  onSaveCell?: (row: Row, columnId: string, value: DataGridCellValue) => Promise<void>;
+  /**
+   * The text for an error that "onSaveCell" was rejected with, for example the
+   * message of the API of the app. When missing: the message of an Error, or
+   * "labels.saveFailed".
+   */
+  getSaveErrorMessage?: (error: unknown) => string;
+  /**
    * Turns on the menu "Columns", where a person hides and shows the columns
    * that are not "required". A column with "defaultHidden" starts hidden.
    */
@@ -199,6 +219,8 @@ export function DataGrid<Row>({
   toolbar,
   search,
   selection,
+  onSaveCell,
+  getSaveErrorMessage,
   columnsMenu = false,
   hiddenColumns,
   onHiddenColumnsChange,
@@ -325,6 +347,32 @@ export function DataGrid<Row>({
     });
   }
 
+  function saveErrorMessage(error: unknown): string {
+    if (getSaveErrorMessage) {
+      return getSaveErrorMessage(error);
+    }
+    return error instanceof Error && error.message !== "" ? error.message : labels.saveFailed;
+  }
+
+  function renderCell(row: Row, column: DataGridColumn<Row>) {
+    const editor = column.editor;
+    const isEditable = column.editOnClick === true && (column.canEdit?.(row) ?? true);
+    if (!isEditable || editor === undefined || onSaveCell === undefined) {
+      return column.cell(row);
+    }
+    return (
+      <DataGridEditableCell
+        label={labels.cellLabel(column.header, getRowLabel(row))}
+        display={column.cell(row)}
+        editor={editor}
+        value={editor.value(row)}
+        onSave={(value) => onSaveCell(row, column.id, value)}
+        getSaveErrorMessage={saveErrorMessage}
+        labels={labels}
+      />
+    );
+  }
+
   function renderHeader(column: DataGridColumn<Row>) {
     const isSortable = isFlat && column.sortValue !== undefined;
     const isSorted = state.sort?.columnId === column.id;
@@ -393,7 +441,7 @@ export function DataGrid<Row>({
         ) : null}
         {columns.map((column) => (
           <Td key={column.id} data-label={column.header} align={column.align}>
-            {column.cell(row)}
+            {renderCell(row, column)}
           </Td>
         ))}
         {hasActions ? <Td className="w-12 text-right whitespace-nowrap">{rowActions(row)}</Td> : null}

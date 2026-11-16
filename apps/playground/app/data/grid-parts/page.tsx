@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@toraline.tech/ui/theme";
+import { EditableProductsGrid } from "./EditableProductsGrid";
 import { SavedColumnsGrid } from "./SavedColumnsGrid";
 import { products } from "./products";
 
@@ -37,6 +38,14 @@ export default function GridPartsPage() {
           SavedColumnsGrid.tsx of this page, and it is still there after a reload.
         </p>
         <SavedColumnsGrid products={products} />
+      </Section>
+
+      <Section title="Cells edited in the grid">
+        <p className="text-sm/5 text-secondary">
+          A press on a cell shows a field. Enter saves, Escape gives up, and leaving the field saves. A price that is
+          not a number is refused: the field stays open with the error text of the app.
+        </p>
+        <EditableProductsGrid products={products.slice(0, 6)} />
       </Section>
     </main>
   );

@@ -43,6 +43,25 @@ export type DataGridColumnFilter<Row> =
       value: (row: Row) => string;
     };
 
+/** The value of a cell that is edited: a text (also for a number and for a select), or true or false for a checkbox. */
+export type DataGridCellValue = string | boolean;
+
+/**
+ * The field that takes the place of a cell while it is edited. "value" reads
+ * the value of the record that the field starts with.
+ *
+ * - "text": a TextInput.
+ * - "number": a DecimalInput. Its value is the text a person typed, with a
+ *   comma or a point; the app reads the number when it saves.
+ * - "select": a Select with the choices of "options".
+ * - "checkbox": a CheckboxControl, which is always shown in the cell.
+ */
+export type DataGridColumnEditor<Row> =
+  | { type: "text"; value: (row: Row) => string }
+  | { type: "number"; value: (row: Row) => string }
+  | { type: "select"; value: (row: Row) => string; options: readonly DataGridOption[] }
+  | { type: "checkbox"; value: (row: Row) => boolean };
+
 /** One column of a DataGrid. "Row" is the type of one record. */
 export type DataGridColumn<Row> = {
   /** A name no other column of the grid has. The sort names the column by it. */
@@ -66,6 +85,16 @@ export type DataGridColumn<Row> = {
   required?: boolean;
   /** true: the column is hidden until a person turns it on in the menu "Columns". */
   defaultHidden?: boolean;
+  /** The field that edits a cell of this column. It is used when "editOnClick" is true and the grid has "onSaveCell". */
+  editor?: DataGridColumnEditor<Row>;
+  /**
+   * true: a press on a cell of this column edits it in place, and the grid
+   * saves the value with "onSaveCell". An app gives false to a person who may
+   * not edit.
+   */
+  editOnClick?: boolean;
+  /** false for a record whose cell cannot be edited, for example an archived record. When missing: every record. */
+  canEdit?: (row: Row) => boolean;
   /** Turns on the filter of this column: a small button in its header opens a panel with the choices or a text field. */
   filter?: DataGridColumnFilter<Row>;
 };
@@ -156,6 +185,16 @@ export type DataGridLabels = {
   filterClear: string;
   /** The placeholder of the text field of a text filter. */
   filterContains: string;
+  /** The name of a cell that can be edited, for a screen reader: the header of its column and the label of its record. */
+  cellLabel: (columnHeader: string, rowLabel: string) => string;
+  /** The start of the name of the button of a cell that can be edited. Only a screen reader says it. It receives the result of cellLabel. */
+  editCell: (cellLabel: string) => string;
+  /** The text of a cell while the app saves its value. */
+  saving: string;
+  /** The error text of a cell when the app gives none. */
+  saveFailed: string;
+  /** The choice a select shows when the record has a value that is not one of its choices. */
+  selectPlaceholder: string;
   /** The text of the button that opens the menu of the columns. */
   columns: string;
   /** The title of the list of columns in that menu. */

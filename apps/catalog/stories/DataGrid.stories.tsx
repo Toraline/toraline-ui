@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Archive, Pencil, Plus } from "lucide-react";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Button, DataGrid, IconButton } from "@toraline.tech/ui";
-import type { DataGridColumn, DataGridProps, DataGridState } from "@toraline.tech/ui";
+import type { DataGridCellValue, DataGridColumn, DataGridProps, DataGridState } from "@toraline.tech/ui";
 
 type Product = {
   id: number;
@@ -559,4 +559,168 @@ export const HiddenColumnsKeptByTheApp: Story = {
     rows: products.slice(0, 6),
   },
   render: (args) => <GridWithHiddenColumns {...args} />,
+};
+
+/** The columns of the stories of the editing: a text, a number, a select and a checkbox. An inactive product cannot be edited, except its status. */
+const editableColumns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => <span className="font-medium text-primary">{product.name}</span>,
+    editor: { type: "text", value: (product) => product.name },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "category",
+    header: "Category",
+    cell: (product) => product.category,
+    editor: {
+      type: "select",
+      value: (product) => product.category,
+      options: ["Bakery", "Desserts", "Drinks", "Savory"].map((category) => ({ value: category, label: category })),
+    },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (product) => money.format(product.price),
+    editor: { type: "number", value: (product) => product.price.toFixed(2) },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "active",
+    header: "Active",
+    cell: (product) => (product.active ? "Yes" : "No"),
+    editor: { type: "checkbox", value: (product) => product.active },
+    editOnClick: true,
+  },
+];
+
+/** The record with the new value of one cell, as the API of an app would return it. */
+function withCellValue(product: Product, columnId: string, value: DataGridCellValue): Product {
+  if (columnId === "price") {
+    return { ...product, price: Number(String(value).replace(",", ".")) };
+  }
+  return { ...product, [columnId]: value };
+}
+
+type EditableGridProps = DataGridProps<Product> & {
+  /** What the app does with a value: it saves it, it never answers, or it refuses it. */
+  answer?: "save" | "never" | "refuse";
+};
+
+function EditableGrid({ answer = "save", rows: firstRows, ...args }: EditableGridProps) {
+  const [rows, setRows] = useState(firstRows);
+  return (
+    <DataGrid
+      {...args}
+      rows={rows}
+      onSaveCell={async (row, columnId, value) => {
+        if (answer === "never") {
+          await new Promise(() => undefined);
+        }
+        if (answer === "refuse" || (columnId === "price" && Number.isNaN(Number(String(value).replace(",", "."))))) {
+          throw new Error("The price must be a number, for example 12.50.");
+        }
+        setRows((currentRows) =>
+          currentRows.map((product) => (product.id === row.id ? withCellValue(product, columnId, value) : product)),
+        );
+      }}
+    />
+  );
+}
+
+/**
+ * A column with "editor" and "editOnClick" is edited in the grid, and the app
+ * saves the value in "onSaveCell". At rest a cell looks like any cell; the
+ * pointer over it, or the keyboard focus, shows a quiet background and a
+ * pencil. A checkbox is always shown. The fourth product is not active, so
+ * "canEdit" leaves only its checkbox.
+ */
+export const EditableCells: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Edit Price — Espresso coffee: R$11.00" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /Edit Price — Carrot cake/ })).toBeNull();
+  },
+};
+
+/**
+ * A press on a cell shows the field, with the focus. The story types another
+ * price: the field has the border and the background of a changed value until
+ * it is saved. Enter saves, and Escape gives up.
+ */
+export const EditingACell: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Price — Espresso coffee/ }));
+    const field = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await expect(field).toHaveFocus();
+    await userEvent.clear(field);
+    await userEvent.type(field, "12.50");
+    await expect(field).toHaveAttribute("data-changed", "true");
+  },
+};
+
+/** The keyboard: Enter on a cell opens the field, Enter in the field saves, and the focus goes back to the cell with the new value. */
+export const EditingWithTheKeyboard: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole("button", { name: /Edit Product — Orange juice/ }).focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" with ice{Enter}");
+    const cell = await canvas.findByRole("button", { name: "Edit Product — Orange juice with ice: Orange juice with ice" });
+    await waitFor(() => expect(cell).toHaveFocus());
+  },
+};
+
+/** While the app saves: the field is disabled and the cell says "Saving…". In this story the app never answers. */
+export const SavingACell: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} answer="never" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Product — Espresso coffee/ }));
+    await userEvent.keyboard(" double{Enter}");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Saving…");
+    await expect(canvas.getByRole("textbox", { name: "Product — Espresso coffee" })).toBeDisabled();
+  },
+};
+
+/** The app refuses the value: the field stays open with the error text of the app under it, and keeps the focus. */
+export const CellSaveError: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Price — Espresso coffee/ }));
+    const field = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(field);
+    await userEvent.type(field, "twelve{Enter}");
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("The price must be a number, for example 12.50.");
+    await expect(field).toHaveAttribute("aria-invalid", "true");
+    await waitFor(() => expect(field).toHaveFocus());
+  },
+};
+
+/** A select is saved when a choice is made. The story opens the select of a category. */
+export const EditingWithASelect: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Category — Orange juice/ }));
+    await expect(canvas.getByRole("combobox", { name: "Category — Orange juice" })).toHaveFocus();
+  },
 };
