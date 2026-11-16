@@ -4,7 +4,7 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
-## 0.3.0 (not published yet)
+## 0.3.0 (2026-11-16)
 
 The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-1209). Nothing breaks: a grid written for 0.2.0 works unchanged.
 

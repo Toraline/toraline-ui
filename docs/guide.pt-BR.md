@@ -27,13 +27,13 @@ Faça o guia 1 primeiro. Os guias 2 e 3 precisam dele.
 
 **Resultado:** uma página do app mostra um Button estilizado.
 
-Os pacotes estão no npm desde 2026-11-15, versão `0.1.0`.
+Os pacotes estão no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 Para testar uma mudança da biblioteca que ainda não foi publicada, gere os dois arquivos de pacote neste repositório e instale os dois no app:
 
 ```bash
 make pack     # in this repository; writes 2 files into .pack/tarballs/
-npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.1.0.tgz     # in the app, in place of step 2
+npm install <path>/.pack/tarballs/toraline.tech-tokens-0.3.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.3.0.tgz     # in the app, in place of step 2
 ```
 
 Troque `<path>` pela pasta deste repositório. Os 3 guias foram executados desse jeito em 2026-11-15, em um app criado com `create-next-app` 16.4.6 (Tailwind CSS 4.3.3), e a seção "Sem Next.js" em um app criado com `npm create vite@latest` (Vite 8.3). Os resultados estão em `apps/catalog/README.md`.

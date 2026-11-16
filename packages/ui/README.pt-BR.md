@@ -7,7 +7,7 @@ Os componentes React estilizados da biblioteca de componentes da Toraline.
 | O quê | Importe de | Estado |
 |---|---|---|
 | As partes que controlam o tema: um provider, um hook e um botão que alterna o tema | `@toraline.tech/ui/theme` | Feito na fase 2 |
-| Os componentes | `@toraline.tech/ui` | Feitos na fase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. A fase 7 (TOR-1123) dá a eles as variantes, os tamanhos e as props dos mesmos componentes do app Intraweb |
+| Os componentes | `@toraline.tech/ui` | Feitos a partir da fase 3 (TOR-997). A fase 7 (TOR-1123) deu a eles as variantes, os tamanhos e as props dos mesmos componentes do app Intraweb, e trocou o `Input` por `Field` e `TextInput`. As fases 8 a 10 adicionaram os controles de formulário, os componentes de feedback, os overlays e os componentes de dados. Cada componente tem sua seção abaixo |
 | A linha que faz o Tailwind CSS gerar as classes de tudo o que está acima | `@toraline.tech/ui/tailwind.css` | Um arquivo CSS, importado uma vez pelo app |
 
 Os componentes são estilizados com classes do Tailwind CSS 4 que leem os tokens de [`@toraline.tech/tokens`](../tokens/README.pt-BR.md). O pacote não tem CSS próprio para um componente. Por isso o app precisa usar o Tailwind CSS 4.
@@ -22,9 +22,7 @@ Um tema é um conjunto de cores, fontes, tamanhos de canto e sombras. A página 
 
 ## Instalação
 
-O pacote está no npm desde 2026-11-15. A primeira versão é `0.1.0`.
-
-Depois do primeiro release:
+O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 ```bash
 npm install @toraline.tech/ui @toraline.tech/tokens
@@ -35,7 +33,7 @@ npm install @toraline.tech/ui @toraline.tech/tokens
 - O app precisa do React 19 (`react` e `react-dom`) e do Tailwind CSS 4 (`tailwindcss`).
 - O pacote tem só módulos ES (arquivos lidos com `import`), com arquivos de tipos para TypeScript.
 
-Antes do primeiro release, um app pode instalar os arquivos de pacote que `make pack` escreve. Os passos estão no começo do guia 1 em [`docs/guide.pt-BR.md`](../../docs/guide.pt-BR.md).
+Para testar uma mudança da biblioteca que ainda não foi publicada, um app pode instalar os arquivos de pacote que `make pack` escreve. Os passos estão no começo do guia 1 em [`docs/guide.pt-BR.md`](../../docs/guide.pt-BR.md).
 
 ## Como usar o tema em um app Next.js
 
@@ -523,7 +521,7 @@ Os tamanhos têm os nomes e as alturas do Intraweb. Um botão (Button, ButtonLin
 1. Um componente é estilizado só com classes do Tailwind CSS 4, escritas no arquivo `.tsx` dele. O pacote não tem arquivo CSS para um componente. O único arquivo CSS dele é `css/tailwind.css`, que diz ao Tailwind de um app para ler os arquivos gerados.
 2. Um nome de classe é escrito por inteiro, como um único texto: `"bg-primary"`. O Tailwind lê os arquivos como texto, e por isso não encontra um nome que o código monta a partir de partes (`"bg-" + color`).
 3. Uma cor é sempre uma classe de token do seu grupo: um fundo é `bg-<name>` (`bg-primary`, `bg-surface`), uma cor de texto é `text-<name>` (`text-primary`, `text-tertiary`), uma cor de borda é `border-<name>` (`border-default`), o outline do foco é `outline-focus`, e a cor de um ícone é `text-icon`, `text-icon-strong` ou `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` e `bg-transparent` são permitidas. Uma cor de nível 1 (`bg-brand-700`), uma cor padrão do Tailwind (`bg-red-500`) e uma cor bruta (`bg-[#f00]`) nunca são usadas.
-   - Quando o app Intraweb tem o mesmo componente, cada parte tem o token que o componente do Intraweb usa. As escolhas para os 6 componentes estão na entrada de TOR-1131 de [`docs/decisions.md`](../../docs/decisions.md).
+   - Quando o app Intraweb tem o mesmo componente, cada parte tem o token que o componente do Intraweb usa. As escolhas para os 6 primeiros componentes estão na entrada de TOR-1131 de [`docs/decisions.md`](../../docs/decisions.md).
 4. Um tamanho de fonte é `text-xs`, `text-sm`, `text-base` ou `text-lg` (e `text-2xl` e `text-3xl` para o número grande de StatCard), escrito com a altura da linha: `text-xs/4` (uma linha de 16 pixels), `text-sm/5` (uma linha de 20 pixels, a altura de linha que o `text-sm` do Intraweb tem), `text-base/6` (24 pixels) ou `text-base/normal`. Uma fonte é `font-body` (texto normal), `font-heading` (um título, um botão, uma aba) ou `font-mono`. `font-heading` é a Poppins, que os apps carregam nos pesos 400, 500 e 600, e por isso o peso dela é `font-normal`, `font-medium` ou `font-semibold`, nunca `font-bold`. O texto de um botão, de uma aba e de um link com a aparência de um deles é `font-heading text-sm/5 font-medium`: os valores do estilo de texto `label` do Intraweb. O raio é `rounded-md` para um botão ou um campo e `rounded-lg` para um menu; `rounded-xl` e `rounded-2xl` são para um card e um drawer. Dois formatos não são tokens: um círculo completo ou uma pílula (`rounded-full`), e o trilho da aparência segmentada (`rounded-[10px]`, o valor do Intraweb). A sombra é uma entre `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` e `shadow-2xl`; um menu tem `shadow-lg`.
 5. Um padding, uma margem e um gap são uma classe padrão de espaçamento do Tailwind (`px-4`, `gap-2`), que é um múltiplo do token `--spacing`.
 6. Estes são escritos como valores simples, porque não mudam com o tema: a largura de uma borda ou de um outline (`border`, `border-2`, `outline-2`), um peso de fonte (`font-bold`), uma largura em pixels que não é um passo da escala de espaçamento (`border-[1.5px]`), um tamanho em `em` ou `%`, uma duração, e um `z-index` (`z-10`). Um comprimento em `rem` nunca é usado.
@@ -548,7 +546,7 @@ Os testes usam Vitest, Testing Library e `@testing-library/user-event`, que pres
 
 ### Depois do código
 
-1. O componente está na página de `apps/playground`, com todas as variantes e todos os estados.
+1. O componente está em uma página de `apps/playground`, com todas as variantes e todos os estados.
 2. Este arquivo tem as props do componente e um exemplo curto.
 
 ## Os controles de formulário e os componentes de feedback da fase 8
@@ -1357,7 +1355,7 @@ Os textos (`labels`), com seus padrões: `actions` (`"Actions"`), `clearFilters`
 - A tabela é uma [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) com `stackOnMobile`: em uma tela com menos de 768 pixels de largura, cada linha é um bloco. Uma tabela mais larga que a sua caixa rola para os lados.
 - Teclado: todo controle é um elemento nativo. Tab passa pelo campo de busca, pelos botões de ordenação, pelos checkboxes, pelos botões das linhas e pelos controles de página; Enter e Espaço pressionam um botão; Espaço marca um checkbox.
 - Leitor de tela: a célula de cabeçalho de uma coluna com `sortValue` tem `aria-sort` (`none`, `ascending`, `descending`). A barra das linhas selecionadas é uma região com o nome de `labels.bulkActions`, e a contagem dela é um status. Os controles de página são uma região de navegação. O checkbox do cabeçalho fica "misto" enquanto só uma parte das linhas está selecionada.
-- `checkboxComponent` recebe `checked`, `disabled`, `onChange`, `aria-label` e `ref` (tipo `DataGridCheckboxProps`). Ele deve passar `ref` para o seu `<input>`. `selectComponent` recebe `size="sm"`, `className="w-20"`, `value`, `onChange` e filhos `<option>` (tipo `DataGridSelectProps`). Eles existem porque o Checkbox e o Select da biblioteca são construídos em outra fase; quando estiverem na biblioteca, eles se tornam os padrões.
+- `checkboxComponent` recebe `checked`, `disabled`, `onChange`, `aria-label` e `ref` (tipo `DataGridCheckboxProps`). Ele deve passar `ref` para o seu `<input>`. `selectComponent` recebe `size="sm"`, `className="w-20"`, `value`, `onChange` e filhos `<option>` (tipo `DataGridSelectProps`). Quando eles faltam, o grid usa o `CheckboxControl` e o `Select` da biblioteca.
 - Não está na biblioteca, e ainda só no Intraweb: uma célula editada com várias escolhas (o editor `multiselect`). Nenhuma tela do Intraweb o usa.
 - A lista `dataGridPageSizes` e os tipos `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridRowChanges`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` e `DataGridSelectProps` são exportados.
 - É um Client Component, porque guarda estado. As colunas dele têm funções, então o arquivo do app que o usa também é um Client Component. Uma página que é Server Component entrega os registros para esse arquivo.

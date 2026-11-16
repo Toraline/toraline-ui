@@ -45,8 +45,6 @@ Os exemplos usam `0.1.1` como a versão nova.
    | Um teste de uma versão antes de ela ser publicada | `0.2.0-beta.0` |
    | O rebrand completo está pronto | `1.0.0` |
 
-   O primeiro release não precisa de um número novo: os pacotes já têm `0.1.0`. Pule o passo 3 nesse caso.
-
 2. **Comece um ticket e o worktree dele**, como para qualquer mudança (`make worktree TICKET=<n> SLUG=release-<version>`). Os passos 3 a 5 acontecem ali.
 
 3. **Defina a versão.** Na raiz do worktree:
@@ -79,9 +77,9 @@ Os exemplos usam `0.1.1` como a versão nova.
 
    `make pack` imprime os arquivos de cada pacote e escreve os tarballs em `.pack/tarballs/`. Leia as duas listas:
 
-   - Cada uma tem `package.json`, `README.md`, uma pasta `css/` e uma pasta `dist/`.
+   - Cada uma tem `package.json`, `README.md`, `README.pt-BR.md`, uma pasta `css/` e uma pasta `dist/`.
    - Nenhum nome de arquivo tem `.test.`, `template` ou `.map`.
-   - Os números são próximos destes: `@toraline.tech/tokens` 14 arquivos, 13 kB; `@toraline.tech/ui` 42 arquivos, 19 kB. Um componente novo adiciona cerca de 4 arquivos.
+   - Os números são próximos destes: `@toraline.tech/tokens` 17 arquivos, 36 kB; `@toraline.tech/ui` 177 arquivos, 149 kB (versão `0.3.0`, com os dois arquivos README). Um componente novo adiciona cerca de 4 arquivos.
 
 6. **Faça o commit, abra o pull request para `main`, e faça o merge** depois que `Check` passar no GitHub. Daqui em diante o branch `main` tem a versão.
 
@@ -122,7 +120,7 @@ Os exemplos usam `0.1.1` como a versão nova.
 
    **Não crie um "Release" na página do GitHub para uma tag da biblioteca nova.** Criar um release no GitHub inicia o workflow do pacote antigo (veja abaixo). Uma tag simples do git não inicia nada.
 
-10. **Só depois do primeiro release**: remova as frases que dizem que os pacotes não estão publicados de `docs/guide.md`, `README.md`, `packages/ui/README.md` e `packages/tokens/README.md`.
+10. **Atualize a versão na documentação**, nos dois idiomas: a frase com a versão atual e a data dela em `README.md`, `docs/guide.md`, `packages/ui/README.md` e `packages/tokens/README.md`, e os nomes dos tarballs no guia 1 de `docs/guide.md`. Um agente pode fazer este passo, em um pull request.
 
 ## Publicar da sua própria máquina
 
@@ -181,7 +179,7 @@ Encontrado em 2026-11-15, não mudado: o npm tem `@toraline/toraline-ui` 1.1.5, 
 - O build dos pacotes gera tarballs que um app Next.js 16.4.6 novo instala e renderiza (verificado em 2026-11-15, veja `docs/decisions.md`).
 - `make pack`, `make version`, a proteção em `npm publish`, o arquivo do workflow, `CHANGELOG.md` com a seção `0.1.0`.
 
-- A versão `0.1.0` dos dois pacotes está no npm, publicada pelo workflow "Release" em 2026-11-15.
+- A versão `0.1.0` dos dois pacotes está no npm, publicada pelo workflow "Release" em 2026-11-15. A versão `0.2.0` veio em seguida em 2026-11-15 e a versão `0.3.0` em 2026-11-16.
 
 **Não feito**
 - Os pacotes não têm licença.

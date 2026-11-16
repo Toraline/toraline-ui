@@ -8,9 +8,7 @@ O catálogo está online: https://toraline-ui.vercel.app/ A página **Foundation
 
 ## Instalação
 
-O pacote está no npm desde 2026-11-15. A primeira versão é `0.1.0`.
-
-Depois do primeiro release:
+O pacote está no npm. A versão atual é a `0.3.0`, publicada em 2026-11-16. A primeira versão, a `0.1.0`, foi publicada em 2026-11-15.
 
 ```bash
 npm install @toraline.tech/tokens
@@ -21,7 +19,7 @@ npm install @toraline.tech/tokens
 - O pacote não precisa de React. O Tailwind CSS 4 é opcional.
 - O pacote tem apenas ES modules (arquivos lidos com `import`), com arquivos de tipos para TypeScript.
 
-Antes do primeiro release, um app pode instalar o arquivo do pacote que `make pack` escreve. Os passos estão no começo do guia 1 em [`docs/guide.pt-BR.md`](../../docs/guide.pt-BR.md).
+Para testar uma mudança da biblioteca que ainda não foi publicada, um app pode instalar o arquivo do pacote que `make pack` escreve. Os passos estão no começo do guia 1 em [`docs/guide.pt-BR.md`](../../docs/guide.pt-BR.md).
 
 ## Os dois níveis
 
