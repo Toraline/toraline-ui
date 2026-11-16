@@ -5,8 +5,9 @@ import * as GuideStories from "./Guide.stories";
 <Meta title="Guide/How to use the library" />
 
 {/* The text of the guide is the file docs/guide.md of the repository. The root README links to the same file. */}
+{/* Line 3 of the file links to its Portuguese version (docs/guide.pt-BR.md). The catalog cannot open that file, so the line is left out. */}
 
-<Markdown>{guide}</Markdown>
+<Markdown>{guide.replace(/^\*\*English\*\* \| \[Português\]\(.*\)\n\n/m, "")}</Markdown>
 
 ## Live examples
 

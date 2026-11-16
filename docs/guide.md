@@ -1,5 +1,7 @@
 # Guide: use the library in an app
 
+**English** | [Português](guide.pt-BR.md)
+
 After the 3 guides of this page, a new Next.js app shows a Button of the library, first in the default look of the library and then in the app's own theme, with a button that changes between a light theme and a dark theme.
 
 | Guide | Result |
