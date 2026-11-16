@@ -2,7 +2,7 @@
 
 The catalog of the library: a site that shows each component alone, in every theme. It is built with Storybook 10. Storybook is a tool that shows one component at a time, outside of an app. Each example of a component is called a story.
 
-The catalog is private. It is never published and never deployed.
+The catalog is online at https://toraline-ui.vercel.app/ . It is never published to npm: its package is private.
 
 ## Commands
 
@@ -25,11 +25,21 @@ The toolbar above a story has the control **Theme**. It lists every theme of the
 
 The control does what an app does: it writes the attribute `data-theme` on `<html>`, and each story is inside `ThemeProvider`. A press on the library's `ThemeToggle` inside a story also changes the control.
 
+## How to change the language of the documentation pages
+
+The toolbar has the control **Language**, with `English` and `Português` (Brazilian Portuguese). It changes the two documentation pages: the guide (**Guide > How to use the library**) and the tokens page (**Foundations > Tokens**), with the captions and the column headers of the token tables.
+
+The component pages, the names in the sidebar and the texts inside a story stay in English in both languages, because the library is in English only.
+
+How it works: `language` is a global of Storybook, like `theme`. A global is a value that every story shares. The text of an MDX page is inside `<InLanguage language="en">` or `<InLanguage language="pt-BR">` (`stories/shared/InLanguage.tsx`), which shows its content only in that language. A table of the tokens page reads the language with `useStoryLanguage()` and takes its texts from `stories/tokens/token-table-texts.ts`. The guide is the file `docs/guide.md` or `docs/guide.pt-BR.md`.
+
+A change in the text of one language is made in the other in the same commit.
+
 ## What the catalog shows
 
 | Group in the sidebar | Entry | What it is |
 |---|---|---|
-| Guide | How to use the library | The guide: install the library, build the theme of an app, style on top of a component. Its text is the file `docs/guide.md` of the repository, which the root `README.md` also links to. Under the text are two live examples |
+| Guide | How to use the library | The guide: install the library, build the theme of an app, style on top of a component. Its text is the file `docs/guide.md` of the repository (`docs/guide.pt-BR.md` in Portuguese), which the root `README.md` also links to. Under the text are two live examples |
 | Guide | Live examples | The two examples of the guide as stories, so the accessibility check covers them |
 | Foundations | Tokens | One page with every token: the colors in their 5 groups (backgrounds, text, borders, icons, charts), fonts, text sizes, spacing, the 4 radius sizes and the 5 shadows, with the value in each theme, then the 9 text styles and the level 1 tokens. The tables read `@toraline.tech/tokens`, so they always show the current values |
 | Foundations | Theme sample | A card that uses only level 2 tokens, with the button that changes the theme |
@@ -55,11 +65,12 @@ What the check does not cover: axe-core finds only the problems a program can fi
 | `.storybook/main.ts` | Which files are stories, which addons are on, and how Vite builds the catalog. An addon is a plugin of Storybook |
 | `.storybook/preview.tsx` | What every story gets: the CSS of the catalog (which loads Tailwind CSS 4 and the tokens), the control **Theme**, the decorator that applies the theme, and the rule that an accessibility problem fails the test. A decorator is a function that wraps every story |
 | `.storybook/themes.ts` | The list of themes of the control. It is `DEFAULT_THEMES` of `@toraline.tech/tokens` |
+| `.storybook/languages.ts` | The list of languages of the control **Language**: `en` and `pt-BR` |
 | `.storybook/preview.css` | The CSS of the catalog itself. It imports Tailwind CSS 4 and the Tailwind preset of `@toraline.tech/tokens`, and tells Tailwind to read the source of the components (`packages/ui/src`), so Tailwind builds the classes they use. It also gives the page behind a story the colors of the current theme |
 | `stories/*.stories.tsx` | The stories of one component |
 | `stories/Tokens.mdx`, `stories/Tokens.stories.tsx`, `stories/tokens/` | The tokens page, its stories, and the tables they draw |
 | `stories/Guide.mdx`, `stories/Guide.stories.tsx`, `stories/guide/` | The guide page, its live examples as stories, and the components and CSS of the examples |
-| `stories/shared/` | Small helpers of the story files |
+| `stories/shared/` | Small helpers of the story files. `language.tsx` and `InLanguage.tsx` have the parts that read the language of the toolbar |
 | `vitest.projects.ts` | The story tests: one Vitest project for each theme. The root `vitest.config.ts` adds them to the unit tests |
 
 ## How the theme control was checked

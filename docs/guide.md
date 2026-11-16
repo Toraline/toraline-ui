@@ -1,5 +1,7 @@
 # Guide: use the library in an app
 
+**English** | [Português](guide.pt-BR.md)
+
 After the 3 guides of this page, a new Next.js app shows a Button of the library, first in the default look of the library and then in the app's own theme, with a button that changes between a light theme and a dark theme.
 
 | Guide | Result |
@@ -25,13 +27,13 @@ Do guide 1 first. Guides 2 and 3 both need it.
 
 **Result:** a page of the app shows a styled Button.
 
-The packages are on npm since 2026-11-15, version `0.1.0`.
+The packages are on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
 
 To try a change of the library that is not released yet, build the two package files in this repository and install them in the app:
 
 ```bash
 make pack     # in this repository; writes 2 files into .pack/tarballs/
-npm install <path>/.pack/tarballs/toraline.tech-tokens-0.1.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.1.0.tgz     # in the app, in place of step 2
+npm install <path>/.pack/tarballs/toraline.tech-tokens-0.3.0.tgz <path>/.pack/tarballs/toraline.tech-ui-0.3.0.tgz     # in the app, in place of step 2
 ```
 
 Replace `<path>` with the folder of this repository. The 3 guides were run that way on 2026-11-15, in an app made with `create-next-app` 16.4.6 (Tailwind CSS 4.3.3), and the section "Without Next.js" in an app made with `npm create vite@latest` (Vite 8.3). The results are in `apps/catalog/README.md`.

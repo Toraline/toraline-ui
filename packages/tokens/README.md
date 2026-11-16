@@ -1,12 +1,14 @@
 # @toraline.tech/tokens
 
+**English** | [Português](https://github.com/Toraline/toraline-ui/blob/main/packages/tokens/README.pt-BR.md)
+
 The design tokens and the themes of the Toraline component library. A design token is a named value of the design, for example a color or a font, stored as a CSS variable. This package has no React code.
+
+The catalog is online: https://toraline-ui.vercel.app/ Its page **Foundations > Tokens** shows every token of this package, with its value in each theme.
 
 ## Installation
 
-The package is on npm since 2026-11-15. The first version is `0.1.0`.
-
-After the first release:
+The package is on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
 
 ```bash
 npm install @toraline.tech/tokens
@@ -17,7 +19,7 @@ npm install @toraline.tech/tokens
 - The package needs no React. Tailwind CSS 4 is optional.
 - The package has ES modules only (files read with `import`), with type files for TypeScript.
 
-Before the first release, an app can install the package file that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
+To try a change of the library that is not released yet, an app can install the package file that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
 
 ## The two levels
 

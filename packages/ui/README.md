@@ -1,16 +1,20 @@
 # @toraline.tech/ui
 
+**English** | [Português](https://github.com/Toraline/toraline-ui/blob/main/packages/ui/README.pt-BR.md)
+
 The styled React components of the Toraline component library.
 
 | What | Import from | State |
 |---|---|---|
 | The parts that control the theme: a provider, a hook and a toggle button | `@toraline.tech/ui/theme` | Built in phase 2 |
-| The components | `@toraline.tech/ui` | Built in phase 3 (TOR-997): Button, Input, Toggle, Tabs, BreadCrumbs, SplitButton. Phase 7 (TOR-1123) gives them the variants, sizes and props of the same components of the app Intraweb |
+| The components | `@toraline.tech/ui` | Built from phase 3 (TOR-997) on. Phase 7 (TOR-1123) gave them the variants, sizes and props of the same components of the app Intraweb, and replaced `Input` with `Field` and `TextInput`. Phases 8 to 10 added the form controls, the feedback components, the overlays and the data components. Each component has its section below |
 | The line that makes Tailwind CSS build the classes of everything above | `@toraline.tech/ui/tailwind.css` | One CSS file, imported once by the app |
 
 The components are styled with Tailwind CSS 4 classes that read the tokens of [`@toraline.tech/tokens`](../tokens/README.md). The package has no CSS of its own for a component. So the app must use Tailwind CSS 4.
 
 The default look is the look of the app Intraweb, an app of Toraline: its colors, its fonts (Inter for normal text, Poppins for headings and buttons), its radius sizes and its shadows. The tokens and the Tailwind classes have the names Intraweb uses. The library downloads no font: the app loads Inter and Poppins. Guide 1 of [`docs/guide.md`](../../docs/guide.md) shows how.
+
+The catalog is online: https://toraline-ui.vercel.app/ It shows every component of this package, in every theme, with the table of its props.
 
 The rules every component follows are in [Rules every component follows](#rules-every-component-follows).
 
@@ -18,9 +22,7 @@ A theme is a set of colors, fonts, corner sizes and shadows. The page selects a 
 
 ## Installation
 
-The package is on npm since 2026-11-15. The first version is `0.1.0`.
-
-After the first release:
+The package is on npm. The current version is `0.3.0`, published on 2026-11-16. The first version, `0.1.0`, was published on 2026-11-15.
 
 ```bash
 npm install @toraline.tech/ui @toraline.tech/tokens
@@ -31,7 +33,7 @@ npm install @toraline.tech/ui @toraline.tech/tokens
 - The app needs React 19 (`react` and `react-dom`) and Tailwind CSS 4 (`tailwindcss`).
 - The package has ES modules only (files read with `import`), with type files for TypeScript.
 
-Before the first release, an app can install the package files that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
+To try a change of the library that is not released yet, an app can install the package files that `make pack` writes. The steps are at the start of guide 1 in [`docs/guide.md`](../../docs/guide.md).
 
 ## How to use the theme in a Next.js app
 
@@ -519,7 +521,7 @@ The sizes have the names and the heights of Intraweb. A button (Button, ButtonLi
 1. A component is styled only with Tailwind CSS 4 classes, written in its `.tsx` file. The package has no CSS file for a component. Its only CSS file is `css/tailwind.css`, which tells the Tailwind of an app to read the built files.
 2. A class name is written in full, as one text: `"bg-primary"`. Tailwind reads the files as text, so it does not find a name that the code builds from parts (`"bg-" + color`).
 3. A color is always a token class of its group: a background is `bg-<name>` (`bg-primary`, `bg-surface`), a text color is `text-<name>` (`text-primary`, `text-tertiary`), a border color is `border-<name>` (`border-default`), the focus outline is `outline-focus`, and the color of an icon is `text-icon`, `text-icon-strong` or `text-icon-brand`. `border-current`, `bg-current`, `border-transparent` and `bg-transparent` are allowed. A level 1 color (`bg-brand-700`), a standard Tailwind color (`bg-red-500`) and a raw color (`bg-[#f00]`) are never used.
-   - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
+   - When the app Intraweb has the same component, each part has the token that Intraweb's component uses. The choices for the first 6 components are in the entry of TOR-1131 of [`docs/decisions.md`](../../docs/decisions.md).
 4. A font size is `text-xs`, `text-sm`, `text-base` or `text-lg` (and `text-2xl` and `text-3xl` for the large number of StatCard), written with the line height: `text-xs/4` (a line of 16 pixels), `text-sm/5` (a line of 20 pixels, the line height Intraweb's `text-sm` has), `text-base/6` (24 pixels) or `text-base/normal`. A font is `font-body` (normal text), `font-heading` (a heading, a button, a tab) or `font-mono`. `font-heading` is Poppins, which the apps load in the weights 400, 500 and 600, so its weight is `font-normal`, `font-medium` or `font-semibold`, never `font-bold`. The text of a button, a tab and a link that looks like one is `font-heading text-sm/5 font-medium`: the values of Intraweb's text style `label`. The radius is `rounded-md` for a button or a field and `rounded-lg` for a menu; `rounded-xl` and `rounded-2xl` are for a card and a drawer. Two shapes are not tokens: a full circle or pill (`rounded-full`), and the track of the segmented look (`rounded-[10px]`, the value of Intraweb). The shadow is one of `shadow-sm`, `shadow-card`, `shadow-lg`, `shadow-xl` and `shadow-2xl`; a menu has `shadow-lg`.
 5. A padding, a margin and a gap are a standard Tailwind spacing class (`px-4`, `gap-2`), which is a multiple of the token `--spacing`.
 6. These are written as plain values, because they do not change with the theme: the width of a border or an outline (`border`, `border-2`, `outline-2`), a font weight (`font-bold`), a width in pixels that is not a step of the spacing scale (`border-[1.5px]`), a size in `em` or `%`, a duration, and a `z-index` (`z-10`). A length in `rem` is never used.
@@ -544,7 +546,7 @@ The tests use Vitest, Testing Library and `@testing-library/user-event`, which p
 
 ### After the code
 
-1. The component is on the page of `apps/playground`, with every variant and state.
+1. The component is on a page of `apps/playground`, with every variant and state.
 2. This file has the component's props and one short example.
 
 ## The form controls and the feedback components of phase 8
@@ -1353,7 +1355,7 @@ The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilter
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
-- `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
+- `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). When they are missing, the grid uses the `CheckboxControl` and the `Select` of the library.
 - Not in the library, and still only in Intraweb: a cell edited with several choices (the editor `multiselect`). No screen of Intraweb uses it.
 - The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridRowChanges`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.

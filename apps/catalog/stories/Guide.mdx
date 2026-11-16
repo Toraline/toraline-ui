@@ -1,12 +1,18 @@
 import { Canvas, Markdown, Meta } from "@storybook/addon-docs/blocks";
 import guide from "../../../docs/guide.md?raw";
+import guidePortuguese from "../../../docs/guide.pt-BR.md?raw";
 import * as GuideStories from "./Guide.stories";
+import { withoutLanguageLine } from "./guide/guide-text";
+import { InLanguage } from "./shared/InLanguage";
 
 <Meta title="Guide/How to use the library" />
 
-{/* The text of the guide is the file docs/guide.md of the repository. The root README links to the same file. */}
+{/* The text of the guide is the file docs/guide.md of the repository, and docs/guide.pt-BR.md in Portuguese. The root README links to the same files. */}
+{/* The control "Language" of the toolbar chooses which one is shown. A change in the text of one language below is made in the other too. */}
 
-<Markdown>{guide}</Markdown>
+<InLanguage language="en" of={GuideStories.ThemeOfTheApp}>
+
+<Markdown>{withoutLanguageLine(guide)}</Markdown>
 
 ## Live examples
 
@@ -23,3 +29,27 @@ The button "Save" is blue, not blue-grey, because the theme of the app changed t
 The first button is as the library styles it. The second button has round corners from a Tailwind class of the app. The third button and the field have round corners from the CSS file of the app.
 
 <Canvas of={GuideStories.StyleOnTop} sourceState="none" />
+
+</InLanguage>
+
+<InLanguage language="pt-BR" of={GuideStories.ThemeOfTheApp}>
+
+<Markdown>{withoutLanguageLine(guidePortuguese)}</Markdown>
+
+## Exemplos ao vivo
+
+Estes dois exemplos executam os componentes reais, com os valores do guia.
+
+### O resultado do guia 2
+
+O botão "Save" é azul, não azul-acinzentado, porque o tema do app mudou a cor principal. O título tem a fonte do app. Mude o tema com o controle **Theme** da barra de ferramentas, ou com o botão do exemplo.
+
+<Canvas of={GuideStories.ThemeOfTheApp} sourceState="none" />
+
+### O resultado do guia 3
+
+O primeiro botão está como a biblioteca o estiliza. O segundo botão tem cantos redondos por causa de uma classe do Tailwind do app. O terceiro botão e o campo têm cantos redondos por causa do arquivo CSS do app.
+
+<Canvas of={GuideStories.StyleOnTop} sourceState="none" />
+
+</InLanguage>

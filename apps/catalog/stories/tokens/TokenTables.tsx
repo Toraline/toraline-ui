@@ -9,12 +9,16 @@ import {
   themeTokenNames,
 } from "@toraline.tech/tokens";
 import type { TextStyleName, ThemeTokenName } from "@toraline.tech/tokens";
+import { useStoryLanguage } from "../shared/language";
+import { tokenTableTexts } from "./token-table-texts";
+import type { TokenTableTexts } from "./token-table-texts";
 import "./token-tables.css";
 
 /**
  * The tables of the tokens page. They read the lists and the values of
  * @toraline.tech/tokens, so a token that the library adds or changes appears here
- * with no change in this file.
+ * with no change in this file. The texts of the tables (captions, column
+ * headers) are in token-table-texts.ts, in each language of the catalog.
  *
  * A level 1 token is a raw value, for example --color-brand-700.
  * A level 2 token is a meaning, for example --bg-primary. Each theme gives it a value.
@@ -85,7 +89,6 @@ function ScrollableTable({ caption, children }: { caption: string; children: Rea
 
 /** One group of level 2 tokens: which tokens are in it, and which sample it draws. */
 type ThemeTokenGroup = {
-  caption: string;
   sampleKind: SampleKind;
   includes: (tokenName: string) => boolean;
 };
@@ -99,56 +102,46 @@ const isColorOfGroup = (prefix: string) => (tokenName: string) =>
 
 const themeTokenGroups = {
   backgrounds: {
-    caption: "Background colors",
     sampleKind: "color",
     includes: isColorOfGroup("bg-"),
   },
   textColors: {
-    caption: "Text colors",
     sampleKind: "color",
     includes: isColorOfGroup("text-"),
   },
   borders: {
-    caption: "Border colors",
     sampleKind: "color",
     includes: isColorOfGroup("border-"),
   },
   icons: {
-    caption: "Icon colors",
     sampleKind: "color",
     includes: isColorOfGroup("icon-"),
   },
   dataColors: {
-    caption: "Colors of charts and progress bars",
     sampleKind: "color",
     includes: isColorOfGroup("data-"),
   },
   fonts: {
-    caption: "Fonts",
     sampleKind: "font",
     includes: (tokenName) => tokenName.startsWith("font-"),
   },
   textSizes: {
-    caption: "Text sizes",
     sampleKind: "text-size",
     includes: (tokenName) => tokenName.startsWith("text-") && !isColorToken(tokenName),
   },
   spacing: {
-    caption: "Spacing",
     sampleKind: "space",
     includes: (tokenName) => tokenName === "spacing",
   },
   radius: {
-    caption: "Radius",
     sampleKind: "radius",
     includes: (tokenName) => tokenName.startsWith("radius-"),
   },
   shadows: {
-    caption: "Shadows",
     sampleKind: "shadow",
     includes: (tokenName) => tokenName.startsWith("shadow-"),
   },
-} satisfies Record<string, ThemeTokenGroup>;
+} satisfies Record<keyof TokenTableTexts["groupCaptions"], ThemeTokenGroup>;
 
 /** The name of a group of level 2 tokens. */
 export type ThemeTokenGroupName = keyof typeof themeTokenGroups;
@@ -167,14 +160,15 @@ function ThemeTokenRows({
   tokenNames: readonly ThemeTokenName[];
   sampleKind: SampleKind;
 }) {
+  const texts = tokenTableTexts[useStoryLanguage()];
   return (
     <>
       <thead>
         <tr>
-          <th scope="col">Token</th>
+          <th scope="col">{texts.token}</th>
           {libraryThemes.map((theme) => (
             <th key={theme.name} scope="col">
-              Value in the theme "{theme.name}"
+              {texts.valueInTheme(theme.name)}
             </th>
           ))}
         </tr>
@@ -210,9 +204,10 @@ function ThemeTokenRows({
 
 /** The table of one group of level 2 tokens, with the value of each token in each theme. */
 export function ThemeTokenTable({ group }: { group: ThemeTokenGroupName }) {
-  const { caption, sampleKind, includes } = themeTokenGroups[group];
+  const texts = tokenTableTexts[useStoryLanguage()];
+  const { sampleKind, includes } = themeTokenGroups[group];
   return (
-    <ScrollableTable caption={caption}>
+    <ScrollableTable caption={texts.groupCaptions[group]}>
       <ThemeTokenRows tokenNames={themeTokenNames.filter(includes)} sampleKind={sampleKind} />
     </ScrollableTable>
   );
@@ -220,12 +215,13 @@ export function ThemeTokenTable({ group }: { group: ThemeTokenGroupName }) {
 
 /** The table of the level 2 tokens that are in none of the groups. It is empty today. */
 export function OtherThemeTokenTable() {
+  const texts = tokenTableTexts[useStoryLanguage()];
   const tokenNames = themeTokenNames.filter(isInNoGroup);
   if (tokenNames.length === 0) {
-    return <p>Every level 2 token of the library is in one of the groups of this page.</p>;
+    return <p>{texts.noOtherTokens}</p>;
   }
   return (
-    <ScrollableTable caption="Other tokens">
+    <ScrollableTable caption={texts.otherTokens}>
       <ThemeTokenRows tokenNames={tokenNames} sampleKind="none" />
     </ScrollableTable>
   );
@@ -249,35 +245,23 @@ const textStyleClasses: Record<TextStyleName, string> = {
   "caption-overline": "caption-overline",
 };
 
-/** What each text style is for. */
-const textStyleUses: Record<TextStyleName, string> = {
-  "heading-page": "The title of a page",
-  "heading-section": "The title of a section, a dialog or a drawer",
-  "heading-card": "The title of a card",
-  "display-number": "A large number, for example a total",
-  "display-number-sm": "A large number, one size smaller",
-  label: "The name of a field, the text of a tab or a badge",
-  "label-lg": "A larger label",
-  "label-sm": "A smaller label",
-  "caption-overline": "A small text in capital letters above a title",
-};
-
 /** The CSS properties that have their own column in the table of the text styles. */
 const textStyleColumns = ["font-size", "line-height", "font-weight"];
 
 /** The table of the text styles: the class, a sample, what it is for and its values. */
 export function TextStyleTable() {
+  const texts = tokenTableTexts[useStoryLanguage()];
   return (
-    <ScrollableTable caption="Text styles">
+    <ScrollableTable caption={texts.textStyles}>
       <thead>
         <tr>
-          <th scope="col">Class</th>
-          <th scope="col">Sample</th>
-          <th scope="col">Used for</th>
-          <th scope="col">Font size</th>
-          <th scope="col">Line height</th>
-          <th scope="col">Font weight</th>
-          <th scope="col">Other</th>
+          <th scope="col">{texts.className}</th>
+          <th scope="col">{texts.sample}</th>
+          <th scope="col">{texts.usedFor}</th>
+          <th scope="col">{texts.fontSize}</th>
+          <th scope="col">{texts.lineHeight}</th>
+          <th scope="col">{texts.fontWeight}</th>
+          <th scope="col">{texts.other}</th>
         </tr>
       </thead>
       <tbody>
@@ -296,7 +280,7 @@ export function TextStyleTable() {
                   {name.startsWith("display-number") ? "1,234.56" : "Toraline"}
                 </span>
               </td>
-              <td>{textStyleUses[name]}</td>
+              <td>{texts.textStyleUses[name]}</td>
               {textStyleColumns.map((property) => (
                 <td key={property}>{declarations[property]}</td>
               ))}
@@ -313,25 +297,26 @@ export function TextStyleTable() {
 
 /** One group of level 1 tokens. */
 type PrimitiveGroup = {
-  caption: string;
+  /** Which caption of token-table-texts.ts the table has. */
+  caption: keyof TokenTableTexts["primitiveCaptions"];
   sampleKind: SampleKind;
   includes: (tokenName: string, value: string) => boolean;
 };
 
 const primitiveGroups: PrimitiveGroup[] = [
-  { caption: "Level 1 colors", sampleKind: "color", includes: (_, value) => value.startsWith("#") },
+  { caption: "colors", sampleKind: "color", includes: (_, value) => value.startsWith("#") },
   {
-    caption: "Level 1 font stacks",
+    caption: "fontStacks",
     sampleKind: "font",
     includes: (tokenName) => tokenName.startsWith("font-stack-"),
   },
   {
-    caption: "Level 1 font sizes",
+    caption: "fontSizes",
     sampleKind: "text-size",
     includes: (tokenName) => tokenName.startsWith("font-size-"),
   },
   {
-    caption: "Level 1 spacing",
+    caption: "spacing",
     sampleKind: "space",
     includes: (tokenName) => tokenName.startsWith("space-"),
   },
@@ -341,12 +326,13 @@ const tableGap: CSSProperties = { display: "grid", gap: "calc(var(--spacing) * 8
 
 /** The tables of the level 1 tokens: the raw values. They are the same in every theme. */
 export function PrimitiveTables() {
+  const texts = tokenTableTexts[useStoryLanguage()];
   const entries = Object.entries(primitives);
-  const groups = [
+  const groups: PrimitiveGroup[] = [
     ...primitiveGroups,
     {
-      caption: "Other level 1 tokens",
-      sampleKind: "none" as const,
+      caption: "other",
+      sampleKind: "none",
       includes: (tokenName: string, value: string) =>
         primitiveGroups.every((group) => !group.includes(tokenName, value)),
     },
@@ -362,11 +348,11 @@ export function PrimitiveTables() {
           return null;
         }
         return (
-          <ScrollableTable key={group.caption} caption={group.caption}>
+          <ScrollableTable key={group.caption} caption={texts.primitiveCaptions[group.caption]}>
             <thead>
               <tr>
-                <th scope="col">Token</th>
-                <th scope="col">Value</th>
+                <th scope="col">{texts.token}</th>
+                <th scope="col">{texts.value}</th>
               </tr>
             </thead>
             <tbody>

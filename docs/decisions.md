@@ -12,6 +12,60 @@ Format of one entry:
 - Decided by: <the person, or "agent, to be confirmed in review">
 ```
 
+## 2026-11-15 - `homepage` of the two packages is the online catalog (TOR-1196)
+- Context: the catalog is online at https://toraline-ui.vercel.app/. `homepage` of `packages/ui/package.json` and `packages/tokens/package.json` was the folder of each package on GitHub.
+- Decision: `homepage` of both packages is `https://toraline-ui.vercel.app/`. The address is also in the root `README.md` and in the README of each package, in both languages.
+- Why: the page of a package on npmjs.com shows 2 links, "Repository" and "Homepage". "Repository" already opens the folder of the package on GitHub (`repository.directory`), so a `homepage` with the same folder repeats it. The catalog is what a person who looks at the package wants to see next: every component, every token, and the guide.
+- Both packages name the first page of the catalog. A link to one page of it (for example the tokens page) breaks when a story is renamed.
+- When it shows: npmjs.com reads `homepage` from a published version. The change is visible from the next version on. No version number changed in this ticket.
+- Risk: `toraline-ui.vercel.app` is the address that Vercel gives by default. If the catalog moves to another address, `homepage` and the 6 README lines change with it.
+- Checked on 2026-11-15: the address answers with status 200 and the page of Storybook. Not verified: who deploys it, and from which branch.
+- Alternatives: keep the GitHub folder as `homepage` and name the catalog only in the READMEs; a custom domain for the catalog before any link is written.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - The check that the documentation exists in both languages (TOR-1184)
+- Decision: `make check` runs `make docs-check` (`scripts/check-docs-languages.mjs`). For each covered file of TOR-1179 it fails when one version is missing, and when the two versions do not have the same number of headings of each level.
+- Decision (2 checks more than the ticket asked for): it also fails when line 3 of a version does not link to the other version, and when the code blocks of the two versions are not the same, byte for byte. Both are rules of TOR-1179, and both are cheap to check.
+- Decision (the catalog): the check also compares the headings of the two languages inside `apps/catalog/stories/Guide.mdx` and `Tokens.mdx`.
+- What the check cannot see: a sentence that changed in one language only. That is the rule in `AGENTS.md`: a change in one language is made in the other in the same commit.
+- The test is `scripts/check-docs-languages.test.mjs`. The unit project of Vitest now also reads `scripts/**/*.test.mjs`.
+- Alternatives: compare the number of paragraphs or of lines, which fails on a harmless difference of wording; a translation tool that marks out-of-date paragraphs, which is a new tool.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - The catalog: the guide and the tokens page in two languages (TOR-1183)
+- Decision: the toolbar of the catalog has the control **Language** (`English`, `Português`). It is a global of Storybook named `language`, with the values `en` and `pt-BR`, next to the global `theme`. The default is `en`.
+- Decision (what changes): the guide page, the tokens page, and the captions and column headers of the token tables. The component pages, the names in the sidebar (`Guide`, `Foundations`) and the texts inside a story stay in English: the library is in English only, and Storybook has one sidebar for every value of a global.
+- Decision (the guide): the page shows `docs/guide.md` or `docs/guide.pt-BR.md`. Line 3 of each file, the link to the other language, is left out in the catalog, which cannot open a file.
+- Decision (the tokens page): `Tokens.mdx` has the text once for each language, each inside `<InLanguage>`. The texts of the tables are in `stories/tokens/token-table-texts.ts`; a type makes the build fail when one language misses a text.
+- How the language is read: a story gets it from a decorator, through a React context. The text of an MDX page is outside every story, so `<InLanguage>` reads the globals of one story of the page from the docs context of Storybook and listens to the event `globalsUpdated`. This is what Storybook's own block `Controls` does. The event name comes from `storybook/internal/core-events`, an internal entry of Storybook 10.6.7 that a later version may move.
+- The story tests run in English, the default. No project was added for Portuguese: it would run every story 2 more times, and only the token tables differ.
+- Checked on 2026-11-15 in the built catalog, in Chromium: the tokens page and the guide page opened with `globals=language:pt-BR` show the Portuguese headings and table captions; the control in the toolbar changes the open page to English and back with no reload; the console has no error.
+- Not verified: a screen reader; the Portuguese pages under the accessibility check (axe-core runs on stories, in English).
+- Alternatives: two entries in the sidebar for each page (`Guia`, `Guide`), which doubles the sidebar; a Vitest project for each language; one MDX file for each language, which Storybook would list as separate pages.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - The Portuguese README of each package is inside the published package (TOR-1182)
+- Context: the page of a package on npmjs.com shows only `README.md`. The question was where a person finds `README.pt-BR.md`.
+- Decision: `README.pt-BR.md` is in the tarball of each package, and line 3 of the English `README.md` links to the Portuguese file on GitHub with its full address. So a person on npmjs.com reaches it with one press, and a person with no network reads it in `node_modules`.
+- Why it is cheap and safe: npm puts every file whose name starts with `README` in a package by itself (checked with `npm pack --dry-run`, npm 11.12.1). `files` of the two `package.json` files did not change. `scripts/check-packages.mjs` now fails when `README.pt-BR.md` is missing from a tarball, as it already did for `README.md`.
+- Cost: the tarballs grow by the size of one more README. The sizes before and after are in the pull request of TOR-1129.
+- Alternatives: keep the Portuguese file out of the package (a `.npmignore` file or a negated entry in `files`) and only link to GitHub, which saves the size and needs a rule against npm's own default; a README with both languages, which doubles the page on npmjs.com.
+- Decided by: agent, to be confirmed in review.
+
+## 2026-11-15 - The documentation in two languages: how the files are stored (TOR-1179)
+- Context: the library is in English only (names, props, built-in texts). Its documentation exists in English and in Brazilian Portuguese (decision of Juliana, TOR-1129).
+- Decision (the file pattern): the Portuguese version of `<name>.md` is `<name>.pt-BR.md`, in the same folder. Example: `docs/guide.pt-BR.md` next to `docs/guide.md`. `pt-BR` is the language tag of Brazilian Portuguese.
+- Decision (the link between the two): line 3 of each file, under the title, names both languages and links to the other one. The English file has `**English** | [Português](<name>.pt-BR.md)`. The Portuguese file has `[English](<name>.md) | **Português**`. In the two package READMEs the link is the full GitHub address, because npm shows a README outside the repository.
+- Decision (covered files): `README.md`, `docs/guide.md`, `docs/releasing.md`, `packages/ui/README.md`, `packages/tokens/README.md`. They are the files a person who uses or releases the library reads.
+- Decision (not covered, with the reason):
+  - `docs/decisions.md` and `CHANGELOG.md`: a record that grows with every ticket. Two copies would differ soon, and an entry is written once and not read as a guide.
+  - `AGENTS.md` and `agent/`: instructions for AI agents. The profile says skill and rule files are in English.
+  - `apps/catalog/README.md`, `apps/playground/README.md` and `docs/workflow/`: for people who work on this repository, who read the code and the commits in English.
+- Decision (the rules of a translation): the English file is the source. The Portuguese file has the same sections in the same order and the same code blocks, byte for byte. Identifiers, prop names, token names, commands and file paths are not translated. A technical term that Brazilian developers use in English stays in English (for example "build", "token", "Server Component"). A link to a covered file points to the Portuguese version of that file.
+- Why: one file next to the other is found without a search, GitHub shows both in the same folder, and a check can pair them by name (TOR-1184).
+- Alternatives: a folder for each language (`docs/pt-BR/guide.md`), which separates the two versions and does not fit a package README; one file with both languages, which doubles what a reader scrolls; a documentation site with its own translation system, which is a new tool.
+- Decided by: agent, to be confirmed in review.
+
 ## 2026-11-15 - DataGrid: the mode that edits the table and saves a whole row (TOR-1216)
 - Design source: Intraweb's `components/ui/data-grid/data-grid.tsx` (the state `editing`, `drafts`, `rowErrors` and the function `saveAll`, commit `f8ad4c2` of `prontera-e-juno`), its tests, the one screen that uses the mode (`categories-page.tsx`), and the text of the ticket. Figma was not read: this session had no access to it.
 - Context: TOR-1216 was added to TOR-1209 after its 6 sub-tickets, so that the library's grid covers all 30 files of Intraweb. It is feature 20 of the entry of TOR-1165.

@@ -38,6 +38,7 @@ A value of `<ask>` is not set yet. The `start` skill asks for it the first time 
 - The flow, in order: [docs/workflow/working-pattern.md](docs/workflow/working-pattern.md).
 - Where each kind of thing lives: [docs/workflow/sources-of-truth.md](docs/workflow/sources-of-truth.md).
 - Technical decisions, newest first: [docs/decisions.md](docs/decisions.md). The plan and its phases are in the Linear project `toraline-ui`.
+- The documentation is in two languages: English (`<name>.md`) and Brazilian Portuguese (`<name>.pt-BR.md`, in the same folder). The covered files are `README.md`, `docs/guide.md`, `docs/releasing.md`, `packages/ui/README.md` and `packages/tokens/README.md`; the guide page and the tokens page of the catalog have both languages in one MDX file. **A change in one language is made in the other in the same commit.** The English file is the source; code blocks, identifiers and commands are not translated. `make check` fails when a version is missing, or when the two versions differ in their headings or code blocks (`scripts/check-docs-languages.mjs`). The library itself is in English only. The decision: `docs/decisions.md`, TOR-1179.
 - Never change `legacy/`. It is the old library, kept until version 2 is fully released.
 - Never run `npm publish` or `npm login`, and never handle an npm token. A person publishes, with the steps in [docs/releasing.md](docs/releasing.md).
 
@@ -65,6 +66,7 @@ make setup       # first time on this machine: npm install, hooks, local-docs, d
 make doctor      # check the machine and the project
 make worktree TICKET=123 SLUG=short-slug
 make check       # what must pass before a commit
+make docs-check  # check that the documentation exists in English and in Portuguese (part of make check)
 make catalog     # open the catalog (Storybook) on http://localhost:6006
 make catalog-build # build the static catalog into apps/catalog/storybook-static
 make catalog-test  # run every story as a test, in each theme, with the accessibility check
