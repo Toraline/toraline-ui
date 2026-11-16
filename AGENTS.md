@@ -67,6 +67,7 @@ make doctor      # check the machine and the project
 make worktree TICKET=123 SLUG=short-slug
 make check       # what must pass before a commit
 make docs-check  # check that the documentation exists in English and in Portuguese (part of make check)
+make workflows-check # check the workflows of GitHub: actions named by a commit id, a permissions block (part of make check)
 make catalog     # open the catalog (Storybook) on http://localhost:6006
 make catalog-build # build the static catalog into apps/catalog/storybook-static
 make catalog-test  # run every story as a test, in each theme, with the accessibility check

@@ -1,6 +1,6 @@
 # toraline-ui: run every command from the repository root.
 .DEFAULT_GOAL := help
-.PHONY: help setup install check build typecheck lint test catalog catalog-build catalog-browser catalog-test packages-check docs-check pack version
+.PHONY: help setup install check build typecheck lint test catalog catalog-build catalog-browser catalog-test packages-check docs-check workflows-check pack version
 
 -include agent/core.mk
 
@@ -43,6 +43,9 @@ packages-check: ## Check the two published packages: same version, files of "exp
 docs-check: ## Check that the documentation exists in English and in Portuguese, with the same headings and code blocks
 	@node scripts/check-docs-languages.mjs
 
+workflows-check: ## Check the workflows of GitHub: actions named by a commit id, a permissions block, no value pasted into a script
+	@node scripts/check-workflows.mjs
+
 pack: ## Build the two published packages, write their tarballs into .pack/ and list the files of each
 	@rm -rf .pack/tarballs && mkdir -p .pack/tarballs
 	@npm pack --workspace @toraline.tech/tokens --workspace @toraline.tech/ui --pack-destination .pack/tarballs
@@ -52,4 +55,4 @@ version: ## Set the version of the two published packages (VERSION=0.1.1)
 	@node scripts/set-version.mjs "$(VERSION)"
 	@npm install --no-audit --no-fund
 
-check: build typecheck lint packages-check docs-check test ## What must pass before a commit (the profile's check_command)
+check: build typecheck lint packages-check docs-check workflows-check test ## What must pass before a commit (the profile's check_command)
