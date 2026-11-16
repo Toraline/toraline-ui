@@ -4,7 +4,26 @@ What changed in each version of `@toraline.tech/ui` and `@toraline.tech/tokens`,
 
 The old package `@toraline/toraline-ui` (versions 0 and 1) is not in this list.
 
-## 0.2.0 (not published yet)
+## 0.3.0 (not published yet)
+
+The DataGrid gets the parts of Intraweb's grid that version 0.2.0 left out (TOR-1209). Nothing breaks: a grid written for 0.2.0 works unchanged.
+
+### New
+
+- DataGrid: the filter of a column (TOR-1210). A column with `filter` has a small button in its header that opens a panel with a list of choices (`type: "options"`, with `defaultValues`) or a text field (`type: "text"`). The state of the grid (`DataGridState`, `defaultState`, `onStateChange`) has the new field `filters`. "Clear filters" puts every filter back to its default. New labels: `filterColumn`, `filterChoices`, `filterSelectAll`, `filterClear`, `filterContains`. New types: `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`.
+- DataGrid: the menu "Columns" (TOR-1211). `columnsMenu` adds a button at the right of the toolbar that opens a list with a checkbox for each column. A column can be `required` (always shown, not in the menu) or `defaultHidden` (hidden until a person turns it on). The app can keep the choice: `hiddenColumns` gives the hidden columns and `onHiddenColumnsChange` reports each change. The README and the playground (`/data/grid-parts`) have an example that saves the choice in `localStorage`. New labels: `columns`, `visibleColumns`, `resetColumns`.
+- DataGrid: a cell is edited in place (TOR-1212). A column with `editor` (`"text"`, `"number"`, `"select"`, `"checkbox"`) and `editOnClick` shows the library's TextInput, DecimalInput, Select or CheckboxControl in the cell. The app saves the value in the new prop `onSaveCell`, which returns a promise. The grid shows the pending state ("Saving…") and, when the promise is rejected, the error text, which the app can give with `getSaveErrorMessage`. Enter saves, Escape gives up, leaving the field saves. `canEdit` refuses single records. New labels: `cellLabel`, `editCell`, `saving`, `saveFailed`, `selectPlaceholder`. New types: `DataGridColumnEditor`, `DataGridCellValue`.
+- DataGrid: rows inside a row (TOR-1213). `subRows` gives each row an arrow (a button with `aria-expanded`) that shows the items of the record in a small table under the row, with their own columns, buttons and footer. A cell of an item is edited in place with `subRows.onSaveCell`. New labels: `showSubRows`, `hideSubRows`, `subRowsCaption`, `noSubRows`. New type: `DataGridSubRows`. `DataGridProps` and `DataGrid` have a second generic type for the items, with a default, so `DataGridProps<Row>` still works.
+- DataGrid: another view in the place of the table (TOR-1214). `renderView` receives the rows after the search and the filters and returns the view, for example a calendar. The search field and the toolbar stay above it, and the filters of the columns move to the toolbar as buttons with the name of their column.
+- DataGrid: an example that keeps the state of the grid in the address of the page (TOR-1215). The library still imports no router. The README (`packages/ui/README.md`, "Keeping the state in the address of the page") and the playground (the route `/data/address`) have an adapter of 2 files for Next.js, built on `defaultState` and `onStateChange`. It uses the query parameter names of Intraweb: `busca`, `ordem`, `f-<column>`, `pagina`, `por-pagina`.
+- DataGrid: the mode that edits the table (TOR-1216). `onSaveRow` adds the button "Edit table". In the mode every cell of a column with `editor` is a field, and one button saves each changed row as one: the app receives the record and only its changed cells, and returns a promise. The grid shows the pending state, and the error text of a refused row under that row. New labels: `editTable`, `noChanges`, `changedRows`, `cancelEditing`, `saveChanges`, `savingChanges`, `rowError`. New type: `DataGridRowChanges`.
+
+### Changed
+
+- The type `DataGridState` has the new field `filters`. An app that builds a full `DataGridState` object itself must add `filters: {}`. An app that only reads the state of `onStateChange`, or gives a part of it to `defaultState`, changes nothing.
+- DataGrid: the row above the table has 2 groups, as in Intraweb: the search field, the toolbar of the screen and "Clear filters" on the left, and the menu "Columns" on the right. The element with `data-slot="toolbar"` is still the outermost one. Without the menu nothing looks different.
+
+## 0.2.0 (2026-11-15)
 
 The components get the shape of the same components of the app Intraweb: variants, sizes, props, measures and states (phase 7, TOR-1123). After this version a screen of Intraweb can import these components from the library and look the same.
 

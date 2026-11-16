@@ -1,9 +1,15 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Archive, Pencil, Plus } from "lucide-react";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Button, DataGrid, IconButton } from "@toraline.tech/ui";
-import type { DataGridColumn, DataGridProps, DataGridState } from "@toraline.tech/ui";
+import type {
+  DataGridCellValue,
+  DataGridColumn,
+  DataGridProps,
+  DataGridRowChanges,
+  DataGridState,
+} from "@toraline.tech/ui";
 
 type Product = {
   id: number;
@@ -350,4 +356,737 @@ export const StateForTheApp: Story = {
     defaultState: { page: 2, sort: { columnId: "name", descending: false } },
   },
   render: (args) => <GridWithState {...args} />,
+};
+
+/** The columns of the stories of the filter: a text filter, 2 lists of choices, and a list with a default. */
+const filterColumns: DataGridColumn<Product>[] = columns.map((column): DataGridColumn<Product> => {
+  if (column.id === "name") {
+    return { ...column, filter: { type: "text", value: (product) => product.name } };
+  }
+  if (column.id === "category") {
+    return {
+      ...column,
+      filter: {
+        type: "options",
+        options: ["Bakery", "Desserts", "Drinks", "Savory"].map((category) => ({ value: category, label: category })),
+        value: (product) => product.category,
+      },
+    };
+  }
+  if (column.id === "supplier") {
+    return {
+      ...column,
+      filter: {
+        type: "options",
+        options: [
+          { value: "Minas Dairy", label: "Minas Dairy" },
+          { value: "Serra Coffee", label: "Serra Coffee" },
+          { value: "Sweet Farm", label: "Sweet Farm" },
+          { value: "", label: "No supplier" },
+        ],
+        value: (product) => product.supplier ?? "",
+      },
+    };
+  }
+  return column;
+});
+
+const statusColumn: DataGridColumn<Product> = {
+  id: "status",
+  header: "Status",
+  cell: (product) => (product.active ? "Active" : "Inactive"),
+  sortValue: (product) => (product.active ? 0 : 1),
+  filter: {
+    type: "options",
+    options: [
+      { value: "active", label: "Active" },
+      { value: "inactive", label: "Inactive" },
+    ],
+    value: (product) => (product.active ? "active" : "inactive"),
+    defaultValues: ["active"],
+  },
+};
+
+/**
+ * A column with "filter" has a small button in its header. "Status" starts
+ * with the choice "Active" checked ("defaultValues"), so its button is in the
+ * brand color. A default is not a change of the person: "Clear filters" is not shown.
+ */
+export const ColumnFilters: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Filter Status (filter on)" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: "Clear filters" })).toBeNull();
+  },
+};
+
+/**
+ * The panel of a filter with a list of choices, open. The story checks
+ * "Drinks": the rows are filtered at once, the button of the header changes
+ * its color, and "Clear filters" is shown. The panel is in <body>, so the box
+ * of the table does not cut it.
+ */
+export const ColumnFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Category" }));
+    const panel = await page.findByRole("dialog", { name: "Filter Category" });
+    await userEvent.click(within(panel).getByRole("checkbox", { name: "Drinks" }));
+    await expect(canvas.getByRole("button", { name: "Filter Category (filter on)" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Clear filters" })).toBeVisible();
+    await expect(canvas.getByText("Showing 1–9 of 9")).toBeVisible();
+  },
+};
+
+/** The panel of a text filter, open: one text field, which has the focus. The story types "cake". */
+export const TextFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Product" }));
+    const field = await page.findByRole("textbox", { name: "Filter Product" });
+    await expect(field).toHaveFocus();
+    await userEvent.type(field, "cake");
+    await expect(canvas.getByText("Showing 1–2 of 2")).toBeVisible();
+  },
+};
+
+/** The keyboard: Enter on the button of the header opens the panel, Tab goes to a choice, Space checks it, Escape closes the panel and gives the focus back to the button. */
+export const ColumnFilterKeyboard: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 8),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    canvas.getByRole("button", { name: "Filter Supplier" }).focus();
+    await userEvent.keyboard("{Enter}");
+    const panel = await page.findByRole("dialog", { name: "Filter Supplier" });
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(within(panel).getByRole("checkbox", { name: "Minas Dairy" })).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await userEvent.keyboard("{Escape}");
+    await expect(page.queryByRole("dialog")).toBeNull();
+    await expect(canvas.getByRole("button", { name: "Filter Supplier (filter on)" })).toHaveFocus();
+  },
+};
+
+/** The columns of the stories of the menu "Columns": "Product" is required, and "Supplier" starts hidden. */
+const menuColumns: DataGridColumn<Product>[] = columns.map((column): DataGridColumn<Product> => {
+  if (column.id === "name") {
+    return { ...column, required: true };
+  }
+  if (column.id === "supplier") {
+    return { ...column, defaultHidden: true };
+  }
+  return column;
+});
+
+/**
+ * "columnsMenu" adds the button "Columns" at the right of the toolbar. A
+ * column with "required" is always shown and is not in the menu. A column with
+ * "defaultHidden" is hidden until a person checks it: here "Supplier".
+ */
+export const ColumnsMenu: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Columns" })).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.queryByRole("columnheader", { name: "Supplier" })).toBeNull();
+  },
+};
+
+/**
+ * The menu open. The story hides "Category" and shows "Supplier": the table
+ * changes at once, and the button "Back to default" is shown.
+ */
+export const ColumnsMenuOpen: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    search: { placeholder: "Search the products" },
+    rows: products.slice(0, 8),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Columns" }));
+    const list = canvas.getByRole("group", { name: "Visible columns" });
+    await userEvent.click(within(list).getByRole("checkbox", { name: "Category" }));
+    await userEvent.click(within(list).getByRole("checkbox", { name: "Supplier" }));
+    await expect(canvas.queryByRole("columnheader", { name: "Category" })).toBeNull();
+    await expect(canvas.getByRole("columnheader", { name: "Supplier" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Back to default" })).toBeVisible();
+  },
+};
+
+function GridWithHiddenColumns(args: DataGridProps<Product>) {
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>(["stock", "price"]);
+  return (
+    <div className="grid gap-4">
+      <DataGrid {...args} hiddenColumns={hiddenColumns} onHiddenColumnsChange={setHiddenColumns} />
+      <p className="text-sm/5 text-secondary">
+        The hidden columns the app keeps: {hiddenColumns.length > 0 ? hiddenColumns.join(", ") : "none"}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The app keeps the hidden columns: it gives them in "hiddenColumns" and
+ * receives each change in "onHiddenColumnsChange". An app saves them where it
+ * wants, for example in the storage of the browser; the playground has that example.
+ */
+export const HiddenColumnsKeptByTheApp: Story = {
+  args: {
+    columns: menuColumns,
+    columnsMenu: true,
+    rows: products.slice(0, 6),
+  },
+  render: (args) => <GridWithHiddenColumns {...args} />,
+};
+
+/** The columns of the stories of the editing: a text, a number, a select and a checkbox. An inactive product cannot be edited, except its status. */
+const editableColumns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => <span className="font-medium text-primary">{product.name}</span>,
+    editor: { type: "text", value: (product) => product.name },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "category",
+    header: "Category",
+    cell: (product) => product.category,
+    editor: {
+      type: "select",
+      value: (product) => product.category,
+      options: ["Bakery", "Desserts", "Drinks", "Savory"].map((category) => ({ value: category, label: category })),
+    },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (product) => money.format(product.price),
+    editor: { type: "number", value: (product) => product.price.toFixed(2) },
+    editOnClick: true,
+    canEdit: (product) => product.active,
+  },
+  {
+    id: "active",
+    header: "Active",
+    cell: (product) => (product.active ? "Yes" : "No"),
+    editor: { type: "checkbox", value: (product) => product.active },
+    editOnClick: true,
+  },
+];
+
+/** The record with the new value of one cell, as the API of an app would return it. */
+function withCellValue(product: Product, columnId: string, value: DataGridCellValue): Product {
+  if (columnId === "price") {
+    return { ...product, price: Number(String(value).replace(",", ".")) };
+  }
+  return { ...product, [columnId]: value };
+}
+
+type EditableGridProps = DataGridProps<Product> & {
+  /** What the app does with a value: it saves it, it never answers, or it refuses it. */
+  answer?: "save" | "never" | "refuse";
+};
+
+function EditableGrid({ answer = "save", rows: firstRows, ...args }: EditableGridProps) {
+  const [rows, setRows] = useState(firstRows);
+  return (
+    <DataGrid
+      {...args}
+      rows={rows}
+      onSaveCell={async (row, columnId, value) => {
+        if (answer === "never") {
+          await new Promise(() => undefined);
+        }
+        if (answer === "refuse" || (columnId === "price" && Number.isNaN(Number(String(value).replace(",", "."))))) {
+          throw new Error("The price must be a number, for example 12.50.");
+        }
+        setRows((currentRows) =>
+          currentRows.map((product) => (product.id === row.id ? withCellValue(product, columnId, value) : product)),
+        );
+      }}
+    />
+  );
+}
+
+/**
+ * A column with "editor" and "editOnClick" is edited in the grid, and the app
+ * saves the value in "onSaveCell". At rest a cell looks like any cell; the
+ * pointer over it, or the keyboard focus, shows a quiet background and a
+ * pencil. A checkbox is always shown. The fourth product is not active, so
+ * "canEdit" leaves only its checkbox.
+ */
+export const EditableCells: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Edit Price — Espresso coffee: R$11.00" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /Edit Price — Carrot cake/ })).toBeNull();
+  },
+};
+
+/**
+ * A press on a cell shows the field, with the focus. The story types another
+ * price: the field has the border and the background of a changed value until
+ * it is saved. Enter saves, and Escape gives up.
+ */
+export const EditingACell: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Price — Espresso coffee/ }));
+    const field = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await expect(field).toHaveFocus();
+    await userEvent.clear(field);
+    await userEvent.type(field, "12.50");
+    await expect(field).toHaveAttribute("data-changed", "true");
+  },
+};
+
+/** The keyboard: Enter on a cell opens the field, Enter in the field saves, and the focus goes back to the cell with the new value. */
+export const EditingWithTheKeyboard: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole("button", { name: /Edit Product — Orange juice/ }).focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" with ice{Enter}");
+    const cell = await canvas.findByRole("button", { name: "Edit Product — Orange juice with ice: Orange juice with ice" });
+    await waitFor(() => expect(cell).toHaveFocus());
+  },
+};
+
+/** While the app saves: the field is disabled and the cell says "Saving…". In this story the app never answers. */
+export const SavingACell: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} answer="never" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Product — Espresso coffee/ }));
+    await userEvent.keyboard(" double{Enter}");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Saving…");
+    await expect(canvas.getByRole("textbox", { name: "Product — Espresso coffee" })).toBeDisabled();
+  },
+};
+
+/** The app refuses the value: the field stays open with the error text of the app under it, and keeps the focus. */
+export const CellSaveError: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Price — Espresso coffee/ }));
+    const field = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(field);
+    await userEvent.type(field, "twelve{Enter}");
+    await expect(await canvas.findByRole("alert")).toHaveTextContent("The price must be a number, for example 12.50.");
+    await expect(field).toHaveAttribute("aria-invalid", "true");
+    await waitFor(() => expect(field).toHaveFocus());
+  },
+};
+
+/** A select is saved when a choice is made. The story opens the select of a category. */
+export const EditingWithASelect: Story = {
+  args: { columns: editableColumns, rows: products.slice(0, 5) },
+  render: (args) => <EditableGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /Edit Category — Orange juice/ }));
+    await expect(canvas.getByRole("combobox", { name: "Category — Orange juice" })).toHaveFocus();
+  },
+};
+
+type ComplementOption = { id: number; name: string; extraPrice: number; active: boolean };
+type ComplementGroup = { id: number; name: string; choices: string; options: ComplementOption[] };
+
+const complementGroups: ComplementGroup[] = [
+  {
+    id: 1,
+    name: "Milk",
+    choices: "Choose 1",
+    options: [
+      { id: 11, name: "Whole milk", extraPrice: 0, active: true },
+      { id: 12, name: "Oat milk", extraPrice: 2, active: true },
+      { id: 13, name: "Lactose-free milk", extraPrice: 1.5, active: false },
+    ],
+  },
+  {
+    id: 2,
+    name: "Syrup",
+    choices: "Up to 2",
+    options: [
+      { id: 21, name: "Vanilla", extraPrice: 3, active: true },
+      { id: 22, name: "Caramel", extraPrice: 3, active: true },
+    ],
+  },
+  { id: 3, name: "Toppings", choices: "Up to 3", options: [] },
+];
+
+const complementGroupColumns: DataGridColumn<ComplementGroup>[] = [
+  {
+    id: "name",
+    header: "Group",
+    cell: (group) => <span className="font-medium text-primary">{group.name}</span>,
+    sortValue: (group) => group.name,
+  },
+  { id: "choices", header: "Choices", cell: (group) => group.choices },
+  { id: "options", header: "Options", align: "right", cell: (group) => group.options.length },
+];
+
+const complementOptionColumns: DataGridColumn<ComplementOption>[] = [
+  {
+    id: "name",
+    header: "Option",
+    cell: (option) => <span className="font-medium text-primary">{option.name}</span>,
+    editor: { type: "text", value: (option) => option.name },
+    editOnClick: true,
+  },
+  {
+    id: "extraPrice",
+    header: "Extra price",
+    align: "right",
+    cell: (option) => money.format(option.extraPrice),
+    editor: { type: "number", value: (option) => option.extraPrice.toFixed(2) },
+    editOnClick: true,
+  },
+  {
+    id: "active",
+    header: "Active",
+    cell: (option) => (option.active ? "Yes" : "No"),
+    editor: { type: "checkbox", value: (option) => option.active },
+    editOnClick: true,
+  },
+];
+
+function ComplementGroupsGrid() {
+  const [groups, setGroups] = useState(complementGroups);
+  return (
+    <DataGrid
+      caption="Groups of complements"
+      columns={complementGroupColumns}
+      rows={groups}
+      getRowKey={(group) => group.id}
+      getRowLabel={(group) => group.name}
+      locale="en"
+      subRows={{
+        label: "options",
+        getRows: (group) => group.options,
+        columns: complementOptionColumns,
+        getRowKey: (option) => option.id,
+        getRowLabel: (option) => option.name,
+        emptyMessage: "No option in this group.",
+        rowActions: (group, option) => (
+          <IconButton icon={Archive} size="sm" aria-label={`Archive ${option.name} of ${group.name}`} />
+        ),
+        footer: (group) => (
+          <Button size="sm" variant="secondary" icon={Plus}>
+            Add an option to {group.name}
+          </Button>
+        ),
+        onSaveCell: async (group, option, columnId, value) => {
+          const savedValue = columnId === "extraPrice" ? Number(String(value).replace(",", ".")) : value;
+          if (typeof savedValue === "number" && Number.isNaN(savedValue)) {
+            throw new Error("The price must be a number, for example 2.50.");
+          }
+          setGroups((currentGroups) =>
+            currentGroups.map((currentGroup) =>
+              currentGroup.id === group.id
+                ? {
+                    ...currentGroup,
+                    options: currentGroup.options.map((currentOption) =>
+                      currentOption.id === option.id ? { ...currentOption, [columnId]: savedValue } : currentOption,
+                    ),
+                  }
+                : currentGroup,
+            ),
+          );
+        },
+      }}
+    />
+  );
+}
+
+/**
+ * "subRows" gives each row an arrow before its first cell. The arrow is a
+ * button with aria-expanded; its name has the items, the record and the number
+ * of items. In this story every row is closed.
+ */
+export const RowsInsideARow: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("button", { name: "Show options of Milk (3)" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  },
+};
+
+/**
+ * A row open: its items are a small table with its own columns, in a row of
+ * its own with a quiet background, with the buttons of each item and the
+ * content of "footer" under it. The third row has no item and shows the message.
+ */
+export const RowsInsideARowOpen: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Show options of Milk (3)" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Show options of Toppings (0)" }));
+    await expect(canvas.getByRole("button", { name: "Hide options of Milk (3)" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    await expect(canvas.getByRole("table", { name: "options of Milk" })).toBeVisible();
+    await expect(canvas.getByText("No option in this group.")).toBeVisible();
+  },
+};
+
+/** The keyboard: Enter on the arrow shows the items, and a cell of an item is edited in place: Enter opens the field and Enter saves. */
+export const RowsInsideARowKeyboard: StoryObj = {
+  render: () => <ComplementGroupsGrid />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole("button", { name: "Show options of Syrup (2)" }).focus();
+    await userEvent.keyboard("{Enter}");
+    canvas.getByRole("button", { name: /Edit Extra price — Vanilla/ }).focus();
+    await userEvent.keyboard("{Enter}");
+    const field = canvas.getByRole("textbox", { name: "Extra price — Vanilla" });
+    await userEvent.clear(field);
+    await userEvent.type(field, "4.50{Enter}");
+    const cell = await canvas.findByRole("button", { name: "Edit Extra price — Vanilla: R$4.50" });
+    await waitFor(() => expect(cell).toHaveFocus());
+  },
+};
+
+/** The view of the stories: the products as cards, one for each row the grid gives. */
+function ProductCards({ rows }: { rows: Product[] }) {
+  if (rows.length === 0) {
+    return <p className="py-8 text-center text-sm/5 text-secondary">No product with these filters.</p>;
+  }
+  return (
+    <ul aria-label="Products as cards" className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {rows.map((product) => (
+        <li key={product.id} className="rounded-lg border border-default bg-surface p-3">
+          <p className="font-heading text-sm/5 font-medium text-primary">{product.name}</p>
+          <p className="text-sm/5 text-secondary">{product.category}</p>
+          <p className="mt-2 text-sm/5 text-body tabular-nums">{money.format(product.price)}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function GridWithViews({ startWithCards, ...args }: DataGridProps<Product> & { startWithCards: boolean }) {
+  const [showsCards, setShowsCards] = useState(startWithCards);
+  return (
+    <DataGrid
+      {...args}
+      toolbar={
+        <div role="group" aria-label="View" className="flex gap-1">
+          <Button size="sm" variant={showsCards ? "ghost" : "soft"} aria-pressed={!showsCards} onClick={() => setShowsCards(false)}>
+            Table
+          </Button>
+          <Button size="sm" variant={showsCards ? "soft" : "ghost"} aria-pressed={showsCards} onClick={() => setShowsCards(true)}>
+            Cards
+          </Button>
+        </div>
+      }
+      renderView={showsCards ? (rows) => <ProductCards rows={rows} /> : undefined}
+    />
+  );
+}
+
+/**
+ * "renderView" shows another view in the place of the table: here cards, in
+ * an app for example a calendar. The search field and the toolbar stay, and
+ * the filters of the columns are buttons with the name of their column in the
+ * toolbar. The view receives the rows after the search and the filters. The
+ * story searches "juice".
+ */
+export const AnotherView: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 12),
+    search: { placeholder: "Search the products" },
+    pageSize: 10,
+  },
+  render: (args) => <GridWithViews {...args} startWithCards />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole("table")).toBeNull();
+    await expect(canvas.getByRole("button", { name: "Filter Status (filter on)" })).toHaveTextContent("Status");
+    await userEvent.type(canvas.getByRole("searchbox", { name: "Search the products" }), "juice");
+    await expect(within(canvas.getByRole("list", { name: "Products as cards" })).getAllByRole("listitem")).toHaveLength(1);
+  },
+};
+
+/**
+ * The panel of a filter open above the view. The story checks "Bakery", and
+ * then goes to the table: the same filter is still on, now in the header of its column.
+ */
+export const AnotherViewWithAFilterOpen: Story = {
+  args: {
+    columns: [...filterColumns, statusColumn],
+    rows: products.slice(0, 12),
+    search: { placeholder: "Search the products" },
+  },
+  render: (args) => <GridWithViews {...args} startWithCards />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "Filter Category" }));
+    const panel = await page.findByRole("dialog", { name: "Filter Category" });
+    await userEvent.click(within(panel).getByRole("checkbox", { name: "Bakery" }));
+    await expect(canvas.getByRole("button", { name: "Filter Category (filter on)" })).toBeVisible();
+  },
+};
+
+/** The columns of the stories of the mode "Edit table": the same editors as the cells edited by a press, with no "editOnClick". */
+const tableEditColumns: DataGridColumn<Product>[] = editableColumns.map((column) => ({ ...column, editOnClick: false }));
+
+/** The record with the changed cells of a row, as the API of an app would return it. A price that is not a number is refused. */
+function withRowChanges(product: Product, changes: DataGridRowChanges): Product {
+  return Object.entries(changes).reduce((changedProduct, [columnId, value]) => {
+    if (columnId === "price" && Number.isNaN(Number(String(value).replace(",", ".")))) {
+      throw new Error("The price must be a number, for example 12.50.");
+    }
+    return withCellValue(changedProduct, columnId, value);
+  }, product);
+}
+
+function TableEditGrid({ rows: firstRows, ...args }: DataGridProps<Product>) {
+  const [rows, setRows] = useState(firstRows);
+  return (
+    <DataGrid
+      {...args}
+      rows={rows}
+      onSaveRow={async (row, changes) => {
+        const savedRow = withRowChanges(row, changes);
+        setRows((currentRows) => currentRows.map((product) => (product.id === row.id ? savedRow : product)));
+      }}
+    />
+  );
+}
+
+/**
+ * "onSaveRow" adds the button "Edit table" at the right of the toolbar. The
+ * table looks as always until a person presses it.
+ */
+export const EditTable: Story = {
+  args: {
+    columns: tableEditColumns,
+    rows: products.slice(0, 5),
+    columnsMenu: true,
+    rowActions: (product) => <IconButton icon={Pencil} size="sm" aria-label={`Edit ${product.name}`} />,
+  },
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByRole("button", { name: "Edit table" })).toBeVisible();
+  },
+};
+
+/**
+ * The mode on. Every cell of a column with "editor" is a field; the buttons of
+ * the rows and the menu of the columns are hidden. The story changes 2 cells of
+ * one row and 1 cell of another: each changed field has the orange border, each
+ * changed row the quiet orange background, and the toolbar counts the rows.
+ */
+export const EditTableWithChanges: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Product — Pão de queijo" })).toHaveFocus());
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Espresso coffee" }), " double");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "12.50");
+    await userEvent.click(canvas.getByRole("checkbox", { name: "Active — Orange juice" }));
+    await expect(canvas.getByRole("status")).toHaveTextContent("2 rows changed");
+    await expect(canvas.getByRole("button", { name: "Save changes (2)" })).toBeEnabled();
+  },
+};
+
+/**
+ * Two cells of one row are changed and the row is saved as one: "onSaveRow"
+ * receives the record and its 2 changed cells. After every row is saved, the
+ * mode ends, the table shows the new values and the focus is on "Edit table".
+ */
+export const EditTableSaved: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Espresso coffee" }), " double");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "12.50");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes (1)" }));
+    const editButton = await canvas.findByRole("button", { name: "Edit table" });
+    await expect(canvas.getByText("Espresso coffee double")).toBeVisible();
+    await expect(canvas.getByText("R$12.50")).toBeVisible();
+    await waitFor(() => expect(editButton).toHaveFocus());
+  },
+};
+
+/**
+ * The app refuses one of 2 changed rows. The saved row is no longer changed.
+ * The refused row keeps its values, and the error text of the app is in a row
+ * of its own under it. The button counts 1 row and has the focus.
+ */
+export const EditTableSaveError: Story = {
+  args: EditTable.args,
+  render: (args) => <TableEditGrid {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Edit table" }));
+    await userEvent.type(canvas.getByRole("textbox", { name: "Product — Pão de queijo" }), " large");
+    const price = canvas.getByRole("textbox", { name: "Price — Espresso coffee" });
+    await userEvent.clear(price);
+    await userEvent.type(price, "twelve");
+    await userEvent.click(canvas.getByRole("button", { name: "Save changes (2)" }));
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "Espresso coffee: The price must be a number, for example 12.50.",
+    );
+    const saveButton = canvas.getByRole("button", { name: "Save changes (1)" });
+    await waitFor(() => expect(saveButton).toHaveFocus());
+  },
 };

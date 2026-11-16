@@ -306,3 +306,23 @@ Checked on 2026-11-15 in the built app (`next start`), with Chromium driven by P
 The comparison of each component with Intraweb's own file, value by value, is in the 4 entries of phase 10 in [`docs/decisions.md`](../../docs/decisions.md) (TOR-1164 to TOR-1167).
 
 Not checked: a real screen reader (VoiceOver or NVDA), and browsers other than Chromium.
+
+## The parts of the DataGrid (TOR-1209, the routes `/data/grid-parts` and `/data/address`)
+
+The route `/data/grid-parts` shows the parts of the DataGrid that version 0.3.0 adds. Its page is a Server Component; each grid is a Client Component file of the folder `app/data/grid-parts/`.
+
+| File | What it shows |
+|---|---|
+| `SavedColumnsGrid.tsx` | The filter of a column and the menu "Columns". The hidden columns are saved in `localStorage` by the hook `useSavedHiddenColumns` of this file; the library saves nothing |
+| `EditableProductsGrid.tsx` | Cells edited in the grid: a text, a select, a number and a checkbox. A price that is not a number is refused, so the error state can be seen |
+| `TableEditGrid.tsx` | The mode "Edit table" (TOR-1216): every cell with an editor is a field, and each changed row is saved as one. A row with a price that is not a number is refused, so the error under a row can be seen |
+| `ComplementGroupsGrid.tsx` | Rows inside a row, with a cell of an item edited in place |
+| `ProductViewsGrid.tsx` | Cards in the place of the table, with the same search and filters |
+
+The route `/data/address` shows a grid whose search, sort, filters and page are in the address of the page. The adapter is `app/data/address/grid-address.ts` (the state as query parameters, and back) and `app/data/address/use-grid-address.ts` (the navigation of Next.js). The same code is in `packages/ui/README.md`.
+
+Checked on 2026-11-15 in the built app (`next start`), with a Playwright script in Chromium, 23 checks, all pass:
+
+- `/data/address`: a search writes `?busca=cake`; 2 presses on "Price" write `ordem=-price`; 2 checked choices write `f-category=Bakery,Drinks` (the comma is not written as a code); unchecking the default of "Status" writes `f-status=`; the next page writes `pagina=2`; another page size writes `por-pagina=25` and removes `pagina`. After a reload the address, the rows, the sort and the filters are the same. An address opened directly (`?busca=a&ordem=-price&f-category=Bakery,Drinks&f-status=&pagina=2&outro=1`) starts the grid with that state, and "Clear filters" leaves `?ordem=-price&outro=1`.
+- `/data/grid-parts`: hiding "Stock" and showing "Supplier" saves `["stock"]` in `localStorage`; after a reload the columns are the saved ones; "Back to default" removes the saved value. A refused price shows the error text of the app and the field has the focus; a valid price is saved. In the mode "Edit table", 2 changed cells of one row are saved as one row, and a refused row shows the error text of the app under it while the other row is saved. A row of the groups opens. The search applies to the cards and to the table.
+- The browser console had no message.

@@ -156,13 +156,21 @@ export type {
 export { DataGrid, dataGridPageSizes } from "./data-grid/index.js";
 export type {
   DataGridCheckboxProps,
+  DataGridCellValue,
   DataGridColumn,
+  DataGridColumnEditor,
+  DataGridColumnFilter,
+  DataGridFilters,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridOption,
+  DataGridRowChanges,
   DataGridProps,
   DataGridSelectProps,
   DataGridSort,
   DataGridState,
+  DataGridSubRows,
 } from "./data-grid/index.js";
 export { ListItem } from "./list-item/index.js";
 export type { ListItemProps } from "./list-item/index.js";

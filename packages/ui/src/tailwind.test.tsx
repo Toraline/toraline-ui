@@ -74,6 +74,7 @@ import {
   Tr,
   tableCellAlignments,
 } from "./index";
+import type { DataGridColumn } from "./index";
 import { Example, exampleSizes, exampleVariants } from "./template/index";
 import { ThemeProvider, ThemeToggle } from "./theme/index";
 
@@ -162,6 +163,113 @@ const gridColumns = [
 ];
 
 const menuItems = [{ label: "Send by e-mail", onSelect: () => undefined, icon: <svg /> }];
+
+/** TOR-1209: the parts of the DataGrid that open or that are shown only with their prop. */
+const gridPartsColumns: DataGridColumn<GridRow>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (row) => row.name,
+    editor: { type: "text", value: (row) => row.name },
+    editOnClick: true,
+    filter: { type: "text", value: (row) => row.name },
+  },
+  {
+    id: "size",
+    header: "Size",
+    cell: () => "Small",
+    editor: { type: "select", value: () => "", options: [{ value: "small", label: "Small" }] },
+    editOnClick: true,
+  },
+  {
+    id: "listed",
+    header: "Listed",
+    cell: () => "Yes",
+    editor: { type: "checkbox", value: () => true },
+    editOnClick: true,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (row) => row.price,
+    filter: {
+      type: "options",
+      options: [
+        { value: "cheap", label: "Up to 8" },
+        { value: "other", label: "More than 8" },
+      ],
+      value: (row) => (row.price <= 8 ? "cheap" : "other"),
+      defaultValues: ["cheap"],
+    },
+  },
+  {
+    id: "id",
+    header: "Number",
+    cell: (row) => row.id,
+    editor: { type: "number", value: (row) => String(row.id) },
+    editOnClick: true,
+    filter: {
+      type: "options",
+      options: [{ value: "1", label: "One" }],
+      value: (row) => String(row.id),
+    },
+  },
+];
+
+function GridPartsExamples() {
+  return (
+    <DataGrid
+      caption="Products with filters"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+      columnsMenu
+      hiddenColumns={["price"]}
+      onSaveCell={() => Promise.reject(new Error("Not saved"))}
+      subRows={{
+        label: "sizes",
+        getRows: (row) => (row.id === 1 ? [{ id: 1, name: "Small" }] : []),
+        columns: [
+          {
+            id: "name",
+            header: "Size",
+            align: "right",
+            cell: (size: { id: number; name: string }) => size.name,
+          },
+        ],
+        getRowKey: (size) => size.id,
+        getRowLabel: (size) => size.name,
+        rowActions: () => <button type="button">Remove</button>,
+        footer: () => <button type="button">Add a size</button>,
+      }}
+    />
+  );
+}
+
+/** TOR-1214: a grid that shows a view, so its filters are labelled buttons in the toolbar. */
+function GridViewExample() {
+  return (
+    <DataGrid
+      caption="Products as a list"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+      renderView={(rows) => <p>{rows.length} products</p>}
+    />
+  );
+}
+
+/** The buttons that open a part of the DataGrid of TOR-1209, in the order they are pressed. */
+const gridPartsButtonNames = [
+  "Filter Product",
+  "Filter Number",
+  "Columns",
+  "Show sizes of Coffee (1)",
+  "Show sizes of Cheese bread (0)",
+];
 
 /** The floating panels of phase 9: each one opens with a press on its button. */
 const floatingButtonNames = [
@@ -474,6 +582,46 @@ async function renderEveryComponent(): Promise<string[]> {
     await user.click(screen.getByRole("button", { name: buttonName }));
     collect();
   }
+  // TOR-1209: the parts of the DataGrid, each one open.
+  render(<GridPartsExamples />);
+  for (const buttonName of gridPartsButtonNames) {
+    await user.click(screen.getByRole("button", { name: buttonName }));
+    collect();
+  }
+  // TOR-1216: the mode "Edit table", with a changed row, and then with a row that the app refused.
+  const { unmount: unmountEditTable } = render(
+    <DataGrid
+      caption="Products to edit"
+      columns={gridPartsColumns}
+      rows={gridRows}
+      getRowKey={(row) => row.id}
+      getRowLabel={(row) => row.name}
+      onSaveRow={() => Promise.reject(new Error("Not saved"))}
+    />,
+  );
+  collect();
+  await user.click(screen.getByRole("button", { name: "Edit table" }));
+  await user.type(screen.getByLabelText("Product — Coffee"), "!");
+  collect();
+  await user.click(screen.getByRole("button", { name: "Save changes (1)" }));
+  await screen.findByRole("alert");
+  collect();
+  unmountEditTable();
+  // TOR-1214: the labelled buttons of the filters above a view.
+  const { unmount: unmountGridView } = render(<GridViewExample />);
+  collect();
+  unmountGridView();
+  // TOR-1212: a text field, a number field and a select, each one open; the number with a changed value and an error.
+  await user.click(screen.getByRole("button", { name: /Edit Product — Coffee/ }));
+  collect();
+  await user.click(screen.getByRole("button", { name: /Edit Size — Coffee/ }));
+  collect();
+  await user.click(screen.getByRole("button", { name: /Edit Number — Coffee/ }));
+  await user.keyboard("5");
+  collect();
+  await user.keyboard("{Enter}");
+  await screen.findByRole("alert");
+  collect();
   // Phase 9: the overlays come last. An open Modal keeps the focus, so nothing behind it could be opened.
   render(<OverlayExamples />);
   collect();
@@ -658,6 +806,16 @@ describe("the class of the state that must win comes later in the built CSS", ()
     ["hover:bg-subtle", "data-checked:bg-selected"],
     ["text-icon", "in-aria-[sort=ascending]:text-icon-brand"],
     ["opacity-60", "in-aria-[sort=descending]:opacity-100"],
+    // TOR-1210, the button of a column filter: a filter that is on wins over the look at rest
+    // and over the pointer, and the pointer over a filter that is on has its own background.
+    ["text-icon", "data-active:text-icon-brand"],
+    ["hover:text-icon-strong", "data-active:text-icon-brand"],
+    ["hover:bg-muted", "data-active:bg-primary-subtle"],
+    ["data-active:bg-primary-subtle", "data-active:hover:bg-primary-muted"],
+    ["border-default", "data-active:border-brand"],
+    // TOR-1212, a cell that is edited: the pencil is shown under the pointer and with the keyboard focus.
+    ["opacity-0", "group-hover/editable-cell:opacity-100"],
+    ["opacity-0", "group-focus-visible/editable-cell:opacity-100"],
     // DetailPanel: the width of a wide screen wins over the full width.
     ["w-full", "xl:w-90"],
   ])('"%s" comes before "%s"', (losingClass, winningClass) => {
@@ -665,6 +823,15 @@ describe("the class of the state that must win comes later in the built CSS", ()
     const winningIndex = cssFromSource.indexOf(`${selectorOf(winningClass)}`);
     expect(losingIndex).toBeGreaterThan(-1);
     expect(winningIndex).toBeGreaterThan(losingIndex);
+  });
+
+  test("TOR-1212: the border and the background of a changed cell win over the pointer, the focus and a value that is not valid", () => {
+    // "!" at the end of a class makes its declaration "!important", which no other class of the field has.
+    for (const className of ["border-changed!", "bg-warning!"]) {
+      const start = cssFromSource.indexOf(selectorOf(className));
+      expect(start).toBeGreaterThan(-1);
+      expect(cssFromSource.slice(start, cssFromSource.indexOf("}", start))).toContain("!important");
+    }
   });
 
   test("the border of a field that is not valid is selected by aria-invalid", () => {

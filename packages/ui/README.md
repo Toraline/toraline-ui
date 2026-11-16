@@ -1256,7 +1256,7 @@ import { ActionsTh, DataTable, DataTableMessage, IconButton, Td, Th, Tr } from "
 
 ### `DataGrid`
 
-A table of records with a search field, a sort by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
+A table of records with a search field, a sort and a filter by column, pages, a selection with actions for the selected rows, a footer row with totals, and groups of rows. The app gives every record; the grid searches, filters, sorts and cuts them into pages in the browser. It loads no data. Each feature is turned on by its prop or by a field of a column.
 
 ```tsx
 "use client";
@@ -1306,15 +1306,23 @@ const columns: DataGridColumn<Product>[] = [
 | `pageSize` | A number | Turns on the pages: the number of rows of a page until the person chooses another |
 | `pageSizeOptions` | A list of numbers. Default `10, 25, 50, 100` | The numbers a person can choose. `pageSize` is added when it is not in the list |
 | `selection` | `{ actions: (rows, clear) => elements }` | Turns on a checkbox in each row and one in the header, which selects every row the search found. While a row is selected, a bar shows the number of selected rows and what `actions` returns. `clear()` clears the selection |
+| `onSaveCell` | A function `(row, columnId, value) => Promise` | Saves one cell of a column with `editOnClick`. See [Editing a cell in place](#editing-a-cell-in-place) |
+| `onSaveRow` | A function `(row, changes) => Promise` | Turns on the mode "Edit table", and saves one changed row. See [The mode that edits the table](#the-mode-that-edits-the-table) |
+| `getSaveErrorMessage` | A function `(error) => text` | The text for an error that `onSaveCell` or `onSaveRow` was rejected with. When missing: the message of an `Error`, or `labels.saveFailed` |
+| `columnsMenu` | `true`, `false` (default) | Turns on the menu "Columns", where a person hides and shows the columns. See [The menu of the columns](#the-menu-of-the-columns) |
+| `hiddenColumns` | A list of column ids | The hidden columns, when the app keeps the choice. When missing: the grid keeps it, and starts with the columns that have `defaultHidden` hidden |
+| `onHiddenColumnsChange` | A function | Called with the list of the hidden column ids after a person changes the columns in the menu |
 | `rowActions` | A function | The buttons of the last column of a row |
 | `isRowSelected` | A function | `true` for the record that is open, for example in a panel next to the grid. Its row gets `aria-current="true"` |
 | `renderExpanded` | A function | Content shown in a row of its own under the row of a record. `null`: no extra row |
 | `rowProps` | A function | Props for the `<tr>` of a row, for example the handlers of a drag |
-| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no selection and no pages |
+| `renderView` | A function `(rows) => elements` | Shows another view in the place of the table. See [Another view in the place of the table](#another-view-in-the-place-of-the-table) |
+| `subRows` | An object | The items inside each row, shown by an arrow. See [Rows inside a row](#rows-inside-a-row) |
+| `groups` | A list of `{ key, title, rows, actions, headerProps }` | Shows the rows in blocks, each with a header row: its title, the number of its rows and its buttons. With groups there is no search, no sort, no filter, no selection and no pages |
 | `emptyMessage` | Text or elements. Default `"No records."` | The message when `rows` is empty |
 | `loading` | `true`, `false` (default) | `true` while the records load: the table has `aria-busy="true"` and shows the text of `labels.loading` in the place of the rows |
-| `defaultState` | `{ search, sort, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null` |
-| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, the page or the page size, for example to write them in the address of the page |
+| `defaultState` | `{ search, sort, filters, page, pageSize }`, each one optional | What the grid starts with, for example read from the address of the page. `sort` is `{ columnId, descending }` or `null`. `filters` is described in [The filter of a column](#the-filter-of-a-column) |
+| `onStateChange` | A function | Called with the full state after a person changes the search text, the sort, a filter, the page or the page size, for example to write them in the address of the page |
 | `locale` | A language, for example `"pt-BR"` | The language that orders the texts of a sort. When missing: the language of the browser |
 | `labels` | An object | The texts of the grid. Each one that is missing has its English default. See below |
 | `checkboxComponent` | A component | The checkbox of a row and of the header. When missing: the `CheckboxControl` of this library |
@@ -1331,18 +1339,531 @@ A column (`DataGridColumn<Row>`):
 | `align` | `"left"`, `"center"`, `"right"` | The side the content is aligned to. `right` is for numbers |
 | `sortValue` | A function that returns a text, a number or `null` | Turns on the sort by this column. A press on the header sorts ascending, a second press descending, a third press removes the sort. A record with `null` is always at the end. A text with a number is ordered by the number (`P9` before `P10`) |
 | `searchValue` | A function that returns a text | The text of this column that the search looks in |
-| `footer` | A function that receives the rows after the search | The content of the footer cell. The footer row is shown when a column has `footer` |
+| `footer` | A function that receives the rows after the search and the filters | The content of the footer cell. The footer row is shown when a column has `footer` |
+| `required` | `true`, `false` (default) | `true`: the column is always shown, and it is not in the menu "Columns" |
+| `defaultHidden` | `true`, `false` (default) | `true`: the column is hidden until a person turns it on in the menu "Columns" |
+| `editor` | `{ type, value }`, and `options` for a select | The field that edits a cell of this column: `"text"`, `"number"`, `"select"` or `"checkbox"`. It is used by a cell edited by a press (`editOnClick`) and by the mode "Edit table" (`onSaveRow`) |
+| `editOnClick` | `true`, `false` (default) | `true`: a press on a cell of this column edits it in place. It needs `editor` and the prop `onSaveCell` of the grid |
+| `canEdit` | A function | `false` for a record whose cell cannot be edited, for example an archived record |
+| `filter` | `{ type: "options", options, value, defaultValues }` or `{ type: "text", value }` | Turns on the filter of this column. See [The filter of a column](#the-filter-of-a-column) |
 
-The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`).
+The texts (`labels`), with their defaults: `actions` (`"Actions"`), `clearFilters` (`"Clear filters"`), `noResults` (`"No results with these filters."`), `loading` (`"Loading…"`), `total` (`"Total"`), `bulkActions` (`"Bulk actions"`), `selectedCount(count)` (`"3 selected"`), `clearSelection` (`"Clear selection"`), `selectAll` (`"Select all"`), `selectRow(rowLabel)` (`"Select Coffee"`), `pagination` (`"Pagination"`), `pageRange(firstRow, lastRow, rowCount)` (`"Showing 1–10 of 34"`), `rowsPerPage` (`"Per page"`), `pageOf(page, pageCount)` (`"1 of 4"`), `previousPage` (`"Previous page"`), `nextPage` (`"Next page"`), `filterColumn(columnHeader, isActive)` (`"Filter Status"`, `"Filter Status (filter on)"`), `filterChoices(columnHeader)` (`"Show Status"`), `filterSelectAll` (`"Select all"`), `filterClear` (`"Clear"`), `filterContains` (`"Contains…"`), `cellLabel(columnHeader, rowLabel)` (`"Price — Coffee"`), `editCell(cellLabel)` (`"Edit Price — Coffee:"`), `saving` (`"Saving…"`), `saveFailed` (`"Could not save."`), `selectPlaceholder` (`"Select…"`), `editTable` (`"Edit table"`), `noChanges` (`"No changes"`), `changedRows(count)` (`"2 rows changed"`), `cancelEditing` (`"Cancel"`), `saveChanges(count)` (`"Save changes (2)"`), `savingChanges` (`"Saving…"`), `rowError(rowLabel, errorMessage)` (`"Coffee: The price is not valid."`), `showSubRows(subRowsLabel, rowLabel, count)` (`"Show options of Milk (3)"`), `hideSubRows(subRowsLabel, rowLabel, count)` (`"Hide options of Milk (3)"`), `subRowsCaption(subRowsLabel, rowLabel)` (`"options of Milk"`), `noSubRows` (`"No items."`), `columns` (`"Columns"`), `visibleColumns` (`"Visible columns"`), `resetColumns` (`"Back to default"`).
 
 - The classes are the ones of the DataGrid of the app Intraweb (`components/ui/data-grid/`). The table, the header with a sort, the pages and the bar of the selected rows were compared with Intraweb's in both themes.
 - The table is a [`DataTable`](#datatable-tr-th-td-actionsth-datatablemessage) with `stackOnMobile`: on a screen less than 768 pixels wide, each row is a block. A table wider than its box scrolls sideways.
 - Keyboard: every control is a native element. Tab goes through the search field, the sort buttons, the checkboxes, the buttons of the rows and the page controls; Enter and Space press a button; Space checks a checkbox.
 - Screen reader: the header cell of a column with `sortValue` has `aria-sort` (`none`, `ascending`, `descending`). The bar of the selected rows is a region with the name of `labels.bulkActions`, and its count is a status. The page controls are a navigation region. The checkbox of the header is "mixed" while only some rows are selected.
 - `checkboxComponent` receives `checked`, `disabled`, `onChange`, `aria-label` and `ref` (type `DataGridCheckboxProps`). It must give `ref` to its `<input>`. `selectComponent` receives `size="sm"`, `className="w-20"`, `value`, `onChange` and `<option>` children (type `DataGridSelectProps`). They exist because the Checkbox and the Select of the library are built in another phase; when they are in the library, they become the defaults.
-- Not in the library yet, and still only in Intraweb: the filter of a column, the menu that chooses the columns, the editing of cells, the rows inside a row, another view in the place of the table, and saving the state in the address of the page or in the browser. The reasons are in the entry of TOR-1165 of [`docs/decisions.md`](../../docs/decisions.md).
-- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridGroup`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
+- Not in the library, and still only in Intraweb: a cell edited with several choices (the editor `multiselect`). No screen of Intraweb uses it.
+- The list `dataGridPageSizes` and the types `DataGridProps`, `DataGridColumn`, `DataGridColumnEditor`, `DataGridCellValue`, `DataGridRowChanges`, `DataGridColumnFilter`, `DataGridOption`, `DataGridFilters`, `DataGridFilterValue`, `DataGridGroup`, `DataGridSubRows`, `DataGridSort`, `DataGridState`, `DataGridLabels`, `DataGridCheckboxProps` and `DataGridSelectProps` are exported.
 - It is a Client Component, because it holds state. Its columns have functions, so the file of the app that uses it is a Client Component too. A Server Component page gives the records to that file.
+
+#### The filter of a column
+
+A column with `filter` has a small button in its header. A press opens a panel with a list of choices or a text field. Each change filters the rows at once.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    // A text field: the rows whose name has the text.
+    filter: { type: "text", value: (product) => product.name },
+  },
+  {
+    id: "status",
+    header: "Status",
+    cell: (product) => (product.active ? "Active" : "Inactive"),
+    // A list of choices. "Active" is checked until a person changes the filter.
+    filter: {
+      type: "options",
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ],
+      value: (product) => (product.active ? "active" : "inactive"),
+      defaultValues: ["active"],
+    },
+  },
+];
+```
+
+| Field of `filter` | Values | Meaning |
+|---|---|---|
+| `type` | `"options"`, `"text"`. Required | A list of choices with a checkbox each, or a text field |
+| `value` | A function. Required | For `"text"`: the text of a record that the filter looks in, with no difference for capital letters and accents. For `"options"`: the value of a record, or a list of values; with a list, one checked value is enough |
+| `options` | A list of `{ value, label }`. Required for `"options"` | The choices, in the order they are shown |
+| `defaultValues` | A list of values. Only for `"options"` | The choices that are checked until a person changes the filter, for example only the active records |
+
+- With no choice checked, a list of choices filters nothing.
+- The state of the grid has the filters: `state.filters` is an object with one entry for each column whose filter a person changed. The key is the `id` of the column. The value is the list of the checked values, or the text. A column that is not in the object has its default. An empty list means that a person unchecked the defaults. `defaultState.filters` has the same shape.
+- "Clear filters" is shown while the search field has a text or `state.filters` has an entry. It empties the search field and puts every filter back to its default. The defaults of a column do not count as a change.
+- The button of the header has the brand colors and `data-active` while its filter hides rows, and its name ends with the text of `labels.filterColumn(header, true)`.
+- Keyboard: Enter or Space on the button opens the panel, and the focus goes to its first control. Tab and Shift+Tab stay inside the panel. Space checks a choice. Escape closes the panel and gives the focus back to the button; it does not reach a Modal or a Drawer under it. A press outside closes the panel.
+- Screen reader: the button has `aria-haspopup="dialog"` and `aria-expanded`. The panel is a dialog named "Filter" and the header of the column. It does not block the page.
+- The panel is rendered in `<body>` with [`useAnchoredPanel`](#useanchoredpanel), as the menu of ActionMenu is: the box of the table scrolls and would cut a panel inside it. Its choices are the library's `Checkbox` and its text field is `TextInput`.
+- A grid with `groups` shows no filter.
+
+#### The menu of the columns
+
+`columnsMenu` adds the button "Columns" at the right of the toolbar. It opens a list with a checkbox for each column that is not `required`. A column with `defaultHidden` starts hidden.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  { id: "name", header: "Product", required: true, cell: (product) => product.name },
+  { id: "category", header: "Category", cell: (product) => product.category },
+  { id: "supplier", header: "Supplier", defaultHidden: true, cell: (product) => product.supplier },
+];
+
+<DataGrid columnsMenu columns={columns} /* ... */ />
+```
+
+- The menu is the library's [`Popover`](#popover) with a `Checkbox` for each column. Keyboard: Enter or Space on the button opens it, Tab goes to the checkboxes, Space changes one, Escape closes it and gives the focus back to the button.
+- The button "Back to default" is shown after a change. It goes back to the columns the screen starts with, and the focus goes to the first checkbox.
+- A hidden column has no header, no cell and no footer cell. Its filter and its sort do not apply while it is hidden: a person could not see them or turn them off.
+- With no column to choose (every column `required`), the button is not shown.
+- Without `columnsMenu`, `defaultHidden` and `hiddenColumns` still hide columns; an app can then show its own control.
+
+The grid does not save the choice. An app that wants to remember it gives `hiddenColumns` and saves what `onHiddenColumnsChange` gives. This example keeps it in the storage of the browser (`localStorage`). It is the file `apps/playground/app/data/grid-parts/SavedColumnsGrid.tsx` of this repository:
+
+```tsx
+"use client";
+
+import { useMemo, useSyncExternalStore } from "react";
+import { DataGrid } from "@toraline.tech/ui";
+
+const CHANGE_EVENT = "my-app:hidden-columns-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(CHANGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(CHANGE_EVENT, onChange);
+  };
+}
+
+function readHiddenColumns(saved: string | null): string[] | undefined {
+  if (saved === null) {
+    return undefined;
+  }
+  try {
+    const parsed: unknown = JSON.parse(saved);
+    const isListOfTexts = Array.isArray(parsed) && parsed.every((item) => typeof item === "string");
+    return isListOfTexts ? (parsed as string[]) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function useSavedHiddenColumns(storageKey: string, defaultHiddenColumns: readonly string[]) {
+  // On the server and until the browser takes over the page: null, so the grid shows its default columns.
+  const saved = useSyncExternalStore(
+    subscribe,
+    () => window.localStorage.getItem(storageKey),
+    () => null,
+  );
+  const hiddenColumns = useMemo(() => readHiddenColumns(saved), [saved]);
+
+  function saveHiddenColumns(nextHiddenColumns: string[]) {
+    // Back to the default: nothing is kept, so a column added later follows its "defaultHidden".
+    if (nextHiddenColumns.join("\n") === defaultHiddenColumns.join("\n")) {
+      window.localStorage.removeItem(storageKey);
+    } else {
+      window.localStorage.setItem(storageKey, JSON.stringify(nextHiddenColumns));
+    }
+    window.dispatchEvent(new Event(CHANGE_EVENT));
+  }
+
+  return [hiddenColumns, saveHiddenColumns] as const;
+}
+
+const defaultHiddenColumns = columns.filter((column) => column.defaultHidden).map((column) => column.id);
+
+export function ProductsGrid({ products }: { products: Product[] }) {
+  const [hiddenColumns, saveHiddenColumns] = useSavedHiddenColumns("my-app:columns:products", defaultHiddenColumns);
+  return (
+    <DataGrid
+      /* caption, columns, rows, getRowKey, getRowLabel */
+      columnsMenu
+      hiddenColumns={hiddenColumns}
+      onHiddenColumnsChange={saveHiddenColumns}
+    />
+  );
+}
+```
+
+#### Editing a cell in place
+
+A column with `editor` and `editOnClick` is edited in the grid. The grid shows the field and the states; the app saves the value in `onSaveCell`.
+
+```tsx
+const columns: DataGridColumn<Product>[] = [
+  {
+    id: "name",
+    header: "Product",
+    cell: (product) => product.name,
+    editor: { type: "text", value: (product) => product.name },
+    editOnClick: canEdit,
+  },
+  {
+    id: "price",
+    header: "Price",
+    align: "right",
+    cell: (product) => formatMoney(product.price),
+    // The value is the text a person typed. The app reads the number when it saves.
+    editor: { type: "number", value: (product) => decimalToInput(product.price) },
+    editOnClick: canEdit,
+    canEdit: (product) => !product.archived,
+  },
+  {
+    id: "status",
+    header: "Status",
+    cell: (product) => (product.active ? "Active" : "Inactive"),
+    editor: {
+      type: "select",
+      value: (product) => (product.active ? "active" : "inactive"),
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ],
+    },
+    editOnClick: canEdit,
+  },
+];
+
+<DataGrid
+  /* caption, columns, rows, getRowKey, getRowLabel */
+  onSaveCell={async (product, columnId, value) => {
+    // A promise that is rejected leaves the field open with the error text.
+    await api.updateProduct(product.id, { [columnId]: value });
+  }}
+  getSaveErrorMessage={(error) => apiErrorText(error)}
+/>
+```
+
+| `editor.type` | The field | The value given to `onSaveCell` |
+|---|---|---|
+| `"text"` | [`TextInput`](#textinput), size `sm` | The text |
+| `"number"` | [`DecimalInput`](#decimalinput), size `sm`, aligned to the right | The text a person typed, with a comma or a point. The app reads the number, for example with `parseDecimalInput` |
+| `"select"` | [`Select`](#select), size `sm`, with the choices of `options` | The `value` of the choice |
+| `"checkbox"` | [`CheckboxControl`](#checkbox-and-checkboxcontrol) | `true` or `false` |
+
+- At rest the cell is a button with the content of the cell. The pointer over it, or the keyboard focus, shows a quiet background and a pencil. A press, Enter or Space shows the field, with the focus.
+- A text and a number are saved with Enter, and when the focus leaves the field. A select is saved when a choice is made. A checkbox is always shown and is saved when it is changed.
+- Escape gives up the change and gives the focus back to the cell. It does not reach a Modal or a Drawer under the grid.
+- A value that did not change is not saved.
+- A field whose value differs from the saved one has an orange border and a quiet orange background, and `data-changed="true"`.
+- Pending: while the promise of `onSaveCell` is not settled, the field is disabled, the cell has `aria-busy="true"`, and the text of `labels.saving` is shown under the field as a status.
+- Saved: the field closes. After Enter, the focus goes back to the button of the cell. The app gives the new records in `rows`, so the cell shows the new value.
+- Error: when the promise is rejected, the field stays open with the value a person typed. The error text is under it, as an alert, and is the description of the field (`aria-describedby`, with `aria-invalid="true"`). After Enter, the field has the focus again. The text is what `getSaveErrorMessage(error)` returns; without that prop it is the message of the `Error`, or `labels.saveFailed`.
+- Screen reader: the button of a cell is named "Edit", the column, the record and the content of the cell (`labels.editCell`, `labels.cellLabel`). The field is named by the column and the record.
+- `editOnClick` is a true or false value, so an app gives the permission of the person there (`editOnClick: canEdit`). `canEdit(row)` refuses single records.
+- A select whose record has a value that is not one of the choices shows the text of `labels.selectPlaceholder`, so the first choice does not look like the value.
+- Not built: a field with several choices (Intraweb's `multiselect`, which no screen of Intraweb uses).
+
+#### The mode that edits the table
+
+`onSaveRow` adds the button "Edit table" at the right of the toolbar. A press turns every cell of a column with `editor` into a field. A person changes the cells of as many rows as they want, and one button saves each changed row as one.
+
+```tsx
+const columns: DataGridColumn<Category>[] = [
+  {
+    id: "name",
+    header: "Category",
+    cell: (category) => category.name,
+    editor: { type: "text", value: (category) => category.name },
+  },
+  {
+    id: "isActive",
+    header: "Active",
+    cell: (category) => (category.isActive ? "Yes" : "No"),
+    editor: { type: "checkbox", value: (category) => category.isActive },
+  },
+];
+
+<DataGrid
+  /* caption, columns, rows, getRowKey, getRowLabel */
+  onSaveRow={async (category, changes) => {
+    // "changes" has only the cells a person changed, by the id of the column: { name: "Drinks" }.
+    // A promise that is rejected keeps the row changed, with the error text under it.
+    await api.updateCategory(category.id, changes);
+  }}
+  getSaveErrorMessage={(error) => apiErrorText(error)}
+/>
+```
+
+- The button "Edit table" is shown when the grid has `onSaveRow` and a column has `editor`. It is disabled while `rows` is empty. It is not shown above [another view](#another-view-in-the-place-of-the-table).
+- In the mode, the toolbar shows a status ("No changes", "2 rows changed"), the button "Cancel" and the button "Save changes (2)", which is disabled while no row is changed. The menu of the columns is hidden.
+- The fields are the ones of [a cell edited in place](#editing-a-cell-in-place), all shown at once. `editOnClick` is not needed. `canEdit(row)` refuses single records.
+- A changed field has the orange border and `data-changed="true"`. A row with a changed cell has a quiet orange background and `data-changed="true"`. A value that is the saved one again is not a change.
+- "Save changes" calls `onSaveRow(row, changes)` once for each changed row, one after the other. `changes` (type `DataGridRowChanges`) has only the changed cells of the row.
+- Pending: while the app saves, the fields and the 2 buttons are disabled, the button says "Saving…", and the table has `aria-busy="true"`.
+- Saved: when every row is saved, the mode ends and the focus goes to the button "Edit table". The app gives the new records in `rows`.
+- Error: a row whose promise is rejected stays changed, with its values. The error text is in a row of its own under it, as an alert: the label of the record and the text of `getSaveErrorMessage(error)` (without that prop: the message of the `Error`, or `labels.saveFailed`). The rows that were saved are no longer changed. The button counts the rows that are left and has the focus.
+- "Cancel" gives up every change and ends the mode. The focus goes to the button "Edit table".
+- In the mode a row has no buttons (`rowActions`), no checkbox (`selection`), no extra content (`renderExpanded`), no arrow (`subRows`) and no props of the app (`rowProps`, for example a drag). The buttons of a group are hidden. The search, the filters, the sort and the pages still work, and the changes of a row that is not shown are kept.
+- Keyboard: Enter or Space on "Edit table" starts the mode, and the focus goes to the first field. Tab goes from field to field and then to the buttons. Enter in a field does nothing: only the button saves.
+- An app can have both: a column with `editOnClick` is edited by a press outside the mode, and is a field in the mode.
+
+#### Rows inside a row
+
+`subRows` gives each row an arrow before its first cell. A press shows the items of the record in a small table, in a row of its own right under the row.
+
+```tsx
+<DataGrid
+  caption="Groups of complements"
+  columns={groupColumns}
+  rows={groups}
+  getRowKey={(group) => group.id}
+  getRowLabel={(group) => group.name}
+  subRows={{
+    label: "options",
+    getRows: (group) => group.options,
+    columns: optionColumns,
+    getRowKey: (option) => option.id,
+    getRowLabel: (option) => option.name,
+    onSaveCell: (group, option, columnId, value) => api.updateOption(group.id, option.id, { [columnId]: value }),
+    rowActions: (group, option) => <IconButton icon={Trash2} size="sm" aria-label={`Remove ${option.name}`} />,
+    footer: (group) => <AddOptionForm group={group} />,
+    emptyMessage: "No option in this group.",
+  }}
+/>
+```
+
+| Field of `subRows` | Values | Meaning |
+|---|---|---|
+| `label` | Text. Required | The name of the items in the plural, for example `"options"`. It is in the name of the arrow and of the inner table |
+| `getRows` | A function. Required | The items of a record |
+| `columns` | A list of columns. Required | The columns of the inner table. Of a column, `id`, `header`, `cell`, `align`, `editor`, `editOnClick` and `canEdit` are used |
+| `getRowKey` | A function. Required | A value no other item of the record has |
+| `getRowLabel` | A function. Required | The name of the item for a screen reader |
+| `onSaveCell` | A function `(row, subRow, columnId, value) => Promise` | Saves one cell of an item. It works as [the editing of a cell](#editing-a-cell-in-place), with the same states and the same error text |
+| `rowActions` | A function `(row, subRow) => elements` | The buttons of the last column of an item |
+| `footer` | A function `(row) => elements` | Content under the items, for example a field that adds an item |
+| `emptyMessage` | Text or elements. Default `labels.noSubRows` | The message of a record with no item |
+
+- The arrow is a button with `aria-expanded`, and `aria-controls` while the items are shown. Its name is `labels.showSubRows` or `labels.hideSubRows`, with the number of items. Enter and Space press it, and it keeps the focus.
+- Several rows can be open at the same time. The grid keeps which rows are open.
+- The inner table is named by `labels.subRowsCaption`. When it is wider than its box it scrolls sideways, and the box can get the keyboard focus.
+- The items have no search, no sort, no filter and no menu of the columns.
+- The generic type of the grid has a second part for the items: `DataGridProps<Row, SubRow>`. TypeScript reads it from `subRows`.
+
+#### Another view in the place of the table
+
+`renderView` shows what the app returns in the place of the table, for example a calendar or cards. It receives the rows after the search, the filters and the sort, for every page.
+
+```tsx
+const [view, setView] = useState<"list" | "calendar">("list");
+
+<DataGrid
+  /* caption, columns, rows, getRowKey, getRowLabel */
+  search={{ placeholder: "Search the events" }}
+  toolbar={<ViewSwitch value={view} onChange={setView} />}
+  renderView={view === "calendar" ? (events) => <EventCalendar events={events} /> : undefined}
+/>
+```
+
+- The app keeps which view is shown: it gives `renderView` for the other view, and `undefined` for the table. The grid keeps the search and the filters, so they stay when the view changes, and they apply to both.
+- The search field, the `toolbar` and "Clear filters" stay above the view.
+- A view has no header cells. So the filter of each column that is shown moves to the toolbar, as a button 32 pixels high with the filter icon and the name of the column. Its panel, its keyboard and its name are the ones of [the filter of a column](#the-filter-of-a-column).
+- With a view there is no selection, no pages and no menu of the columns. `loading` and `emptyMessage` belong to the table: the view shows its own text for no rows.
+- The view is inside an element with `data-slot="view"`.
+
+#### Keeping the state in the address of the page
+
+The grid does not read or write the address of the page, and the library does not import Next.js. The app does it with 2 props: `defaultState` is what the grid starts with, and `onStateChange` is called with the full state after each change. The adapter below keeps the search, the sort, the filters, the page and the page size in the query parameters of the address, with the navigation of Next.js. After a reload, or when a person opens a saved link, the grid is the same.
+
+The example is the route `/data/address` of the playground of this repository (`apps/playground/app/data/address/`). The parameter names are the ones of the app Intraweb, so its saved addresses keep working:
+
+| Parameter | Example | Meaning |
+|---|---|---|
+| `busca` | `busca=cake` | The text of the search field |
+| `ordem` | `ordem=name`, `ordem=-name` | The `id` of the sorted column. `-` in front means descending |
+| `f-<column id>` | `f-status=active,paused` | The checked choices of the filter of that column, with commas; or the text of a text filter |
+| `f-<column id>` | `f-status=` | Empty: a person unchecked the default choices of the column |
+| `pagina` | `pagina=3` | The page. Not written for the first page |
+| `por-pagina` | `por-pagina=50` | The rows of a page. Not written for the page size of the screen |
+
+A value that is the default is not written, so the address of a grid that nobody changed has no parameter.
+
+File 1, `grid-address.ts`: the state as query parameters, and back. It knows no router, so it also works with another router.
+
+```ts
+const SEARCH = "busca";
+const SORT = "ordem";
+const FILTER_PREFIX = "f-";
+const PAGE = "pagina";
+const PAGE_SIZE = "por-pagina";
+
+/** What reads one query parameter: URLSearchParams, and the result of useSearchParams of Next.js. */
+type QueryReader = { get: (name: string) => string | null };
+
+function readSort(text: string | null): DataGridSort {
+  if (text === null || text === "") {
+    return null;
+  }
+  return text.startsWith("-") ? { columnId: text.slice(1), descending: true } : { columnId: text, descending: false };
+}
+
+/** The filters of the address. Only a column that has a filter is read. */
+function readFilters<Row>(query: QueryReader, columns: readonly DataGridColumn<Row>[]): DataGridFilters {
+  const filters: DataGridFilters = {};
+  for (const column of columns) {
+    const text = query.get(`${FILTER_PREFIX}${column.id}`);
+    if (column.filter === undefined || text === null) {
+      continue;
+    }
+    if (column.filter.type === "options") {
+      // An empty text is an empty list: every default choice unchecked.
+      filters[column.id] = text === "" ? [] : text.split(",");
+    } else if (text !== "") {
+      filters[column.id] = text;
+    }
+  }
+  return filters;
+}
+
+/**
+ * The state that the grid starts with, read from the address: give it to
+ * "defaultState". A page size that is not one of "pageSizes" is ignored.
+ */
+export function readGridState<Row>(
+  query: QueryReader,
+  columns: readonly DataGridColumn<Row>[],
+  pageSizes: readonly number[],
+): Partial<DataGridState> {
+  const pageSize = Number(query.get(PAGE_SIZE));
+  return {
+    search: query.get(SEARCH) ?? "",
+    sort: readSort(query.get(SORT)),
+    filters: readFilters(query, columns),
+    page: Math.max(1, Math.floor(Number(query.get(PAGE))) || 1),
+    ...(pageSizes.includes(pageSize) ? { pageSize } : {}),
+  };
+}
+
+/**
+ * The query parameters of a state of the grid: what "onStateChange" writes in
+ * the address. null means "take this parameter out of the address". A value
+ * that is the default (no search, no sort, the first page, the page size of
+ * the screen, the default of a filter) is taken out, so the address stays short.
+ */
+export function gridStateToQuery<Row>(
+  state: DataGridState,
+  columns: readonly DataGridColumn<Row>[],
+  defaultPageSize: number,
+): Record<string, string | null> {
+  const sortPrefix = state.sort?.descending ? "-" : "";
+  const query: Record<string, string | null> = {
+    [SEARCH]: state.search === "" ? null : state.search,
+    [SORT]: state.sort === null ? null : `${sortPrefix}${state.sort.columnId}`,
+    [PAGE]: state.page > 1 ? String(state.page) : null,
+    [PAGE_SIZE]: state.pageSize === defaultPageSize ? null : String(state.pageSize),
+  };
+  for (const column of columns) {
+    if (column.filter === undefined) {
+      continue;
+    }
+    const value = state.filters[column.id];
+    const text = typeof value === "string" ? value : value?.join(",");
+    query[`${FILTER_PREFIX}${column.id}`] = text ?? null;
+  }
+  return query;
+}
+```
+
+The file starts with `import type { DataGridColumn, DataGridFilters, DataGridSort, DataGridState } from "@toraline.tech/ui";`.
+
+File 2, `use-grid-address.ts`: the navigation of Next.js.
+
+```ts
+"use client";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { dataGridPageSizes } from "@toraline.tech/ui";
+import type { DataGridColumn, DataGridState } from "@toraline.tech/ui";
+import { gridStateToQuery, readGridState } from "./grid-address";
+
+/** URLSearchParams writes "," ":" "(" ")" and "!" as codes. They are allowed as they are, and the address is easier to read. */
+const READABLE: Record<string, string> = { "%2C": ",", "%3A": ":", "%28": "(", "%29": ")", "%21": "!" };
+
+function readableQuery(params: URLSearchParams): string {
+  return params.toString().replace(/%2C|%3A|%28|%29|%21/g, (code) => READABLE[code] ?? code);
+}
+
+/**
+ * Keeps the search, the sort, the filters and the page of a DataGrid in the
+ * address of the page, with the navigation of Next.js. It is the adapter
+ * between the grid and the router: the library does not import Next.js.
+ *
+ * - The address is read once, when the grid is first shown: "defaultState".
+ * - Each change of the grid replaces the address ("onStateChange"). It adds no
+ *   step to the history of the browser, and it does not scroll the page.
+ * - The other query parameters of the page are kept.
+ * - One grid for each page: the names have no prefix.
+ *
+ * The component that calls it must be inside <Suspense>, because it reads the
+ * query parameters (a rule of useSearchParams in Next.js).
+ */
+export function useGridAddress<Row>(columns: readonly DataGridColumn<Row>[], defaultPageSize: number) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [defaultState] = useState(() => readGridState(searchParams, columns, dataGridPageSizes));
+
+  function onStateChange(state: DataGridState) {
+    const params = new URLSearchParams(searchParams.toString());
+    for (const [name, value] of Object.entries(gridStateToQuery(state, columns, defaultPageSize))) {
+      if (value === null) {
+        params.delete(name);
+      } else {
+        params.set(name, value);
+      }
+    }
+    const query = readableQuery(params);
+    router.replace(query === "" ? pathname : `${pathname}?${query}`, { scroll: false });
+  }
+
+  return { defaultState, onStateChange };
+}
+```
+
+The screen:
+
+```tsx
+"use client";
+
+const PAGE_SIZE = 25;
+
+export function ProductsGrid({ products }: { products: Product[] }) {
+  const { defaultState, onStateChange } = useGridAddress(columns, PAGE_SIZE);
+  return (
+    <DataGrid
+      /* caption, columns, rows, getRowKey, getRowLabel */
+      search={{ placeholder: "Search the products" }}
+      pageSize={PAGE_SIZE}
+      defaultState={defaultState}
+      onStateChange={onStateChange}
+    />
+  );
+}
+```
+
+```tsx
+// The page, a Server Component. useSearchParams needs <Suspense> around the component that calls it.
+<Suspense fallback={<p>Loading…</p>}>
+  <ProductsGrid products={products} />
+</Suspense>
+```
+
+- The address is read once, when the grid is first shown. After that the grid keeps its own state and answers at once; the address follows it.
+- Each change replaces the address (`router.replace`), so the "back" button of the browser leaves the page in one step.
+- The other query parameters of the page are kept, for example the one that opens a side panel.
+- One grid for each page: the names have no prefix.
+- The hidden columns are not in the address. They are a choice of the person, not of the link: see [The menu of the columns](#the-menu-of-the-columns).
 
 ### `ListItem`
 

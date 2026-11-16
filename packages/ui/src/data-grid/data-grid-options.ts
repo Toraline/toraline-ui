@@ -11,6 +11,60 @@ import type { TableCellAlignment } from "../data-table/index.js";
 /** The numbers of rows a person can choose for one page. */
 export const dataGridPageSizes = [10, 25, 50, 100] as const;
 
+/** One choice of a list: of the filter of a column, or of a cell that is edited with a select. */
+export type DataGridOption = {
+  /** The value the grid keeps and gives back to the app. */
+  value: string;
+  /** The text a person reads. */
+  label: string;
+};
+
+/**
+ * The filter in the header of a column.
+ *
+ * - "options": a list of choices with a checkbox each. A row is shown when its
+ *   value is one of the checked choices. With no choice checked, every row is shown.
+ * - "text": a text field. A row is shown when its value has the text, with no
+ *   difference for capital letters and accents.
+ */
+export type DataGridColumnFilter<Row> =
+  | {
+      type: "options";
+      /** The choices, in the order they are shown. */
+      options: readonly DataGridOption[];
+      /** The value of a record, or its values: with several, one checked value is enough. */
+      value: (row: Row) => string | readonly string[];
+      /** The choices that are checked until a person changes the filter, for example only the active records. */
+      defaultValues?: readonly string[];
+    }
+  | {
+      type: "text";
+      /** The text of a record that the filter looks in. */
+      value: (row: Row) => string;
+    };
+
+/** The value of a cell that is edited: a text (also for a number and for a select), or true or false for a checkbox. */
+export type DataGridCellValue = string | boolean;
+
+/** The changed cells of one row in the mode "Edit table": the new value of each changed cell, by the "id" of its column. */
+export type DataGridRowChanges = Record<string, DataGridCellValue>;
+
+/**
+ * The field that takes the place of a cell while it is edited. "value" reads
+ * the value of the record that the field starts with.
+ *
+ * - "text": a TextInput.
+ * - "number": a DecimalInput. Its value is the text a person typed, with a
+ *   comma or a point; the app reads the number when it saves.
+ * - "select": a Select with the choices of "options".
+ * - "checkbox": a CheckboxControl, which is always shown in the cell.
+ */
+export type DataGridColumnEditor<Row> =
+  | { type: "text"; value: (row: Row) => string }
+  | { type: "number"; value: (row: Row) => string }
+  | { type: "select"; value: (row: Row) => string; options: readonly DataGridOption[] }
+  | { type: "checkbox"; value: (row: Row) => boolean };
+
 /** One column of a DataGrid. "Row" is the type of one record. */
 export type DataGridColumn<Row> = {
   /** A name no other column of the grid has. The sort names the column by it. */
@@ -28,8 +82,58 @@ export type DataGridColumn<Row> = {
   sortValue?: (row: Row) => string | number | null;
   /** The text of this column that the search field looks in. */
   searchValue?: (row: Row) => string;
-  /** The content of the footer cell, computed from the rows after the search (every page). */
+  /** The content of the footer cell, computed from the rows after the search and the filters (every page). */
   footer?: (rows: Row[]) => ReactNode;
+  /** true: the column is always shown, and it is not in the menu "Columns". */
+  required?: boolean;
+  /** true: the column is hidden until a person turns it on in the menu "Columns". */
+  defaultHidden?: boolean;
+  /**
+   * The field that edits a cell of this column. It is used in the mode "Edit
+   * table" (the grid has "onSaveRow"), and for a cell edited by a press
+   * ("editOnClick" is true and the grid has "onSaveCell").
+   */
+  editor?: DataGridColumnEditor<Row>;
+  /**
+   * true: a press on a cell of this column edits it in place, and the grid
+   * saves the value with "onSaveCell". An app gives false to a person who may
+   * not edit.
+   */
+  editOnClick?: boolean;
+  /** false for a record whose cell cannot be edited, for example an archived record. When missing: every record. */
+  canEdit?: (row: Row) => boolean;
+  /** Turns on the filter of this column: a small button in its header opens a panel with the choices or a text field. */
+  filter?: DataGridColumnFilter<Row>;
+};
+
+/**
+ * The items inside each row, for example the options of a group. The row gets
+ * an arrow that shows, right under it, a small table with its own columns.
+ * "SubRow" is the type of one item.
+ *
+ * Of a column of the items, these fields are used: "id", "header", "cell",
+ * "align", "editor", "editOnClick" and "canEdit". The items have no search,
+ * no sort, no filter and no menu of the columns.
+ */
+export type DataGridSubRows<Row, SubRow> = {
+  /** The name of the items in the plural, for the name of the arrow and of the inner table, for example "options". */
+  label: string;
+  /** The items of a record, in the order they are shown. */
+  getRows: (row: Row) => readonly SubRow[];
+  /** The columns of the inner table. */
+  columns: readonly DataGridColumn<SubRow>[];
+  /** A value no other item of the same record has, for example its id. */
+  getRowKey: (subRow: SubRow) => string | number;
+  /** The name of the item for a screen reader, for example in the name of a cell that is edited. */
+  getRowLabel: (subRow: SubRow) => string;
+  /** Saves one cell of an item, of a column with "editOnClick". It works as "onSaveCell" of the grid, and also receives the record. */
+  onSaveCell?: (row: Row, subRow: SubRow, columnId: string, value: DataGridCellValue) => Promise<void>;
+  /** The buttons of the last column of an item. */
+  rowActions?: (row: Row, subRow: SubRow) => ReactNode;
+  /** Content under the items of a record, for example a field that adds an item. */
+  footer?: (row: Row) => ReactNode;
+  /** The message of a record with no item. When missing: "labels.noSubRows". */
+  emptyMessage?: ReactNode;
 };
 
 /** A block of rows with its own header row, for example the products of one category. */
@@ -49,10 +153,22 @@ export type DataGridGroup<Row> = {
 /** The column the rows are sorted by and the direction, or null when the rows are in the order the app gave. */
 export type DataGridSort = { columnId: string; descending: boolean } | null;
 
-/** What a person changed in the grid: the search text, the sort, the page and the number of rows of a page. */
+/** What a person chose in the filter of one column: the checked values of a list of choices, or the text of a text filter. */
+export type DataGridFilterValue = readonly string[] | string;
+
+/**
+ * The filters a person changed, by the "id" of the column. A column that is
+ * not in the object has its default: the "defaultValues" of a list of choices,
+ * or no text. An empty list means that a person unchecked every choice of a
+ * filter that has defaults.
+ */
+export type DataGridFilters = Record<string, DataGridFilterValue>;
+
+/** What a person changed in the grid: the search text, the sort, the filters, the page and the number of rows of a page. */
 export type DataGridState = {
   search: string;
   sort: DataGridSort;
+  filters: DataGridFilters;
   /** The page that is shown. The first page is 1. */
   page: number;
   pageSize: number;
@@ -62,9 +178,9 @@ export type DataGridState = {
 export type DataGridLabels = {
   /** The name of the column of the buttons of each row. Only a screen reader says it. */
   actions: string;
-  /** The button that empties the search field. */
+  /** The button that empties the search field and puts every filter back to its default. */
   clearFilters: string;
-  /** The message when the search finds no row. */
+  /** The message when the search and the filters find no row. */
   noResults: string;
   /** The message while "loading" is true. */
   loading: string;
@@ -92,6 +208,58 @@ export type DataGridLabels = {
   previousPage: string;
   /** The name of the button of the page after. */
   nextPage: string;
+  /**
+   * The name of the button that opens the filter of a column, and of its
+   * panel. It receives the header of the column, and true while the filter is
+   * not the default of the column.
+   */
+  filterColumn: (columnHeader: string, isActive: boolean) => string;
+  /** The name of the list of choices of a filter, for a screen reader. It receives the header of the column. */
+  filterChoices: (columnHeader: string) => string;
+  /** The button of a filter that checks every choice. */
+  filterSelectAll: string;
+  /** The button of a filter that unchecks every choice. */
+  filterClear: string;
+  /** The placeholder of the text field of a text filter. */
+  filterContains: string;
+  /** The name of a cell that can be edited, for a screen reader: the header of its column and the label of its record. */
+  cellLabel: (columnHeader: string, rowLabel: string) => string;
+  /** The start of the name of the button of a cell that can be edited. Only a screen reader says it. It receives the result of cellLabel. */
+  editCell: (cellLabel: string) => string;
+  /** The text of a cell while the app saves its value. */
+  saving: string;
+  /** The error text of a cell when the app gives none. */
+  saveFailed: string;
+  /** The choice a select shows when the record has a value that is not one of its choices. */
+  selectPlaceholder: string;
+  /** The button that turns on the mode "Edit table", where every cell with an editor is a field. */
+  editTable: string;
+  /** The status of the mode "Edit table" while no row is changed. */
+  noChanges: string;
+  /** The status of the mode "Edit table": how many rows are changed. */
+  changedRows: (count: number) => string;
+  /** The button that leaves the mode "Edit table" and gives up every change. */
+  cancelEditing: string;
+  /** The button that saves the changed rows. It receives how many rows are changed. */
+  saveChanges: (count: number) => string;
+  /** The text of that button while the app saves the rows. */
+  savingChanges: string;
+  /** The error of a row that the app refused, shown under the row. It receives the label of the record and the error text. */
+  rowError: (rowLabel: string, errorMessage: string) => string;
+  /** The name of the arrow of a row whose items are hidden. It receives "subRows.label", the label of the record and the number of its items. */
+  showSubRows: (subRowsLabel: string, rowLabel: string, count: number) => string;
+  /** The name of the arrow of a row whose items are shown. */
+  hideSubRows: (subRowsLabel: string, rowLabel: string, count: number) => string;
+  /** The name of the inner table with the items of a record, for a screen reader. It receives "subRows.label" and the label of the record. */
+  subRowsCaption: (subRowsLabel: string, rowLabel: string) => string;
+  /** The message of a record with no item, when "subRows.emptyMessage" is missing. */
+  noSubRows: string;
+  /** The text of the button that opens the menu of the columns. */
+  columns: string;
+  /** The title of the list of columns in that menu. */
+  visibleColumns: string;
+  /** The button of that menu that goes back to the columns the screen starts with. */
+  resetColumns: string;
 };
 
 /**

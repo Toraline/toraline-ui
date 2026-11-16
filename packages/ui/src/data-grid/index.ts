@@ -3,10 +3,18 @@ export type { DataGridProps } from "./DataGrid.js";
 export { dataGridPageSizes } from "./data-grid-options.js";
 export type {
   DataGridCheckboxProps,
+  DataGridCellValue,
   DataGridColumn,
+  DataGridColumnEditor,
+  DataGridColumnFilter,
+  DataGridFilters,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridOption,
+  DataGridRowChanges,
   DataGridSelectProps,
   DataGridSort,
   DataGridState,
+  DataGridSubRows,
 } from "./data-grid-options.js";

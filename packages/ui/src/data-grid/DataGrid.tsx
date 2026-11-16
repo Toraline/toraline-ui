@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ComponentProps, ElementType, ReactNode } from "react";
 import { Button } from "../button/index.js";
 import { CheckboxControl } from "../checkbox/index.js";
@@ -18,16 +18,25 @@ import {
   ChevronsUpDownIcon,
   SearchIcon,
 } from "./DataGridIcons.js";
+import { DataGridColumnFilter } from "./DataGridColumnFilter.js";
+import { DataGridColumnsMenu } from "./DataGridColumnsMenu.js";
+import { DataGridCellEditor } from "./DataGridCellEditor.js";
+import { DataGridEditableCell } from "./DataGridEditableCell.js";
+import { DataGridSubRowsTable, DataGridSubRowsToggle } from "./DataGridSubRows.js";
 import { dataGridPageSizes } from "./data-grid-options.js";
 import type {
+  DataGridCellValue,
   DataGridCheckboxProps,
   DataGridColumn,
+  DataGridFilterValue,
   DataGridGroup,
   DataGridLabels,
+  DataGridRowChanges,
   DataGridSelectProps,
   DataGridState,
+  DataGridSubRows,
 } from "./data-grid-options.js";
-import { nextSort, searchAndSortRows } from "./data-grid-rows.js";
+import { nextSort, searchAndSortRows, withFilterValue } from "./data-grid-rows.js";
 
 /*
  * The classes are the ones of the DataGrid of the app Intraweb
@@ -52,6 +61,30 @@ const defaultLabels: DataGridLabels = {
   pageOf: (page, pageCount) => `${page} of ${pageCount}`,
   previousPage: "Previous page",
   nextPage: "Next page",
+  filterColumn: (columnHeader, isActive) => `Filter ${columnHeader}${isActive ? " (filter on)" : ""}`,
+  filterChoices: (columnHeader) => `Show ${columnHeader}`,
+  filterSelectAll: "Select all",
+  filterClear: "Clear",
+  filterContains: "Contains…",
+  cellLabel: (columnHeader, rowLabel) => `${columnHeader} — ${rowLabel}`,
+  editCell: (cellLabel) => `Edit ${cellLabel}:`,
+  saving: "Saving…",
+  saveFailed: "Could not save.",
+  selectPlaceholder: "Select…",
+  editTable: "Edit table",
+  noChanges: "No changes",
+  changedRows: (count) => `${count} ${count === 1 ? "row changed" : "rows changed"}`,
+  cancelEditing: "Cancel",
+  saveChanges: (count) => `Save changes (${count})`,
+  savingChanges: "Saving…",
+  rowError: (rowLabel, errorMessage) => `${rowLabel}: ${errorMessage}`,
+  showSubRows: (subRowsLabel, rowLabel, count) => `Show ${subRowsLabel} of ${rowLabel} (${count})`,
+  hideSubRows: (subRowsLabel, rowLabel, count) => `Hide ${subRowsLabel} of ${rowLabel} (${count})`,
+  subRowsCaption: (subRowsLabel, rowLabel) => `${subRowsLabel} of ${rowLabel}`,
+  noSubRows: "No items.",
+  columns: "Columns",
+  visibleColumns: "Visible columns",
+  resetColumns: "Back to default",
 };
 
 /**
@@ -72,6 +105,9 @@ const sortIconClass =
 /** The text style "label" of Intraweb, written as the classes of its values. */
 const labelTextClass = "font-heading text-sm/5 font-medium";
 
+/** A row with a changed cell in the mode "Edit table" has the background of a warning. The row of the open record keeps its own. */
+const changedRowClass = "bg-warning";
+
 /** A row whose checkbox is checked has the background of a selected part, also under the pointer. */
 const checkedRowClass = "data-checked:bg-selected";
 
@@ -87,7 +123,7 @@ function DefaultSelect(props: DataGridSelectProps) {
   return <SelectControl {...props} />;
 }
 
-export type DataGridProps<Row> = {
+export type DataGridProps<Row, SubRow = never> = {
   /** The name of the table. A screen reader says it; it is not shown. */
   caption: string;
   /** The columns, in the order they are shown. */
@@ -97,7 +133,7 @@ export type DataGridProps<Row> = {
   /**
    * Shows the rows in blocks, each with a header row, in the order given.
    * "rows" is still the full list. With groups there is no search, no sort, no
-   * selection and no pages: the order is the order of the groups.
+   * filter, no selection and no pages: the order is the order of the groups.
    */
   groups?: readonly DataGridGroup<Row>[];
   /** A value no other record has, for example its id. */
@@ -112,6 +148,20 @@ export type DataGridProps<Row> = {
   rowProps?: (row: Row) => ComponentProps<"tr">;
   /** Content shown in a row of its own under the row of a record. null or undefined: no extra row. */
   renderExpanded?: (row: Row) => ReactNode;
+  /**
+   * The items inside each row, for example the options of a group. A row gets
+   * an arrow before its first cell, which shows the items in a small table
+   * right under the row.
+   */
+  subRows?: DataGridSubRows<Row, SubRow>;
+  /**
+   * Shows another view in the place of the table, for example a calendar. It
+   * receives the rows after the search and the filters. The search field and
+   * the toolbar stay above it, and the filters of the columns move to the
+   * toolbar, as buttons with the name of their column. With a view there is no
+   * selection, no pages and no menu of the columns. Give undefined to show the table.
+   */
+  renderView?: (rows: Row[]) => ReactNode;
   /** The filters and the buttons of the screen, shown above the table, after the search field. */
   toolbar?: ReactNode;
   /** Turns on the search field, which looks in the columns with "searchValue". */
@@ -122,6 +172,40 @@ export type DataGridProps<Row> = {
    * returns. "clear" clears the selection, for example after an action ran.
    */
   selection?: { actions: (rows: Row[], clear: () => void) => ReactNode };
+  /**
+   * Saves one cell of a column with "editOnClick". It receives the record, the
+   * "id" of the column and the new value. While the promise is pending, the
+   * cell shows "labels.saving". When it is rejected, the field stays open with
+   * the error text.
+   */
+  onSaveCell?: (row: Row, columnId: string, value: DataGridCellValue) => Promise<void>;
+  /**
+   * Turns on the mode "Edit table": a button above the table turns every cell
+   * of a column with "editor" into a field, and another button saves the
+   * changed rows. It is called once for each changed row, with the record and
+   * only its changed cells. A row whose promise is rejected stays changed,
+   * with the error text under it.
+   */
+  onSaveRow?: (row: Row, changes: DataGridRowChanges) => Promise<void>;
+  /**
+   * The text for an error that "onSaveCell" or "onSaveRow" was rejected with, for example the
+   * message of the API of the app. When missing: the message of an Error, or
+   * "labels.saveFailed".
+   */
+  getSaveErrorMessage?: (error: unknown) => string;
+  /**
+   * Turns on the menu "Columns", where a person hides and shows the columns
+   * that are not "required". A column with "defaultHidden" starts hidden.
+   */
+  columnsMenu?: boolean;
+  /**
+   * The "id" of each hidden column, when the app keeps the choice, for example
+   * in the storage of the browser. When missing: the grid keeps the choice
+   * itself, and starts with the columns that have "defaultHidden" hidden.
+   */
+  hiddenColumns?: readonly string[];
+  /** Called with the "id" of each hidden column after a person changes the columns in the menu. */
+  onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
   /** Turns on the pages. The number of rows of a page, until the person chooses another. */
   pageSize?: number;
   /** The numbers of rows a person can choose for a page. When missing: 10, 25, 50 and 100. */
@@ -130,9 +214,9 @@ export type DataGridProps<Row> = {
   emptyMessage?: ReactNode;
   /** true while the records are loading: the table has aria-busy="true" and shows the text of "labels.loading" in the place of the rows. */
   loading?: boolean;
-  /** The search text, the sort, the page and the number of rows of a page the grid starts with, for example read from the address of the page. */
+  /** The search text, the sort, the filters, the page and the number of rows of a page the grid starts with, for example read from the address of the page. */
   defaultState?: Partial<DataGridState>;
-  /** Called after a person changes the search text, the sort, the page or the number of rows of a page, for example to write them in the address of the page. */
+  /** Called after a person changes the search text, the sort, a filter, the page or the number of rows of a page, for example to write them in the address of the page. */
   onStateChange?: (state: DataGridState) => void;
   /** The language that orders the texts of a sort, for example "pt-BR". When missing: the language of the browser. */
   locale?: string;
@@ -147,21 +231,23 @@ export type DataGridProps<Row> = {
 };
 
 /**
- * A table of records with a search field, a sort by column, pages, a selection
- * with actions for the selected rows, a footer row with totals, and groups of rows.
+ * A table of records with a search field, a sort and a filter by column, pages,
+ * a selection with actions for the selected rows, a footer row with totals, and
+ * groups of rows.
  * Every feature is turned on by its prop or by a field of a column.
  *
  * - The app gives every record in "rows". The grid searches, sorts and cuts
  *   them into pages in the browser. It loads no data.
  * - The table is a DataTable with "stackOnMobile": on a narrow screen each row is a block.
- * - Keyboard: every control is a native button, field or checkbox.
+ * - Keyboard: every control is a native button, field or checkbox. The panel
+ *   of a filter keeps the Tab key inside it, and Escape closes it.
  * - Screen reader: the header cell of a column that can be sorted has
  *   "aria-sort". The bar of the selected rows and the page controls are named
  *   regions. The row of the open record has aria-current="true".
  */
-export function DataGrid<Row>({
+export function DataGrid<Row, SubRow = never>({
   caption,
-  columns,
+  columns: allColumns,
   rows,
   groups,
   getRowKey,
@@ -170,9 +256,17 @@ export function DataGrid<Row>({
   rowActions,
   rowProps,
   renderExpanded,
+  subRows,
+  renderView,
   toolbar,
   search,
   selection,
+  onSaveCell,
+  onSaveRow,
+  getSaveErrorMessage,
+  columnsMenu = false,
+  hiddenColumns,
+  onHiddenColumnsChange,
   pageSize,
   pageSizeOptions = dataGridPageSizes,
   emptyMessage = "No records.",
@@ -184,30 +278,61 @@ export function DataGrid<Row>({
   checkboxComponent: Checkbox = DefaultCheckbox,
   selectComponent: Select = DefaultSelect,
   className,
-}: DataGridProps<Row>) {
+}: DataGridProps<Row, SubRow>) {
   const labels = { ...defaultLabels, ...givenLabels };
   const [state, setState] = useState<DataGridState>(() => ({
     search: defaultState?.search ?? "",
     sort: defaultState?.sort ?? null,
+    filters: defaultState?.filters ?? {},
     page: Math.max(1, defaultState?.page ?? 1),
     pageSize: defaultState?.pageSize ?? pageSize ?? dataGridPageSizes[1],
   }));
   const [checkedKeys, setCheckedKeys] = useState<Set<RowKey>>(new Set());
+  // null: a person did not change the columns, so they are the ones the columns ask for.
+  const [ownHiddenColumns, setOwnHiddenColumns] = useState<readonly string[] | null>(null);
+  // The rows whose items are shown.
+  const [openRowKeys, setOpenRowKeys] = useState<Set<RowKey>>(new Set());
+  // The mode "Edit table": on or off, the changed cells of each row, the error of each refused row, and whether the app saves now.
+  const [isEditingTable, setIsEditingTable] = useState(false);
+  const [rowDrafts, setRowDrafts] = useState<Map<RowKey, DataGridRowChanges>>(new Map());
+  const [rowErrors, setRowErrors] = useState<Map<RowKey, string>>(new Map());
+  const [isSavingRows, setIsSavingRows] = useState(false);
   const selectAllRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Which part of the mode "Edit table" gets the focus after the next render.
+  const focusAfterRenderRef = useRef<"first-field" | "edit-button" | "save-button" | null>(null);
+  const gridId = useId();
+
+  const defaultHiddenColumnIds = allColumns
+    .filter((column) => column.defaultHidden && !column.required)
+    .map((column) => column.id);
+  // A required column is never hidden, and the "id" of a column that no longer exists is left out.
+  const hiddenColumnIds = allColumns
+    .filter((column) => !column.required)
+    .map((column) => column.id)
+    .filter((columnId) => (hiddenColumns ?? ownHiddenColumns ?? defaultHiddenColumnIds).includes(columnId));
+  const areColumnsDefault = hiddenColumnIds.join("\n") === defaultHiddenColumnIds.join("\n");
+  // From here on, "columns" is only the columns that are shown. A hidden column does not filter and does not sort.
+  const columns = allColumns.filter((column) => !hiddenColumnIds.includes(column.id));
 
   const isFlat = groups === undefined;
   // Without the prop "search" there is no field to empty, so a search text of defaultState does nothing.
   const searchText = search ? state.search : "";
-  const foundRows = isFlat ? searchAndSortRows(rows, columns, searchText, state.sort, locale) : [...rows];
+  const foundRows = isFlat
+    ? searchAndSortRows(rows, columns, searchText, state.sort, locale, state.filters)
+    : [...rows];
   const isPaginated = isFlat && pageSize !== undefined;
   const pageCount = isPaginated ? Math.max(1, Math.ceil(foundRows.length / state.pageSize)) : 1;
   const page = Math.min(state.page, pageCount);
   const pageRows = isPaginated
     ? foundRows.slice((page - 1) * state.pageSize, page * state.pageSize)
     : foundRows;
-  const hasFilters = isFlat && searchText !== "";
+  // A filter that is the default of its column is not in "state.filters", so it does not count.
+  const hasChangedFilters = columns.some((column) => column.filter !== undefined && column.id in state.filters);
+  const hasFilters = isFlat && (searchText !== "" || hasChangedFilters);
 
-  const isSelectable = isFlat && selection !== undefined && !loading;
+  const hasView = isFlat && renderView !== undefined;
+  const isSelectable = isFlat && selection !== undefined && !loading && !hasView && !isEditingTable;
   const selectedRows = isSelectable ? foundRows.filter((row) => checkedKeys.has(getRowKey(row))) : [];
   const areAllSelected = foundRows.length > 0 && selectedRows.length === foundRows.length;
   const areSomeSelected = selectedRows.length > 0 && !areAllSelected;
@@ -218,7 +343,39 @@ export function DataGrid<Row>({
     }
   }, [areSomeSelected]);
 
-  const hasActions = rowActions !== undefined;
+  // The buttons of a row are hidden in the mode "Edit table".
+  const hasActions = rowActions !== undefined && !isEditingTable;
+  const changedRowList = rows.filter((row) => rowDrafts.has(getRowKey(row)));
+
+  /**
+   * The mode "Edit table" removes the button that had the focus (the button
+   * that turns it on, or the buttons that leave it) and disables the button
+   * that saves. After the render, the focus goes to the part that took its place.
+   */
+  useEffect(() => {
+    const target = focusAfterRenderRef.current;
+    const root = rootRef.current;
+    if (target === null || root === null || isSavingRows) {
+      return;
+    }
+    focusAfterRenderRef.current = null;
+    // The focus moves only when it was lost. When a person already moved it to another element, it stays there.
+    const active = document.activeElement;
+    const isLost = active === null || active === document.body || active.matches(":disabled");
+    if (!isLost) {
+      return;
+    }
+    // The first field of the table, or the button "Cancel" when no cell of the page can be edited.
+    const firstField =
+      root.querySelector<HTMLElement>("tbody input:not([disabled]), tbody select:not([disabled])") ??
+      root.querySelector<HTMLElement>("[data-slot=cancel-editing]");
+    const elements = {
+      "first-field": firstField,
+      "edit-button": root.querySelector<HTMLElement>("[data-slot=edit-table]"),
+      "save-button": root.querySelector<HTMLElement>("[data-slot=save-changes]"),
+    };
+    elements[target]?.focus();
+  });
   const hasFooter = columns.some((column) => column.footer);
   const columnCount = columns.length + (hasActions ? 1 : 0) + (isSelectable ? 1 : 0);
   const firstColumnId = columns[0]?.id;
@@ -233,11 +390,47 @@ export function DataGrid<Row>({
   }
 
   function clearFilters() {
-    update({ search: "", page: 1 });
+    update({ search: "", filters: {}, page: 1 });
+  }
+
+  function setHiddenColumns(nextHiddenColumnIds: string[]) {
+    setOwnHiddenColumns(nextHiddenColumnIds);
+    onHiddenColumnsChange?.(nextHiddenColumnIds);
+  }
+
+  function toggleColumn(columnId: string) {
+    const isHidden = hiddenColumnIds.includes(columnId);
+    // The list keeps the order of the columns.
+    setHiddenColumns(
+      allColumns
+        .map((column) => column.id)
+        .filter((id) => (id === columnId ? !isHidden : hiddenColumnIds.includes(id))),
+    );
+  }
+
+  function resetColumns() {
+    setOwnHiddenColumns(null);
+    onHiddenColumnsChange?.(defaultHiddenColumnIds);
+  }
+
+  function setFilter(column: DataGridColumn<Row>, value: DataGridFilterValue) {
+    update({ filters: withFilterValue(column, state.filters, value), page: 1 });
   }
 
   function clearSelection() {
     setCheckedKeys(new Set());
+  }
+
+  function toggleSubRows(key: RowKey) {
+    setOpenRowKeys((currentKeys) => {
+      const nextKeys = new Set(currentKeys);
+      if (nextKeys.has(key)) {
+        nextKeys.delete(key);
+      } else {
+        nextKeys.add(key);
+      }
+      return nextKeys;
+    });
   }
 
   function toggleRow(row: Row) {
@@ -251,6 +444,108 @@ export function DataGrid<Row>({
       }
       return nextKeys;
     });
+  }
+
+  function setRowDraft(row: Row, column: DataGridColumn<Row>, value: DataGridCellValue) {
+    const key = getRowKey(row);
+    setRowDrafts((currentDrafts) => {
+      const nextDrafts = new Map(currentDrafts);
+      const otherChanges = Object.fromEntries(
+        Object.entries(nextDrafts.get(key) ?? {}).filter(([columnId]) => columnId !== column.id),
+      );
+      // A value that is the saved one again is not a change.
+      const changes = value === column.editor?.value(row) ? otherChanges : { ...otherChanges, [column.id]: value };
+      if (Object.keys(changes).length === 0) {
+        nextDrafts.delete(key);
+      } else {
+        nextDrafts.set(key, changes);
+      }
+      return nextDrafts;
+    });
+  }
+
+  function startEditingTable() {
+    focusAfterRenderRef.current = "first-field";
+    setIsEditingTable(true);
+  }
+
+  function stopEditingTable() {
+    focusAfterRenderRef.current = "edit-button";
+    setIsEditingTable(false);
+    setRowDrafts(new Map());
+    setRowErrors(new Map());
+  }
+
+  async function saveChangedRows() {
+    if (!onSaveRow || isSavingRows) {
+      return;
+    }
+    setIsSavingRows(true);
+    const remainingDrafts = new Map(rowDrafts);
+    const nextErrors = new Map<RowKey, string>();
+    // One row after the other, so the app's API gets one request at a time, as in Intraweb.
+    for (const row of changedRowList) {
+      const key = getRowKey(row);
+      try {
+        await onSaveRow(row, rowDrafts.get(key) ?? {});
+        remainingDrafts.delete(key);
+      } catch (error) {
+        nextErrors.set(key, saveErrorMessage(error));
+      }
+    }
+    setIsSavingRows(false);
+    if (remainingDrafts.size === 0) {
+      stopEditingTable();
+    } else {
+      focusAfterRenderRef.current = "save-button";
+      setRowDrafts(remainingDrafts);
+      setRowErrors(nextErrors);
+    }
+  }
+
+  function saveErrorMessage(error: unknown): string {
+    if (getSaveErrorMessage) {
+      return getSaveErrorMessage(error);
+    }
+    return error instanceof Error && error.message !== "" ? error.message : labels.saveFailed;
+  }
+
+  function renderCell(row: Row, column: DataGridColumn<Row>) {
+    const editor = column.editor;
+    const canEditRow = column.canEdit?.(row) ?? true;
+    if (isEditingTable) {
+      if (editor === undefined || !canEditRow) {
+        return column.cell(row);
+      }
+      const changes = rowDrafts.get(getRowKey(row));
+      const isChanged = changes !== undefined && column.id in changes;
+      return (
+        <DataGridCellEditor
+          label={labels.cellLabel(column.header, getRowLabel(row))}
+          editor={editor}
+          value={changes?.[column.id] ?? editor.value(row)}
+          changed={isChanged}
+          disabled={isSavingRows}
+          selectPlaceholder={labels.selectPlaceholder}
+          onChange={(value) => setRowDraft(row, column, value)}
+        />
+      );
+    }
+    const isEditable = column.editOnClick === true && canEditRow;
+    if (!isEditable || editor === undefined || onSaveCell === undefined) {
+      return column.cell(row);
+    }
+    return (
+      <DataGridEditableCell
+        label={labels.cellLabel(column.header, getRowLabel(row))}
+        display={column.cell(row)}
+        editor={editor}
+        value={editor.value(row)}
+        onSave={(value) => onSaveCell(row, column.id, value)}
+        getSaveErrorMessage={saveErrorMessage}
+        labels={labels}
+      />
+    );
   }
 
   function renderHeader(column: DataGridColumn<Row>) {
@@ -283,6 +578,14 @@ export function DataGrid<Row>({
           ) : (
             column.header
           )}
+          {isFlat && column.filter ? (
+            <DataGridColumnFilter
+              column={column}
+              filters={state.filters}
+              onChange={(value) => setFilter(column, value)}
+              labels={labels}
+            />
+          ) : null}
         </div>
       </Th>
     );
@@ -290,17 +593,26 @@ export function DataGrid<Row>({
 
   function renderRow(row: Row) {
     const key = getRowKey(row);
-    const expanded = renderExpanded?.(row);
+    // In the mode "Edit table" a row has no extra content, no items and no props of the app (a drag).
+    const expanded = isEditingTable ? null : renderExpanded?.(row);
     const isChecked = isSelectable && checkedKeys.has(key);
-    const { className: rowClassName, ...otherRowProps } = rowProps?.(row) ?? {};
+    const subRowsId = `${gridId}-${key}-sub-rows`;
+    const hasSubRows = subRows !== undefined && !isEditingTable;
+    const areSubRowsOpen = hasSubRows && openRowKeys.has(key);
+    const rowLabel = getRowLabel(row);
+    const { className: rowClassName, ...otherRowProps } = (isEditingTable ? undefined : rowProps?.(row)) ?? {};
+    const isOpenRecord = isRowSelected?.(row) ?? false;
+    const hasChanges = rowDrafts.has(key);
+    const rowError = rowErrors.get(key);
     return [
       <Tr
         key={key}
         {...otherRowProps}
-        hoverable
-        selected={isRowSelected?.(row) ?? false}
+        hoverable={!hasChanges}
+        selected={isOpenRecord}
         data-checked={isChecked ? "" : undefined}
-        className={classNames(checkedRowClass, rowClassName)}
+        data-changed={hasChanges ? "true" : undefined}
+        className={classNames(checkedRowClass, hasChanges && !isOpenRecord && changedRowClass, rowClassName)}
       >
         {isSelectable ? (
           <Td className="w-10 pr-0">
@@ -313,11 +625,41 @@ export function DataGrid<Row>({
         ) : null}
         {columns.map((column) => (
           <Td key={column.id} data-label={column.header} align={column.align}>
-            {column.cell(row)}
+            {hasSubRows && subRows && column.id === firstColumnId ? (
+              <div className="flex items-start gap-1">
+                <DataGridSubRowsToggle
+                  aria-label={(areSubRowsOpen ? labels.hideSubRows : labels.showSubRows)(
+                    subRows.label,
+                    rowLabel,
+                    subRows.getRows(row).length,
+                  )}
+                  open={areSubRowsOpen}
+                  controls={subRowsId}
+                  onToggle={() => toggleSubRows(key)}
+                />
+                <div className="min-w-0">{renderCell(row, column)}</div>
+              </div>
+            ) : (
+              renderCell(row, column)
+            )}
           </Td>
         ))}
         {hasActions ? <Td className="w-12 text-right whitespace-nowrap">{rowActions(row)}</Td> : null}
       </Tr>,
+      areSubRowsOpen && subRows ? (
+        <tr key={`${key}-sub-rows`} data-slot="sub-rows-row">
+          <Td colSpan={columnCount} className="bg-subtle py-3 pl-12">
+            <DataGridSubRowsTable
+              id={subRowsId}
+              parent={row}
+              parentLabel={rowLabel}
+              subRows={subRows}
+              getSaveErrorMessage={saveErrorMessage}
+              labels={labels}
+            />
+          </Td>
+        </tr>
+      ) : null,
       expanded !== null && expanded !== undefined && expanded !== false ? (
         <tr key={`${key}-expanded`} data-slot="expanded-row">
           <Td colSpan={columnCount} className="bg-subtle">
@@ -325,13 +667,21 @@ export function DataGrid<Row>({
           </Td>
         </tr>
       ) : null,
+      rowError === undefined ? null : (
+        <tr key={`${key}-error`} data-slot="row-error">
+          <Td colSpan={columnCount} className="bg-error text-sm/5 text-danger">
+            <span role="alert">{labels.rowError(rowLabel, rowError)}</span>
+          </Td>
+        </tr>
+      ),
     ];
   }
 
   function renderGroup(group: DataGridGroup<Row>) {
     const { className: headerClassName, ...otherHeaderProps } = group.headerProps ?? {};
+    const headerRowProps = isEditingTable ? {} : otherHeaderProps;
     return [
-      <tr key={`group-${group.key}`} {...otherHeaderProps} className={headerClassName} data-slot="group-header">
+      <tr key={`group-${group.key}`} {...headerRowProps} className={headerClassName} data-slot="group-header">
         <th
           scope="colgroup"
           colSpan={columnCount}
@@ -342,7 +692,7 @@ export function DataGrid<Row>({
               {group.title}{" "}
               <span className="font-body font-normal text-tertiary">({group.rows.length})</span>
             </span>
-            {group.actions ? <div className="flex gap-1 font-normal">{group.actions}</div> : null}
+            {group.actions && !isEditingTable ? <div className="flex gap-1 font-normal">{group.actions}</div> : null}
           </div>
         </th>
       </tr>,
@@ -377,30 +727,99 @@ export function DataGrid<Row>({
   }
 
   const hasSearchField = isFlat && search !== undefined;
-  const hasToolbar = hasSearchField || (toolbar !== undefined && toolbar !== null) || hasFilters;
+  const hasColumnsMenu =
+    columnsMenu && !hasView && !isEditingTable && allColumns.some((column) => !column.required);
+  const hasEditTable = onSaveRow !== undefined && !hasView && allColumns.some((column) => column.editor !== undefined);
+  // A view has no header cells, so the filters of the columns are in the toolbar.
+  const viewFilterColumns = hasView ? columns.filter((column) => column.filter !== undefined) : [];
+  const hasToolbar =
+    hasSearchField ||
+    (toolbar !== undefined && toolbar !== null) ||
+    hasFilters ||
+    hasColumnsMenu ||
+    hasEditTable ||
+    viewFilterColumns.length > 0;
 
   return (
-    <div className={classNames("space-y-3", className)} data-slot="data-grid">
+    <div ref={rootRef} className={classNames("space-y-3", className)} data-slot="data-grid">
       {hasToolbar ? (
-        <div className="flex flex-wrap items-center gap-2" data-slot="toolbar">
-          {hasSearchField ? (
-            <div className="w-full sm:w-80">
-              <TextInput
-                type="search"
-                icon={SearchIcon}
-                size="sm"
-                aria-label={search.placeholder}
-                placeholder={search.placeholder}
-                value={state.search}
-                onChange={(event) => update({ search: event.target.value, page: 1 })}
+        <div className="flex flex-wrap items-center justify-between gap-2" data-slot="toolbar">
+          <div className="flex flex-1 flex-wrap items-center gap-2">
+            {hasSearchField ? (
+              <div className="w-full sm:w-80">
+                <TextInput
+                  type="search"
+                  icon={SearchIcon}
+                  size="sm"
+                  aria-label={search.placeholder}
+                  placeholder={search.placeholder}
+                  value={state.search}
+                  onChange={(event) => update({ search: event.target.value, page: 1 })}
+                />
+              </div>
+            ) : null}
+            {toolbar}
+            {viewFilterColumns.map((column) => (
+              <DataGridColumnFilter
+                key={column.id}
+                column={column}
+                filters={state.filters}
+                onChange={(value) => setFilter(column, value)}
+                labels={labels}
+                labeled
               />
+            ))}
+            {hasFilters ? (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                {labels.clearFilters}
+              </Button>
+            ) : null}
+          </div>
+          {hasColumnsMenu || hasEditTable ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {hasColumnsMenu ? (
+                <DataGridColumnsMenu
+                  columns={allColumns}
+                  hiddenColumnIds={hiddenColumnIds}
+                  isDefault={areColumnsDefault}
+                  onToggle={toggleColumn}
+                  onReset={resetColumns}
+                  labels={labels}
+                />
+              ) : null}
+              {hasEditTable && !isEditingTable ? (
+                <Button
+                  variant="secondary"
+                  disabled={rows.length === 0}
+                  onClick={startEditingTable}
+                  data-slot="edit-table"
+                >
+                  {labels.editTable}
+                </Button>
+              ) : null}
+              {hasEditTable && isEditingTable ? (
+                <>
+                  <span className="text-sm/5 text-secondary" role="status">
+                    {changedRowList.length === 0 ? labels.noChanges : labels.changedRows(changedRowList.length)}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    disabled={isSavingRows}
+                    onClick={stopEditingTable}
+                    data-slot="cancel-editing"
+                  >
+                    {labels.cancelEditing}
+                  </Button>
+                  <Button
+                    disabled={isSavingRows || changedRowList.length === 0}
+                    onClick={() => void saveChangedRows()}
+                    data-slot="save-changes"
+                  >
+                    {isSavingRows ? labels.savingChanges : labels.saveChanges(changedRowList.length)}
+                  </Button>
+                </>
+              ) : null}
             </div>
-          ) : null}
-          {toolbar}
-          {hasFilters ? (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              {labels.clearFilters}
-            </Button>
           ) : null}
         </div>
       ) : null}
@@ -424,51 +843,55 @@ export function DataGrid<Row>({
         </div>
       ) : null}
 
-      <DataTable caption={caption} stackOnMobile aria-busy={loading ? "true" : undefined}>
-        <thead>
-          <tr>
-            {isSelectable ? (
-              <Th className="w-10 pr-0">
-                <Checkbox
-                  ref={selectAllRef}
-                  aria-label={labels.selectAll}
-                  checked={areAllSelected}
-                  disabled={foundRows.length === 0}
-                  onChange={() =>
-                    setCheckedKeys(areAllSelected ? new Set() : new Set(foundRows.map(getRowKey)))
-                  }
-                />
-              </Th>
-            ) : null}
-            {columns.map(renderHeader)}
-            {hasActions ? <ActionsTh label={labels.actions} /> : null}
-          </tr>
-        </thead>
-        <tbody>{renderBody()}</tbody>
-        {hasFooter && !loading && foundRows.length > 0 ? (
-          <tfoot>
-            <tr className="bg-subtle font-medium text-strong">
-              {isSelectable ? <Td className="border-t" /> : null}
-              {columns.map((column) => {
-                const firstCellText = column.id === firstColumnId ? labels.total : null;
-                return (
-                  <Td
-                    key={column.id}
-                    data-label={column.footer ? column.header : undefined}
-                    align={column.align}
-                    className="border-t text-strong"
-                  >
-                    {column.footer ? column.footer(foundRows) : firstCellText}
-                  </Td>
-                );
-              })}
-              {hasActions ? <Td className="border-t" /> : null}
-            </tr>
-          </tfoot>
-        ) : null}
-      </DataTable>
+      {hasView ? <div data-slot="view">{renderView(foundRows)}</div> : null}
 
-      {isPaginated && !loading && foundRows.length > 0 ? (
+      {hasView ? null : (
+        <DataTable caption={caption} stackOnMobile aria-busy={loading || isSavingRows ? "true" : undefined}>
+          <thead>
+            <tr>
+              {isSelectable ? (
+                <Th className="w-10 pr-0">
+                  <Checkbox
+                    ref={selectAllRef}
+                    aria-label={labels.selectAll}
+                    checked={areAllSelected}
+                    disabled={foundRows.length === 0}
+                    onChange={() =>
+                      setCheckedKeys(areAllSelected ? new Set() : new Set(foundRows.map(getRowKey)))
+                    }
+                  />
+                </Th>
+              ) : null}
+              {columns.map(renderHeader)}
+              {hasActions ? <ActionsTh label={labels.actions} /> : null}
+            </tr>
+          </thead>
+          <tbody>{renderBody()}</tbody>
+          {hasFooter && !loading && foundRows.length > 0 ? (
+            <tfoot>
+              <tr className="bg-subtle font-medium text-strong">
+                {isSelectable ? <Td className="border-t" /> : null}
+                {columns.map((column) => {
+                  const firstCellText = column.id === firstColumnId ? labels.total : null;
+                  return (
+                    <Td
+                      key={column.id}
+                      data-label={column.footer ? column.header : undefined}
+                      align={column.align}
+                      className="border-t text-strong"
+                    >
+                      {column.footer ? column.footer(foundRows) : firstCellText}
+                    </Td>
+                  );
+                })}
+                {hasActions ? <Td className="border-t" /> : null}
+              </tr>
+            </tfoot>
+          ) : null}
+        </DataTable>
+      )}
+
+      {isPaginated && !hasView && !loading && foundRows.length > 0 ? (
         <nav
           aria-label={labels.pagination}
           className="flex flex-wrap items-center justify-between gap-3 text-sm/5 text-secondary"

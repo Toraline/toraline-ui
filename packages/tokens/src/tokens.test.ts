@@ -295,3 +295,43 @@ test.each([
     expect(contrastRatio(darkTheme, foreground, background)).toBeGreaterThanOrEqual(3);
   },
 );
+
+/*
+ * TOR-1209: the parts of the DataGrid. Each text is on the background of a
+ * row at rest, of a row under the pointer and of a checked row.
+ */
+
+test.each([lightTheme, darkTheme])(
+  "TOR-1209, in the $name theme: the texts of the filter, of the menu of the columns and of a cell that is edited can be read (contrast of 4.5 or more)",
+  (theme) => {
+    const pairs: [ThemeTokenName, ThemeTokenName][] = [
+      // The name of the column on the labelled button of a filter that is on, at rest and under the pointer.
+      ["text-primary", "bg-primary-subtle"],
+      ["text-primary", "bg-primary-muted"],
+      // The 2 small buttons of the panel of a filter, and the title of the list of columns.
+      ["text-brand", "bg-surface"],
+      ["text-secondary", "bg-surface"],
+      ["text-tertiary", "bg-surface"],
+      // The error text of a cell, and "Saving…".
+      ["text-danger", "bg-surface"],
+      ["text-danger", "bg-subtle"],
+      ["text-danger", "bg-selected"],
+      ["text-secondary", "bg-subtle"],
+      ["text-secondary", "bg-selected"],
+      // The text a person types in a field with a changed value.
+      ["text-primary", "bg-warning"],
+      // The mode "Edit table": the cells of a changed row, and the error of a refused row.
+      ["text-body", "bg-warning"],
+      ["text-danger", "bg-error"],
+      // The content of a cell that can be edited, under the pointer.
+      ["text-body", "bg-muted"],
+      ["text-primary", "bg-muted"],
+    ];
+    for (const [foreground, background] of pairs) {
+      expect(
+        contrastRatio(theme, foreground, background),
+        `${foreground} on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  },
+);

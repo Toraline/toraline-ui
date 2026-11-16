@@ -64,7 +64,7 @@ export function ChevronLeftIcon(props: IconProps) {
   );
 }
 
-/** "chevron-right": the page after. */
+/** "chevron-right": the page after, and the rows inside a row that are hidden. */
 export function ChevronRightIcon(props: IconProps) {
   return (
     <Icon {...props}>
@@ -79,6 +79,36 @@ export function SearchIcon(props: IconProps) {
     <Icon {...props}>
       <path d="m21 21-4.34-4.34" />
       <circle cx="11" cy="11" r="8" />
+    </Icon>
+  );
+}
+
+/** "chevron-down": the rows inside a row are shown. */
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </Icon>
+  );
+}
+
+/** "pencil": the cell can be edited. */
+export function PencilIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+      <path d="m15 5 4 4" />
+    </Icon>
+  );
+}
+
+/** "list-filter": the filter of a column. */
+export function ListFilterIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 5h20" />
+      <path d="M6 12h12" />
+      <path d="M9 19h6" />
     </Icon>
   );
 }
